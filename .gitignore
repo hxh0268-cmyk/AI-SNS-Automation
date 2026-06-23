@@ -1,3 +1,8 @@
 .env
-logs/
+logs/*
+!logs/.gitkeep
 content/archive/
+content/draft/*
+!content/draft/.gitkeep
+content/reviewed/*
+!content/reviewed/.gitkeep
