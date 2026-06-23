@@ -33,6 +33,16 @@ mkdir -p "$LOG_DIR"
   npm run image-prompt
 
   echo ""
+  echo "--- generate-image 実行 ---"
+  # 画像生成用の最終プロンプトを作成
+  npm run generate-image
+
+  echo ""
+  echo "--- openai-image 実行 ---"
+  # OpenAI Images APIで画像を生成
+  npm run openai-image
+
+  echo ""
   echo "Daily AI SNS pipeline completed"
 } 2>&1 | tee -a "$LOG_FILE"
 
