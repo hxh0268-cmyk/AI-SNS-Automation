@@ -28,6 +28,11 @@ mkdir -p "$LOG_DIR"
   npm run gemini-review
 
   echo ""
+  echo "--- image-prompt 実行 ---"
+  # Instagram画像生成用プロンプトを作成
+  npm run image-prompt
+
+  echo ""
   echo "Daily AI SNS pipeline completed"
 } 2>&1 | tee -a "$LOG_FILE"
 

@@ -6,3 +6,4 @@ content/draft/*
 !content/draft/.gitkeep
 content/reviewed/*
 !content/reviewed/.gitkeep
+images/*.md

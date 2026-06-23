@@ -8,6 +8,8 @@
   "scripts": {
     "generate": "node src/generate_post.js",
     "review": "node src/review_with_openai.js",
-    "gemini-review": "node src/review_with_gemini.js"
+    "gemini-review": "node src/review_with_gemini.js",
+    "image-prompt": "node src/create_image_prompt.js",
+    "generate-image": "node src/generate_image.js"
   }
 }
