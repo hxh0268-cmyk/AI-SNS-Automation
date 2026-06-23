@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^2.9.0",
+    "dotenv": "^17.4.2",
+    "openai": "^6.44.0"
+  },
+  "scripts": {
+    "review": "node src/review_with_openai.js",
+    "gemini-review": "node src/review_with_gemini.js"
+  }
+}
