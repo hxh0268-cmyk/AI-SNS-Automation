@@ -6,6 +6,7 @@
     "openai": "^6.44.0"
   },
   "scripts": {
+    "generate": "node src/generate_post.js",
     "review": "node src/review_with_openai.js",
     "gemini-review": "node src/review_with_gemini.js"
   }
