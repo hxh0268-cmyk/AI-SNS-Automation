@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0",
+  "tool": "nano_banana_image_improvement",
+  "version": "v1.2.1",
+  "generatedAt": "2026-06-27T03:13:34.356Z",
+  "reviewFile": "tmp/image_review_test_below80.json",
+  "dryRun": false,
+  "threshold": 80,
+  "totalImages": 5,
+  "targetCount": 1,
+  "skippedCount": 4,
+  "failedCount": 0,
+  "improvedCount": 1,
+  "items": [
+    {
+      "slideId": "slide01",
+      "sourceImagePath": "images/carousel/output/slide01.png",
+      "outputPath": "output/carousel/improved/slide01.png",
+      "beforeScore": 90,
+      "rootCause": null,
+      "status": "skipped",
+      "error": null,
+      "elapsedMs": 0,
+      "attempts": 0,
+      "timeoutMs": 60000,
+      "retry": 3
+    },
+    {
+      "slideId": "slide02",
+      "sourceImagePath": "images/carousel/output/slide02.png",
+      "outputPath": "output/carousel/improved/slide02.png",
+      "beforeScore": 88,
+      "rootCause": null,
+      "status": "skipped",
+      "error": null,
+      "elapsedMs": 0,
+      "attempts": 0,
+      "timeoutMs": 60000,
+      "retry": 3
+    },
+    {
+      "slideId": "slide03",
+      "sourceImagePath": "images/carousel/output/slide03.png",
+      "outputPath": "output/carousel/improved/slide03.png",
+      "beforeScore": 79,
+      "rootCause": "STYLE",
+      "status": "improved",
+      "error": null,
+      "elapsedMs": 10295,
+      "attempts": 1,
+      "timeoutMs": 60000,
+      "retry": 3
+    },
+    {
+      "slideId": "slide04",
+      "sourceImagePath": "images/carousel/output/slide04.png",
+      "outputPath": "output/carousel/improved/slide04.png",
+      "beforeScore": 92,
+      "rootCause": null,
+      "status": "skipped",
+      "error": null,
+      "elapsedMs": 0,
+      "attempts": 0,
+      "timeoutMs": 60000,
+      "retry": 3
+    },
+    {
+      "slideId": "slide05",
+      "sourceImagePath": "images/carousel/output/slide05.png",
+      "outputPath": "output/carousel/improved/slide05.png",
+      "beforeScore": 90,
+      "rootCause": null,
+      "status": "skipped",
+      "error": null,
+      "elapsedMs": 0,
+      "attempts": 0,
+      "timeoutMs": 60000,
+      "retry": 3
+    }
+  ]
+}

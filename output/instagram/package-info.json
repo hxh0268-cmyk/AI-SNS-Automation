@@ -1,0 +1,16 @@
+{
+  "exportedAt": "2026-06-27T02:04:38.178Z",
+  "imageReviewScore": 88,
+  "imageReviewPassed": true,
+  "slideCount": 5,
+  "files": [
+    "caption.txt",
+    "review-summary.md",
+    "slides/slide01.png",
+    "slides/slide02.png",
+    "slides/slide03.png",
+    "slides/slide04.png",
+    "slides/slide05.png",
+    "package-info.json"
+  ]
+}

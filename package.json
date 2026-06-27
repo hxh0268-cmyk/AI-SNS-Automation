@@ -11,6 +11,19 @@
     "gemini-review": "node src/review_with_gemini.js",
     "image-prompt": "node src/create_image_prompt.js",
     "generate-image": "node src/generate_image.js",
-    "openai-image": "node src/generate_image_with_openai.js"
+    "openai-image": "node src/generate_image_with_openai.js",
+    "image-generate": "npm run generate-image && npm run openai-image",
+    "carousel": "node src/create_carousel.js",
+    "carousel-review": "node src/review_carousel.js",
+    "carousel-improve": "node src/improve_carousel.js",
+    "image-review": "node src/review_generated_images.js",
+    "image-improve": "node src/improve_generated_images.js",
+    "export-instagram": "node src/export_instagram_package.js",
+    "research-check": "node src/check_research.js",
+    "health-check": "node src/health_check.js",
+    "doctor": "node src/doctor.js",
+    "root-cause-check": "node src/check_root_cause.js",
+    "smart-auto-fix": "node src/smart_auto_fix.js",
+    "daily": "bash scripts/run_daily.sh"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "networkPolicy": {
+    "default": "deny",
+    "allow": [
+      "registry.npmjs.org",
+      "*.npmjs.org",
+      "api.openai.com",
+      "*.openai.com",
+      "generativelanguage.googleapis.com",
+      "*.googleapis.com",
+      "localhost",
+      "127.0.0.1"
+    ]
+  }
+}

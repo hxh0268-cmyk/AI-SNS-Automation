@@ -1,0 +1,99 @@
+{
+  "date": "2026-06-25",
+  "recommendedTheme": "ChatGPTでInstagram投稿が10分で終わる方法",
+  "topTopic": "ChatGPTを投稿文の下書きに使うことで、忙しい飲食店店長のInstagram投稿作成が30分から10分に短縮できる",
+  "topics": [
+    {
+      "title": "ChatGPTでInstagram投稿が10分で終わる方法",
+      "summary": "毎日30分かかっていた投稿作成を、ChatGPTの下書き機能で10分前後に短縮する具体的手順",
+      "importance": "high",
+      "postValueScore": 92,
+      "scoreBreakdown": {
+        "novelty": 82,
+        "savePotential": 95,
+        "restaurantFit": 96,
+        "beginnerFriendly": 93
+      },
+      "competitionGap": "「AI活用」ではなく「店長の1日の時短ストーリー」という実体験視点で差別化できる",
+      "personalAngle": "「毎日投稿したいけど文章が浮かばない」という店長の共感から入り、Before/Afterで変化を見せる",
+      "restaurantApplication": "メニュー紹介・ランチ告知・スタッフ募集文など、毎日のInstagram更新にそのまま応用できる",
+      "carouselIdea": {
+        "slide01": "AIで投稿10分",
+        "slide02": "毎日30分かかってた…",
+        "slide03": "毎回ゼロから書いてた",
+        "slide04": "ChatGPTに下書き依頼",
+        "slide05": "保存して明日試す"
+      },
+      "hashtags": [
+        "#飲食店SNS集客",
+        "#ChatGPT活用",
+        "#Instagram時短",
+        "#店長の仕事術",
+        "#飲食店Instagram",
+        "#AI活用",
+        "#飲食店経営"
+      ],
+      "url": "https://openai.com/chatgpt"
+    },
+    {
+      "title": "店長がChatGPTに頼む「魔法の1文」",
+      "summary": "コピペで使えるプロンプト例1つを公開し、初心者店長が今日から試せる内容",
+      "importance": "medium",
+      "postValueScore": 78,
+      "scoreBreakdown": {
+        "novelty": 75,
+        "savePotential": 80,
+        "restaurantFit": 78,
+        "beginnerFriendly": 79
+      },
+      "competitionGap": "長い解説ではなく「1文だけ」に絞ることで、忙しい店長でもすぐ試せる",
+      "personalAngle": "「AI、何て書けばいいか分からない」という初心者店長の声に応える",
+      "restaurantApplication": "メニュー名・価格・ターゲット層を入れるだけで投稿文が作れる",
+      "carouselIdea": {
+        "slide01": "魔法の1文",
+        "slide02": "AI、何て書けば…",
+        "slide03": "「投稿文書いて」だけ",
+        "slide04": "この1文をコピペ",
+        "slide05": "保存して使う"
+      },
+      "hashtags": [
+        "#ChatGPT活用",
+        "#飲食店SNS",
+        "#プロンプト",
+        "#店長の仕事術",
+        "#Instagram運用"
+      ],
+      "url": "https://openai.com/chatgpt"
+    },
+    {
+      "title": "AIに任せてはいけない3つのこと",
+      "summary": "ChatGPT活用の注意点を先に伝えることで信頼を得る投稿。誇大表現を避ける",
+      "importance": "medium",
+      "postValueScore": 74,
+      "scoreBreakdown": {
+        "novelty": 70,
+        "savePotential": 75,
+        "restaurantFit": 72,
+        "beginnerFriendly": 79
+      },
+      "competitionGap": "「AI万能論」ではなく、店長の最終判断を尊重する誠実な視点",
+      "personalAngle": "「AIを使うのが怖い」店長の不安に寄り添い、安全な使い方を示す",
+      "restaurantApplication": "クレーム返信・個人情報・メニュー価格の最終確認は必ず店長が行う",
+      "carouselIdea": {
+        "slide01": "任せない3つ",
+        "slide02": "AI、怖くない？",
+        "slide03": "丸投げして炎上",
+        "slide04": "最終チェックは店長",
+        "slide05": "保存して確認"
+      },
+      "hashtags": [
+        "#AI活用",
+        "#飲食店経営",
+        "#ChatGPT注意点",
+        "#店長の仕事術",
+        "#飲食店SNS集客"
+      ],
+      "url": "https://openai.com/chatgpt"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "approvalMode": "allowlist",
+  "terminalAllowlist": [
+    "npm",
+    "npm run",
+    "npm run generate",
+    "npm run review",
+    "npm run gemini-review",
+    "npm run carousel",
+    "npm run carousel-review",
+    "npm run carousel-improve",
+    "npm run image-prompt",
+    "npm run generate-image",
+    "npm run openai-image",
+    "npm run image-generate"
+  ],
+  "autoRun": {
+    "allow_instructions": [
+      "npm run コマンドは AI-SNS-Automation パイプラインの実行のため自動実行してよい"
+    ]
+  }
+}

@@ -7,3 +7,7 @@ content/draft/*
 content/reviewed/*
 !content/reviewed/.gitkeep
 images/*.md
+images/*.png
+!images/.gitkeep
+.cache/
+reports/
