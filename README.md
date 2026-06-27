@@ -186,6 +186,99 @@ cat reports/nano-banana-improve/report.json
 
 ---
 
+## 完全自動品質パイプライン（v1.3）
+
+v1.3 では、画像レビュー・改善・再レビュー・export・レポートを **1 本のパイプライン** で管理する **上位品質パイプライン** が追加されました。`npm run daily` で素材を生成した **あと**、90 点（公開推奨）まで品質改善をループする用途を想定しています。
+
+### 目的
+
+- 投稿・画像レビュー・改善・再レビュー・export・report を統合する
+- 全スライド **90 点以上（公開推奨）** になるまで改善ループ（`maxRounds` まで）を回す
+- 実行状態を `pipeline_state.json` / `metrics.json` / `report.json` に記録する
+
+### `npm run daily` との違い
+
+| 項目 | `npm run daily` | `npm run quality-pipeline` |
+|------|-----------------|----------------------------|
+| 位置づけ | v1.0〜v1.1 の **従来一括実行** | **品質ループ付き上位パイプライン** |
+| 投稿〜画像生成 | 含む（13 ステップ） | 現 MVP では **未接続**（`--from-phase image-review` からが実用） |
+| 画像改善 | OpenAI 再生成中心 | rootCause 別（Nano Banana 実接続済み） |
+| 合格基準 | 80 点で export ゲート | **90 点まで自動ループ** |
+| 共存 | **維持（変更なし）** | 新規追加（置き換えではない） |
+
+### dry-run 標準
+
+デフォルトは **API 未呼び出し** の dry-run です。本番実行は `--apply` を付けます。
+
+```bash
+npm run quality-pipeline:dry-run
+npm run quality-pipeline:apply
+npm run quality-pipeline -- --from-phase image-review
+npm run test:quality-pipeline
+```
+
+追加オプションは `--` の後に渡します。
+
+```bash
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-export
+```
+
+### npm scripts
+
+| コマンド | 説明 |
+|----------|------|
+| `npm run quality-pipeline` | デフォルト（dry-run）で実行 |
+| `npm run quality-pipeline:dry-run` | 明示 dry-run |
+| `npm run quality-pipeline:apply` | API 実行モード |
+| `npm run quality-pipeline:report` | REPORT フェーズから実行 |
+| `npm run quality-pipeline:export` | EXPORT フェーズから実行 |
+| `npm run test:quality-pipeline` | 最小テスト（API 未使用） |
+
+### 推奨フロー（画像レビュー済みの場合）
+
+```bash
+# 1. 計画確認（dry-run）
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+
+# 2. 本番実行
+npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
+
+# 3. 90 点未達でも 80 点以上なら export したい場合
+npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-export
+```
+
+### 出力ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `reports/quality-pipeline/latest/pipeline_state.json` | 実行状態・scoreSummary・改善履歴 |
+| `reports/quality-pipeline/latest/metrics.json` | API 呼び出し数・ラウンド別 metrics |
+| `reports/quality-pipeline/latest/report.json` | REPORT_SCHEMA 準拠（`quality_pipeline_report`） |
+| `reports/quality-pipeline/latest/report.md` | 人間向けサマリー |
+| `reports/quality-pipeline/latest/export_manifest.json` | export 画像選定結果 |
+| `output/instagram/` | apply + export 条件達成時の Instagram Package |
+
+`reports/` 配下は **Git 管理対象外** です。
+
+### 品質基準（v1.3 パイプライン）
+
+| 点数 | 判定 | パイプラインの動き |
+|------|------|-------------------|
+| **90 点以上** | 公開推奨 | 全スライド達成で export 可能（デフォルト） |
+| **80 点以上** | 合格 | `--allow-partial-export` 時のみ export 可能 |
+| **79 点以下** | 要改善 | 改善ループ対象 |
+
+### 現時点の制限（将来拡張）
+
+- POST_GENERATION 〜 IMAGE_GENERATION フェーズは **placeholder**（未接続）
+- smart_auto_fix / openai_regenerate は **接続準備のみ**（Nano Banana は apply 時に実実行）
+- `--resume` 途中再開は未実装
+
+設計詳細: [docs/V1.3_QUALITY_PIPELINE_DESIGN.md](docs/V1.3_QUALITY_PIPELINE_DESIGN.md)
+
+---
+
 ## 事前準備
 
 ### 1. Node.js をインストールする
@@ -699,6 +792,17 @@ images/carousel/review/image_review.md を確認してください
 | `npm run daily` | リサーチ確認〜Instagram 素材出力まで一括実行 |
 | `npm run image-generate` | 画像プロンプト整形 + 画像生成 |
 
+### 品質パイプライン（v1.3）
+
+| コマンド | 説明 |
+|----------|------|
+| `npm run quality-pipeline` | 品質パイプライン（dry-run 標準） |
+| `npm run quality-pipeline:dry-run` | 明示 dry-run |
+| `npm run quality-pipeline:apply` | API 実行モード |
+| `npm run quality-pipeline:report` | REPORT フェーズから実行 |
+| `npm run quality-pipeline:export` | EXPORT フェーズから実行 |
+| `npm run test:quality-pipeline` | 最小テスト（API 未使用） |
+
 ### 環境確認・Genspark 連携
 
 | コマンド | 説明 |
@@ -762,9 +866,15 @@ AI-SNS-Automation/
 ├── output/
 │   ├── instagram/    … Instagram 投稿用の最終出力
 │   └── carousel/improved/ … Nano Banana 改善画像（v1.2）
-├── reports/          … 運用レポート（Git 管理外・smart-auto-fix / nano-banana-improve）
+├── reports/          … 運用レポート（Git 管理外）
+│   ├── smart-auto-fix/ … Smart Auto Fix レポート
+│   ├── nano-banana-improve/ … v1.2 Nano Banana レポート
+│   └── quality-pipeline/latest/ … v1.3 品質パイプライン state / metrics / report
 ├── src/              … Node.js スクリプト本体
+│   └── lib/          … 品質パイプライン等の共通モジュール
 ├── scripts/          … シェルスクリプト（run_daily.sh など）
+│   ├── run_quality_pipeline.js … v1.3 品質パイプライン CLI
+│   └── test_quality_pipeline.sh … v1.3 最小テスト
 ├── prompts/
 │   ├── instagram/    … 投稿生成用プロンプト
 │   └── genspark/       … Genspark リサーチ用テンプレート
@@ -791,6 +901,7 @@ AI-SNS-Automation/
 | カルーセルテキスト | 総合 90 点以上 + 各項目の最低点クリア |
 | 画像レビュー | 各スライド 80 点以上（1 枚でも未満なら不合格） |
 | Nano Banana 再レビュー | 80 点以上で合格、90 点以上で公開推奨（v1.2） |
+| 品質パイプライン（v1.3） | targetScore 90 まで改善ループ、export / report 統合 |
 
 ---
 

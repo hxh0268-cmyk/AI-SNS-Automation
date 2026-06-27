@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.2**（Nano Banana 画像改善 — 完了）
+**v1.3.0**（完全自動品質パイプライン — MVP 完了）
 
 ---
 
@@ -10,10 +10,65 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.3.0** | 完全自動品質パイプライン | ✅ MVP 完了 | 品質ループ・export・report 統合、npm scripts 登録 |
 | **v1.2** | Nano Banana 画像改善 | ✅ 完了 | Nano Banana による画像改善・Gemini 再レビュー・レポート生成 |
 | **v1.1.1** | 運用品質向上 | ✅ 完了 | Health Check / Doctor / Smart Auto Fix で日常運用を支援 |
 | **v1.1** | Genspark連携 | ✅ 完了 | Genspark の調査結果を投稿生成に反映（半自動運用） |
 | **v1.0** | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
+
+---
+
+## v1.3 でできること（MVP 完了）
+
+- **品質パイプライン** … 画像レビュー・改善・再レビュー・export・report を 1 本化
+- **改善ループ** … IMPROVEMENT ⇄ RE_REVIEW（maxRounds）、90 点公開推奨まで自動ループ
+- **Nano Banana 実接続** … apply 時に rootCause 別改善（LAYOUT / STYLE 等）
+- **improved 画像 export** … 条件を満たすスライドは `output/carousel/improved/` を Instagram Package に採用
+- **REPORT_SCHEMA レポート** … `quality_pipeline_report`（report.json / report.md）
+- **pipeline state / metrics** … `reports/quality-pipeline/latest/` に実行状態を記録
+- **終了コード統合** … `getPipelineExitCode()`（exit 0〜4）
+- **npm scripts** … `quality-pipeline` 系 + `test:quality-pipeline`
+- **dry-run 標準** … デフォルト API 未呼び出し、`--apply` で本番
+
+### v1.3 の運用イメージ
+
+```
+npm run daily                          … 従来どおり素材生成（変更なし）
+  ↓
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+  ↓ 計画確認
+npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
+  ↓
+reports/quality-pipeline/latest/report.md を確認
+output/instagram/                      … 90 点達成時（または --allow-partial-export 時）
+```
+
+### 品質基準（v1.3 パイプライン）
+
+| 点数 / 条件 | 判定 | 対応 |
+|-------------|------|------|
+| **90 点以上** | 公開推奨 | export 可能（デフォルト） |
+| **80 点以上** | 合格 | `--allow-partial-export` 時に export 可能 |
+| **79 点以下** | 要改善 | 改善ループ対象 |
+| **smart_auto_fix / openai_regenerate** | 接続準備のみ | 将来 Phase で実接続予定 |
+
+### v1.3 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| 設計 | ✅ 完了（`docs/V1.3_QUALITY_PIPELINE_DESIGN.md`） |
+| 実装（MVP Phase 1〜7） | ✅ 完了 |
+| テスト | ✅ 完了（`npm run test:quality-pipeline`） |
+| README | ✅ 完了 |
+| CHANGELOG | ✅ 完了 |
+| VERSION | ✅ 完了 |
+
+### 既知事項（v1.3）
+
+- POST_GENERATION 〜 IMAGE_GENERATION は **placeholder**（未接続）
+- `--resume` 途中再開は **未実装**
+- `run_daily.sh` は **変更していない**
+- `reports/` は Git 管理対象外
 
 ---
 
@@ -141,6 +196,7 @@
 |----------|------|
 | [README.md](../README.md) | 使い方・コマンド一覧 |
 | [CHANGELOG.md](./CHANGELOG.md) | バージョンごとの変更履歴 |
+| [V1.3_QUALITY_PIPELINE_DESIGN.md](./V1.3_QUALITY_PIPELINE_DESIGN.md) | v1.3 品質パイプライン設計 |
 | [V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md](./V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md) | v1.2 Nano Banana 画像改善の設計 |
 | [Genspark連携設計.md](./Genspark連携設計.md) | v1.1 Genspark 連携の設計・運用 |
 | [SmartAutoFix設計.md](./SmartAutoFix設計.md) | v1.1.1 Smart Auto Fix の設計 |

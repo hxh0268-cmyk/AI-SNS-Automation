@@ -4,6 +4,135 @@
 
 ---
 
+## v1.3 — 完全自動品質パイプライン（MVP 完了）
+
+投稿・画像レビュー・改善・再レビュー・export・レポートを統合する **上位品質パイプライン** を追加しました。`npm run daily` は変更せず、並立して利用します。
+
+### 概要
+
+- **dry-run 標準** … デフォルトは API 未呼び出し。`--apply` で本番実行
+- **90 点公開推奨まで改善ループ** … IMPROVEMENT ⇄ RE_REVIEW を `maxRounds` まで繰り返す
+- **rootCause ルーティング** … TEXT→smart_auto_fix、LAYOUT/STYLE→nano_banana、PROMPT→openai_regenerate（後者2つは接続準備のみ）
+- **state / metrics / report 出力** … `reports/quality-pipeline/latest/` に集約
+- **npm scripts 登録** … `quality-pipeline` 系 + `test:quality-pipeline`
+
+### 新機能
+
+#### 品質パイプライン CLI
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | `scripts/run_quality_pipeline.js` |
+| オーケストレータ | `src/lib/quality_pipeline.js` |
+| 接続済み Phase | HEALTH_CHECK、IMAGE_REVIEW、IMPROVEMENT、RE_REVIEW、EXPORT、REPORT |
+| 未接続 Phase | POST_* / CAROUSEL_* / IMAGE_GENERATION（placeholder） |
+
+#### 改善ループ
+
+| 項目 | 内容 |
+|------|------|
+| Nano Banana | apply 時に実改善（v1.2 lib 直呼び） |
+| stopReason | `NO_SUCCESSFUL_ACTIONS_API_FAILED`（exit 2）、`NO_SCORE_IMPROVEMENT`（exit 3）等 |
+| lastRound | executedActions / scoreBefore / scoreAfter / scoreDelta を記録 |
+
+#### export 拡張
+
+| 項目 | 内容 |
+|------|------|
+| ファイル | `src/lib/pipeline_export.js` |
+| improved 採用 | manifest + re-review + ファイル存在の 3 条件 |
+| ゲート | 全スライド 90 点以上（デフォルト）、`--allow-partial-export` で 80 点以上 |
+
+#### レポート
+
+| 項目 | 内容 |
+|------|------|
+| ファイル | `src/lib/pipeline_report.js` |
+| tool | `quality_pipeline_report`（REPORT_SCHEMA 準拠） |
+| 出力 | `report.json` / `report.md`（dry-run / apply 共通） |
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `scripts/run_quality_pipeline.js` | CLI 入口 |
+| `scripts/test_quality_pipeline.sh` | 最小テスト |
+| `src/lib/quality_pipeline.js` | オーケストレータ |
+| `src/lib/phases.js` | Phase 定数・遷移 |
+| `src/lib/pipeline_config.js` | CLI 設定 |
+| `src/lib/pipeline_state.js` | pipeline_state 読み書き |
+| `src/lib/pipeline_metrics.js` | metrics 集計 |
+| `src/lib/pipeline_hooks.js` | Hook 機構（no-op） |
+| `src/lib/pipeline_phase_handlers.js` | Phase dispatcher |
+| `src/lib/pipeline_improvement.js` | 改善ループ |
+| `src/lib/pipeline_score.js` | scoreSummary |
+| `src/lib/pipeline_export.js` | Instagram Package export |
+| `src/lib/pipeline_report.js` | レポート生成 |
+| `src/lib/retry.js` | 共通 retry |
+| `docs/V1.3_QUALITY_PIPELINE_DESIGN.md` | 設計書 |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `package.json` | quality-pipeline 系 npm scripts |
+| `src/lib/exit_codes.js` | `getPipelineExitCode()` |
+| `README.md` | v1.3 使い方 |
+| `docs/VERSION.md` | v1.3 追記 |
+| `docs/CLI_EXIT_CODES.md` | 品質パイプライン終了コード |
+
+### 運用方法（v1.3 追加コマンド）
+
+```
+【画像レビュー済み・品質ループを回したい場合】
+
+# 1. 計画確認（dry-run）
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+
+# 2. 本番実行
+npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
+
+# 3. テスト
+npm run test:quality-pipeline
+
+【レポート確認】
+reports/quality-pipeline/latest/report.md を開く
+```
+
+### 品質基準（v1.3 パイプライン）
+
+| 点数 | 判定 | export（デフォルト） |
+|------|------|---------------------|
+| **90 点以上** | 公開推奨 | 可 |
+| **80 点以上** | 合格 | `--allow-partial-export` 時のみ |
+| **79 点以下** | 要改善 | 不可 |
+
+### 設計思想
+
+| 判断 | 理由 |
+|------|------|
+| **run_daily.sh は非変更** | 従来運用との共存 |
+| **dry-run 標準** | API コスト確認後に `--apply` |
+| **90 点までループ** | 公開推奨品質を自動で目指す |
+| **reports/ は Git 管理外** | 実行ログはローカル保持 |
+
+### テスト結果
+
+| 項目 | 内容 |
+|------|------|
+| `npm run test:quality-pipeline` | dry-run / report schema / buildPipelineReport / from-phase report |
+| dry-run E2E | image-review 起点で state / metrics / report 生成を確認 |
+| apply E2E | Nano Banana API キー未設定時 `NO_SUCCESSFUL_ACTIONS_API_FAILED`（exit 2）を確認 |
+
+### 注意点
+
+- 現 MVP では **画像レビュー以降**（`--from-phase image-review`）が実用の起点です
+- smart_auto_fix / openai_regenerate の **実改善は未接続** です
+- `--resume` 途中再開は未実装です
+- `run_daily.sh` / `npm run daily` は **変更していません**
+
+---
+
 ## v1.2 — Nano Banana画像改善（完了）
 
 OpenAI Images で生成したカルーセル画像を **Nano Banana（Gemini 画像 API）** で改善し、Gemini による再レビューと改善レポート生成までを自動化しました。

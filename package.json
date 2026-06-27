@@ -24,6 +24,12 @@
     "doctor": "node src/doctor.js",
     "root-cause-check": "node src/check_root_cause.js",
     "smart-auto-fix": "node src/smart_auto_fix.js",
-    "daily": "bash scripts/run_daily.sh"
+    "daily": "bash scripts/run_daily.sh",
+    "quality-pipeline": "node scripts/run_quality_pipeline.js",
+    "quality-pipeline:dry-run": "node scripts/run_quality_pipeline.js --dry-run",
+    "quality-pipeline:apply": "node scripts/run_quality_pipeline.js --apply",
+    "quality-pipeline:report": "node scripts/run_quality_pipeline.js --from-phase report",
+    "quality-pipeline:export": "node scripts/run_quality_pipeline.js --from-phase export",
+    "test:quality-pipeline": "bash scripts/test_quality_pipeline.sh"
   }
 }
