@@ -113,6 +113,7 @@ function snapshotConfig(config) {
     allowPartialExport: config.allowPartialExport,
     skipContent: config.skipContent,
     skipExport: config.skipExport,
+    cleanLatest: config.cleanLatest ?? false,
     fromPhase: config.fromPhase,
   };
 }

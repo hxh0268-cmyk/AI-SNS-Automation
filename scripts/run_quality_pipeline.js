@@ -23,6 +23,11 @@ function printRunSummary(params) {
   console.log("");
   console.log("[QualityPipeline] Summary");
   console.log(`  mode: ${config.dryRun ? "dry-run" : "apply"}`);
+  if (config.cleanLatest) {
+    console.log("  workspace: --clean-latest（latest を実行前に削除）");
+  } else if (result.state.workspace?.action === "archived") {
+    console.log(`  workspace: archived → ${result.state.workspace.archivePath}`);
+  }
   console.log(`  status: ${result.state.status}`);
   console.log(`  final phase: ${result.state.phase}`);
   console.log(`  completed steps: ${result.state.completedSteps.length}`);

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { SLIDE_COUNT } from "./carousel.js";
 import { EXPORT_MANIFEST_FILENAME } from "./pipeline_export.js";
+import { IMPROVEMENT_STOP_REASONS, IMPROVEMENT_TOOLS } from "./pipeline_improvement.js";
 import { PIPELINE_METRICS_FILENAME } from "./pipeline_metrics.js";
 import {
   DEFAULT_PIPELINE_STATE_DIR,
@@ -16,13 +17,278 @@ export const REPORT_SCHEMA_VERSION = "1.0";
 export const REPORT_TOOL = "quality_pipeline_report";
 
 /** レポート生成バージョン */
-export const REPORT_VERSION = "v1.3.0";
+export const REPORT_VERSION = "v1.3.1";
+
+/** apply 実行後に git status に出やすい output 副産物（commit 対象外） */
+export const OUTPUT_ARTIFACT_PATHS = [
+  "output/carousel/improved/manifest.json",
+  "output/carousel/improved/slideXX.png",
+  "output/instagram/package-info.json",
+  "output/instagram/review-summary.md",
+];
+
+/** output 副産物の運用案内（README / report 共通） */
+export const OUTPUT_ARTIFACT_GUIDANCE =
+  "apply 実行後、`output/carousel/improved/` や `output/instagram/` に生成物が残ることがあります。これらは実行結果の副産物であり、通常は git commit しません。不要なら削除するか `.gitignore` で無視してください。";
 
 /** report.json ファイル名 */
 export const REPORT_JSON_FILENAME = "report.json";
 
 /** report.md ファイル名 */
 export const REPORT_MD_FILENAME = "report.md";
+
+/**
+ * stopReason 別の Next Actions 定義
+ * @type {Record<string, string[]>}
+ */
+const STOP_REASON_NEXT_ACTIONS = {
+  [IMPROVEMENT_STOP_REASONS.NO_SUCCESSFUL_ACTIONS_API_FAILED]: [
+    "`.env` に必要な API キーを設定する（下記「API キー設定」を参照）",
+    "`npm run health-check` でキー設定と quota を確認する",
+    "`--dry-run` で改善計画を再確認してから `--apply` を実行する",
+  ],
+  [IMPROVEMENT_STOP_REASONS.NO_SUCCESSFUL_ACTIONS]: [
+    "`.env` に必要な API キーを設定する（下記「API キー設定」を参照）",
+    "`npm run health-check` でキー設定と quota を確認する",
+    "`--dry-run` で改善計画を再確認してから `--apply` を実行する",
+  ],
+  [IMPROVEMENT_STOP_REASONS.LIMIT_ZERO_DETECTED]: [
+    "Gemini / Nano Banana の API quota（limit:0）を確認する",
+    "quota 回復まで待つか、別キー・課金プランを検討する",
+    "`--max-api-calls` を下げて部分実行するか、翌日に再実行する",
+  ],
+  [IMPROVEMENT_STOP_REASONS.MAX_API_CALLS_REACHED]: [
+    "`--max-api-calls` を増やして再実行する",
+    "低スコアスライドのみ v1.2 個別スクリプト（`npm run image-improve` 等）で手動改善する",
+    "`--dry-run` で改善対象を確認し、必要なら `--from-phase image-review` から再開する",
+  ],
+  [IMPROVEMENT_STOP_REASONS.MANUAL_REVIEW_ONLY]: [
+    "手動レビューが必要なスライドを report のスライド別表で確認する",
+    "smart_auto_fix / openai_regenerate の pipeline 実接続は v1.4 以降予定",
+    "TEXT / PROMPT 系は v1.2 の `smart-auto-fix` や個別再生成スクリプトで対応する",
+  ],
+  [IMPROVEMENT_STOP_REASONS.NO_SCORE_IMPROVEMENT]: [
+    "rootCause と改善 tool の組み合わせを見直す（prompt / レイアウト / スタイル）",
+    "`--max-rounds` を増やして再実行する",
+    "改善前後の score を比較し、手動でスライド内容または画像を修正する",
+  ],
+};
+
+/** API キー設定案内の定義 */
+const API_KEY_HINT_SPECS = [
+  {
+    id: "nano_banana",
+    label: "Nano Banana API",
+    envVars: ["NANO_BANANA_API_KEY", "GEMINI_API_KEY"],
+    setup:
+      "`.env` に `NANO_BANANA_API_KEY=...` を設定する（未設定時は `GEMINI_API_KEY` でも可）",
+    tools: [IMPROVEMENT_TOOLS.NANO_BANANA],
+    errorPatterns: [/NANO_BANANA_API_KEY/i, /Nano Banana.*API/i],
+  },
+  {
+    id: "gemini",
+    label: "Gemini API",
+    envVars: ["GEMINI_API_KEY"],
+    setup: "`.env` に `GEMINI_API_KEY=...` を設定する（Gemini 再レビュー用）",
+    tools: [],
+    errorPatterns: [/GEMINI_API_KEY/i, /GEMINI_QUOTA_EXCEEDED/i],
+  },
+  {
+    id: "openai",
+    label: "OpenAI API",
+    envVars: ["OPENAI_API_KEY"],
+    setup:
+      "`.env` に `OPENAI_API_KEY=...` を設定する（openai_regenerate 用。pipeline 実接続は v1.4 以降）",
+    tools: [IMPROVEMENT_TOOLS.OPENAI_REGENERATE],
+    errorPatterns: [/OPENAI_API_KEY/i],
+  },
+];
+
+/**
+ * 環境変数が設定されているか（いずれかで可）
+ * @param {string[]} envVars
+ * @returns {boolean}
+ */
+function isAnyEnvVarSet(envVars) {
+  return envVars.some((name) => Boolean(process.env[name]?.trim()));
+}
+
+/**
+ * improvement history / items から使用 tool を収集する
+ * @param {object} state
+ * @param {object[]} items
+ * @returns {Set<string>}
+ */
+function collectUsedTools(state, items) {
+  /** @type {Set<string>} */
+  const tools = new Set();
+
+  for (const roundEntry of state.improvement?.history ?? []) {
+    for (const target of roundEntry.targets ?? []) {
+      if (target.tool) {
+        tools.add(target.tool);
+      }
+    }
+    for (const target of roundEntry.plan?.targets ?? []) {
+      if (target.tool) {
+        tools.add(target.tool);
+      }
+    }
+  }
+
+  for (const target of state.improvement?.lastPlan?.targets ?? []) {
+    if (target.tool) {
+      tools.add(target.tool);
+    }
+  }
+
+  for (const item of items) {
+    if (item.improvementTool) {
+      tools.add(item.improvementTool);
+    }
+  }
+
+  if ((state.improvement?.roundsExecuted ?? 0) > 0 || tools.size > 0) {
+    tools.add(IMPROVEMENT_TOOLS.NANO_BANANA);
+    tools.add("gemini_re_review");
+  }
+
+  return tools;
+}
+
+/**
+ * エラーメッセージを収集する
+ * @param {object} state
+ * @param {object[]} items
+ * @returns {string[]}
+ */
+function collectErrorMessages(state, items) {
+  /** @type {string[]} */
+  const messages = [];
+
+  for (const roundEntry of state.improvement?.history ?? []) {
+    for (const target of roundEntry.targets ?? []) {
+      if (target.error) {
+        messages.push(String(target.error));
+      }
+    }
+  }
+
+  for (const item of items) {
+    if (item.error) {
+      messages.push(String(item.error));
+    }
+  }
+
+  for (const step of state.failedSteps ?? []) {
+    if (step.reason) {
+      messages.push(String(step.reason));
+    }
+  }
+
+  return messages;
+}
+
+/**
+ * API キー未設定・エラーに基づく設定案内を生成する
+ * @param {object} params
+ * @returns {object[]}
+ */
+export function buildApiKeyHints({ state, config, items }) {
+  const dryRun = config.dryRun ?? state.config?.dryRun ?? true;
+  const usedTools = collectUsedTools(state, items);
+  const errorMessages = collectErrorMessages(state, items);
+  const stopReason =
+    state.improvement?.stopReason ??
+    null;
+  const apiFailed =
+    stopReason === IMPROVEMENT_STOP_REASONS.NO_SUCCESSFUL_ACTIONS_API_FAILED ||
+    stopReason === IMPROVEMENT_STOP_REASONS.NO_SUCCESSFUL_ACTIONS;
+
+  /** @type {object[]} */
+  const hints = [];
+
+  for (const spec of API_KEY_HINT_SPECS) {
+    if (isAnyEnvVarSet(spec.envVars)) {
+      continue;
+    }
+
+    const toolMatch = spec.tools.some((tool) => usedTools.has(tool));
+    const errorMatch = errorMessages.some((message) =>
+      spec.errorPatterns.some((pattern) => pattern.test(message)),
+    );
+    const geminiReReviewNeeded =
+      spec.id === "gemini" &&
+      (usedTools.has("gemini_re_review") ||
+        (state.improvement?.roundsExecuted ?? 0) > 0);
+    const applyNeedsKey = !dryRun && (toolMatch || geminiReReviewNeeded);
+    const dryRunInformative =
+      dryRun && toolMatch && (state.improvement?.lastPlan?.totalTargets ?? 0) > 0;
+
+    if (errorMatch || apiFailed || applyNeedsKey || dryRunInformative) {
+      hints.push({
+        id: spec.id,
+        label: spec.label,
+        envVars: spec.envVars,
+        setup: spec.setup,
+        reason: errorMatch
+          ? "error_detected"
+          : apiFailed
+            ? "api_failed"
+            : dryRunInformative
+              ? "planned_for_apply"
+              : "apply_mode",
+      });
+    }
+  }
+
+  return hints;
+}
+
+/**
+ * stopReason と実行結果から Next Actions を生成する
+ * @param {object} params
+ * @returns {string[]}
+ */
+export function buildNextActions({ summary, items, config, apiKeyHints }) {
+  /** @type {string[]} */
+  const actions = [];
+
+  const stopReason = summary.improvementStopReason;
+  if (stopReason && STOP_REASON_NEXT_ACTIONS[stopReason]) {
+    actions.push(...STOP_REASON_NEXT_ACTIONS[stopReason]);
+  }
+
+  if (apiKeyHints.length > 0 && !actions.some((action) => action.includes("API キー"))) {
+    actions.unshift("`.env` に不足している API キーを設定する（下記「API キー設定」を参照）");
+  }
+
+  if (summary.improvementFailedCount > 0 && !stopReason) {
+    actions.push("改善失敗スライドをスライド別表で確認し、個別に再実行する");
+  }
+
+  if (
+    !summary.dryRun &&
+    !summary.allSlidesPublishRecommended &&
+    summary.exportSkipped
+  ) {
+    actions.push(
+      "targetScore 未達のため export がスキップされています。改善ループを継続するか `--allow-partial-export` を検討する",
+    );
+  }
+
+  if (summary.dryRun && (summary.plannedActions ?? 0) > 0) {
+    actions.push(
+      "計画確認が完了したら `--apply` で本番実行する（API キーと quota を事前に確認）",
+    );
+  }
+
+  if (actions.length === 0 && summary.pipelineStatus === "completed") {
+    actions.push("特記事項なし。必要に応じて export 成果物と Instagram Package を確認する");
+  }
+
+  return [...new Set(actions)];
+}
 
 /**
  * export manifest を読み込む
@@ -233,7 +499,18 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
     pipelineStatus: state.status ?? null,
     completedSteps: state.completedSteps?.length ?? 0,
     failedSteps: state.failedSteps?.length ?? 0,
+    workspaceAction: state.workspace?.action ?? null,
+    archivePath: state.workspace?.archivePath ?? null,
+    cleanLatest: config.cleanLatest ?? state.config?.cleanLatest ?? false,
   };
+
+  const apiKeyHints = buildApiKeyHints({ state, config, items });
+  const nextActions = buildNextActions({ summary, items, config, apiKeyHints });
+
+  summary.apiKeyHints = apiKeyHints;
+  summary.nextActions = nextActions;
+  summary.outputArtifactGuidance = OUTPUT_ARTIFACT_GUIDANCE;
+  summary.outputArtifactPaths = OUTPUT_ARTIFACT_PATHS;
 
   return {
     schemaVersion: REPORT_SCHEMA_VERSION,
@@ -356,6 +633,46 @@ export function buildPipelineReportMarkdown(report) {
       ? `## 警告\n\n${warnings.join("\n")}\n`
       : "## 警告\n\n- なし\n";
 
+  const nextActions = summary.nextActions ?? [];
+  const nextActionsSection =
+    nextActions.length > 0
+      ? `## Next Actions\n\n${nextActions.map((action) => `- ${action}`).join("\n")}\n`
+      : "";
+
+  const apiKeyHints = summary.apiKeyHints ?? [];
+  const apiKeySection =
+    apiKeyHints.length > 0
+      ? `## API キー設定\n\n${apiKeyHints
+          .map(
+            (hint) =>
+              `### ${hint.label}\n\n- 設定変数: ${hint.envVars.map((name) => `\`${name}\``).join(" / ")}\n- ${hint.setup}\n`,
+          )
+          .join("\n")}`
+      : "";
+
+  const workspaceLines = [];
+  if (summary.cleanLatest) {
+    workspaceLines.push("- `--clean-latest` により実行前に `latest` を削除しました");
+  } else if (summary.workspaceAction === "archived" && summary.archivePath) {
+    workspaceLines.push(
+      `- 実行前に \`latest\` を退避しました: \`${summary.archivePath}\``,
+    );
+  }
+
+  const outputArtifactSection = `## output 副産物（git 注意）
+
+${summary.outputArtifactGuidance ?? OUTPUT_ARTIFACT_GUIDANCE}
+
+よく残るパス:
+
+${(summary.outputArtifactPaths ?? OUTPUT_ARTIFACT_PATHS).map((artifactPath) => `- \`${artifactPath}\``).join("\n")}
+`;
+
+  const operationalSection =
+    workspaceLines.length > 0
+      ? `## 運用メモ\n\n${workspaceLines.join("\n")}\n\n`
+      : "";
+
   return `# Quality Pipeline レポート
 
 生成日時: ${report.generatedAt}
@@ -367,7 +684,7 @@ version: ${report.version}
 ${summaryTable}
 
 ${warningsSection}
-
+${nextActionsSection}${apiKeySection ? `${apiKeySection}\n` : ""}${operationalSection}${outputArtifactSection}
 ## スライド別
 
 ${slideTable}

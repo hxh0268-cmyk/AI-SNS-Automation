@@ -222,7 +222,15 @@ npm run test:quality-pipeline
 ```bash
 npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
 npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-export
+npm run quality-pipeline:dry-run -- --clean-latest --from-phase image-review
 ```
+
+追加オプション（v1.3.1）:
+
+| オプション | 説明 |
+|------------|------|
+| `--clean-latest` | 実行前に `reports/quality-pipeline/latest` を削除してから開始 |
+| （デフォルト） | 既存 `latest` がある場合、上書き前に `reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/` へ退避 |
 
 ### npm scripts
 
@@ -257,9 +265,31 @@ npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-expo
 | `reports/quality-pipeline/latest/report.json` | REPORT_SCHEMA 準拠（`quality_pipeline_report`） |
 | `reports/quality-pipeline/latest/report.md` | 人間向けサマリー |
 | `reports/quality-pipeline/latest/export_manifest.json` | export 画像選定結果 |
+| `reports/quality-pipeline/archive/` | 上書き前に退避した過去実行（v1.3.1） |
 | `output/instagram/` | apply + export 条件達成時の Instagram Package |
 
 `reports/` 配下は **Git 管理対象外** です。
+
+### output 副産物と git（v1.3.1）
+
+apply 実行後、次のパスが `git status` に残ることがあります。これらは **実行結果の副産物** で、通常は commit しません。
+
+| パス | 内容 |
+|------|------|
+| `output/carousel/improved/manifest.json` | 改善 manifest |
+| `output/carousel/improved/slideXX.png` | 改善済み画像 |
+| `output/instagram/package-info.json` | Instagram Package メタ |
+| `output/instagram/review-summary.md` | export レビューサマリー |
+
+`report.md` の「output 副産物（git 注意）」セクションにも同内容が出力されます。不要なら削除するか `.gitignore` で無視してください。
+
+### report.md の運用案内（v1.3.1）
+
+`report.md` には次が追加されます。
+
+- **Next Actions** … `stopReason`（例: `LIMIT_ZERO_DETECTED`, `NO_SUCCESSFUL_ACTIONS_API_FAILED`）に応じた次の手順
+- **API キー設定** … Nano Banana / Gemini / OpenAI キー未設定時の `.env` 設定案内
+- **output 副産物（git 注意）** … 上記副産物を commit しない旨
 
 ### 品質基準（v1.3 パイプライン）
 

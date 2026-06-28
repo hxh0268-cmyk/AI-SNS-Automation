@@ -4,6 +4,46 @@
 
 ---
 
+## v1.3.1 — 運用品質パッチ
+
+v1.3.0 の完全自動品質パイプラインに対する **運用安全性** の改善です。新機能追加は行わず、事故防止・後片付け・エラー案内・テスト強化に限定しています。
+
+### 改善内容
+
+| 項目 | 内容 |
+|------|------|
+| latest 退避 | 上書き前に `reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/` へコピー |
+| `--clean-latest` | 実行前に `latest` を削除 |
+| report.md 強化 | Next Actions / API キー設定案内 / output 副産物の git 注意 |
+| テスト | `--clean-latest`、report.md セクション、archive の確認を追加 |
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_workspace.js` | archive / clean-latest 処理 |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_config.js` | `--clean-latest` オプション |
+| `src/lib/pipeline_state.js` | config スナップショットに `cleanLatest` |
+| `src/lib/quality_pipeline.js` | 実行前 workspace 準備 |
+| `src/lib/pipeline_report.js` | v1.3.1 レポート拡張 |
+| `scripts/run_quality_pipeline.js` | workspace サマリー表示 |
+| `scripts/test_quality_pipeline.sh` | テスト追加 |
+| `README.md` | 運用案内 |
+| `docs/VERSION.md` | v1.3.1 |
+| `docs/V1.3_QUALITY_PIPELINE_DESIGN.md` | 運用パッチ追記 |
+
+### 変更なし（意図的）
+
+- `scripts/run_daily.sh` … 非変更
+- smart_auto_fix / openai_regenerate の pipeline 実接続 … v1.4 以降
+
+---
+
 ## v1.3 — 完全自動品質パイプライン（MVP 完了）
 
 投稿・画像レビュー・改善・再レビュー・export・レポートを統合する **上位品質パイプライン** を追加しました。`npm run daily` は変更せず、並立して利用します。

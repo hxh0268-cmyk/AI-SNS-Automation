@@ -11,6 +11,7 @@ import { PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
  * @property {boolean} allowPartialExport
  * @property {boolean} skipContent
  * @property {boolean} skipExport
+ * @property {boolean} cleanLatest
  * @property {string} fromPhase
  */
 
@@ -24,13 +25,14 @@ export const DEFAULT_PIPELINE_CONFIG = {
   allowPartialExport: false,
   skipContent: false,
   skipExport: false,
+  cleanLatest: false,
   fromPhase: PIPELINE_PHASES.INIT,
 };
 
 /**
  * CLI 引数を解析する（生のオプション）
  * @param {string[]} argv
- * @returns {{ apply: boolean, dryRunExplicit: boolean, help: boolean, targetScore: number | null, passingScore: number | null, maxRounds: number | null, maxApiCalls: number | null, allowPartialExport: boolean, skipContent: boolean, skipExport: boolean, fromPhase: string | null }}
+ * @returns {{ apply: boolean, dryRunExplicit: boolean, help: boolean, targetScore: number | null, passingScore: number | null, maxRounds: number | null, maxApiCalls: number | null, allowPartialExport: boolean, skipContent: boolean, skipExport: boolean, cleanLatest: boolean, fromPhase: string | null }}
  */
 export function parsePipelineArgs(argv) {
   const options = {
@@ -44,6 +46,7 @@ export function parsePipelineArgs(argv) {
     allowPartialExport: false,
     skipContent: false,
     skipExport: false,
+    cleanLatest: false,
     fromPhase: null,
   };
 
@@ -77,6 +80,11 @@ export function parsePipelineArgs(argv) {
 
     if (arg === "--skip-export") {
       options.skipExport = true;
+      continue;
+    }
+
+    if (arg === "--clean-latest") {
+      options.cleanLatest = true;
       continue;
     }
 
@@ -154,6 +162,7 @@ export function createPipelineConfig(argv) {
     allowPartialExport: args.allowPartialExport,
     skipContent: args.skipContent,
     skipExport: args.skipExport,
+    cleanLatest: args.cleanLatest,
   };
 
   if (args.targetScore !== null) {
@@ -242,6 +251,7 @@ Options:
   --allow-partial-export    90 点未達でも export を許可
   --skip-content            投稿・カルーセル生成をスキップ
   --skip-export             Instagram Package 出力をスキップ
+  --clean-latest            実行前に reports/quality-pipeline/latest を削除
   --from-phase <phase>      開始 Phase（例: INIT, image-review）
   --help, -h                このヘルプを表示
 

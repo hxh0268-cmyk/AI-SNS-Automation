@@ -27,6 +27,7 @@ import {
   updatePipelineState,
   writePipelineState,
 } from "./pipeline_state.js";
+import { preparePipelineWorkspace } from "./pipeline_workspace.js";
 import {
   appendRoundMetrics,
   createPipelineMetrics,
@@ -595,7 +596,12 @@ export async function runPipeline(config, options = {}) {
   let metrics = startMetrics(options.metrics ?? createPipelineMetrics());
   const outputDir = options.outputDir ?? DEFAULT_PIPELINE_STATE_DIR;
 
+  const workspace = await preparePipelineWorkspace(config, outputDir);
+
   let state = createInitialPipelineState(config);
+  if (workspace.action !== "none") {
+    state = updatePipelineState(state, { workspace });
+  }
   state = updatePipelineState(state, { status: "running" });
 
   let statePath = await writePipelineState(state, outputDir);

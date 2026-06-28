@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.3.0**（完全自動品質パイプライン — MVP 完了）
+**v1.3.1**（運用品質パッチ）
 
 ---
 
@@ -10,6 +10,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.3.1** | 運用品質パッチ | ✅ 完了 | latest 退避 / clean-latest / report 運用案内強化 |
 | **v1.3.0** | 完全自動品質パイプライン | ✅ MVP 完了 | 品質ループ・export・report 統合、npm scripts 登録 |
 | **v1.2** | Nano Banana 画像改善 | ✅ 完了 | Nano Banana による画像改善・Gemini 再レビュー・レポート生成 |
 | **v1.1.1** | 運用品質向上 | ✅ 完了 | Health Check / Doctor / Smart Auto Fix で日常運用を支援 |
@@ -18,7 +19,13 @@
 
 ---
 
-## v1.3 でできること（MVP 完了）
+### v1.3.1 で追加（運用品質パッチ）
+
+- **latest 退避** … 上書き前に `reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/` へコピー
+- **`--clean-latest`** … 実行前に `latest` を削除
+- **report 運用案内** … Next Actions / API キー設定 / output 副産物の git 注意
+
+### v1.3 でできること（MVP 完了）
 
 - **品質パイプライン** … 画像レビュー・改善・再レビュー・export・report を 1 本化
 - **改善ループ** … IMPROVEMENT ⇄ RE_REVIEW（maxRounds）、90 点公開推奨まで自動ループ
