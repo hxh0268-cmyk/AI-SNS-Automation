@@ -1,5 +1,15 @@
 import { InputConfigurationError } from "./exit_codes.js";
 import { PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
+import {
+  DEFAULT_REGENERATION_ADAPTER_ID,
+  REGENERATION_ADAPTER_IDS,
+} from "./regeneration_engine.js";
+
+/** 有効な regeneration adapter 一覧 */
+export const VALID_REGENERATION_ADAPTERS = [
+  REGENERATION_ADAPTER_IDS.NANO_BANANA,
+  REGENERATION_ADAPTER_IDS.OPENAI,
+];
 
 /** @typedef {object} PipelineConfig
  * @property {number} targetScore
@@ -13,6 +23,7 @@ import { PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
  * @property {boolean} skipExport
  * @property {boolean} cleanLatest
  * @property {string} fromPhase
+ * @property {string} regenerationAdapter
  */
 
 /** 品質パイプラインのデフォルト設定 */
@@ -27,6 +38,7 @@ export const DEFAULT_PIPELINE_CONFIG = {
   skipExport: false,
   cleanLatest: false,
   fromPhase: PIPELINE_PHASES.INIT,
+  regenerationAdapter: DEFAULT_REGENERATION_ADAPTER_ID,
 };
 
 /**
@@ -48,6 +60,7 @@ export function parsePipelineArgs(argv) {
     skipExport: false,
     cleanLatest: false,
     fromPhase: null,
+    regenerationAdapter: null,
   };
 
   for (let index = 2; index < argv.length; index += 1) {
@@ -120,6 +133,18 @@ export function parsePipelineArgs(argv) {
       continue;
     }
 
+    if (arg === "--regeneration-adapter") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new InputConfigurationError(
+          "--regeneration-adapter には adapter 名を指定してください。",
+        );
+      }
+      options.regenerationAdapter = value;
+      index += 1;
+      continue;
+    }
+
     throw new InputConfigurationError(`不明な引数: ${arg}`);
   }
 
@@ -163,6 +188,7 @@ export function createPipelineConfig(argv) {
     skipContent: args.skipContent,
     skipExport: args.skipExport,
     cleanLatest: args.cleanLatest,
+    regenerationAdapter: DEFAULT_PIPELINE_CONFIG.regenerationAdapter,
   };
 
   if (args.targetScore !== null) {
@@ -183,6 +209,10 @@ export function createPipelineConfig(argv) {
 
   if (args.fromPhase !== null) {
     config.fromPhase = resolveFromPhase(args.fromPhase);
+  }
+
+  if (args.regenerationAdapter !== null) {
+    config.regenerationAdapter = args.regenerationAdapter;
   }
 
   if (args.apply) {
@@ -230,6 +260,12 @@ export function validatePipelineConfig(config) {
   }
 
   resolveFromPhase(config.fromPhase);
+
+  if (!VALID_REGENERATION_ADAPTERS.includes(config.regenerationAdapter)) {
+    throw new InputConfigurationError(
+      `--regeneration-adapter は ${VALID_REGENERATION_ADAPTERS.join(" | ")} のいずれかを指定してください。`,
+    );
+  }
 }
 
 /**
@@ -239,11 +275,13 @@ export function validatePipelineConfig(config) {
 export function getPipelineHelpText() {
   return `Usage: node scripts/run_quality_pipeline.js [options]
 
-完全自動品質パイプライン（v1.4）
+完全自動品質パイプライン（v1.5）
 
 Options:
   --apply                   本番実行（API 呼び出し・output 変更あり。先に dry-run で report 確認）
   --dry-run                 dry-run を明示（デフォルト。latest / report は更新される）
+  --regeneration-adapter <nano_banana|openai>
+                            Select regeneration adapter. Default: nano_banana.
   --target-score <number>   公開推奨ライン（デフォルト: 90）
   --passing-score <number>  合格ライン（デフォルト: 80）
   --max-rounds <number>     改善ループ上限（デフォルト: 3）

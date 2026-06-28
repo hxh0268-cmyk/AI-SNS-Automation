@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { InputConfigurationError } from "./exit_codes.js";
 import { PIPELINE_PHASES } from "./phases.js";
+import { DEFAULT_REGENERATION_ADAPTER_ID } from "./regeneration_engine.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -115,6 +116,7 @@ function snapshotConfig(config) {
     skipExport: config.skipExport,
     cleanLatest: config.cleanLatest ?? false,
     fromPhase: config.fromPhase,
+    regenerationAdapter: config.regenerationAdapter ?? DEFAULT_REGENERATION_ADAPTER_ID,
   };
 }
 

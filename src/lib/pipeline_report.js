@@ -9,6 +9,7 @@ import {
   PIPELINE_STATE_FILENAME,
   PROJECT_ROOT,
 } from "./pipeline_state.js";
+import { DEFAULT_REGENERATION_ADAPTER_ID } from "./regeneration_engine.js";
 
 /** report.json スキーマ識別子（docs/REPORT_SCHEMA.md 参照） */
 export const REPORT_SCHEMA_VERSION = "1.0";
@@ -17,7 +18,7 @@ export const REPORT_SCHEMA_VERSION = "1.0";
 export const REPORT_TOOL = "quality_pipeline_report";
 
 /** レポート生成バージョン */
-export const REPORT_VERSION = "v1.4.1";
+export const REPORT_VERSION = "v1.5.0";
 
 /** scoreSummary / ReReview で使う source 値 */
 const REVIEWED_SCORE_SOURCES = new Set([
@@ -104,9 +105,9 @@ const API_KEY_HINT_SPECS = [
     label: "OpenAI API",
     envVars: ["OPENAI_API_KEY"],
     setup:
-      "`.env` に `OPENAI_API_KEY=...` を設定する（openai_regenerate 用。pipeline では placeholder のまま）",
+      "`.env` に `OPENAI_API_KEY=...` を設定する（`--regeneration-adapter openai` 時の Regeneration に使用。openai_regenerate placeholder にも使用）",
     tools: [IMPROVEMENT_TOOLS.OPENAI_REGENERATE],
-    errorPatterns: [/OPENAI_API_KEY/i],
+    errorPatterns: [/OPENAI_API_KEY/i, /OPENAI_API_KEY_MISSING/i],
   },
 ];
 
@@ -212,6 +213,10 @@ export function buildApiKeyHints({ state, config, items }) {
   const dryRun = config.dryRun ?? state.config?.dryRun ?? true;
   const usedTools = collectUsedTools(state, items);
   const errorMessages = collectErrorMessages(state, items);
+  const regenerationAdapter =
+    config.regenerationAdapter ??
+    state.config?.regenerationAdapter ??
+    DEFAULT_REGENERATION_ADAPTER_ID;
   const stopReason =
     state.improvement?.stopReason ??
     null;
@@ -236,10 +241,17 @@ export function buildApiKeyHints({ state, config, items }) {
       (usedTools.has("gemini_re_review") ||
         usedTools.has(IMPROVEMENT_TOOLS.SMART_AUTO_FIX) ||
         (state.improvement?.roundsExecuted ?? 0) > 0);
-    const applyNeedsKey = !dryRun && (toolMatch || geminiReReviewNeeded);
+    const openaiRegenerationNeeded =
+      spec.id === "openai" &&
+      regenerationAdapter === "openai" &&
+      (usedTools.has(IMPROVEMENT_TOOLS.SMART_AUTO_FIX) ||
+        (state.improvement?.lastPlan?.totalTargets ?? 0) > 0 ||
+        items.some((item) => item.textChainConnected));
+    const applyNeedsKey =
+      !dryRun && (toolMatch || geminiReReviewNeeded || openaiRegenerationNeeded);
     const dryRunInformative =
       dryRun &&
-      (toolMatch || geminiReReviewNeeded) &&
+      (toolMatch || geminiReReviewNeeded || openaiRegenerationNeeded) &&
       (state.improvement?.lastPlan?.totalTargets ?? 0) > 0;
 
     if (errorMatch || apiFailed || applyNeedsKey || dryRunInformative) {
@@ -596,6 +608,9 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
       regenerationAdapter: improvement?.regenerationAdapter ?? null,
       smartAutoFixStatus: improvement?.smartAutoFix?.status ?? null,
       regenerationStatus: improvement?.regeneration?.status ?? null,
+      regenerationModel: improvement?.regeneration?.model ?? null,
+      regenerationDryRun: improvement?.regeneration?.dryRun ?? null,
+      regenerationAdapterPayload: improvement?.regeneration?.adapterPayload ?? null,
       textChainConnected: textChainSlide,
       reviewStatus:
         REVIEWED_SCORE_SOURCES.has(slide.source)
@@ -626,6 +641,14 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
     dryRun,
     targetScore,
     passingScore,
+    regenerationAdapter:
+      config.regenerationAdapter ??
+      state.config?.regenerationAdapter ??
+      DEFAULT_REGENERATION_ADAPTER_ID,
+    regenerationByAdapter: metrics.regenerationByAdapter ?? {
+      nano_banana: 0,
+      openai: 0,
+    },
     finalAverageScore: scoreSummary.averageScore ?? null,
     finalMinScore: scoreSummary.minScore ?? null,
     allSlidesPassed: scoreSummary.allSlidesPassed ?? false,
@@ -700,6 +723,24 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
 }
 
 /**
+ * regeneration adapter の表示ラベル
+ * @param {string | null | undefined} adapterId
+ * @returns {string}
+ */
+function formatRegenerationAdapterLabel(adapterId) {
+  if (!adapterId) {
+    return "—";
+  }
+  if (adapterId === "openai") {
+    return "openai (OpenAI Adapter)";
+  }
+  if (adapterId === "nano_banana") {
+    return "nano_banana (Nano Banana Adapter)";
+  }
+  return adapterId;
+}
+
+/**
  * recommendation の日本語ラベル
  * @param {string} recommendation
  * @returns {string}
@@ -756,6 +797,11 @@ export function buildPipelineReportMarkdown(report) {
     ["改善ラウンド", `${summary.roundsExecuted}/${summary.maxRounds}`],
     ["改善停止理由", summary.improvementStopReason ?? "—"],
     ["TEXT チェーン接続", summary.textChainConnected ? "はい" : "いいえ"],
+    ["Regeneration adapter", formatRegenerationAdapterLabel(summary.regenerationAdapter)],
+    [
+      "Regeneration by adapter",
+      `nano_banana=${summary.regenerationByAdapter?.nano_banana ?? 0}, openai=${summary.regenerationByAdapter?.openai ?? 0}`,
+    ],
     ["Smart Auto Fix 実行", summary.executedSmartAutoFix ?? 0],
     ["Smart Auto Fix 成功", summary.successfulSmartAutoFix ?? 0],
     ["Smart Auto Fix 失敗", summary.failedSmartAutoFix ?? 0],
@@ -803,10 +849,10 @@ export function buildPipelineReportMarkdown(report) {
   const smartAutoFixItems = items.filter((item) => item.textChainConnected);
   const smartAutoFixSection =
     smartAutoFixItems.length > 0
-      ? `## Smart Auto Fix / TEXT チェーン\n\n| スライド | SAF | Regeneration | adapter | ReReview | before | after |\n|----------|-----|--------------|---------|----------|--------|-------|\n${smartAutoFixItems
+      ? `## Smart Auto Fix / TEXT チェーン\n\n| スライド | SAF | Regeneration | adapter | model | dryRun | ReReview | before | after |\n|----------|-----|--------------|---------|-------|--------|----------|--------|-------|\n${smartAutoFixItems
           .map(
             (item) =>
-              `| ${item.slideId} | ${item.smartAutoFixStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationAdapter ?? "—"} | ${item.reviewStatus ?? "—"} | ${formatScore(item.beforeScore)} | ${formatScore(item.afterScore)} |`,
+              `| ${item.slideId} | ${item.smartAutoFixStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationAdapter ?? "—"} | ${item.regenerationModel ?? "—"} | ${item.regenerationDryRun === true ? "はい" : item.regenerationDryRun === false ? "いいえ" : "—"} | ${item.reviewStatus ?? "—"} | ${formatScore(item.beforeScore)} | ${formatScore(item.afterScore)} |`,
           )
           .join("\n")}\n`
       : "";

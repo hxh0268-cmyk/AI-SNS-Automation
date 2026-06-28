@@ -21,10 +21,12 @@ import {
   incrementApiCall,
   recordFailedCall,
   recordImprovementExecutionMetrics,
+  recordRegenerationByAdapter,
 } from "./pipeline_metrics.js";
 import { PIPELINE_PHASES } from "./phases.js";
 import {
   DEFAULT_REGENERATION_ADAPTER_ID,
+  REGENERATION_ADAPTER_IDS,
   planRegeneration,
   regenerateImage,
 } from "./regeneration_engine.js";
@@ -804,6 +806,7 @@ function buildSmartAutoFixManifestItem(params) {
     timeoutMs,
     retry,
     error,
+    regenerationAdapterId,
   } = params;
 
   const promptPath =
@@ -814,6 +817,9 @@ function buildSmartAutoFixManifestItem(params) {
     ? {
         status: regenResult.status,
         adapterId: regenResult.adapterId,
+        model: regenResult.model ?? null,
+        dryRun: regenResult.dryRun ?? false,
+        adapterPayload: regenResult.adapterPayload ?? null,
         promptPath: regenResult.promptPath,
         sourceImagePath: regenResult.sourceImagePath,
         outputPath: regenResult.outputPath,
@@ -837,7 +843,7 @@ function buildSmartAutoFixManifestItem(params) {
     retry: retry ?? 0,
     tool: IMPROVEMENT_TOOLS.SMART_AUTO_FIX,
     improvementPipeline: [...IMPROVEMENT_PIPELINE_SMART_AUTO_FIX],
-    regenerationAdapter: regenResult?.adapterId ?? DEFAULT_REGENERATION_ADAPTER_ID,
+    regenerationAdapter: regenResult?.adapterId ?? regenerationAdapterId ?? DEFAULT_REGENERATION_ADAPTER_ID,
     smartAutoFix: {
       status: safResult?.status ?? "failed",
       changedFiles: safResult?.changedFiles ?? [],
@@ -888,6 +894,10 @@ export async function processSmartAutoFixTarget(target, slide, context) {
   const timeoutMs = context.config?.nanoBananaTimeoutMs ?? DEFAULT_TIMEOUT_MS;
   const retry = context.config?.nanoBananaRetry ?? DEFAULT_RETRY;
   const rootCause = target.rootCause ?? "TEXT";
+  const adapterId =
+    context.config?.regenerationAdapter ?? DEFAULT_REGENERATION_ADAPTER_ID;
+  const regenApiProvider =
+    adapterId === REGENERATION_ADAPTER_IDS.OPENAI ? "openai" : "nano_banana";
 
   const safSlide = buildSafSlideInput(target, slide);
 
@@ -912,6 +922,7 @@ export async function processSmartAutoFixTarget(target, slide, context) {
       timeoutMs,
       retry,
       error: safResult.error ?? "Smart Auto Fix に失敗しました。",
+      regenerationAdapterId: adapterId,
     });
 
     return {
@@ -936,7 +947,7 @@ export async function processSmartAutoFixTarget(target, slide, context) {
     promptPath,
     sourceImagePath,
     outputPath,
-    adapterId: DEFAULT_REGENERATION_ADAPTER_ID,
+    adapterId,
     dryRun,
     changedTextPaths: safResult.changedFiles ?? [],
   };
@@ -944,29 +955,30 @@ export async function processSmartAutoFixTarget(target, slide, context) {
   let regenResult;
   let limitZeroDetected = false;
 
+  const regenOptions = {
+    projectRoot,
+    timeoutMs,
+    retry,
+    defaultAdapterId: adapterId,
+  };
+
   if (dryRun) {
-    regenResult = await planRegeneration(regenRequest, {
-      projectRoot,
-      timeoutMs,
-      retry,
-    });
+    regenResult = await planRegeneration(regenRequest, regenOptions);
+    metrics = recordRegenerationByAdapter(metrics, regenResult.adapterId);
   } else {
-    metrics = incrementApiCall(metrics, "nano_banana", PIPELINE_PHASES.IMPROVEMENT);
+    metrics = incrementApiCall(metrics, regenApiProvider, PIPELINE_PHASES.IMPROVEMENT);
     regenResult = await regenerateImage(
       { ...regenRequest, dryRun: false },
-      {
-        projectRoot,
-        timeoutMs,
-        retry,
-      },
+      regenOptions,
     );
+    metrics = recordRegenerationByAdapter(metrics, regenResult.adapterId);
 
     if (regenResult.status === "failed") {
       const errorMessage = regenResult.error ?? "画像再生成に失敗しました。";
       limitZeroDetected = isLimitZeroError(new Error(errorMessage));
       metrics = recordFailedCall(
         metrics,
-        "nano_banana",
+        regenApiProvider,
         PIPELINE_PHASES.IMPROVEMENT,
         errorMessage,
       );
@@ -998,6 +1010,7 @@ export async function processSmartAutoFixTarget(target, slide, context) {
     timeoutMs,
     retry,
     error: errorMessage,
+    regenerationAdapterId: adapterId,
   });
 
   if (!dryRun && manifestStatus === "improved") {

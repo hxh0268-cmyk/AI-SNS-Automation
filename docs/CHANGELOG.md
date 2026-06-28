@@ -4,6 +4,60 @@
 
 ---
 
+## v1.5.0 — OpenAI Regeneration Adapter
+
+Regeneration Engine に **OpenAI Adapter** を追加し、TEXT チェーンの画像再生成を **Nano Banana と CLI から切り替え可能** にしました。Smart Auto Fix 中核・quality loop 構造は変更しません。
+
+### 概要
+
+| 項目 | 内容 |
+|------|------|
+| OpenAI Adapter | `src/lib/regeneration/openai_regeneration_adapter.js`（`gpt-image-1`） |
+| CLI | `--regeneration-adapter <nano_banana\|openai>`（**デフォルト: `nano_banana`**） |
+| dry-run | API 未呼び出し、placeholder 結果 + adapter 情報を report に記録 |
+| API キー未設定 | 失敗扱いにせず `OPENAI_API_KEY` 案内（dry-run / report） |
+| report / metrics | `regenerationAdapter`、`regenerationByAdapter`、model / dryRun 表示 |
+| テスト | **28 PASS**（Test 24–28 追加） |
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/regeneration/openai_regeneration_adapter.js` | OpenAI Regeneration Adapter |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/regeneration_engine.js` | OpenAI adapter 登録、`REGENERATION_ADAPTER_IDS` |
+| `src/lib/pipeline_config.js` | `--regeneration-adapter`、CLI help（v1.5） |
+| `src/lib/pipeline_state.js` | `snapshotConfig.regenerationAdapter` |
+| `src/lib/pipeline_improvement.js` | config から adapter 選択、metrics 記録 |
+| `src/lib/pipeline_metrics.js` | `regenerationByAdapter` 集計 |
+| `src/lib/pipeline_report.js` | v1.5.0 レポート、OpenAI API キー案内 |
+| `scripts/run_quality_pipeline.js` | Summary に adapter 表示 |
+| `scripts/test_quality_pipeline.sh` | Test 24–28 |
+| `README.md` | v1.5 使い方 |
+| `docs/VERSION.md` / `docs/CHANGELOG.md` | バージョン追記 |
+
+### 変更なし（意図的）
+
+- `scripts/run_daily.sh`
+- Smart Auto Fix lib 中核
+- LAYOUT / STYLE / BOOST の Nano Banana 直呼びルート
+- `openai_regenerate` placeholder（改善 plan 上の別ルート）
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| `npm run test:quality-pipeline` | **PASS**（28 tests） |
+| `npm run quality-pipeline:dry-run` | **exit 0** |
+| `npm run quality-pipeline:dry-run -- --regeneration-adapter openai` | **exit 0** |
+| `git diff -- scripts/run_daily.sh` | **差分なし** |
+
+---
+
 ## v1.4.1 — 運用品質パッチ
 
 v1.4.0 リリース直後の **運用案内・安全性** を改善。Smart Auto Fix / Regeneration 中核・quality loop は変更しません。

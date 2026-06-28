@@ -24,6 +24,7 @@ function printRunSummary(params) {
   console.log("");
   console.log("[QualityPipeline] Summary");
   console.log(`  mode: ${config.dryRun ? "dry-run" : "apply"}`);
+  console.log(`  regeneration adapter: ${config.regenerationAdapter ?? "nano_banana"}`);
   if (config.cleanLatest) {
     console.log("  workspace: --clean-latest（latest を実行前に削除）");
   } else if (result.state.workspace?.action === "archived") {
@@ -78,9 +79,16 @@ function printRunSummary(params) {
     }
   }
 
-  if (result.metrics.nanoBananaCalls > 0 || result.metrics.geminiCalls > 0) {
+  if (result.metrics.nanoBananaCalls > 0 || result.metrics.geminiCalls > 0 || result.metrics.openaiCalls > 0) {
     console.log(
-      `  api calls: nanoBanana=${result.metrics.nanoBananaCalls}, gemini=${result.metrics.geminiCalls}, failed=${result.metrics.failedCalls}`,
+      `  api calls: nanoBanana=${result.metrics.nanoBananaCalls}, openai=${result.metrics.openaiCalls ?? 0}, gemini=${result.metrics.geminiCalls}, failed=${result.metrics.failedCalls}`,
+    );
+  }
+
+  const regenByAdapter = result.metrics.regenerationByAdapter;
+  if (regenByAdapter && (regenByAdapter.nano_banana > 0 || regenByAdapter.openai > 0)) {
+    console.log(
+      `  regeneration by adapter: nano_banana=${regenByAdapter.nano_banana}, openai=${regenByAdapter.openai}`,
     );
   }
 

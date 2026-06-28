@@ -984,4 +984,215 @@ EOF
 pass "smart_auto_fix api hints"
 
 echo ""
+echo "-- Test 24: OpenAI adapter dry-run selectable --"
+node scripts/run_quality_pipeline.js --dry-run --from-phase image-review --max-rounds 1 --regeneration-adapter openai
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const state = JSON.parse(
+  fs.readFileSync("reports/quality-pipeline/latest/pipeline_state.json", "utf-8"),
+);
+if (state.config.regenerationAdapter !== "openai") {
+  throw new Error(`expected regenerationAdapter openai, got ${state.config.regenerationAdapter}`);
+}
+console.log("openai adapter dry-run ok");
+EOF
+pass "OpenAI adapter dry-run"
+
+echo ""
+echo "-- Test 25: OPENAI_API_KEY missing guidance --"
+node --input-type=module <<'EOF'
+import { buildApiKeyHints } from "./src/lib/pipeline_report.js";
+import { planOpenAiRegeneration } from "./src/lib/regeneration/openai_regeneration_adapter.js";
+import { OPENAI_API_KEY_MISSING_CODE } from "./src/lib/regeneration/openai_regeneration_adapter.js";
+
+const saved = process.env.OPENAI_API_KEY;
+delete process.env.OPENAI_API_KEY;
+
+try {
+  const hints = buildApiKeyHints({
+    state: {
+      config: { dryRun: true, regenerationAdapter: "openai" },
+      improvement: {
+        lastPlan: { totalTargets: 1, targets: [{ slideId: "slide02", tool: "smart_auto_fix" }] },
+        history: [],
+        roundsExecuted: 0,
+      },
+    },
+    config: { dryRun: true, regenerationAdapter: "openai" },
+    items: [{ slideId: "slide02", textChainConnected: true, improvementTool: "smart_auto_fix" }],
+  });
+
+  if (!hints.some((hint) => hint.id === "openai")) {
+    throw new Error("expected openai api key hint");
+  }
+
+  const planned = await planOpenAiRegeneration(
+    {
+      slideId: "slide02",
+      promptPath: "images/carousel/prompts/prompt02.md",
+      sourceImagePath: "output/carousel/slide02.png",
+      outputPath: "output/carousel/improved/slide02.png",
+      dryRun: true,
+    },
+    { projectRoot: process.cwd() },
+  );
+
+  if (planned.status !== "planned") {
+    throw new Error(`expected planned status, got ${planned.status}`);
+  }
+  if (planned.adapterPayload?.meta?.apiKeyGuidance?.code !== OPENAI_API_KEY_MISSING_CODE) {
+    throw new Error("expected apiKeyGuidance for missing OPENAI_API_KEY");
+  }
+} finally {
+  if (saved) process.env.OPENAI_API_KEY = saved;
+  else delete process.env.OPENAI_API_KEY;
+}
+
+console.log("openai api key guidance ok");
+EOF
+pass "OPENAI_API_KEY guidance"
+
+echo ""
+echo "-- Test 26: report.json regenerationAdapter openai --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const report = JSON.parse(
+  fs.readFileSync("reports/quality-pipeline/latest/report.json", "utf-8"),
+);
+
+if (report.summary.regenerationAdapter !== "openai") {
+  throw new Error(`expected summary.regenerationAdapter openai, got ${report.summary.regenerationAdapter}`);
+}
+if (typeof report.summary.regenerationByAdapter !== "object") {
+  throw new Error("summary.regenerationByAdapter missing");
+}
+console.log(`report regenerationAdapter=${report.summary.regenerationAdapter}`);
+EOF
+pass "report.json openai adapter"
+
+echo ""
+echo "-- Test 27: report.md OpenAI adapter display --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { buildPipelineReport, buildPipelineReportMarkdown } from "./src/lib/pipeline_report.js";
+import { createPipelineMetrics } from "./src/lib/pipeline_metrics.js";
+
+const report = JSON.parse(
+  fs.readFileSync("reports/quality-pipeline/latest/report.json", "utf-8"),
+);
+const md = buildPipelineReportMarkdown(report);
+
+if (!md.includes("Regeneration adapter")) {
+  throw new Error("report.md missing Regeneration adapter row");
+}
+if (!md.includes("OpenAI Adapter")) {
+  throw new Error("report.md missing OpenAI Adapter label");
+}
+
+const openAiReport = buildPipelineReportMarkdown(
+  buildPipelineReport({
+    state: {
+      status: "completed",
+      scoreSummary: {
+        slides: [{ slideId: "slide02", score: 75 }],
+        averageScore: 75,
+        minScore: 75,
+      },
+      improvement: {
+        history: [
+          {
+            round: 1,
+            targets: [
+              {
+                slideId: "slide02",
+                tool: "smart_auto_fix",
+                status: "planned",
+                improvementPipeline: ["smart_auto_fix", "regeneration_engine"],
+                regenerationAdapter: "openai",
+                regeneration: {
+                  status: "planned",
+                  adapterId: "openai",
+                  model: "gpt-image-1",
+                  dryRun: true,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      export: { skipped: true },
+    },
+    metrics: {
+      ...createPipelineMetrics(),
+      regenerationByAdapter: { nano_banana: 0, openai: 1 },
+    },
+    exportManifest: null,
+    config: { dryRun: true, regenerationAdapter: "openai", targetScore: 90, passingScore: 80 },
+  }),
+);
+
+if (!openAiReport.includes("OpenAI Adapter")) {
+  throw new Error("OpenAI Adapter label missing in report.md");
+}
+if (!openAiReport.includes("gpt-image-1")) {
+  throw new Error("OpenAI model missing in report.md");
+}
+
+console.log("report.md openai display ok");
+EOF
+pass "report.md OpenAI adapter"
+
+echo ""
+echo "-- Test 28: default nano_banana adapter unchanged --"
+node --input-type=module <<'EOF'
+import { createPipelineConfig, getPipelineHelpText } from "./src/lib/pipeline_config.js";
+import {
+  DEFAULT_REGENERATION_ADAPTER_ID,
+  getRegenerationAdapter,
+  listRegenerationAdapterIds,
+  planRegeneration,
+} from "./src/lib/regeneration_engine.js";
+
+const config = createPipelineConfig(["node", "scripts/run_quality_pipeline.js", "--dry-run"]);
+if (config.regenerationAdapter !== "nano_banana") {
+  throw new Error(`default adapter expected nano_banana, got ${config.regenerationAdapter}`);
+}
+if (DEFAULT_REGENERATION_ADAPTER_ID !== "nano_banana") {
+  throw new Error("DEFAULT_REGENERATION_ADAPTER_ID changed");
+}
+
+const help = getPipelineHelpText();
+if (!help.includes("--regeneration-adapter")) {
+  throw new Error("CLI help missing --regeneration-adapter");
+}
+
+const ids = listRegenerationAdapterIds();
+if (!ids.includes("nano_banana") || !ids.includes("openai")) {
+  throw new Error(`adapters missing: ${ids.join(",")}`);
+}
+if (!getRegenerationAdapter("openai")) {
+  throw new Error("openai adapter not registered");
+}
+
+const planned = await planRegeneration(
+  {
+    slideId: "slide02",
+    promptPath: "images/carousel/prompts/prompt02.md",
+    sourceImagePath: "output/carousel/slide02.png",
+    outputPath: "output/carousel/improved/slide02.png",
+    dryRun: true,
+  },
+  { projectRoot: process.cwd() },
+);
+if (planned.adapterId !== "nano_banana") {
+  throw new Error(`default plan adapter expected nano_banana, got ${planned.adapterId}`);
+}
+
+console.log("default nano_banana ok");
+EOF
+pass "default nano_banana"
+
+echo ""
 echo "All quality pipeline tests passed."

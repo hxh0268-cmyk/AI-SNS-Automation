@@ -127,6 +127,43 @@ v1.2.1 では Nano Banana 画像改善レポート（`scripts/report_nano_banana
 
 ---
 
+## quality_pipeline_report の追加フィールド（v1.5.0）
+
+`version: "v1.5.0"` 以降、Regeneration adapter 切替に伴い以下を **任意フィールド** として追加します。
+
+### summary 追加（v1.5）
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| `regenerationAdapter` | `string` | pipeline 設定の adapter ID。例：`"nano_banana"` / `"openai"` |
+| `regenerationByAdapter` | `object` | adapter 別 Regeneration 実行回数。例：`{ "nano_banana": 0, "openai": 1 }` |
+
+### items[] 追加（v1.5）
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| `regenerationModel` | `string \| null` | 例：`"gpt-image-1"`（OpenAI adapter 時） |
+| `regenerationDryRun` | `boolean \| null` | Regeneration が dry-run 計画か |
+| `regenerationAdapterPayload` | `object \| null` | adapter 共通ペイロード（`ok` / `adapter` / `model` / `dryRun` / `output` / `meta` / `error`） |
+
+`regenerationAdapter` の値に `"openai"` が追加されます。
+
+### metrics.json（pipeline_metrics）v1.5 追加
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| `regenerationByAdapter` | `object` | `{ nano_banana: number, openai: number }` |
+
+### report.md 追加（v1.5）
+
+| 表示 | 内容 |
+|------|------|
+| サマリー `Regeneration adapter` | 例：`openai (OpenAI Adapter)` |
+| サマリー `Regeneration by adapter` | adapter 別カウント |
+| Smart Auto Fix 表 | `model` / `dryRun` 列 |
+
+---
+
 ## Nano Banana report の追加フィールド（v1.2.1）
 
 `nano_banana_image_improvement_report` では、入力トレーサビリティのため次を **ルートに追加** します（削除・改名しない）。
@@ -244,4 +281,5 @@ const tool = report.tool ?? "unknown";
 ---
 
 *スキーマ初版：v1.2.1（schemaVersion `"1.0"`、tool `nano_banana_image_improvement_report`）*  
-*v1.4.0 追記：tool `quality_pipeline_report` の summary / items / metrics / export 拡張*
+*v1.4.0 追記：tool `quality_pipeline_report` の summary / items / metrics / export 拡張*  
+*v1.5.0 追記：Regeneration adapter 切替（`regenerationAdapter` / `regenerationByAdapter` / model / dryRun）*

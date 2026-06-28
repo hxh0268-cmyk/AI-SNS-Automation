@@ -4,6 +4,16 @@ import {
   NANO_BANANA_ADAPTER_ID,
   nanoBananaRegenerationAdapter,
 } from "./regeneration/nano_banana_adapter.js";
+import {
+  OPENAI_REGENERATION_ADAPTER_ID,
+  openAiRegenerationAdapter,
+} from "./regeneration/openai_regeneration_adapter.js";
+
+/** 利用可能な regeneration adapter ID */
+export const REGENERATION_ADAPTER_IDS = {
+  NANO_BANANA: NANO_BANANA_ADAPTER_ID,
+  OPENAI: OPENAI_REGENERATION_ADAPTER_ID,
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,6 +49,9 @@ export const DEFAULT_REGENERATION_ADAPTER_ID = NANO_BANANA_ADAPTER_ID;
  * @property {number} elapsedMs
  * @property {number} [attempts]
  * @property {string | null} error
+ * @property {string} [model]
+ * @property {boolean} [dryRun]
+ * @property {object | null} [adapterPayload]
  */
 
 /**
@@ -160,6 +173,9 @@ export function normalizeRegenerationResult(result, request) {
     elapsedMs: typeof result.elapsedMs === "number" ? result.elapsedMs : 0,
     attempts: typeof result.attempts === "number" ? result.attempts : 0,
     error: result.error ?? null,
+    model: result.model ?? null,
+    dryRun: result.dryRun ?? request.dryRun ?? false,
+    adapterPayload: result.adapterPayload ?? null,
   };
 }
 
@@ -245,4 +261,9 @@ export async function regenerateImage(request, options = {}) {
 registerRegenerationAdapter(
   nanoBananaRegenerationAdapter.id,
   nanoBananaRegenerationAdapter,
+);
+
+registerRegenerationAdapter(
+  openAiRegenerationAdapter.id,
+  openAiRegenerationAdapter,
 );

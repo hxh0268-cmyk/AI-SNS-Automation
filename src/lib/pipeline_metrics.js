@@ -67,6 +67,10 @@ export function createPipelineMetrics() {
       mdPath: null,
       generatedAt: null,
     },
+    regenerationByAdapter: {
+      nano_banana: 0,
+      openai: 0,
+    },
   };
 }
 
@@ -499,6 +503,31 @@ function resolveOutputDir(outputDir) {
   return path.isAbsolute(outputDir)
     ? path.normalize(outputDir)
     : path.join(PROJECT_ROOT, outputDir);
+}
+
+/**
+ * regeneration adapter 別の実行回数を記録する
+ * @param {object} metrics
+ * @param {string} adapterId
+ * @returns {object}
+ */
+export function recordRegenerationByAdapter(metrics, adapterId) {
+  const current = metrics.regenerationByAdapter ?? {
+    nano_banana: 0,
+    openai: 0,
+  };
+
+  if (!(adapterId in current)) {
+    return metrics;
+  }
+
+  return {
+    ...metrics,
+    regenerationByAdapter: {
+      ...current,
+      [adapterId]: current[adapterId] + 1,
+    },
+  };
 }
 
 /**

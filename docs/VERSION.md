@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.4.1**（運用品質パッチ）
+**v1.5.0**（OpenAI Regeneration Adapter）
 
 ---
 
@@ -10,6 +10,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.5.0** | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
 | **v1.4.1** | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
 | **v1.4.0** | Smart Auto Fix 統合 | ✅ 完了 | TEXT チェーン接続、Regeneration Engine、ReReview / report / export / metrics |
 | **v1.3.1** | 運用品質パッチ | ✅ 完了 | latest 退避 / clean-latest / report 運用案内強化 |
@@ -20,6 +21,16 @@
 | **v1.0** | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
 
 ---
+
+### v1.5.0 で追加（OpenAI Regeneration Adapter）
+
+- **OpenAI Regeneration Adapter** … `regeneration/openai_regeneration_adapter.js`（`gpt-image-1`）
+- **CLI** … `--regeneration-adapter <nano_banana|openai>`（デフォルト `nano_banana`）
+- **Regeneration Engine** … adapter 選択を config から解決（Smart Auto Fix 側は非変更）
+- **dry-run** … OpenAI 選択時も API 未呼び出し、キー未設定時は案内のみ
+- **report v1.5.0** … `regenerationAdapter`、`regenerationByAdapter`、model / dryRun
+- **metrics** … `regenerationByAdapter: { nano_banana, openai }`
+- **テスト** … `npm run test:quality-pipeline` **28 PASS**
 
 ### v1.4.1 で追加（運用品質パッチ）
 
@@ -71,7 +82,8 @@ output/instagram/                      … 90 点達成時（または --allow-p
 | **90 点以上** | 公開推奨 | export 可能（デフォルト） |
 | **80 点以上** | 合格 | `--allow-partial-export` 時に export 可能 |
 | **79 点以下** | 要改善 | 改善ループ対象 |
-| **TEXT rootCause** | Smart Auto Fix チェーン | v1.4 で接続済み |
+| **TEXT rootCause** | Smart Auto Fix チェーン | v1.4 接続、v1.5 で adapter 切替 |
+| **Regeneration adapter** | `nano_banana`（デフォルト） / `openai` | v1.5 |
 | **LAYOUT / STYLE / BOOST** | Nano Banana 直呼び | v1.3 から維持 |
 | **openai_regenerate** | placeholder | 未実装 |
 
@@ -126,6 +138,7 @@ output/instagram/                      … 90 点達成時（または --allow-p
 | [README.md](../README.md) | 使い方・コマンド一覧 |
 | [CHANGELOG.md](./CHANGELOG.md) | バージョンごとの変更履歴 |
 | [V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md](./V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md) | v1.4 Smart Auto Fix 統合設計 |
+| [REPORT_SCHEMA.md](./REPORT_SCHEMA.md) | quality_pipeline_report スキーマ |
 | [V1.3_QUALITY_PIPELINE_DESIGN.md](./V1.3_QUALITY_PIPELINE_DESIGN.md) | v1.3 品質パイプライン設計 |
 | [V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md](./V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md) | v1.2 Nano Banana 画像改善の設計 |
 | [Genspark連携設計.md](./Genspark連携設計.md) | v1.1 Genspark 連携の設計・運用 |
@@ -133,4 +146,4 @@ output/instagram/                      … 90 点達成時（または --allow-p
 
 ---
 
-*最終更新：2026-06-28*
+*最終更新：2026-06-25*
