@@ -4,6 +4,42 @@
 
 ---
 
+## v1.4.1 — 運用品質パッチ
+
+v1.4.0 リリース直後の **運用案内・安全性** を改善。Smart Auto Fix / Regeneration 中核・quality loop は変更しません。
+
+### 改善内容
+
+| 項目 | 内容 |
+|------|------|
+| report.md 強化 | 通常 commit 不要の副産物 / dry-run・latest・archive / apply 実行判断 |
+| API キー案内 | `smart_auto_fix` target 時の Nano Banana / Gemini ヒント精度向上 |
+| CLI | `--apply` 注意バナー、Summary に Next Actions 上位表示 |
+| 陳腐化文案修正 | MANUAL_REVIEW_ONLY、OpenAI ヒント、CLI help |
+| README | dry-run latest 更新、archive、output 整理コマンド、apply 前チェックリスト |
+| テスト | report セクション / 文案 / API ヒント / CLI help |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_report.js` | v1.4.1 レポートセクション、API ヒント |
+| `scripts/run_quality_pipeline.js` | apply バナー、Next Actions Summary |
+| `src/lib/pipeline_config.js` | CLI help 更新 |
+| `README.md` | 運用フロー・副産物整理 |
+| `docs/V1.4.1_OPERATIONAL_PATCH_DESIGN.md` | 設計書 |
+| `docs/VERSION.md` / `docs/CHANGELOG.md` | バージョン追記 |
+| `scripts/test_quality_pipeline.sh` | テスト追加 |
+
+### 変更なし（意図的）
+
+- `scripts/run_daily.sh`
+- Smart Auto Fix / Regeneration Engine 中核
+- `openai_regenerate` / `--resume` / GitHub Actions
+- `output/` の git 追跡解除（`git rm --cached`）
+
+---
+
 ## v1.4.0 — Smart Auto Fix 統合（完了）
 
 品質パイプラインにおいて **TEXT rootCause** を Smart Auto Fix チェーンで実改善し、Gemini ReReview → scoreSummary → export / report / metrics まで quality loop に接続しました。

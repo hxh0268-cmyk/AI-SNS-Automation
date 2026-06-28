@@ -190,17 +190,24 @@ import { buildPipelineReportMarkdown } from "./src/lib/pipeline_report.js";
 import { IMPROVEMENT_STOP_REASONS } from "./src/lib/pipeline_improvement.js";
 
 const md = fs.readFileSync("reports/quality-pipeline/latest/report.md", "utf-8");
-if (!md.includes("## Next Actions") && !md.includes("## output 副産物")) {
-  throw new Error("report.md missing operational sections");
+for (const section of [
+  "## Next Actions",
+  "## 通常 commit 不要の副産物",
+  "## dry-run / latest / archive",
+  "## --apply 実行判断",
+]) {
+  if (!md.includes(section)) {
+    throw new Error(`report.md missing section: ${section}`);
+  }
 }
-if (!md.includes("git commit") && !md.includes("副産物")) {
-  throw new Error("report.md missing output artifact guidance");
+if (md.includes("v1.4 以降予定")) {
+  throw new Error("stale text in report.md: v1.4 以降予定");
 }
 
 const sample = buildPipelineReportMarkdown({
   generatedAt: new Date().toISOString(),
   tool: "quality_pipeline_report",
-  version: "v1.3.1",
+  version: "v1.4.1",
   pipelineStateFile: "reports/quality-pipeline/latest/pipeline_state.json",
   metricsFile: "reports/quality-pipeline/latest/metrics.json",
   exportManifestFile: null,
@@ -215,6 +222,7 @@ const sample = buildPipelineReportMarkdown({
     roundsExecuted: 1,
     maxRounds: 3,
     improvementStopReason: IMPROVEMENT_STOP_REASONS.LIMIT_ZERO_DETECTED,
+    plannedActions: 2,
     totalApiCalls: 1,
     failedCalls: 1,
     limitZeroDetected: true,
@@ -230,6 +238,9 @@ const sample = buildPipelineReportMarkdown({
     elapsedMs: 100,
     pipelineStatus: "completed",
     allowPartialExport: false,
+    cleanLatest: false,
+    workspaceAction: "archived",
+    archivePath: "reports/quality-pipeline/archive/2026-06-28-120000",
     nextActions: [
       "Gemini / Nano Banana の API quota（limit:0）を確認する",
     ],
@@ -239,6 +250,17 @@ const sample = buildPipelineReportMarkdown({
   },
   items: [],
 });
+
+for (const section of [
+  "## 通常 commit 不要の副産物",
+  "## dry-run / latest / archive",
+  "## --apply 実行判断",
+  "git restore output/",
+]) {
+  if (!sample.includes(section)) {
+    throw new Error(`sample markdown missing: ${section}`);
+  }
+}
 
 if (!sample.includes("## Next Actions")) {
   throw new Error("sample markdown missing Next Actions");
@@ -872,6 +894,94 @@ if (metrics.improvement.executedRegeneration !== 1) {
 console.log("metrics SAF counts ok");
 EOF
 pass "metrics SAF counts"
+
+echo ""
+echo "-- Test 22: stale operational text regression --"
+node --input-type=module <<'EOF'
+import { buildNextActions } from "./src/lib/pipeline_report.js";
+import { IMPROVEMENT_STOP_REASONS } from "./src/lib/pipeline_improvement.js";
+import { getPipelineHelpText } from "./src/lib/pipeline_config.js";
+
+const help = getPipelineHelpText();
+if (help.includes("Phase 1")) {
+  throw new Error("stale CLI help: Phase 1");
+}
+if (!help.includes("dry-run でも")) {
+  throw new Error("CLI help missing dry-run latest note");
+}
+
+const actions = buildNextActions({
+  summary: {
+    improvementStopReason: IMPROVEMENT_STOP_REASONS.MANUAL_REVIEW_ONLY,
+    dryRun: false,
+    plannedActions: 0,
+    improvementFailedCount: 0,
+    allSlidesPublishRecommended: false,
+    exportSkipped: false,
+    pipelineStatus: "completed",
+  },
+  items: [],
+  config: { dryRun: false },
+  apiKeyHints: [],
+});
+const joined = actions.join(" ");
+if (joined.includes("v1.4 以降予定")) {
+  throw new Error("stale MANUAL_REVIEW_ONLY next action");
+}
+console.log("stale text regression ok");
+EOF
+pass "stale text regression"
+
+echo ""
+echo "-- Test 23: buildApiKeyHints for smart_auto_fix target --"
+node --input-type=module <<'EOF'
+import { buildApiKeyHints } from "./src/lib/pipeline_report.js";
+
+const savedGemini = process.env.GEMINI_API_KEY;
+const savedNano = process.env.NANO_BANANA_API_KEY;
+delete process.env.GEMINI_API_KEY;
+delete process.env.NANO_BANANA_API_KEY;
+
+try {
+  const hints = buildApiKeyHints({
+    state: {
+      config: { dryRun: true },
+      improvement: {
+        lastPlan: {
+          totalTargets: 1,
+          targets: [{ slideId: "slide02", tool: "smart_auto_fix" }],
+        },
+        history: [],
+        roundsExecuted: 0,
+      },
+    },
+    config: { dryRun: true },
+    items: [
+      {
+        slideId: "slide02",
+        improvementTool: "smart_auto_fix",
+        textChainConnected: true,
+      },
+    ],
+  });
+
+  const ids = hints.map((hint) => hint.id);
+  if (!ids.includes("nano_banana")) {
+    throw new Error(`expected nano_banana hint, got ${ids.join(",")}`);
+  }
+  if (!ids.includes("gemini")) {
+    throw new Error(`expected gemini hint, got ${ids.join(",")}`);
+  }
+} finally {
+  if (savedGemini) process.env.GEMINI_API_KEY = savedGemini;
+  else delete process.env.GEMINI_API_KEY;
+  if (savedNano) process.env.NANO_BANANA_API_KEY = savedNano;
+  else delete process.env.NANO_BANANA_API_KEY;
+}
+
+console.log("smart_auto_fix api hints ok");
+EOF
+pass "smart_auto_fix api hints"
 
 echo ""
 echo "All quality pipeline tests passed."

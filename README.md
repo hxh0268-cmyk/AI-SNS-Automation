@@ -274,26 +274,70 @@ npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-expo
 
 `reports/` 配下は **Git 管理対象外** です。
 
-### output 副産物と git（v1.3.1）
+### dry-run と latest / archive（v1.4.1）
+
+| 項目 | 内容 |
+|------|------|
+| dry-run でも `latest` 更新 | **はい** — 計画結果・report を `reports/quality-pipeline/latest/` に保存 |
+| archive 退避 | **毎回 pipeline 開始時**。既存 `latest` があれば `archive/YYYY-MM-DD-HHmmss/` へコピーしてから上書き |
+| `--clean-latest` | 退避せず `latest` を削除してから実行 |
+
+dry-run は API を呼ばず **slide / prompt は基本変更しません** が、state / metrics / report は更新されます。
+
+### 推奨フロー（apply 前チェックリスト）
+
+```bash
+# 1. 環境確認
+npm run health-check
+
+# 2. 計画確認（dry-run — latest / report 更新）
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+
+# 3. レポート確認（Next Actions / API キー / apply 実行判断）
+cat reports/quality-pipeline/latest/report.md
+
+# 4. 本番実行（API 呼び出し・output 変更あり）
+npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
+```
+
+**apply 前チェックリスト：**
+
+- [ ] dry-run を実行済み
+- [ ] `report.md` の改善計画を確認済み
+- [ ] 必要な API キー（`GEMINI_API_KEY` 等）を `.env` に設定済み
+- [ ] quota に余裕がある（limit:0 直後でない）
+
+### output 副産物と git（v1.3.1 / v1.4.1）
 
 apply 実行後、次のパスが `git status` に残ることがあります。これらは **実行結果の副産物** で、通常は commit しません。
 
-| パス | 内容 |
-|------|------|
-| `output/carousel/improved/manifest.json` | 改善 manifest |
-| `output/carousel/improved/slideXX.png` | 改善済み画像 |
-| `output/instagram/package-info.json` | Instagram Package メタ |
-| `output/instagram/review-summary.md` | export レビューサマリー |
+| パス | 内容 | git status |
+|------|------|------------|
+| `reports/quality-pipeline/latest/*` | state / metrics / report | **出ない**（`.gitignore`） |
+| `output/carousel/improved/manifest.json` | 改善 manifest | 追跡済みなら **M** |
+| `output/carousel/improved/slideXX.png` | 改善済み画像 | 新規は **??** |
+| `output/instagram/package-info.json` | Instagram Package メタ | 追跡済みなら **M** |
+| `output/instagram/review-summary.md` | export レビューサマリー | 追跡済みなら **M** |
 
-`report.md` の「output 副産物（git 注意）」セクションにも同内容が出力されます。不要なら削除するか `.gitignore` で無視してください。
+**整理コマンド（変更を破棄）：**
 
-### report.md の運用案内（v1.3.1）
+```bash
+git restore output/
+git clean -fd output/carousel/improved/
+```
 
-`report.md` には次が追加されます。
+`report.md` の「通常 commit 不要の副産物」セクションにも同内容が出力されます。
 
-- **Next Actions** … `stopReason`（例: `LIMIT_ZERO_DETECTED`, `NO_SUCCESSFUL_ACTIONS_API_FAILED`）に応じた次の手順
-- **API キー設定** … Nano Banana / Gemini / OpenAI キー未設定時の `.env` 設定案内
-- **output 副産物（git 注意）** … 上記副産物を commit しない旨
+### report.md の運用案内（v1.4.1）
+
+`report.md` には次が含まれます。
+
+- **Next Actions** … stopReason / dry-run 完了後の次手順
+- **API キー設定** … 不足キーと設定理由（dry-run 計画 / apply 失敗）
+- **dry-run / latest / archive** … latest 更新と退避の説明
+- **--apply 実行判断** … キーあり/なし時の apply 可否
+- **通常 commit 不要の副産物** … output 整理コマンド
+- **Smart Auto Fix / TEXT チェーン**（v1.4）
 
 ### 品質基準（v1.3 パイプライン）
 

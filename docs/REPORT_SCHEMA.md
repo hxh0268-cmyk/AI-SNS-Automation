@@ -113,6 +113,18 @@ v1.2.1 では Nano Banana 画像改善レポート（`scripts/report_nano_banana
 | `reviewSource` | ReReview source |
 | `selectionReason` | `improved_adopted_text_chain`（TEXT チェーン採用時） |
 
+### report.md 運用セクション（v1.4.1）
+
+`quality_pipeline_report` の Markdown 出力に以下を追加（JSON summary には既存フィールドを維持）:
+
+| セクション | 内容 |
+|------------|------|
+| `## 通常 commit 不要の副産物` | reports / output の git 影響、整理コマンド |
+| `## dry-run / latest / archive` | dry-run でも latest 更新、archive 退避 |
+| `## --apply 実行判断` | API キー・quota・rootCause 別 apply 可否 |
+
+`summary.apiKeyHints[].reason`: `planned_for_apply` / `apply_mode` / `api_failed` / `error_detected`
+
 ---
 
 ## Nano Banana report の追加フィールド（v1.2.1）

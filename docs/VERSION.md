@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.4.0**（Smart Auto Fix 統合）
+**v1.4.1**（運用品質パッチ）
 
 ---
 
@@ -10,6 +10,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.4.1** | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
 | **v1.4.0** | Smart Auto Fix 統合 | ✅ 完了 | TEXT チェーン接続、Regeneration Engine、ReReview / report / export / metrics |
 | **v1.3.1** | 運用品質パッチ | ✅ 完了 | latest 退避 / clean-latest / report 運用案内強化 |
 | **v1.3.0** | 完全自動品質パイプライン | ✅ MVP 完了 | 品質ループ・export・report 統合、npm scripts 登録 |
@@ -19,6 +20,14 @@
 | **v1.0** | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
 
 ---
+
+### v1.4.1 で追加（運用品質パッチ）
+
+- **report.md** … 通常 commit 不要の副産物 / dry-run・latest・archive / apply 実行判断
+- **API キー案内** … TEXT チェーン（smart_auto_fix）時の Nano Banana / Gemini ヒント
+- **CLI** … `--apply` バナー、Summary Next Actions
+- **README** … 推奨フロー、output 整理コマンド、apply 前チェックリスト
+- **陳腐化文案修正** … v1.4 以降予定 / Phase 1 表記の削除
 
 ### v1.4.0 で追加（Smart Auto Fix 統合）
 

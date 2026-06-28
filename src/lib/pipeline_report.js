@@ -17,7 +17,7 @@ export const REPORT_SCHEMA_VERSION = "1.0";
 export const REPORT_TOOL = "quality_pipeline_report";
 
 /** レポート生成バージョン */
-export const REPORT_VERSION = "v1.4.0";
+export const REPORT_VERSION = "v1.4.1";
 
 /** scoreSummary / ReReview で使う source 値 */
 const REVIEWED_SCORE_SOURCES = new Set([
@@ -70,8 +70,8 @@ const STOP_REASON_NEXT_ACTIONS = {
   ],
   [IMPROVEMENT_STOP_REASONS.MANUAL_REVIEW_ONLY]: [
     "手動レビューが必要なスライドを report のスライド別表で確認する",
-    "smart_auto_fix / openai_regenerate の pipeline 実接続は v1.4 以降予定",
-    "TEXT / PROMPT 系は v1.2 の `smart-auto-fix` や個別再生成スクリプトで対応する",
+    "TEXT rootCause は v1.4 以降 `smart_auto_fix` チェーンで pipeline 改善可能（`--apply` 時）",
+    "PROMPT / openai_regenerate 対象は placeholder のため、個別スクリプトまたは手動対応",
   ],
   [IMPROVEMENT_STOP_REASONS.NO_SCORE_IMPROVEMENT]: [
     "rootCause と改善 tool の組み合わせを見直す（prompt / レイアウト / スタイル）",
@@ -87,15 +87,15 @@ const API_KEY_HINT_SPECS = [
     label: "Nano Banana API",
     envVars: ["NANO_BANANA_API_KEY", "GEMINI_API_KEY"],
     setup:
-      "`.env` に `NANO_BANANA_API_KEY=...` を設定する（未設定時は `GEMINI_API_KEY` でも可）",
-    tools: [IMPROVEMENT_TOOLS.NANO_BANANA],
+      "`.env` に `NANO_BANANA_API_KEY=...` を設定する（未設定時は `GEMINI_API_KEY` でも可。TEXT チェーンの Regeneration にも使用）",
+    tools: [IMPROVEMENT_TOOLS.NANO_BANANA, IMPROVEMENT_TOOLS.SMART_AUTO_FIX],
     errorPatterns: [/NANO_BANANA_API_KEY/i, /Nano Banana.*API/i],
   },
   {
     id: "gemini",
     label: "Gemini API",
     envVars: ["GEMINI_API_KEY"],
-    setup: "`.env` に `GEMINI_API_KEY=...` を設定する（Gemini 再レビュー用）",
+    setup: "`.env` に `GEMINI_API_KEY=...` を設定する（Gemini 再レビュー・Nano Banana 代替キー用）",
     tools: [],
     errorPatterns: [/GEMINI_API_KEY/i, /GEMINI_QUOTA_EXCEEDED/i],
   },
@@ -104,7 +104,7 @@ const API_KEY_HINT_SPECS = [
     label: "OpenAI API",
     envVars: ["OPENAI_API_KEY"],
     setup:
-      "`.env` に `OPENAI_API_KEY=...` を設定する（openai_regenerate 用。pipeline 実接続は v1.4 以降）",
+      "`.env` に `OPENAI_API_KEY=...` を設定する（openai_regenerate 用。pipeline では placeholder のまま）",
     tools: [IMPROVEMENT_TOOLS.OPENAI_REGENERATE],
     errorPatterns: [/OPENAI_API_KEY/i],
   },
@@ -152,6 +152,14 @@ function collectUsedTools(state, items) {
     if (item.improvementTool) {
       tools.add(item.improvementTool);
     }
+    if (item.textChainConnected) {
+      tools.add(IMPROVEMENT_TOOLS.SMART_AUTO_FIX);
+    }
+  }
+
+  if (tools.has(IMPROVEMENT_TOOLS.SMART_AUTO_FIX)) {
+    tools.add(IMPROVEMENT_TOOLS.NANO_BANANA);
+    tools.add("gemini_re_review");
   }
 
   if ((state.improvement?.roundsExecuted ?? 0) > 0 || tools.size > 0) {
@@ -226,10 +234,13 @@ export function buildApiKeyHints({ state, config, items }) {
     const geminiReReviewNeeded =
       spec.id === "gemini" &&
       (usedTools.has("gemini_re_review") ||
+        usedTools.has(IMPROVEMENT_TOOLS.SMART_AUTO_FIX) ||
         (state.improvement?.roundsExecuted ?? 0) > 0);
     const applyNeedsKey = !dryRun && (toolMatch || geminiReReviewNeeded);
     const dryRunInformative =
-      dryRun && toolMatch && (state.improvement?.lastPlan?.totalTargets ?? 0) > 0;
+      dryRun &&
+      (toolMatch || geminiReReviewNeeded) &&
+      (state.improvement?.lastPlan?.totalTargets ?? 0) > 0;
 
     if (errorMatch || apiFailed || applyNeedsKey || dryRunInformative) {
       hints.push({
@@ -284,6 +295,14 @@ export function buildNextActions({ summary, items, config, apiKeyHints }) {
   }
 
   if (summary.dryRun && (summary.plannedActions ?? 0) > 0) {
+    actions.unshift(
+      "`reports/quality-pipeline/latest/report.md` で計画・API キー案内・apply 実行判断を確認する",
+    );
+    actions.push(
+      "`npm run health-check` で API キーと quota を確認する",
+      "問題なければ `npm run quality-pipeline:apply -- --from-phase image-review` を実行する",
+    );
+  } else if (summary.dryRun) {
     actions.push(
       "計画確認が完了したら `--apply` で本番実行する（API キーと quota を事前に確認）",
     );
@@ -294,6 +313,117 @@ export function buildNextActions({ summary, items, config, apiKeyHints }) {
   }
 
   return [...new Set(actions)];
+}
+
+/** API キー hint の reason ラベル */
+const API_KEY_HINT_REASON_LABELS = {
+  error_detected: "エラー検出",
+  api_failed: "API 失敗",
+  planned_for_apply: "dry-run 計画（`--apply` 前に設定）",
+  apply_mode: "apply 実行中",
+};
+
+/**
+ * report.md 用: 通常 commit 不要の副産物セクション
+ * @returns {string}
+ */
+export function buildNonCommittableArtifactsMarkdown() {
+  return `## 通常 commit 不要の副産物
+
+品質パイプライン実行後、次のパスが変更されることがあります。**通常は git commit しません。**
+
+| パス | 更新タイミング | git への影響 |
+|------|---------------|-------------|
+| \`reports/quality-pipeline/latest/*\` | dry-run / apply 共通 | \`.gitignore\` 対象（\`git status\` に出ない） |
+| \`output/carousel/improved/*\` | apply 時（dry-run では基本なし） | 追跡済みファイルは **M**、新規 PNG は **??** |
+| \`output/instagram/*\` | apply + export 条件達成時 | 同上 |
+
+${OUTPUT_ARTIFACT_GUIDANCE}
+
+整理コマンド例:
+
+\`\`\`bash
+git restore output/
+git clean -fd output/carousel/improved/
+\`\`\`
+
+よく残るパス:
+
+${OUTPUT_ARTIFACT_PATHS.map((artifactPath) => `- \`${artifactPath}\``).join("\n")}
+`;
+}
+
+/**
+ * report.md 用: dry-run / latest / archive セクション
+ * @param {object} summary
+ * @returns {string}
+ */
+export function buildDryRunLatestArchiveMarkdown(summary) {
+  const modeLabel = summary.dryRun ? "dry-run" : "apply";
+  const cleanNote = summary.cleanLatest
+    ? "- 今回は `--clean-latest` により、実行前に `latest` を削除しました（archive 退避なし）"
+    : summary.workspaceAction === "archived" && summary.archivePath
+      ? `- 今回の実行前に、前回の \`latest\` を \`${summary.archivePath}\` へ退避しました`
+      : "- 今回の実行前に退避対象の `latest` はありませんでした";
+
+  return `## dry-run / latest / archive
+
+- 本実行モード: **${modeLabel}**
+- **dry-run でも** \`reports/quality-pipeline/latest/\` は更新されます（計画結果・レポート保存のため）
+- 次回 pipeline 実行時、既存 \`latest\` は \`reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/\` へ退避されてから上書きされます
+- \`--clean-latest\` 指定時は退避せず \`latest\` を削除してから実行します
+
+${cleanNote}
+`;
+}
+
+/**
+ * report.md 用: --apply 実行判断セクション
+ * @param {object} summary
+ * @returns {string}
+ */
+export function buildApplyDecisionMarkdown(summary) {
+  const hints = summary.apiKeyHints ?? [];
+  const missingKeys =
+    hints.length > 0
+      ? hints.map((hint) => `- **${hint.label}**: ${hint.envVars.map((name) => `\`${name}\``).join(" / ")}`).join("\n")
+      : "- （不足キーなし — 計画上必要なキーは設定済み）";
+
+  const applyRecommendation = summary.dryRun
+    ? hints.length > 0
+      ? "**dry-run 完了。API キー設定後に `--apply` を実行してください。**"
+      : summary.plannedActions > 0
+        ? "**dry-run 完了。report 確認後、`--apply` 実行可能です。**"
+        : "**dry-run 完了。改善 target がなければ apply は不要です。**"
+    : summary.limitZeroDetected
+      ? "**quota limit:0 検出。翌日まで待つか quota を確認してください。**"
+      : hints.length > 0
+        ? "**apply 実行中または完了。不足 API キーを設定して再実行してください。**"
+        : "**apply 実行完了。export / スライド別表を確認してください。**";
+
+  return `## --apply 実行判断
+
+${applyRecommendation}
+
+| 条件 | 推奨 |
+|------|------|
+| dry-run 完了 + report 確認済み + 必要 API キー設定済み | \`npm run quality-pipeline:apply -- --from-phase image-review\` |
+| \`GEMINI_API_KEY\` 未設定 + ReReview 予定あり | 先に \`.env\` を設定 |
+| 改善 target あり + API キー不足 | \`NO_SUCCESSFUL_ACTIONS_API_FAILED\` 等で失敗する可能性 |
+| quota limit:0 検出 | 翌日以降に再実行、または quota / 課金プランを確認 |
+
+### 不足している API キー（計画 / 実行に基づく）
+
+${missingKeys}
+
+### rootCause 別に必要な処理（apply 時）
+
+| rootCause | 処理 |
+|-----------|------|
+| **LAYOUT / STYLE / BOOST** | Nano Banana 直呼び → Gemini ReReview（\`GEMINI_API_KEY\` または \`NANO_BANANA_API_KEY\`） |
+| **TEXT** | Smart Auto Fix（slide/prompt 追記）→ Regeneration Engine → Nano Banana adapter → Gemini ReReview |
+| **PROMPT** | \`openai_regenerate\`（pipeline では placeholder） |
+`;
 }
 
 /**
@@ -710,10 +840,10 @@ export function buildPipelineReportMarkdown(report) {
   const apiKeySection =
     apiKeyHints.length > 0
       ? `## API キー設定\n\n${apiKeyHints
-          .map(
-            (hint) =>
-              `### ${hint.label}\n\n- 設定変数: ${hint.envVars.map((name) => `\`${name}\``).join(" / ")}\n- ${hint.setup}\n`,
-          )
+          .map((hint) => {
+            const reasonLabel = API_KEY_HINT_REASON_LABELS[hint.reason] ?? hint.reason;
+            return `### ${hint.label}（${reasonLabel}）\n\n- 設定変数: ${hint.envVars.map((name) => `\`${name}\``).join(" / ")}\n- ${hint.setup}\n`;
+          })
           .join("\n")}`
       : "";
 
@@ -726,14 +856,9 @@ export function buildPipelineReportMarkdown(report) {
     );
   }
 
-  const outputArtifactSection = `## output 副産物（git 注意）
-
-${summary.outputArtifactGuidance ?? OUTPUT_ARTIFACT_GUIDANCE}
-
-よく残るパス:
-
-${(summary.outputArtifactPaths ?? OUTPUT_ARTIFACT_PATHS).map((artifactPath) => `- \`${artifactPath}\``).join("\n")}
-`;
+  const outputArtifactSection = buildNonCommittableArtifactsMarkdown();
+  const dryRunLatestSection = buildDryRunLatestArchiveMarkdown(summary);
+  const applyDecisionSection = buildApplyDecisionMarkdown(summary);
 
   const operationalSection =
     workspaceLines.length > 0
@@ -751,7 +876,9 @@ version: ${report.version}
 ${summaryTable}
 
 ${warningsSection}
-${nextActionsSection}${apiKeySection ? `${apiKeySection}\n` : ""}${operationalSection}${smartAutoFixSection}${outputArtifactSection}
+${nextActionsSection}${apiKeySection ? `${apiKeySection}\n` : ""}${operationalSection}${smartAutoFixSection}${dryRunLatestSection}
+${applyDecisionSection}
+${outputArtifactSection}
 ## スライド別
 
 ${slideTable}

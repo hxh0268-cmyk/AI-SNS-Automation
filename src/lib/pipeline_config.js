@@ -239,11 +239,11 @@ export function validatePipelineConfig(config) {
 export function getPipelineHelpText() {
   return `Usage: node scripts/run_quality_pipeline.js [options]
 
-完全自動品質パイプライン（v1.3 Phase 1: 基盤モジュール）
+完全自動品質パイプライン（v1.4）
 
 Options:
-  --apply                   本番実行（API 呼び出し予定。Phase 1 では state 生成のみ）
-  --dry-run                 dry-run を明示（デフォルト）
+  --apply                   本番実行（API 呼び出し・output 変更あり。先に dry-run で report 確認）
+  --dry-run                 dry-run を明示（デフォルト。latest / report は更新される）
   --target-score <number>   公開推奨ライン（デフォルト: 90）
   --passing-score <number>  合格ライン（デフォルト: 80）
   --max-rounds <number>     改善ループ上限（デフォルト: 3）
@@ -251,10 +251,11 @@ Options:
   --allow-partial-export    90 点未達でも export を許可
   --skip-content            投稿・カルーセル生成をスキップ
   --skip-export             Instagram Package 出力をスキップ
-  --clean-latest            実行前に reports/quality-pipeline/latest を削除
+  --clean-latest            実行前に reports/quality-pipeline/latest を削除（archive 退避なし）
   --from-phase <phase>      開始 Phase（例: INIT, image-review）
   --help, -h                このヘルプを表示
 
-デフォルトは dry-run です。--apply 指定時のみ dryRun: false になります。
+デフォルトは dry-run です。dry-run でも reports/quality-pipeline/latest/ は計画結果として更新されます。
+--apply 指定時のみ dryRun: false になり、API 呼び出しと output/ 副産物が発生する可能性があります。
 `;
 }

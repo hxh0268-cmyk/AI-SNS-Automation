@@ -10,6 +10,7 @@ import {
   parsePipelineArgs,
 } from "../src/lib/pipeline_config.js";
 import { mergeHooks, NOOP_HOOKS } from "../src/lib/pipeline_hooks.js";
+import { buildPipelineReport } from "../src/lib/pipeline_report.js";
 import { runPipeline } from "../src/lib/quality_pipeline.js";
 
 /**
@@ -101,6 +102,31 @@ function printRunSummary(params) {
     console.log(`  report: ${reportInfo.jsonPath}, ${reportInfo.mdPath}`);
   }
 
+  try {
+    const report = buildPipelineReport({
+      state: result.state,
+      metrics: result.metrics,
+      exportManifest: null,
+      config,
+    });
+    const nextActions = report.summary.nextActions ?? [];
+    if (nextActions.length > 0) {
+      console.log("  next actions:");
+      for (const action of nextActions.slice(0, 3)) {
+        console.log(`    - ${action}`);
+      }
+      if (nextActions.length > 3) {
+        console.log(`    - ... 他 ${nextActions.length - 3} 件（report.md 参照）`);
+      }
+    } else if (reportInfo?.mdPath) {
+      console.log(`  next actions: 特記事項なし（詳細は ${reportInfo.mdPath}）`);
+    }
+  } catch {
+    if (reportInfo?.mdPath) {
+      console.log(`  details: see ${reportInfo.mdPath}`);
+    }
+  }
+
   console.log(`  state path: ${result.statePath}`);
   console.log(`  metrics path: ${result.metricsPath}`);
   console.log(
@@ -119,6 +145,12 @@ async function main() {
 
   const config = createPipelineConfig(process.argv);
   const hooks = mergeHooks(NOOP_HOOKS);
+
+  if (!config.dryRun) {
+    console.log(
+      "[QualityPipeline] apply mode: API calls and file/output changes may occur. Confirm dry-run report first.",
+    );
+  }
 
   const result = await runPipeline(config, { hooks });
 
