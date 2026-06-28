@@ -24,9 +24,14 @@ function printRunSummary(params) {
   console.log("");
   console.log("[QualityPipeline] Summary");
   console.log(`  mode: ${config.dryRun ? "dry-run" : "apply"}`);
+  if (config.resume) {
+    console.log("  resume: enabled (state.json checkpoint)");
+  }
   console.log(`  regeneration adapter: ${config.regenerationAdapter ?? "nano_banana"}`);
   if (config.cleanLatest) {
     console.log("  workspace: --clean-latest（latest を実行前に削除）");
+  } else if (result.state.workspace?.action === "resumed") {
+    console.log("  workspace: --resume（latest を archive せず再開）");
   } else if (result.state.workspace?.action === "archived") {
     console.log(`  workspace: archived → ${result.state.workspace.archivePath}`);
   }
@@ -157,6 +162,12 @@ async function main() {
   if (!config.dryRun) {
     console.log(
       "[QualityPipeline] apply mode: API calls and file/output changes may occur. Confirm dry-run report first.",
+    );
+  }
+
+  if (config.resume) {
+    console.log(
+      "[QualityPipeline] resume mode: continuing from reports/quality-pipeline/latest/state.json",
     );
   }
 

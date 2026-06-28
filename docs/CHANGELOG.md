@@ -4,6 +4,68 @@
 
 ---
 
+## v1.6.0 — Resume Execution
+
+Quality Pipeline が途中で停止した場合でも、`--resume` によって **最後に成功したフェーズ以降** から安全に再開できるようにしました。checkpoint は `reports/quality-pipeline/latest/state.json` に集約し、`pipeline_state.json` / `metrics.json` と連携して実行状態を復元します。
+
+### 追加機能
+
+| 項目 | 内容 |
+|------|------|
+| Resume Execution | CLI `--resume` による途中再開 |
+| `state.json` | resume 専用 checkpoint ファイル（`reports/quality-pipeline/latest/state.json`） |
+| Resume Engine | `src/lib/pipeline_resume.js` — checkpoint 読み書き・nextPhase 解決 |
+| checkpoint 保存 | 各 Phase 成功時・失敗時・完了時に `state.json` を更新 |
+| `checkpointRound` 復元 | 改善ループを `roundsExecuted` 基準で継続 |
+| 状態復元 | `pipeline_state.json` / `metrics.json` を読み込んで再開 |
+| latest archive スキップ | `--resume` 時は `preparePipelineWorkspace` が archive しない |
+| CLI | `--resume`（`--help` 表示、`--clean-latest` 併用不可） |
+| テスト | Test 29–34 追加（**34 PASS**） |
+
+### 設計判断
+
+- **Resume は `state.json` を唯一の checkpoint とする** — 再開可否・nextPhase の判断は `state.json` を正とする
+- **Resume は `latest` ワークスペースのみ対象** — `reports/quality-pipeline/latest/` 配下の checkpoint / state / metrics を使用
+- **archive は Resume 時には実施しない** — `--resume` 実行時は既存 `latest` を退避せずそのまま復元
+- **completed phase は再実行しない** — `state.json` の `nextPhase` 以降のみ実行計画に含める
+- **改善ループは `checkpointRound` から継続** — `improvement.roundsExecuted` を起点に IMPROVEMENT / RE_REVIEW ラウンドを再開
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_resume.js` | Resume checkpoint（`state.json`）の build / read / write / 検証 |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_config.js` | `--resume`、`validateResumeConfig`、CLI help（v1.6） |
+| `src/lib/quality_pipeline.js` | Resume 復元・checkpoint 永続化・改善ループ `startRound` |
+| `src/lib/pipeline_workspace.js` | resume 時 archive スキップ（`action: resumed`） |
+| `src/lib/pipeline_state.js` | `snapshotConfig.resume` |
+| `scripts/run_quality_pipeline.js` | resume モード表示・Summary |
+| `scripts/test_quality_pipeline.sh` | Test 29–34 |
+| `README.md` | v1.6 Resume Execution 使い方 |
+
+### 変更なし（意図的）
+
+- `scripts/run_daily.sh`
+- Smart Auto Fix / Regeneration Engine 中核
+- `openai_regenerate` placeholder
+- GitHub Actions 連携
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| `npm run test:quality-pipeline` | **PASS**（34 tests） |
+| `npm run quality-pipeline:dry-run` | **exit 0** |
+| `npm run quality-pipeline:dry-run -- --resume` | **exit 0** |
+| `git diff -- scripts/run_daily.sh` | **差分なし** |
+
+---
+
 ## v1.5.0 — OpenAI Regeneration Adapter
 
 Regeneration Engine に **OpenAI Adapter** を追加し、TEXT チェーンの画像再生成を **Nano Banana と CLI から切り替え可能** にしました。Smart Auto Fix 中核・quality loop 構造は変更しません。

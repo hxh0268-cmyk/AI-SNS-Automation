@@ -1,6 +1,10 @@
 import { InputConfigurationError } from "./exit_codes.js";
 import { PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
 import {
+  getResumeStateRelativePath,
+  resumeStateFileExists,
+} from "./pipeline_resume.js";
+import {
   DEFAULT_REGENERATION_ADAPTER_ID,
   REGENERATION_ADAPTER_IDS,
 } from "./regeneration_engine.js";
@@ -24,6 +28,7 @@ export const VALID_REGENERATION_ADAPTERS = [
  * @property {boolean} cleanLatest
  * @property {string} fromPhase
  * @property {string} regenerationAdapter
+ * @property {boolean} resume
  */
 
 /** 品質パイプラインのデフォルト設定 */
@@ -39,6 +44,7 @@ export const DEFAULT_PIPELINE_CONFIG = {
   cleanLatest: false,
   fromPhase: PIPELINE_PHASES.INIT,
   regenerationAdapter: DEFAULT_REGENERATION_ADAPTER_ID,
+  resume: false,
 };
 
 /**
@@ -61,6 +67,7 @@ export function parsePipelineArgs(argv) {
     cleanLatest: false,
     fromPhase: null,
     regenerationAdapter: null,
+    resume: false,
   };
 
   for (let index = 2; index < argv.length; index += 1) {
@@ -133,6 +140,11 @@ export function parsePipelineArgs(argv) {
       continue;
     }
 
+    if (arg === "--resume") {
+      options.resume = true;
+      continue;
+    }
+
     if (arg === "--regeneration-adapter") {
       const value = argv[index + 1];
       if (!value || value.startsWith("--")) {
@@ -189,6 +201,7 @@ export function createPipelineConfig(argv) {
     skipExport: args.skipExport,
     cleanLatest: args.cleanLatest,
     regenerationAdapter: DEFAULT_PIPELINE_CONFIG.regenerationAdapter,
+    resume: false,
   };
 
   if (args.targetScore !== null) {
@@ -213,6 +226,10 @@ export function createPipelineConfig(argv) {
 
   if (args.regenerationAdapter !== null) {
     config.regenerationAdapter = args.regenerationAdapter;
+  }
+
+  if (args.resume) {
+    config.resume = true;
   }
 
   if (args.apply) {
@@ -266,6 +283,30 @@ export function validatePipelineConfig(config) {
       `--regeneration-adapter は ${VALID_REGENERATION_ADAPTERS.join(" | ")} のいずれかを指定してください。`,
     );
   }
+
+  validateResumeConfig(config);
+}
+
+/**
+ * --resume 関連の設定を検証する
+ * @param {PipelineConfig} config
+ */
+export function validateResumeConfig(config) {
+  if (!config.resume) {
+    return;
+  }
+
+  if (config.cleanLatest) {
+    throw new InputConfigurationError(
+      "--resume と --clean-latest は同時に指定できません。",
+    );
+  }
+
+  if (!resumeStateFileExists()) {
+    throw new InputConfigurationError(
+      `--resume には ${getResumeStateRelativePath()} が必要です。`,
+    );
+  }
 }
 
 /**
@@ -275,11 +316,12 @@ export function validatePipelineConfig(config) {
 export function getPipelineHelpText() {
   return `Usage: node scripts/run_quality_pipeline.js [options]
 
-完全自動品質パイプライン（v1.5）
+完全自動品質パイプライン（v1.6）
 
 Options:
   --apply                   本番実行（API 呼び出し・output 変更あり。先に dry-run で report 確認）
   --dry-run                 dry-run を明示（デフォルト。latest / report は更新される）
+  --resume                  前回 checkpoint（state.json）から途中再開（latest を archive しない）
   --regeneration-adapter <nano_banana|openai>
                             Select regeneration adapter. Default: nano_banana.
   --target-score <number>   公開推奨ライン（デフォルト: 90）
@@ -289,7 +331,7 @@ Options:
   --allow-partial-export    90 点未達でも export を許可
   --skip-content            投稿・カルーセル生成をスキップ
   --skip-export             Instagram Package 出力をスキップ
-  --clean-latest            実行前に reports/quality-pipeline/latest を削除（archive 退避なし）
+  --clean-latest            実行前に reports/quality-pipeline/latest を削除（archive 退避なし。--resume 不可）
   --from-phase <phase>      開始 Phase（例: INIT, image-review）
   --help, -h                このヘルプを表示
 

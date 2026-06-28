@@ -13,6 +13,7 @@ import {
   getPlannedPhases,
   isLoopPhase,
   PIPELINE_PHASES,
+  resolveFromPhase,
 } from "./phases.js";
 import { extractScoreSnapshot } from "./pipeline_score.js";
 import {
@@ -20,6 +21,7 @@ import {
   appendFailedStep,
   createInitialPipelineState,
   DEFAULT_PIPELINE_STATE_DIR,
+  readPipelineState,
   recordImprovementRound,
   recordExportResult,
   recordReportResult,
@@ -27,11 +29,17 @@ import {
   updatePipelineState,
   writePipelineState,
 } from "./pipeline_state.js";
+import {
+  persistResumeCheckpoint,
+  readResumeState,
+  validateResumeCheckpoint,
+} from "./pipeline_resume.js";
 import { preparePipelineWorkspace } from "./pipeline_workspace.js";
 import {
   appendRoundMetrics,
   createPipelineMetrics,
   finishMetrics,
+  readPipelineMetrics,
   recordImprovementMetrics,
   recordExportMetrics,
   recordReportMetrics,
@@ -283,6 +291,14 @@ async function executeSinglePhase(params) {
   const statePath = await writePipelineState(nextState, outputDir);
   const metricsPath = await writePipelineMetrics(nextMetrics, outputDir);
 
+  if (!applied.stopPipeline && phaseResult.status !== "failed") {
+    await persistResumeCheckpoint({
+      pipelineState: nextState,
+      config,
+      outputDir,
+    });
+  }
+
   return {
     state: nextState,
     metrics: nextMetrics,
@@ -341,6 +357,7 @@ async function runImprovementLoop(params) {
     scoreSummaryLoaded,
     statePath,
     metricsPath,
+    startRound = 0,
   } = params;
 
   /** @type {string | null} */
@@ -371,7 +388,7 @@ async function runImprovementLoop(params) {
     };
   }
 
-  let round = 0;
+  let round = startRound;
 
   while (true) {
     if (state.scoreSummary.allSlidesPublishRecommended) {
@@ -570,6 +587,12 @@ async function runImprovementLoop(params) {
     statePath = await writePipelineState(state, outputDir);
   }
 
+  await persistResumeCheckpoint({
+    pipelineState: state,
+    config,
+    outputDir,
+  });
+
   return {
     state,
     metrics,
@@ -593,19 +616,75 @@ async function runImprovementLoop(params) {
  */
 export async function runPipeline(config, options = {}) {
   const hooks = mergeHooks(options.hooks ?? NOOP_HOOKS);
-  let metrics = startMetrics(options.metrics ?? createPipelineMetrics());
   const outputDir = options.outputDir ?? DEFAULT_PIPELINE_STATE_DIR;
 
-  const workspace = await preparePipelineWorkspace(config, outputDir);
+  /** @type {object} */
+  let effectiveConfig = { ...config };
+  /** @type {number} */
+  let improvementStartRound = 0;
 
-  let state = createInitialPipelineState(config);
-  if (workspace.action !== "none") {
-    state = updatePipelineState(state, { workspace });
+  /** @type {object | null} */
+  let resumeCheckpoint = null;
+
+  if (config.resume) {
+    resumeCheckpoint = await readResumeState(outputDir);
+    validateResumeCheckpoint(resumeCheckpoint);
+
+    effectiveConfig = {
+      ...effectiveConfig,
+      fromPhase: resolveFromPhase(resumeCheckpoint.nextPhase),
+    };
+    improvementStartRound = resumeCheckpoint.checkpointRound ?? 0;
+
+    console.log(
+      `[QualityPipeline] [--resume] checkpoint=${resumeCheckpoint.checkpointPhase}, next=${resumeCheckpoint.nextPhase}, round=${improvementStartRound}`,
+    );
   }
-  state = updatePipelineState(state, { status: "running" });
+
+  const workspace = await preparePipelineWorkspace(effectiveConfig, outputDir);
+
+  let metrics;
+  let state;
+
+  if (config.resume) {
+    state = await readPipelineState(outputDir);
+    try {
+      metrics = startMetrics(await readPipelineMetrics(outputDir));
+    } catch {
+      metrics = startMetrics(createPipelineMetrics());
+    }
+
+    state = updatePipelineState(state, {
+      status: "running",
+      phase: effectiveConfig.fromPhase,
+      workspace,
+      resume: {
+        enabled: true,
+        checkpointPhase: resumeCheckpoint?.checkpointPhase ?? null,
+        checkpointRound: improvementStartRound,
+      },
+      failedSteps: [],
+      lastError: null,
+    });
+  } else {
+    metrics = startMetrics(options.metrics ?? createPipelineMetrics());
+    state = createInitialPipelineState(effectiveConfig);
+    if (workspace.action !== "none") {
+      state = updatePipelineState(state, { workspace });
+    }
+    state = updatePipelineState(state, { status: "running" });
+  }
 
   let statePath = await writePipelineState(state, outputDir);
   let metricsPath = await writePipelineMetrics(metrics, outputDir);
+
+  if (!config.resume) {
+    await persistResumeCheckpoint({
+      pipelineState: state,
+      config: effectiveConfig,
+      outputDir,
+    });
+  }
 
   /** @type {unknown} */
   let pipelineError = null;
@@ -617,16 +696,16 @@ export async function runPipeline(config, options = {}) {
   let improvementStopReason = null;
 
   try {
-    await hooks.beforePipeline({ config, state, metrics });
+    await hooks.beforePipeline({ config: effectiveConfig, state, metrics });
 
-    const allPhases = buildExecutionPlan(config);
+    const allPhases = buildExecutionPlan(effectiveConfig);
     const { preLoopPhases, postLoopPhases, hasImprovementLoop } =
       splitPhasesAroundImprovementLoop(allPhases);
 
     for (const phase of preLoopPhases) {
       const result = await executeSinglePhase({
         phase,
-        config,
+        config: effectiveConfig,
         state,
         metrics,
         outputDir,
@@ -654,13 +733,14 @@ export async function runPipeline(config, options = {}) {
       const loopResult = await runImprovementLoop({
         state,
         metrics,
-        config,
+        config: effectiveConfig,
         hooks,
         outputDir,
         healthCheckFailed,
         scoreSummaryLoaded,
         statePath,
         metricsPath,
+        startRound: improvementStartRound,
       });
 
       state = loopResult.state;
@@ -683,7 +763,7 @@ export async function runPipeline(config, options = {}) {
       for (const phase of postLoopPhases) {
         const result = await executeSinglePhase({
           phase,
-          config,
+          config: effectiveConfig,
           state,
           metrics,
           outputDir,
@@ -714,10 +794,15 @@ export async function runPipeline(config, options = {}) {
         status: "completed",
       });
       await hooks.onSuccess({
-        config,
+        config: effectiveConfig,
         state,
         metrics,
         exportPath: state.export?.path ?? undefined,
+      });
+      await persistResumeCheckpoint({
+        pipelineState: state,
+        config: effectiveConfig,
+        outputDir,
       });
     }
   } catch (error) {
@@ -729,15 +814,28 @@ export async function runPipeline(config, options = {}) {
         : state.phase;
 
     state = appendFailedStep(state, failedPhase, reason);
-    await hooks.onFailure({ config, state, metrics, error });
+    await persistResumeCheckpoint({
+      pipelineState: state,
+      config: effectiveConfig,
+      outputDir,
+    });
+    await hooks.onFailure({ config: effectiveConfig, state, metrics, error });
   } finally {
     metrics = finishMetrics(metrics);
 
     statePath = await writePipelineState(state, outputDir);
     metricsPath = await writePipelineMetrics(metrics, outputDir);
 
+    if (state.status !== "completed") {
+      await persistResumeCheckpoint({
+        pipelineState: state,
+        config: effectiveConfig,
+        outputDir,
+      });
+    }
+
     await hooks.afterPipeline({
-      config,
+      config: effectiveConfig,
       state,
       metrics,
       error: pipelineError ?? undefined,
@@ -746,7 +844,7 @@ export async function runPipeline(config, options = {}) {
 
   const exitCode = getPipelineExitCode({
     state,
-    config,
+    config: effectiveConfig,
     metrics,
     error: pipelineError,
     dryRun: config.dryRun,

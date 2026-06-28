@@ -117,6 +117,7 @@ function snapshotConfig(config) {
     cleanLatest: config.cleanLatest ?? false,
     fromPhase: config.fromPhase,
     regenerationAdapter: config.regenerationAdapter ?? DEFAULT_REGENERATION_ADAPTER_ID,
+    resume: config.resume ?? false,
   };
 }
 

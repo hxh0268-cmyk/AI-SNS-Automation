@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.5.0**（OpenAI Regeneration Adapter）
+**v1.6.0**（Resume Execution）
 
 ---
 
@@ -10,15 +10,100 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.5.0** | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
-| **v1.4.1** | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
-| **v1.4.0** | Smart Auto Fix 統合 | ✅ 完了 | TEXT チェーン接続、Regeneration Engine、ReReview / report / export / metrics |
-| **v1.3.1** | 運用品質パッチ | ✅ 完了 | latest 退避 / clean-latest / report 運用案内強化 |
-| **v1.3.0** | 完全自動品質パイプライン | ✅ MVP 完了 | 品質ループ・export・report 統合、npm scripts 登録 |
-| **v1.2** | Nano Banana 画像改善 | ✅ 完了 | Nano Banana による画像改善・Gemini 再レビュー・レポート生成 |
-| **v1.1.1** | 運用品質向上 | ✅ 完了 | Health Check / Doctor / Smart Auto Fix で日常運用を支援 |
-| **v1.1** | Genspark連携 | ✅ 完了 | Genspark の調査結果を投稿生成に反映（半自動運用） |
-| **v1.0** | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
+| v1.0 | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
+| v1.1 | Genspark連携 | ✅ 完了 | Genspark の調査結果を投稿生成に反映（半自動運用） |
+| v1.1.1 | 運用品質向上 | ✅ 完了 | Health Check / Doctor / Smart Auto Fix で日常運用を支援 |
+| v1.2.0 | Nano Banana 画像改善 | ✅ 完了 | Nano Banana による画像改善・Gemini 再レビュー・レポート生成 |
+| v1.2.1 | スキーマ / 終了コード統一 | ✅ 完了 | manifest / report schema 固定、CLI 終了コード統一 |
+| v1.3.0 | 完全自動品質パイプライン | ✅ 完了 | 品質ループ・export・report 統合、npm scripts 登録 |
+| v1.3.1 | 運用品質パッチ | ✅ 完了 | latest 退避 / clean-latest / report 運用案内強化 |
+| v1.4.0 | Smart Auto Fix 統合 | ✅ 完了 | TEXT チェーン接続、Regeneration Engine、ReReview / report / export / metrics |
+| v1.4.1 | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
+| v1.5.0 | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
+| **v1.6.0** | **Resume Execution** | **✅ 完了** | **`--resume` 途中再開、`state.json` checkpoint、latest archive スキップ** |
+
+---
+
+### v1.6.0 で追加（Resume Execution）
+
+#### Resume Execution
+
+**主な追加機能**
+
+- **Resume Engine** … `src/lib/pipeline_resume.js`
+- **`state.json`** … `reports/quality-pipeline/latest/state.json`（resume 専用 checkpoint）
+- **checkpoint 保存** … Phase 成功 / 失敗 / 完了時に更新
+- **`checkpointRound` 復元** … 改善ループを `roundsExecuted` 基準で継続
+- **completed phase の自動 skip** … `nextPhase` 以降のみ実行
+- **latest archive を Resume 時にスキップ** … `--resume` 時は `latest` を退避しない
+- **CLI `--resume`** … `--clean-latest` 併用不可、`state.json` 必須
+- **Resume テスト追加** … Test 29–34
+
+**状態復元**
+
+- `pipeline_state.json` … 実行状態・scoreSummary・改善履歴
+- `metrics.json` … API 呼び出し数・ラウンド別 metrics
+
+### 品質状況（v1.6.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **34 PASS** |
+
+**確認済み**
+
+- `npm run quality-pipeline:dry-run` … **PASS**
+- `npm run quality-pipeline:dry-run -- --resume` … **PASS**
+
+### v1.6.0 完成済み機能一覧
+
+| 機能 | 状態 |
+|------|------|
+| Smart Auto Fix | ✅ |
+| Regeneration Engine | ✅ |
+| Nano Banana Adapter | ✅ |
+| OpenAI Adapter | ✅ |
+| Gemini ReReview | ✅ |
+| scoreSummary | ✅ |
+| Resume Execution | ✅ |
+| report.json | ✅ |
+| report.md | ✅ |
+| metrics.json | ✅ |
+| state.json | ✅ |
+| export | ✅ |
+| latest archive | ✅ |
+| dry-run | ✅ |
+| apply | ✅ |
+| CLI help | ✅ |
+
+### 未実装一覧（v1.6.0 時点）
+
+| 項目 | 状態 |
+|------|------|
+| GitHub Actions | 未実装 |
+
+### 次期バージョン
+
+**Next Release: v1.7.0**
+
+候補例：
+
+- GitHub Actions
+- CI/CD
+- 自動リリース
+- Nightly Pipeline
+- Pipeline Notification
+
+### v1.6.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| 実装 | ✅ 完了 |
+| テスト | ✅ 完了（34 tests PASS、dry-run / `--resume` dry-run exit 0） |
+| README | ✅ 完了 |
+| CHANGELOG | ✅ 完了 |
+| VERSION | ✅ 完了 |
+| Git Commit / Tag | 未実施（次フェーズ） |
 
 ---
 
@@ -44,7 +129,7 @@
 
 - **Smart Auto Fix lib 化** … `src/lib/smart_auto_fix.js`、CLI 薄型化
 - **Regeneration Engine** … `src/lib/regeneration_engine.js` + Nano Banana adapter
-- **TEXT rootCause 接続** … SAF → Regeneration → Nano Banana → Gemini ReReview → scoreSummary
+- **TEXT rootCause 接続** … SAF → Regeneration → adapter → Gemini ReReview → scoreSummary
 - **scoreSummary source 一般化** … `smart_auto_fix_re_review` / `nano_banana_re_review`
 - **report v1.4.0** … SAF / Regeneration / TEXT チェーン表示
 - **export** … TEXT chain improved 採用（`improved_adopted_text_chain`）
@@ -52,15 +137,18 @@
 - **テスト** … `npm run test:quality-pipeline` 21 件 PASS
 - **dry-run 標準** … 維持
 
-### v1.3.1 → v1.4.0 差分要約
+### 品質基準（v1.6 維持）
 
-| 観点 | v1.3.1 | v1.4.0 |
-|------|--------|--------|
-| TEXT 改善 | placeholder（`smart_auto_fix` 計画のみ） | **実接続**（SAF → Regeneration → ReReview） |
-| 画像再生成 IF | Nano Banana 直呼びのみ | **Regeneration Engine** + adapter |
-| scoreSummary source | `nano_banana_re_review` 固定 | **一般化**（TEXT / Nano Banana 別 source） |
-| report / metrics | Nano Banana / ReReview のみ | **SAF / Regeneration カウント追加** |
-| export | manifest improved 採用 | **TEXT チェーン improved も採用** |
+| 点数 / 条件 | 判定 | 対応 |
+|-------------|------|------|
+| **90 点以上** | 公開推奨 | export 可能（デフォルト） |
+| **80 点以上** | 合格 | `--allow-partial-export` 時に export 可能 |
+| **79 点以下** | 要改善 | 改善ループ対象 |
+| **TEXT rootCause** | Smart Auto Fix チェーン | v1.4 接続、v1.5 で adapter 切替 |
+| **Regeneration adapter** | `nano_banana`（デフォルト） / `openai` | v1.5 |
+| **Resume** | `--resume` + `state.json` | v1.6 |
+| **LAYOUT / STYLE / BOOST** | Nano Banana 直呼び | v1.3 から維持 |
+| **openai_regenerate** | placeholder | 未実装（改善 plan 上の別ルート） |
 
 ### v1.4 の運用イメージ
 
@@ -72,44 +160,10 @@ npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
 npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
   ↓ TEXT rootCause は Smart Auto Fix チェーンで改善
 reports/quality-pipeline/latest/report.md を確認
+  ↓ 途中停止時
+npm run quality-pipeline:dry-run -- --resume   … v1.6 checkpoint から再開
 output/instagram/                      … 90 点達成時（または --allow-partial-export 時）
 ```
-
-### 品質基準（v1.4 維持）
-
-| 点数 / 条件 | 判定 | 対応 |
-|-------------|------|------|
-| **90 点以上** | 公開推奨 | export 可能（デフォルト） |
-| **80 点以上** | 合格 | `--allow-partial-export` 時に export 可能 |
-| **79 点以下** | 要改善 | 改善ループ対象 |
-| **TEXT rootCause** | Smart Auto Fix チェーン | v1.4 接続、v1.5 で adapter 切替 |
-| **Regeneration adapter** | `nano_banana`（デフォルト） / `openai` | v1.5 |
-| **LAYOUT / STYLE / BOOST** | Nano Banana 直呼び | v1.3 から維持 |
-| **openai_regenerate** | placeholder | 未実装 |
-
-### v1.4.0 完成判定
-
-| 項目 | 状態 |
-|------|------|
-| 設計 | ✅ 完了（`docs/V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md`） |
-| 実装（Phase 4-A〜4-E） | ✅ 完了 |
-| テスト | ✅ 完了（21 tests PASS、dry-run exit 0） |
-| README | ✅ 完了 |
-| CHANGELOG | ✅ 完了 |
-| VERSION | ✅ 完了 |
-| REPORT_SCHEMA | ✅ 追記 |
-
-### 未接続項目（v1.4 時点）
-
-| 項目 | 状態 |
-|------|------|
-| `openai_regenerate` | placeholder |
-| `--resume` | 未実装 |
-| GitHub Actions | 未実装 |
-| POST_GENERATION 〜 IMAGE_GENERATION | placeholder |
-| `run_daily.sh` | **変更なし** |
-
----
 
 ### v1.3.1 で追加（運用品質パッチ）
 
@@ -138,8 +192,8 @@ output/instagram/                      … 90 点達成時（または --allow-p
 | [README.md](../README.md) | 使い方・コマンド一覧 |
 | [CHANGELOG.md](./CHANGELOG.md) | バージョンごとの変更履歴 |
 | [V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md](./V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md) | v1.4 Smart Auto Fix 統合設計 |
-| [REPORT_SCHEMA.md](./REPORT_SCHEMA.md) | quality_pipeline_report スキーマ |
 | [V1.3_QUALITY_PIPELINE_DESIGN.md](./V1.3_QUALITY_PIPELINE_DESIGN.md) | v1.3 品質パイプライン設計 |
+| [REPORT_SCHEMA.md](./REPORT_SCHEMA.md) | quality_pipeline_report スキーマ |
 | [V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md](./V1.2_NANO_BANANA_IMAGE_IMPROVEMENT_DESIGN.md) | v1.2 Nano Banana 画像改善の設計 |
 | [Genspark連携設計.md](./Genspark連携設計.md) | v1.1 Genspark 連携の設計・運用 |
 | [SmartAutoFix設計.md](./SmartAutoFix設計.md) | v1.1.1 Smart Auto Fix の設計 |

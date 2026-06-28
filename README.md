@@ -230,13 +230,14 @@ npm run quality-pipeline:dry-run -- --clean-latest --from-phase image-review
 npm run quality-pipeline:dry-run -- --regeneration-adapter openai --from-phase image-review
 ```
 
-追加オプション（v1.3.1 / v1.5）:
+追加オプション（v1.3.1 / v1.5 / v1.6）:
 
 | オプション | 説明 |
 |------------|------|
-| `--clean-latest` | 実行前に `reports/quality-pipeline/latest` を削除してから開始 |
+| `--clean-latest` | 実行前に `reports/quality-pipeline/latest` を削除してから開始（`--resume` 不可） |
 | （デフォルト） | 既存 `latest` がある場合、上書き前に `reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/` へ退避 |
 | `--regeneration-adapter <nano_banana\|openai>` | TEXT チェーンの Regeneration adapter を選択（**デフォルト: `nano_banana`**） |
+| `--resume` | `state.json` checkpoint から途中再開（`latest` を archive しない） |
 
 ### npm scripts
 
@@ -267,6 +268,7 @@ npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-expo
 | ファイル | 内容 |
 |----------|------|
 | `reports/quality-pipeline/latest/pipeline_state.json` | 実行状態・scoreSummary・改善履歴 |
+| `reports/quality-pipeline/latest/state.json` | 途中再開用 checkpoint（v1.6・`--resume`） |
 | `reports/quality-pipeline/latest/metrics.json` | API 呼び出し数・ラウンド別 metrics |
 | `reports/quality-pipeline/latest/report.json` | REPORT_SCHEMA 準拠（`quality_pipeline_report`） |
 | `reports/quality-pipeline/latest/report.md` | 人間向けサマリー |
@@ -355,7 +357,6 @@ git clean -fd output/carousel/improved/
 - POST_GENERATION 〜 IMAGE_GENERATION フェーズは **placeholder**（未接続）
 - **TEXT rootCause** は v1.4 で Smart Auto Fix チェーン接続済み（下記 v1.4 参照）
 - **PROMPT / openai_regenerate** は **placeholder のまま**
-- `--resume` 途中再開は未実装
 - GitHub Actions 連携は未実装
 
 設計詳細: [docs/V1.3_QUALITY_PIPELINE_DESIGN.md](docs/V1.3_QUALITY_PIPELINE_DESIGN.md)
@@ -423,7 +424,7 @@ npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
 # 本番実行（TEXT チェーン含む改善を実実行）
 npm run quality-pipeline:apply -- --from-phase image-review --max-rounds 3
 
-# テスト（28 件・API 未使用）
+# テスト（34 件・API 未使用）
 npm run test:quality-pipeline
 ```
 
@@ -444,7 +445,6 @@ dry-run 時、TEXT 対象は `status: planned` として report / metrics に記
 | 項目 | 状態 |
 |------|------|
 | `openai_regenerate` | placeholder のまま |
-| `--resume` | 未実装 |
 | GitHub Actions | 未実装 |
 | `run_daily.sh` | **変更なし**（v1.0〜v1.4 維持） |
 
@@ -534,7 +534,73 @@ dry-run 後は `reports/quality-pipeline/latest/report.md` で adapter 選択と
 ### テスト
 
 ```bash
-npm run test:quality-pipeline   # 28 PASS（OpenAI adapter 含む）
+npm run test:quality-pipeline   # 34 PASS（OpenAI adapter / Resume 含む）
+```
+
+---
+
+## Resume Execution（v1.6）
+
+v1.6 では、Quality Pipeline が **途中で停止した場合** でも、`--resume` によって **最後に成功したフェーズ以降** から安全に再開できるようになりました。
+
+### 概要
+
+| 項目 | 内容 |
+|------|------|
+| checkpoint ファイル | `reports/quality-pipeline/latest/state.json` |
+| 関連ファイル | `pipeline_state.json` / `metrics.json`（実行状態の復元に使用） |
+| 再開単位 | 最後に成功した Phase（改善ループは `checkpointRound` から継続） |
+| dry-run 標準 | **維持** — `--resume` でも dry-run / apply は CLI 指定どおり |
+| archive 退避 | **`--resume` 時は行わない**（`latest` をそのまま利用） |
+
+各 Phase 成功時に `state.json` が更新されます。`checkpointPhase`・`nextPhase`・`completedSteps`・`checkpointRound` などが記録され、`--resume` 実行時に読み込まれます。
+
+### いつ使うか
+
+- API quota 超過・ネットワークエラー等で pipeline が **途中停止** したとき
+- `--max-api-calls` 到達などで **部分実行** したあと、続きから再開したいとき
+- 前回の `pipeline_state.json` / `metrics.json` を活かし、**最初からやり直さず** EXPORT / REPORT 以降だけ実行したいとき
+
+### 使用例
+
+```bash
+# dry-run で checkpoint から計画確認・再開
+npm run quality-pipeline:dry-run -- --resume
+
+# 本番実行で checkpoint から再開（API 呼び出し・output 変更あり）
+npm run quality-pipeline:apply -- --resume
+```
+
+### 制約・注意
+
+| 項目 | 内容 |
+|------|------|
+| `--resume` 必須ファイル | `reports/quality-pipeline/latest/state.json` が存在すること |
+| `--resume` + `--clean-latest` | **併用不可**（エラー） |
+| 完了済み実行 | `state.json` の `status: completed` の場合、`--resume` は不要（エラー） |
+| 初回実行 | 通常どおり `npm run quality-pipeline:dry-run` 等を実行すると `state.json` が自動生成される |
+
+**推奨フロー：**
+
+```bash
+# 1. 通常実行（途中停止または計画確認）
+npm run quality-pipeline:dry-run -- --from-phase image-review --max-rounds 3
+
+# 2. checkpoint 確認
+cat reports/quality-pipeline/latest/state.json
+
+# 3. 途中から再開
+npm run quality-pipeline:dry-run -- --resume
+# 問題なければ apply
+npm run quality-pipeline:apply -- --resume
+```
+
+CLI Summary では `resume: enabled` と `workspace: --resume（latest を archive せず再開）` が表示されます。
+
+### テスト
+
+```bash
+npm run test:quality-pipeline   # 34 PASS（Resume 含む）
 ```
 
 ---
@@ -1134,6 +1200,7 @@ AI-SNS-Automation/
 │   └── lib/          … 品質パイプライン・Smart Auto Fix・Regeneration Engine 等
 │       ├── smart_auto_fix.js      … SAF lib（v1.4）
 │       ├── regeneration_engine.js … Regeneration Engine（v1.4）
+│       ├── pipeline_resume.js     … Resume checkpoint / state.json（v1.6）
 │       └── regeneration/          … adapter（nano_banana / openai）
 ├── scripts/          … シェルスクリプト（run_daily.sh など）
 │   ├── run_quality_pipeline.js … v1.3 品質パイプライン CLI
@@ -1167,6 +1234,7 @@ AI-SNS-Automation/
 | 品質パイプライン（v1.3） | targetScore 90 まで改善ループ、export / report 統合 |
 | 品質パイプライン（v1.4） | TEXT rootCause → Smart Auto Fix チェーン接続 |
 | 品質パイプライン（v1.5） | Regeneration adapter 切替（`nano_banana` / `openai`） |
+| 品質パイプライン（v1.6） | `--resume` による途中再開（`state.json` checkpoint） |
 
 ---
 

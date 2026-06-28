@@ -1195,4 +1195,222 @@ EOF
 pass "default nano_banana"
 
 echo ""
+echo "-- Test 29: --resume requires state.json --"
+node --input-type=module <<'EOF'
+import { createPipelineConfig } from "./src/lib/pipeline_config.js";
+import fs from "node:fs";
+import { getResumeStateAbsolutePath } from "./src/lib/pipeline_resume.js";
+
+const statePath = getResumeStateAbsolutePath();
+const backup = fs.existsSync(statePath) ? fs.readFileSync(statePath) : null;
+if (fs.existsSync(statePath)) {
+  fs.unlinkSync(statePath);
+}
+
+try {
+  let threw = false;
+  try {
+    createPipelineConfig(["node", "scripts/run_quality_pipeline.js", "--resume"]);
+  } catch (error) {
+    threw = true;
+    if (!String(error.message).includes("state.json")) {
+      throw new Error(`unexpected error: ${error.message}`);
+    }
+  }
+  if (!threw) {
+    throw new Error("expected error for missing state.json");
+  }
+} finally {
+  if (backup) {
+    fs.writeFileSync(statePath, backup);
+  }
+}
+
+console.log("resume requires state.json ok");
+EOF
+pass "resume requires state.json"
+
+echo ""
+echo "-- Test 30: --resume and --clean-latest conflict --"
+node --input-type=module <<'EOF'
+import { createPipelineConfig } from "./src/lib/pipeline_config.js";
+import fs from "node:fs";
+import { getResumeStateAbsolutePath } from "./src/lib/pipeline_resume.js";
+
+const statePath = getResumeStateAbsolutePath();
+if (!fs.existsSync(statePath)) {
+  fs.writeFileSync(statePath, '{"tool":"quality_pipeline_resume","status":"resumable","nextPhase":"REPORT"}\n');
+}
+
+try {
+  let threw = false;
+  try {
+    createPipelineConfig([
+      "node",
+      "scripts/run_quality_pipeline.js",
+      "--resume",
+      "--clean-latest",
+    ]);
+  } catch (error) {
+    threw = true;
+    if (!String(error.message).includes("--clean-latest")) {
+      throw new Error(`unexpected error: ${error.message}`);
+    }
+  }
+  if (!threw) {
+    throw new Error("expected conflict error");
+  }
+} finally {
+  // leave state.json for later tests
+}
+
+console.log("resume clean-latest conflict ok");
+EOF
+pass "resume clean-latest conflict"
+
+echo ""
+echo "-- Test 31: CLI help includes --resume --"
+node --input-type=module <<'EOF'
+import { getPipelineHelpText } from "./src/lib/pipeline_config.js";
+
+const help = getPipelineHelpText();
+if (!help.includes("--resume")) {
+  throw new Error("CLI help missing --resume");
+}
+console.log("CLI help resume ok");
+EOF
+pass "CLI help resume"
+
+echo ""
+echo "-- Test 32: pipeline_resume checkpoint roundtrip --"
+node --input-type=module <<'EOF'
+import {
+  buildResumeCheckpoint,
+  readResumeState,
+  RESUME_STATE_TOOL,
+  writeResumeState,
+} from "./src/lib/pipeline_resume.js";
+import { PIPELINE_PHASES } from "./src/lib/phases.js";
+
+const checkpoint = buildResumeCheckpoint({
+  pipelineState: {
+    status: "running",
+    phase: PIPELINE_PHASES.IMAGE_REVIEW,
+    round: 0,
+    completedSteps: [PIPELINE_PHASES.IMAGE_REVIEW],
+    improvement: { roundsExecuted: 0 },
+    config: { fromPhase: PIPELINE_PHASES.IMAGE_REVIEW, dryRun: true },
+  },
+  config: { dryRun: true, targetScore: 90, passingScore: 80, maxRounds: 3 },
+  status: "resumable",
+});
+
+if (checkpoint.tool !== RESUME_STATE_TOOL) {
+  throw new Error("tool mismatch");
+}
+if (checkpoint.nextPhase !== PIPELINE_PHASES.IMPROVEMENT) {
+  throw new Error(`expected next IMPROVEMENT, got ${checkpoint.nextPhase}`);
+}
+
+await writeResumeState(checkpoint);
+const loaded = await readResumeState();
+if (loaded.checkpointPhase !== PIPELINE_PHASES.IMAGE_REVIEW) {
+  throw new Error("checkpointPhase mismatch");
+}
+
+console.log("resume checkpoint roundtrip ok");
+EOF
+pass "resume checkpoint roundtrip"
+
+echo ""
+echo "-- Test 33: dry-run writes state.json --"
+node scripts/run_quality_pipeline.js --dry-run --from-phase image-review --max-rounds 1 --clean-latest
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { getResumeStateAbsolutePath } from "./src/lib/pipeline_resume.js";
+import { RESUME_STATE_TOOL } from "./src/lib/pipeline_resume.js";
+
+const statePath = getResumeStateAbsolutePath();
+if (!fs.existsSync(statePath)) {
+  throw new Error("state.json missing after dry-run");
+}
+const checkpoint = JSON.parse(fs.readFileSync(statePath, "utf-8"));
+if (checkpoint.tool !== RESUME_STATE_TOOL) {
+  throw new Error(`unexpected tool: ${checkpoint.tool}`);
+}
+if (!checkpoint.nextPhase && checkpoint.status === "completed") {
+  console.log("state.json completed ok");
+} else if (checkpoint.nextPhase) {
+  console.log(`state.json resumable next=${checkpoint.nextPhase}`);
+} else {
+  throw new Error("invalid state.json checkpoint");
+}
+EOF
+pass "dry-run writes state.json"
+
+echo ""
+echo "-- Test 34: --resume continues from checkpoint --"
+node --input-type=module <<'EOF'
+import fs from "node:fs/promises";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+import { PIPELINE_PHASES } from "./src/lib/phases.js";
+import { buildResumeCheckpoint, writeResumeState } from "./src/lib/pipeline_resume.js";
+
+const latestDir = path.join(PROJECT_ROOT, "reports/quality-pipeline/latest");
+const pipelineStatePath = path.join(latestDir, "pipeline_state.json");
+const pipelineState = JSON.parse(await fs.readFile(pipelineStatePath, "utf-8"));
+
+pipelineState.status = "running";
+pipelineState.phase = PIPELINE_PHASES.EXPORT;
+pipelineState.completedSteps = (pipelineState.completedSteps ?? []).filter(
+  (phase) => phase !== PIPELINE_PHASES.REPORT && phase !== PIPELINE_PHASES.COMPLETE,
+);
+await fs.writeFile(pipelineStatePath, `${JSON.stringify(pipelineState, null, 2)}\n`);
+
+const checkpoint = buildResumeCheckpoint({
+  pipelineState,
+  config: { ...pipelineState.config, dryRun: true },
+  status: "resumable",
+});
+checkpoint.nextPhase = PIPELINE_PHASES.REPORT;
+await writeResumeState(checkpoint);
+
+console.log("checkpoint prepared for REPORT resume");
+EOF
+node scripts/run_quality_pipeline.js --resume 2>&1 | tail -5
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const pipelineState = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/quality-pipeline/latest/pipeline_state.json"),
+    "utf-8",
+  ),
+);
+
+if (!pipelineState.completedSteps.includes("REPORT")) {
+  throw new Error("REPORT not completed after resume");
+}
+if (pipelineState.workspace?.action !== "resumed") {
+  throw new Error("expected workspace action resumed");
+}
+
+const checkpoint = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/quality-pipeline/latest/state.json"),
+    "utf-8",
+  ),
+);
+if (checkpoint.status !== "completed") {
+  throw new Error(`expected completed checkpoint, got ${checkpoint.status}`);
+}
+
+console.log("resume continuation ok");
+EOF
+pass "resume continues from checkpoint"
+
+echo ""
 echo "All quality pipeline tests passed."

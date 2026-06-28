@@ -98,6 +98,10 @@ export async function preparePipelineWorkspace(
   config,
   outputDir = DEFAULT_PIPELINE_STATE_DIR,
 ) {
+  if (config.resume) {
+    return { action: "resumed", archivePath: null };
+  }
+
   if (config.cleanLatest) {
     await cleanLatestOutput(outputDir);
     return { action: "cleaned", archivePath: null };
