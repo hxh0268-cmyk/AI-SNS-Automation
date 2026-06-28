@@ -1,5 +1,5 @@
 import { InputConfigurationError } from "./exit_codes.js";
-import { PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
+import { isPhaseBefore, PHASE_ORDER, PIPELINE_PHASES, resolveFromPhase } from "./phases.js";
 import {
   getResumeStateRelativePath,
   resumeStateFileExists,
@@ -29,6 +29,7 @@ export const VALID_REGENERATION_ADAPTERS = [
  * @property {string} fromPhase
  * @property {string} regenerationAdapter
  * @property {boolean} resume
+ * @property {string | null} stopBeforePhase
  */
 
 /** 品質パイプラインのデフォルト設定 */
@@ -45,6 +46,7 @@ export const DEFAULT_PIPELINE_CONFIG = {
   fromPhase: PIPELINE_PHASES.INIT,
   regenerationAdapter: DEFAULT_REGENERATION_ADAPTER_ID,
   resume: false,
+  stopBeforePhase: null,
 };
 
 /**
@@ -68,6 +70,7 @@ export function parsePipelineArgs(argv) {
     fromPhase: null,
     regenerationAdapter: null,
     resume: false,
+    stopBeforePhase: null,
   };
 
   for (let index = 2; index < argv.length; index += 1) {
@@ -145,6 +148,18 @@ export function parsePipelineArgs(argv) {
       continue;
     }
 
+    if (arg === "--stop-before-phase") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new InputConfigurationError(
+          "--stop-before-phase には Phase 名を指定してください。",
+        );
+      }
+      options.stopBeforePhase = value;
+      index += 1;
+      continue;
+    }
+
     if (arg === "--regeneration-adapter") {
       const value = argv[index + 1];
       if (!value || value.startsWith("--")) {
@@ -202,6 +217,7 @@ export function createPipelineConfig(argv) {
     cleanLatest: args.cleanLatest,
     regenerationAdapter: DEFAULT_PIPELINE_CONFIG.regenerationAdapter,
     resume: false,
+    stopBeforePhase: null,
   };
 
   if (args.targetScore !== null) {
@@ -230,6 +246,10 @@ export function createPipelineConfig(argv) {
 
   if (args.resume) {
     config.resume = true;
+  }
+
+  if (args.stopBeforePhase !== null) {
+    config.stopBeforePhase = resolveFromPhase(args.stopBeforePhase);
   }
 
   if (args.apply) {
@@ -285,6 +305,43 @@ export function validatePipelineConfig(config) {
   }
 
   validateResumeConfig(config);
+  validateStopBeforePhaseConfig(config);
+}
+
+/**
+ * --stop-before-phase 関連の設定を検証する
+ * @param {PipelineConfig} config
+ */
+export function validateStopBeforePhaseConfig(config) {
+  if (!config.stopBeforePhase) {
+    return;
+  }
+
+  if (config.resume) {
+    throw new InputConfigurationError(
+      "--resume と --stop-before-phase は同時に指定できません。",
+    );
+  }
+
+  const stopPhase = config.stopBeforePhase;
+
+  if (stopPhase === PIPELINE_PHASES.COMPLETE || stopPhase === PIPELINE_PHASES.FAILED) {
+    throw new InputConfigurationError(
+      "--stop-before-phase に COMPLETE / FAILED は指定できません。",
+    );
+  }
+
+  if (!PHASE_ORDER.includes(stopPhase)) {
+    throw new InputConfigurationError(
+      `--stop-before-phase の Phase が不正です: ${stopPhase}`,
+    );
+  }
+
+  if (!isPhaseBefore(config.fromPhase, stopPhase)) {
+    throw new InputConfigurationError(
+      "--stop-before-phase は --from-phase より後の Phase を指定してください。",
+    );
+  }
 }
 
 /**
@@ -316,12 +373,14 @@ export function validateResumeConfig(config) {
 export function getPipelineHelpText() {
   return `Usage: node scripts/run_quality_pipeline.js [options]
 
-完全自動品質パイプライン（v1.6）
+完全自動品質パイプライン（v1.7）
 
 Options:
   --apply                   本番実行（API 呼び出し・output 変更あり。先に dry-run で report 確認）
   --dry-run                 dry-run を明示（デフォルト。latest / report は更新される）
   --resume                  前回 checkpoint（state.json）から途中再開（latest を archive しない）
+  --stop-before-phase <phase>
+                            指定 Phase の直前で実行を中断（state.json に checkpoint 保存）
   --regeneration-adapter <nano_banana|openai>
                             Select regeneration adapter. Default: nano_banana.
   --target-score <number>   公開推奨ライン（デフォルト: 90）

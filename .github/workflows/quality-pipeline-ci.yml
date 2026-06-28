@@ -1,0 +1,107 @@
+name: Quality Pipeline CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 18 * * *"
+
+concurrency:
+  group: quality-pipeline-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Dry-run with stop-before-phase
+        run: |
+          npm run quality-pipeline:dry-run -- \
+            --from-phase image-review \
+            --max-rounds 1 \
+            --clean-latest \
+            --stop-before-phase report
+
+      - name: Verify stop checkpoint
+        run: |
+          node --input-type=module <<'EOF'
+          import fs from "node:fs";
+          import { RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE } from "./src/lib/pipeline_resume.js";
+
+          const checkpoint = JSON.parse(
+            fs.readFileSync("reports/quality-pipeline/latest/state.json", "utf-8"),
+          );
+
+          if (checkpoint.status !== "resumable") {
+            throw new Error(`expected resumable, got ${checkpoint.status}`);
+          }
+          if (checkpoint.stopReason !== RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE) {
+            throw new Error(`expected stopReason before-phase, got ${checkpoint.stopReason}`);
+          }
+          if (checkpoint.stopBeforePhase !== "REPORT") {
+            throw new Error(`expected stopBeforePhase REPORT, got ${checkpoint.stopBeforePhase}`);
+          }
+          if (checkpoint.nextPhase !== "REPORT") {
+            throw new Error(`expected nextPhase REPORT, got ${checkpoint.nextPhase}`);
+          }
+          if (fs.existsSync("reports/quality-pipeline/latest/report.json")) {
+            throw new Error("report.json should not exist before resume");
+          }
+          EOF
+
+      - name: Resume dry-run
+        run: npm run quality-pipeline:dry-run -- --resume
+
+      - name: Verify resume artifacts
+        run: |
+          test -f reports/quality-pipeline/latest/report.json
+          test -f reports/quality-pipeline/latest/report.md
+          test -f reports/quality-pipeline/latest/metrics.json
+          test -f reports/quality-pipeline/latest/state.json
+          test -f reports/quality-pipeline/latest/pipeline_state.json
+          node --input-type=module <<'EOF'
+          import fs from "node:fs";
+
+          const checkpoint = JSON.parse(
+            fs.readFileSync("reports/quality-pipeline/latest/state.json", "utf-8"),
+          );
+
+          if (checkpoint.status !== "completed") {
+            throw new Error(`expected completed, got ${checkpoint.status}`);
+          }
+          if (checkpoint.stopReason !== null) {
+            throw new Error(`expected stopReason null, got ${checkpoint.stopReason}`);
+          }
+          if (checkpoint.stopBeforePhase !== null) {
+            throw new Error(`expected stopBeforePhase null, got ${checkpoint.stopBeforePhase}`);
+          }
+          EOF
+
+      - name: Upload quality pipeline reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-pipeline-reports-${{ github.run_id }}
+          path: reports/quality-pipeline/latest/
+          retention-days: 14

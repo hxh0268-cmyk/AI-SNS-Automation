@@ -230,7 +230,7 @@ npm run quality-pipeline:dry-run -- --clean-latest --from-phase image-review
 npm run quality-pipeline:dry-run -- --regeneration-adapter openai --from-phase image-review
 ```
 
-追加オプション（v1.3.1 / v1.5 / v1.6）:
+追加オプション（v1.3.1 / v1.5 / v1.6 / v1.7）:
 
 | オプション | 説明 |
 |------------|------|
@@ -238,6 +238,7 @@ npm run quality-pipeline:dry-run -- --regeneration-adapter openai --from-phase i
 | （デフォルト） | 既存 `latest` がある場合、上書き前に `reports/quality-pipeline/archive/YYYY-MM-DD-HHmmss/` へ退避 |
 | `--regeneration-adapter <nano_banana\|openai>` | TEXT チェーンの Regeneration adapter を選択（**デフォルト: `nano_banana`**） |
 | `--resume` | `state.json` checkpoint から途中再開（`latest` を archive しない） |
+| `--stop-before-phase <phase>` | 指定 Phase の直前で意図的中断（`state.json` に `stopReason: before-phase` を保存） |
 
 ### npm scripts
 
@@ -249,6 +250,7 @@ npm run quality-pipeline:dry-run -- --regeneration-adapter openai --from-phase i
 | `npm run quality-pipeline:report` | REPORT フェーズから実行 |
 | `npm run quality-pipeline:export` | EXPORT フェーズから実行 |
 | `npm run test:quality-pipeline` | 最小テスト（API 未使用） |
+| `npm test` | 上記と同じ（CI エイリアス） |
 
 ### 推奨フロー（画像レビュー済みの場合）
 
@@ -268,7 +270,7 @@ npm run quality-pipeline:apply -- --from-phase image-review --allow-partial-expo
 | ファイル | 内容 |
 |----------|------|
 | `reports/quality-pipeline/latest/pipeline_state.json` | 実行状態・scoreSummary・改善履歴 |
-| `reports/quality-pipeline/latest/state.json` | 途中再開用 checkpoint（v1.6・`--resume`） |
+| `reports/quality-pipeline/latest/state.json` | 途中再開用 checkpoint（v1.6 `--resume` / v1.7 `stopReason`） |
 | `reports/quality-pipeline/latest/metrics.json` | API 呼び出し数・ラウンド別 metrics |
 | `reports/quality-pipeline/latest/report.json` | REPORT_SCHEMA 準拠（`quality_pipeline_report`） |
 | `reports/quality-pipeline/latest/report.md` | 人間向けサマリー |
@@ -534,7 +536,8 @@ dry-run 後は `reports/quality-pipeline/latest/report.md` で adapter 選択と
 ### テスト
 
 ```bash
-npm run test:quality-pipeline   # 34 PASS（OpenAI adapter / Resume 含む）
+npm run test:quality-pipeline   # 38 PASS
+npm test                        # 同上（CI エイリアス）
 ```
 
 ---
@@ -577,6 +580,7 @@ npm run quality-pipeline:apply -- --resume
 |------|------|
 | `--resume` 必須ファイル | `reports/quality-pipeline/latest/state.json` が存在すること |
 | `--resume` + `--clean-latest` | **併用不可**（エラー） |
+| `--resume` + `--stop-before-phase` | **併用不可**（エラー） |
 | 完了済み実行 | `state.json` の `status: completed` の場合、`--resume` は不要（エラー） |
 | 初回実行 | 通常どおり `npm run quality-pipeline:dry-run` 等を実行すると `state.json` が自動生成される |
 
@@ -600,8 +604,59 @@ CLI Summary では `resume: enabled` と `workspace: --resume（latest を archi
 ### テスト
 
 ```bash
-npm run test:quality-pipeline   # 34 PASS（Resume 含む）
+npm run test:quality-pipeline   # 38 PASS
+npm test                        # 同上
 ```
+
+### `--stop-before-phase`（v1.7）
+
+指定 Phase の **直前** で pipeline を意図的に中断し、`state.json` に resumable checkpoint を保存します。
+
+```bash
+# EXPORT 完了後、REPORT 前で停止
+npm run quality-pipeline:dry-run -- \
+  --from-phase image-review \
+  --max-rounds 1 \
+  --clean-latest \
+  --stop-before-phase report
+
+# 続きから再開
+npm run quality-pipeline:dry-run -- --resume
+```
+
+中断時の `state.json`:
+
+| フィールド | 値 |
+|------------|-----|
+| `status` | `resumable` |
+| `stopReason` | `before-phase` |
+| `stopBeforePhase` | `REPORT` |
+| `checkpointPhase` | `EXPORT` |
+| `nextPhase` | `REPORT` |
+
+Resume 完了後は `status: completed`、`stopReason: null`、`stopBeforePhase: null`、`nextPhase: null` になります。
+
+---
+
+## GitHub Actions / CI（v1.7）
+
+Quality Pipeline の品質ゲートを GitHub Actions 上で自動実行します。**API キー不要**（dry-run のみ）で Green になる構成です。
+
+| 項目 | 内容 |
+|------|------|
+| ファイル | `.github/workflows/quality-pipeline-ci.yml` |
+| トリガー | `push` / `pull_request`（main）/ `workflow_dispatch` / `schedule` |
+| Node.js | 20.x |
+| Secrets | **不要** |
+
+CI 実行内容:
+
+1. `npm test`（38 PASS）
+2. `quality-pipeline:dry-run -- --stop-before-phase report`
+3. `quality-pipeline:dry-run -- --resume`
+4. Artifacts として `reports/quality-pipeline/latest/` を保存
+
+GitHub Actions の Run 詳細 → **Artifacts** → `quality-pipeline-reports-<run_id>` から成果物をダウンロードできます。
 
 ---
 
@@ -1128,6 +1183,7 @@ images/carousel/review/image_review.md を確認してください
 | `npm run quality-pipeline:report` | REPORT フェーズから実行 |
 | `npm run quality-pipeline:export` | EXPORT フェーズから実行 |
 | `npm run test:quality-pipeline` | 最小テスト（API 未使用） |
+| `npm test` | 上記と同じ（CI エイリアス） |
 
 ### 環境確認・Genspark 連携
 
@@ -1235,6 +1291,7 @@ AI-SNS-Automation/
 | 品質パイプライン（v1.4） | TEXT rootCause → Smart Auto Fix チェーン接続 |
 | 品質パイプライン（v1.5） | Regeneration adapter 切替（`nano_banana` / `openai`） |
 | 品質パイプライン（v1.6） | `--resume` による途中再開（`state.json` checkpoint） |
+| 品質パイプライン（v1.7） | `--stop-before-phase`、GitHub Actions CI、Artifacts |
 
 ---
 

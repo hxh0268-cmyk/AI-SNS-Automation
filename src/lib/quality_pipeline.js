@@ -32,6 +32,7 @@ import {
 import {
   persistResumeCheckpoint,
   readResumeState,
+  RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE,
   validateResumeCheckpoint,
 } from "./pipeline_resume.js";
 import { preparePipelineWorkspace } from "./pipeline_workspace.js";
@@ -74,6 +75,37 @@ function shouldSkipPhase(phase, config) {
   }
 
   return false;
+}
+
+/**
+ * 指定 Phase の直前で停止するか判定する
+ * @param {string} phase
+ * @param {object} config
+ * @returns {boolean}
+ */
+function shouldStopBeforePhase(phase, config) {
+  return Boolean(config.stopBeforePhase && phase === config.stopBeforePhase);
+}
+
+/**
+ * --stop-before-phase による意図的中断 checkpoint を保存する
+ * @param {object} params
+ * @returns {Promise<string>}
+ */
+async function persistStopBeforePhaseCheckpoint(params) {
+  const { phase, config, state, outputDir } = params;
+
+  console.log(
+    `[QualityPipeline] [--stop-before-phase] stopping before ${phase} (checkpoint saved)`,
+  );
+
+  return persistResumeCheckpoint({
+    pipelineState: state,
+    config,
+    outputDir,
+    stopReason: RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE,
+    stopBeforePhase: phase,
+  });
 }
 
 /**
@@ -380,6 +412,7 @@ async function runImprovementLoop(params) {
       state,
       metrics,
       stopPipeline: false,
+      stoppedBeforePhase: null,
       healthCheckFailed,
       scoreSummaryLoaded,
       statePath,
@@ -434,6 +467,26 @@ async function runImprovementLoop(params) {
     state = updatePipelineState(state, { round: nextRound });
     await hooks.beforeRound({ config, state, metrics, round: nextRound });
 
+    if (shouldStopBeforePhase(PIPELINE_PHASES.IMPROVEMENT, config)) {
+      await persistStopBeforePhaseCheckpoint({
+        phase: PIPELINE_PHASES.IMPROVEMENT,
+        config,
+        state,
+        outputDir,
+      });
+      return {
+        state,
+        metrics,
+        stopPipeline: false,
+        stoppedBeforePhase: PIPELINE_PHASES.IMPROVEMENT,
+        healthCheckFailed,
+        scoreSummaryLoaded,
+        statePath,
+        metricsPath,
+        improvementStopReason,
+      };
+    }
+
     const scoreBefore = extractScoreSnapshot(state.scoreSummary);
 
     let improvementExec = await executeSinglePhase({
@@ -463,6 +516,27 @@ async function runImprovementLoop(params) {
         state,
         metrics,
         stopPipeline: true,
+        stoppedBeforePhase: null,
+        healthCheckFailed,
+        scoreSummaryLoaded,
+        statePath,
+        metricsPath,
+        improvementStopReason,
+      };
+    }
+
+    if (shouldStopBeforePhase(PIPELINE_PHASES.RE_REVIEW, config)) {
+      await persistStopBeforePhaseCheckpoint({
+        phase: PIPELINE_PHASES.RE_REVIEW,
+        config,
+        state,
+        outputDir,
+      });
+      return {
+        state,
+        metrics,
+        stopPipeline: false,
+        stoppedBeforePhase: PIPELINE_PHASES.RE_REVIEW,
         healthCheckFailed,
         scoreSummaryLoaded,
         statePath,
@@ -497,6 +571,7 @@ async function runImprovementLoop(params) {
         state,
         metrics,
         stopPipeline: true,
+        stoppedBeforePhase: null,
         healthCheckFailed,
         scoreSummaryLoaded,
         statePath,
@@ -597,6 +672,7 @@ async function runImprovementLoop(params) {
     state,
     metrics,
     stopPipeline: false,
+    stoppedBeforePhase: null,
     healthCheckFailed,
     scoreSummaryLoaded,
     statePath,
@@ -693,6 +769,8 @@ export async function runPipeline(config, options = {}) {
   let scoreSummaryLoaded = null;
   let stopPipeline = false;
   /** @type {string | null} */
+  let stoppedBeforePhase = null;
+  /** @type {string | null} */
   let improvementStopReason = null;
 
   try {
@@ -703,6 +781,17 @@ export async function runPipeline(config, options = {}) {
       splitPhasesAroundImprovementLoop(allPhases);
 
     for (const phase of preLoopPhases) {
+      if (shouldStopBeforePhase(phase, effectiveConfig)) {
+        await persistStopBeforePhaseCheckpoint({
+          phase,
+          config: effectiveConfig,
+          state,
+          outputDir,
+        });
+        stoppedBeforePhase = phase;
+        break;
+      }
+
       const result = await executeSinglePhase({
         phase,
         config: effectiveConfig,
@@ -729,38 +818,60 @@ export async function runPipeline(config, options = {}) {
       }
     }
 
-    if (!stopPipeline && hasImprovementLoop) {
-      const loopResult = await runImprovementLoop({
-        state,
-        metrics,
-        config: effectiveConfig,
-        hooks,
-        outputDir,
-        healthCheckFailed,
-        scoreSummaryLoaded,
-        statePath,
-        metricsPath,
-        startRound: improvementStartRound,
-      });
+    if (!stopPipeline && !stoppedBeforePhase && hasImprovementLoop) {
+      if (shouldStopBeforePhase(PIPELINE_PHASES.IMPROVEMENT, effectiveConfig)) {
+        await persistStopBeforePhaseCheckpoint({
+          phase: PIPELINE_PHASES.IMPROVEMENT,
+          config: effectiveConfig,
+          state,
+          outputDir,
+        });
+        stoppedBeforePhase = PIPELINE_PHASES.IMPROVEMENT;
+      } else {
+        const loopResult = await runImprovementLoop({
+          state,
+          metrics,
+          config: effectiveConfig,
+          hooks,
+          outputDir,
+          healthCheckFailed,
+          scoreSummaryLoaded,
+          statePath,
+          metricsPath,
+          startRound: improvementStartRound,
+        });
 
-      state = loopResult.state;
-      metrics = loopResult.metrics;
-      statePath = loopResult.statePath;
-      metricsPath = loopResult.metricsPath;
-      stopPipeline = loopResult.stopPipeline;
-      healthCheckFailed = loopResult.healthCheckFailed;
-      if (loopResult.scoreSummaryLoaded !== null) {
-        scoreSummaryLoaded = loopResult.scoreSummaryLoaded;
+        state = loopResult.state;
+        metrics = loopResult.metrics;
+        statePath = loopResult.statePath;
+        metricsPath = loopResult.metricsPath;
+        stopPipeline = loopResult.stopPipeline;
+        stoppedBeforePhase = loopResult.stoppedBeforePhase ?? null;
+        healthCheckFailed = loopResult.healthCheckFailed;
+        if (loopResult.scoreSummaryLoaded !== null) {
+          scoreSummaryLoaded = loopResult.scoreSummaryLoaded;
+        }
+        improvementStopReason =
+          loopResult.improvementStopReason ??
+          loopResult.state?.improvement?.stopReason ??
+          metrics.improvement?.stopReason ??
+          null;
       }
-      improvementStopReason =
-        loopResult.improvementStopReason ??
-        loopResult.state?.improvement?.stopReason ??
-        metrics.improvement?.stopReason ??
-        null;
     }
 
-    if (!stopPipeline) {
+    if (!stopPipeline && !stoppedBeforePhase) {
       for (const phase of postLoopPhases) {
+        if (shouldStopBeforePhase(phase, effectiveConfig)) {
+          await persistStopBeforePhaseCheckpoint({
+            phase,
+            config: effectiveConfig,
+            state,
+            outputDir,
+          });
+          stoppedBeforePhase = phase;
+          break;
+        }
+
         const result = await executeSinglePhase({
           phase,
           config: effectiveConfig,
@@ -788,7 +899,7 @@ export async function runPipeline(config, options = {}) {
       }
     }
 
-    if (!healthCheckFailed && !stopPipeline && state.status !== "failed") {
+    if (!healthCheckFailed && !stopPipeline && !stoppedBeforePhase && state.status !== "failed") {
       state = updatePipelineState(state, {
         phase: PIPELINE_PHASES.COMPLETE,
         status: "completed",
@@ -831,6 +942,10 @@ export async function runPipeline(config, options = {}) {
         pipelineState: state,
         config: effectiveConfig,
         outputDir,
+        stopReason: stoppedBeforePhase
+          ? RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE
+          : null,
+        stopBeforePhase: stoppedBeforePhase,
       });
     }
 
@@ -866,6 +981,7 @@ export async function runPipeline(config, options = {}) {
     exitCode,
     statePath,
     metricsPath,
+    stoppedBeforePhase,
   };
 }
 

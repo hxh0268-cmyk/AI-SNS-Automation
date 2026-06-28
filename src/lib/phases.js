@@ -168,3 +168,20 @@ export function getPlannedPhases(fromPhase) {
 
   return PHASE_ORDER.slice(startIndex);
 }
+
+/**
+ * PHASE_ORDER 上で a が b より前かどうか
+ * @param {string} a
+ * @param {string} b
+ * @returns {boolean}
+ */
+export function isPhaseBefore(a, b) {
+  const indexA = PHASE_ORDER.indexOf(a);
+  const indexB = PHASE_ORDER.indexOf(b);
+
+  if (indexA === -1 || indexB === -1) {
+    return false;
+  }
+
+  return indexA < indexB;
+}

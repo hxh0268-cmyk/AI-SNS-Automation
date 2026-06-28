@@ -1349,68 +1349,192 @@ EOF
 pass "dry-run writes state.json"
 
 echo ""
-echo "-- Test 34: --resume continues from checkpoint --"
+echo "-- Test 34: --stop-before-phase report + --resume --"
+node scripts/run_quality_pipeline.js --dry-run --from-phase image-review --max-rounds 1 --clean-latest --stop-before-phase report
 node --input-type=module <<'EOF'
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
 import { PIPELINE_PHASES } from "./src/lib/phases.js";
-import { buildResumeCheckpoint, writeResumeState } from "./src/lib/pipeline_resume.js";
+import {
+  getResumeStateAbsolutePath,
+  RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE,
+} from "./src/lib/pipeline_resume.js";
 
 const latestDir = path.join(PROJECT_ROOT, "reports/quality-pipeline/latest");
-const pipelineStatePath = path.join(latestDir, "pipeline_state.json");
-const pipelineState = JSON.parse(await fs.readFile(pipelineStatePath, "utf-8"));
-
-pipelineState.status = "running";
-pipelineState.phase = PIPELINE_PHASES.EXPORT;
-pipelineState.completedSteps = (pipelineState.completedSteps ?? []).filter(
-  (phase) => phase !== PIPELINE_PHASES.REPORT && phase !== PIPELINE_PHASES.COMPLETE,
+const checkpoint = JSON.parse(fs.readFileSync(getResumeStateAbsolutePath(), "utf-8"));
+const pipelineState = JSON.parse(
+  fs.readFileSync(path.join(latestDir, "pipeline_state.json"), "utf-8"),
 );
-await fs.writeFile(pipelineStatePath, `${JSON.stringify(pipelineState, null, 2)}\n`);
 
-const checkpoint = buildResumeCheckpoint({
-  pipelineState,
-  config: { ...pipelineState.config, dryRun: true },
-  status: "resumable",
-});
-checkpoint.nextPhase = PIPELINE_PHASES.REPORT;
-await writeResumeState(checkpoint);
+if (checkpoint.status !== "resumable") {
+  throw new Error(`expected resumable, got ${checkpoint.status}`);
+}
+if (checkpoint.stopReason !== RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE) {
+  throw new Error(`expected stopReason before-phase, got ${checkpoint.stopReason}`);
+}
+if (checkpoint.stopBeforePhase !== PIPELINE_PHASES.REPORT) {
+  throw new Error(`expected stopBeforePhase REPORT, got ${checkpoint.stopBeforePhase}`);
+}
+if (checkpoint.nextPhase !== PIPELINE_PHASES.REPORT) {
+  throw new Error(`expected nextPhase REPORT, got ${checkpoint.nextPhase}`);
+}
+if (checkpoint.checkpointPhase !== PIPELINE_PHASES.EXPORT) {
+  throw new Error(`expected checkpointPhase EXPORT, got ${checkpoint.checkpointPhase}`);
+}
+if (pipelineState.completedSteps.includes(PIPELINE_PHASES.REPORT)) {
+  throw new Error("REPORT should not be completed before resume");
+}
+if (fs.existsSync(path.join(latestDir, "report.json"))) {
+  throw new Error("report.json should not exist before resume");
+}
 
-console.log("checkpoint prepared for REPORT resume");
+console.log("stop-before-phase checkpoint ok");
 EOF
 node scripts/run_quality_pipeline.js --resume 2>&1 | tail -5
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
 import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+import { PIPELINE_PHASES } from "./src/lib/phases.js";
+import { getResumeStateAbsolutePath } from "./src/lib/pipeline_resume.js";
 
+const latestDir = path.join(PROJECT_ROOT, "reports/quality-pipeline/latest");
 const pipelineState = JSON.parse(
-  fs.readFileSync(
-    path.join(PROJECT_ROOT, "reports/quality-pipeline/latest/pipeline_state.json"),
-    "utf-8",
-  ),
+  fs.readFileSync(path.join(latestDir, "pipeline_state.json"), "utf-8"),
 );
+const checkpoint = JSON.parse(fs.readFileSync(getResumeStateAbsolutePath(), "utf-8"));
 
-if (!pipelineState.completedSteps.includes("REPORT")) {
+if (!pipelineState.completedSteps.includes(PIPELINE_PHASES.REPORT)) {
   throw new Error("REPORT not completed after resume");
 }
 if (pipelineState.workspace?.action !== "resumed") {
   throw new Error("expected workspace action resumed");
 }
-
-const checkpoint = JSON.parse(
-  fs.readFileSync(
-    path.join(PROJECT_ROOT, "reports/quality-pipeline/latest/state.json"),
-    "utf-8",
-  ),
-);
 if (checkpoint.status !== "completed") {
   throw new Error(`expected completed checkpoint, got ${checkpoint.status}`);
+}
+if (checkpoint.stopReason !== null) {
+  throw new Error(`expected stopReason null after resume, got ${checkpoint.stopReason}`);
+}
+if (checkpoint.stopBeforePhase !== null) {
+  throw new Error(`expected stopBeforePhase null after resume, got ${checkpoint.stopBeforePhase}`);
+}
+if (checkpoint.nextPhase !== null) {
+  throw new Error(`expected nextPhase null after resume, got ${checkpoint.nextPhase}`);
+}
+if (!fs.existsSync(path.join(latestDir, "report.json"))) {
+  throw new Error("report.json missing after resume");
+}
+if (!fs.existsSync(path.join(latestDir, "report.md"))) {
+  throw new Error("report.md missing after resume");
 }
 
 console.log("resume continuation ok");
 EOF
-pass "resume continues from checkpoint"
+pass "stop-before-phase + resume"
+
+echo ""
+echo "-- Test 35: CLI help includes --stop-before-phase --"
+node --input-type=module <<'EOF'
+import { getPipelineHelpText } from "./src/lib/pipeline_config.js";
+
+const help = getPipelineHelpText();
+if (!help.includes("--stop-before-phase")) {
+  throw new Error("CLI help missing --stop-before-phase");
+}
+console.log("CLI help stop-before-phase ok");
+EOF
+pass "CLI help stop-before-phase"
+
+echo ""
+echo "-- Test 36: --stop-before-phase before from-phase rejected --"
+node --input-type=module <<'EOF'
+import { createPipelineConfig } from "./src/lib/pipeline_config.js";
+
+let threw = false;
+try {
+  createPipelineConfig([
+    "node",
+    "scripts/run_quality_pipeline.js",
+    "--from-phase",
+    "report",
+    "--stop-before-phase",
+    "report",
+  ]);
+} catch (error) {
+  threw = true;
+  if (!String(error.message).includes("--from-phase")) {
+    throw new Error(`unexpected error: ${error.message}`);
+  }
+}
+if (!threw) {
+  throw new Error("expected validation error");
+}
+console.log("stop-before-phase order validation ok");
+EOF
+pass "stop-before-phase order validation"
+
+echo ""
+echo "-- Test 37: --resume and --stop-before-phase conflict --"
+node --input-type=module <<'EOF'
+import { createPipelineConfig } from "./src/lib/pipeline_config.js";
+import fs from "node:fs";
+import { getResumeStateAbsolutePath } from "./src/lib/pipeline_resume.js";
+
+const statePath = getResumeStateAbsolutePath();
+if (!fs.existsSync(statePath)) {
+  fs.writeFileSync(statePath, '{"tool":"quality_pipeline_resume","status":"resumable","nextPhase":"REPORT"}\n');
+}
+
+let threw = false;
+try {
+  createPipelineConfig([
+    "node",
+    "scripts/run_quality_pipeline.js",
+    "--resume",
+    "--stop-before-phase",
+    "report",
+  ]);
+} catch (error) {
+  threw = true;
+  if (!String(error.message).includes("--stop-before-phase")) {
+    throw new Error(`unexpected error: ${error.message}`);
+  }
+}
+if (!threw) {
+  throw new Error("expected conflict error");
+}
+console.log("resume stop-before-phase conflict ok");
+EOF
+pass "resume stop-before-phase conflict"
+
+echo ""
+echo "-- Test 38: resume artifacts exist --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const latestDir = path.join(PROJECT_ROOT, "reports/quality-pipeline/latest");
+const required = [
+  "pipeline_state.json",
+  "state.json",
+  "metrics.json",
+  "report.json",
+  "report.md",
+];
+
+for (const file of required) {
+  const filePath = path.join(latestDir, file);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`missing artifact: ${file}`);
+  }
+}
+
+console.log("resume artifacts ok");
+EOF
+pass "resume artifacts"
 
 echo ""
 echo "All quality pipeline tests passed."

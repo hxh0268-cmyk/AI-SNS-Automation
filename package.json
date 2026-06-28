@@ -30,6 +30,7 @@
     "quality-pipeline:apply": "node scripts/run_quality_pipeline.js --apply",
     "quality-pipeline:report": "node scripts/run_quality_pipeline.js --from-phase report",
     "quality-pipeline:export": "node scripts/run_quality_pipeline.js --from-phase export",
-    "test:quality-pipeline": "bash scripts/test_quality_pipeline.sh"
+    "test:quality-pipeline": "bash scripts/test_quality_pipeline.sh",
+    "test": "npm run test:quality-pipeline"
   }
 }

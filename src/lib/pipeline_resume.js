@@ -19,6 +19,9 @@ export const RESUME_STATE_TOOL = "quality_pipeline_resume";
 /** resume checkpoint ファイル名 */
 export const RESUME_STATE_FILENAME = "state.json";
 
+/** --stop-before-phase による意図的中断時の stopReason */
+export const RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE = "before-phase";
+
 /**
  * resume checkpoint の status 値
  * @typedef {"resumable" | "completed" | "failed"} ResumeCheckpointStatus
@@ -102,6 +105,8 @@ export function resolveNextPhaseFromPipelineState(pipelineState) {
  * @param {object} params.config
  * @param {"resumable" | "completed" | "failed"} [params.status]
  * @param {string} [params.outputDir]
+ * @param {string | null} [params.stopReason]
+ * @param {string | null} [params.stopBeforePhase]
  * @returns {object}
  */
 export function buildResumeCheckpoint(params) {
@@ -110,6 +115,8 @@ export function buildResumeCheckpoint(params) {
     config,
     status = "resumable",
     outputDir = DEFAULT_PIPELINE_STATE_DIR,
+    stopReason = null,
+    stopBeforePhase = null,
   } = params;
 
   const completedSteps = [...(pipelineState.completedSteps ?? [])];
@@ -125,12 +132,30 @@ export function buildResumeCheckpoint(params) {
 
   const relativeDir = outputDir.split(path.sep).join("/");
 
+  /** @type {string | null} */
+  let checkpointStopReason = null;
+  /** @type {string | null} */
+  let checkpointStopBeforePhase = null;
+
+  if (
+    stopReason === RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE &&
+    stopBeforePhase
+  ) {
+    checkpointStopReason = RESUME_CHECKPOINT_STOP_REASON_BEFORE_PHASE;
+    checkpointStopBeforePhase = stopBeforePhase;
+  } else if (status !== "completed") {
+    checkpointStopReason = null;
+    checkpointStopBeforePhase = null;
+  }
+
   return {
     schemaVersion: RESUME_STATE_SCHEMA_VERSION,
     tool: RESUME_STATE_TOOL,
     updatedAt: new Date().toISOString(),
     dryRun: config.dryRun ?? pipelineState.config?.dryRun ?? true,
     status,
+    stopReason: checkpointStopReason,
+    stopBeforePhase: checkpointStopBeforePhase,
     config: {
       targetScore: config.targetScore ?? pipelineState.config?.targetScore,
       passingScore: config.passingScore ?? pipelineState.config?.passingScore,
@@ -174,7 +199,13 @@ export async function writeResumeState(checkpoint, outputDir = DEFAULT_PIPELINE_
  * @returns {Promise<string>}
  */
 export async function persistResumeCheckpoint(params) {
-  const { pipelineState, config, outputDir = DEFAULT_PIPELINE_STATE_DIR } = params;
+  const {
+    pipelineState,
+    config,
+    outputDir = DEFAULT_PIPELINE_STATE_DIR,
+    stopReason = null,
+    stopBeforePhase = null,
+  } = params;
 
   let status = "resumable";
   if (pipelineState.status === "completed" || pipelineState.phase === PIPELINE_PHASES.COMPLETE) {
@@ -188,6 +219,8 @@ export async function persistResumeCheckpoint(params) {
     config,
     status,
     outputDir,
+    stopReason: status === "completed" ? null : stopReason,
+    stopBeforePhase: status === "completed" ? null : stopBeforePhase,
   });
 
   return writeResumeState(checkpoint, outputDir);

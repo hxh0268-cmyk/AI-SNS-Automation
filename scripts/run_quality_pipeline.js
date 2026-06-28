@@ -27,6 +27,9 @@ function printRunSummary(params) {
   if (config.resume) {
     console.log("  resume: enabled (state.json checkpoint)");
   }
+  if (result.stoppedBeforePhase) {
+    console.log(`  stop-before-phase: ${result.stoppedBeforePhase} (checkpoint saved)`);
+  }
   console.log(`  regeneration adapter: ${config.regenerationAdapter ?? "nano_banana"}`);
   if (config.cleanLatest) {
     console.log("  workspace: --clean-latest（latest を実行前に削除）");
@@ -168,6 +171,12 @@ async function main() {
   if (config.resume) {
     console.log(
       "[QualityPipeline] resume mode: continuing from reports/quality-pipeline/latest/state.json",
+    );
+  }
+
+  if (config.stopBeforePhase) {
+    console.log(
+      `[QualityPipeline] stop-before-phase: will stop before ${config.stopBeforePhase}`,
     );
   }
 

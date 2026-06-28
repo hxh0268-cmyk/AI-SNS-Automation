@@ -4,6 +4,62 @@
 
 ---
 
+## v1.7.0 — GitHub Actions / CI
+
+Quality Pipeline を GitHub Actions 上で **Secrets なし** に自動検証できるようにしました。`--stop-before-phase` による意図的中断と `--resume` による自然再開を CI で確認し、成果物を Artifacts として保存します。
+
+### 追加機能
+
+| 項目 | 内容 |
+|------|------|
+| `--stop-before-phase` | 指定 Phase 直前で意図的中断（`state.json` に checkpoint 保存） |
+| `stopReason` | 意図的中断時 `before-phase` を `state.json` に記録 |
+| `stopBeforePhase` | 停止対象 Phase（例: `REPORT`）を `state.json` に記録 |
+| GitHub Actions | `.github/workflows/quality-pipeline-ci.yml` |
+| CI 検証 | `npm test` → stop → resume → Artifacts upload |
+| `npm test` | `test:quality-pipeline` のエイリアス |
+| テスト | Test 34 置換 + Test 35–38 追加（**38 PASS**） |
+
+### 設計判断
+
+- **`ci_prepare_resume_checkpoint.js` は作らない** — 本体の `--stop-before-phase` で自然中断
+- **手動 `pipeline_state.json` 改変は不要** — Test 34 は stop → resume フローに置換
+- **CI は dry-run 標準** — API キーなしで Green
+- **Resume 完了後** — `stopReason` / `stopBeforePhase` / `nextPhase` は `null`
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `.github/workflows/quality-pipeline-ci.yml` | Quality Pipeline CI workflow |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/pipeline_config.js` | `--stop-before-phase`、`validateStopBeforePhaseConfig`、CLI help（v1.7） |
+| `src/lib/pipeline_resume.js` | `stopReason` / `stopBeforePhase` を checkpoint に追加 |
+| `src/lib/quality_pipeline.js` | 停止判定・意図的中断 checkpoint 保存 |
+| `src/lib/phases.js` | `isPhaseBefore` |
+| `scripts/run_quality_pipeline.js` | stop-before-phase 表示・Summary |
+| `scripts/test_quality_pipeline.sh` | Test 34–38 |
+| `package.json` | `npm test` エイリアス |
+| `README.md` | v1.7 CI / stop-before-phase ドキュメント |
+
+### 変更なし（意図的）
+
+- `scripts/run_daily.sh`
+- Smart Auto Fix / Regeneration Engine 中核
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **38 PASS** |
+| GitHub Actions CI | main 上で Green 完走（Secrets 不要） |
+
+---
+
 ## v1.6.0 — Resume Execution
 
 Quality Pipeline が途中で停止した場合でも、`--resume` によって **最後に成功したフェーズ以降** から安全に再開できるようにしました。checkpoint は `reports/quality-pipeline/latest/state.json` に集約し、`pipeline_state.json` / `metrics.json` と連携して実行状態を復元します。

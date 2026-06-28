@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.6.0**（Resume Execution）
+**v1.7.0**（GitHub Actions / CI）
 
 ---
 
@@ -20,7 +20,91 @@
 | v1.4.0 | Smart Auto Fix 統合 | ✅ 完了 | TEXT チェーン接続、Regeneration Engine、ReReview / report / export / metrics |
 | v1.4.1 | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
 | v1.5.0 | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
-| **v1.6.0** | **Resume Execution** | **✅ 完了** | **`--resume` 途中再開、`state.json` checkpoint、latest archive スキップ** |
+| v1.6.0 | Resume Execution | ✅ 完了 | `--resume` 途中再開、`state.json` checkpoint、latest archive スキップ |
+| **v1.7.0** | **GitHub Actions / CI** | **✅ 完了** | **`--stop-before-phase`、CI workflow、Artifacts、npm test** |
+
+---
+
+### v1.7.0 で追加（GitHub Actions / CI）
+
+#### `--stop-before-phase`
+
+**主な追加機能**
+
+- **意図的中断** … `--stop-before-phase <phase>` で指定 Phase 直前に停止
+- **`stopReason: before-phase`** … `state.json` に中断理由を記録
+- **`stopBeforePhase`** … 停止対象 Phase を記録
+- **自然 Resume** … 手動 state 改変なしで `--resume` 可能
+- **GitHub Actions** … `.github/workflows/quality-pipeline-ci.yml`
+- **CI 完走** … Secrets なし Green（`npm test` → stop → resume → Artifacts）
+- **`npm test`** … `test:quality-pipeline` エイリアス
+- **テスト追加** … Test 34–38（**38 PASS**）
+
+### 品質状況（v1.7.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **38 PASS** |
+| GitHub Actions CI | **Green 完走**（Secrets 不要） |
+
+**確認済み**
+
+- `npm test` … **PASS**
+- `npm run quality-pipeline:dry-run -- --stop-before-phase report` … **PASS**
+- `npm run quality-pipeline:dry-run -- --resume` … **PASS**
+
+### v1.7.0 完成済み機能一覧
+
+| 機能 | 状態 |
+|------|------|
+| Smart Auto Fix | ✅ |
+| Regeneration Engine | ✅ |
+| Nano Banana Adapter | ✅ |
+| OpenAI Adapter | ✅ |
+| Gemini ReReview | ✅ |
+| scoreSummary | ✅ |
+| Resume Execution | ✅ |
+| `--stop-before-phase` | ✅ |
+| GitHub Actions CI | ✅ |
+| report.json | ✅ |
+| report.md | ✅ |
+| metrics.json | ✅ |
+| state.json | ✅ |
+| export | ✅ |
+| latest archive | ✅ |
+| dry-run | ✅ |
+| apply | ✅ |
+| CLI help | ✅ |
+
+### 未実装一覧（v1.7.0 時点）
+
+| 項目 | 状態 |
+|------|------|
+| CI apply（API キー使用） | 未実装 |
+| Nightly apply pipeline | 未実装 |
+
+### 次期バージョン
+
+**Next Release: v1.8.0**
+
+候補例:
+
+- CI apply workflow（Secrets 必須・手動 dispatch）
+- Nightly Pipeline
+- Pipeline Notification
+- 自動リリース
+
+### v1.7.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| `--stop-before-phase` 実装 | ✅ |
+| stopReason / stopBeforePhase 保存 | ✅ |
+| Test 34 stop → resume 置換 | ✅ |
+| GitHub Actions workflow | ✅ |
+| GitHub Actions Green 完走 | ✅ |
+| npm test エイリアス | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 
@@ -76,25 +160,13 @@
 | apply | ✅ |
 | CLI help | ✅ |
 
-### 未実装一覧（v1.6.0 時点）
+### 未実装一覧（v1.6.0 時点・履歴）
 
 | 項目 | 状態 |
 |------|------|
-| GitHub Actions | 未実装 |
+| GitHub Actions | v1.7.0 で実装済み |
 
-### 次期バージョン
-
-**Next Release: v1.7.0**
-
-候補例：
-
-- GitHub Actions
-- CI/CD
-- 自動リリース
-- Nightly Pipeline
-- Pipeline Notification
-
-### v1.6.0 完成判定
+### v1.6.0 完成判定（履歴）
 
 | 項目 | 状態 |
 |------|------|
@@ -147,6 +219,7 @@
 | **TEXT rootCause** | Smart Auto Fix チェーン | v1.4 接続、v1.5 で adapter 切替 |
 | **Regeneration adapter** | `nano_banana`（デフォルト） / `openai` | v1.5 |
 | **Resume** | `--resume` + `state.json` | v1.6 |
+| **`--stop-before-phase`** | 意図的中断 + `stopReason: before-phase` | v1.7 |
 | **LAYOUT / STYLE / BOOST** | Nano Banana 直呼び | v1.3 から維持 |
 | **openai_regenerate** | placeholder | 未実装（改善 plan 上の別ルート） |
 
