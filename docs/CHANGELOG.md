@@ -4,6 +4,74 @@
 
 ---
 
+## v1.4.0 — Smart Auto Fix 統合（完了）
+
+品質パイプラインにおいて **TEXT rootCause** を Smart Auto Fix チェーンで実改善し、Gemini ReReview → scoreSummary → export / report / metrics まで quality loop に接続しました。
+
+### 概要
+
+- **Smart Auto Fix lib 化** … `src/lib/smart_auto_fix.js` へ抽出、CLI は薄型ラッパー
+- **Regeneration Engine 追加** … SAF と画像再生成の間に共通 IF を配置
+- **Nano Banana adapter 追加** … v1.4 暫定 adapter として `regeneration/nano_banana_adapter.js`
+- **TEXT rootCause pipeline 接続** … `processSmartAutoFixTarget` で SAF → Regeneration → PNG 生成
+- **Gemini ReReview / scoreSummary source 一般化** … `smart_auto_fix_re_review` / `nano_banana_re_review`
+- **report / export / metrics 対応** … SAF / Regeneration カウント、TEXT チェーン表示
+- **dry-run 標準維持** … デフォルト API 未呼び出し
+- **LAYOUT / STYLE / BOOST** … 既存 Nano Banana 直呼びルートは退行なし
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/lib/smart_auto_fix.js` | Smart Auto Fix lib（classify / plan / apply / run） |
+| `src/lib/regeneration_engine.js` | Regeneration Engine（plan / regenerate / adapter 登録） |
+| `src/lib/regeneration/nano_banana_adapter.js` | Nano Banana adapter |
+| `docs/V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md` | v1.4 設計書 |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `src/smart_auto_fix.js` | CLI 薄型化（lib 委譲） |
+| `src/lib/pipeline_improvement.js` | `processSmartAutoFixTarget`、ReReview メタデータ、metrics 集計 |
+| `src/lib/pipeline_score.js` | `resolveReviewSource*`、source 一般化 |
+| `src/lib/pipeline_metrics.js` | SAF / Regeneration カウント |
+| `src/lib/pipeline_report.js` | v1.4.0 レポート、TEXT チェーンセクション |
+| `src/lib/pipeline_export.js` | TEXT chain improved 採用、`smart_auto_fix_re_review` 許容 |
+| `scripts/test_quality_pipeline.sh` | Test 11–21 追加 |
+| `README.md` | v1.4 使い方 |
+| `docs/VERSION.md` | v1.4.0 |
+| `docs/REPORT_SCHEMA.md` | quality_pipeline_report v1.4 フィールド追記 |
+
+### 変更なし（意図的）
+
+| 項目 | 内容 |
+|------|------|
+| `scripts/run_daily.sh` | 非変更 |
+| `openai_regenerate` | placeholder のまま |
+| `--resume` | 未実装 |
+| GitHub Actions | 未実装 |
+
+### 品質基準（維持）
+
+| 点数 | 判定 |
+|------|------|
+| **90 点以上** | 公開推奨 |
+| **80 点以上** | 合格 |
+| **79 点以下** | 要改善 |
+
+### テスト結果（Phase 4-E）
+
+| 項目 | 結果 |
+|------|------|
+| `npm run test:quality-pipeline` | **PASS**（21 tests） |
+| `npm run quality-pipeline:dry-run` | **exit 0** |
+| TEXT chain stub apply（Test 13） | **PASS** |
+| `git diff -- scripts/run_daily.sh` | **差分なし** |
+| 実 API apply E2E | 任意（stub / dry-run を正式確認とする） |
+
+---
+
 ## v1.3.1 — 運用品質パッチ
 
 v1.3.0 の完全自動品質パイプラインに対する **運用安全性** の改善です。新機能追加は行わず、事故防止・後片付け・エラー案内・テスト強化に限定しています。

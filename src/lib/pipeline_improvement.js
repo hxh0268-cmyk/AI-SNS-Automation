@@ -15,6 +15,7 @@ import {
   buildScoreDelta,
   extractScoreSnapshot,
   mergeReviewResultIntoScoreSummary,
+  resolveReviewSourceFromManifestItem,
 } from "./pipeline_score.js";
 import {
   incrementApiCall,
@@ -22,8 +23,17 @@ import {
   recordImprovementExecutionMetrics,
 } from "./pipeline_metrics.js";
 import { PIPELINE_PHASES } from "./phases.js";
+import {
+  DEFAULT_REGENERATION_ADAPTER_ID,
+  planRegeneration,
+  regenerateImage,
+} from "./regeneration_engine.js";
 import { classifyRootCause } from "./root_cause.js";
 import { isLimitZeroError } from "./retry.js";
+import {
+  applySmartAutoFixForSlide,
+  getSlideFilePaths,
+} from "./smart_auto_fix.js";
 
 /** @typedef {"BOOST_TO_PUBLISH_RECOMMENDED" | "REPAIR_REQUIRED"} ImprovementAction */
 
@@ -226,6 +236,12 @@ export const IMPROVEMENT_TOOLS = {
   MANUAL_REVIEW: "manual_review",
 };
 
+/** TEXT 改善チェーン（Phase 4-C） */
+const IMPROVEMENT_PIPELINE_SMART_AUTO_FIX = [
+  IMPROVEMENT_TOOLS.SMART_AUTO_FIX,
+  "regeneration_engine",
+];
+
 /**
  * 改善ループを継続すべきか判定する
  * @param {object} scoreSummary
@@ -371,8 +387,25 @@ export function countImprovementRoundActions(targetResults = [], reReviewResult 
       continue;
     }
 
+    if (tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX) {
+      if (
+        status === "planned" ||
+        status === "improved"
+      ) {
+        executedActions += 1;
+        successfulActions += 1;
+      } else if (
+        status === "saf_failed" ||
+        status === "regen_failed" ||
+        status === "failed"
+      ) {
+        executedActions += 1;
+        failedActions += 1;
+      }
+      continue;
+    }
+
     if (
-      tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX ||
       tool === IMPROVEMENT_TOOLS.OPENAI_REGENERATE ||
       tool === IMPROVEMENT_TOOLS.MANUAL_REVIEW ||
       status === "manual_review" ||
@@ -723,7 +756,7 @@ async function reviewImprovedImageWithGemini({ slideId, improvedImagePath }) {
  * @returns {object}
  */
 function buildManifestItem(base) {
-  return {
+  const item = {
     slideId: base.slideId,
     sourceImagePath: base.sourceImagePath,
     outputPath: base.outputPath,
@@ -736,6 +769,261 @@ function buildManifestItem(base) {
     timeoutMs: base.timeoutMs ?? 0,
     retry: base.retry ?? 0,
     tool: base.tool ?? null,
+  };
+
+  if (Array.isArray(base.improvementPipeline)) {
+    item.improvementPipeline = base.improvementPipeline;
+  }
+  if (base.regenerationAdapter) {
+    item.regenerationAdapter = base.regenerationAdapter;
+  }
+  if (base.smartAutoFix) {
+    item.smartAutoFix = base.smartAutoFix;
+  }
+  if (base.regeneration) {
+    item.regeneration = base.regeneration;
+  }
+
+  return item;
+}
+
+/**
+ * Smart Auto Fix 用 manifest / target result を組み立てる
+ * @param {object} params
+ * @returns {object}
+ */
+function buildSmartAutoFixManifestItem(params) {
+  const {
+    target,
+    sourceImagePath,
+    outputPath,
+    rootCause,
+    manifestStatus,
+    safResult,
+    regenResult,
+    timeoutMs,
+    retry,
+    error,
+  } = params;
+
+  const promptPath =
+    safResult?.promptPath ??
+    getSlideFilePaths(parseSlideNumber(target.slideId) ?? 0).promptMd;
+
+  const regeneration = regenResult
+    ? {
+        status: regenResult.status,
+        adapterId: regenResult.adapterId,
+        promptPath: regenResult.promptPath,
+        sourceImagePath: regenResult.sourceImagePath,
+        outputPath: regenResult.outputPath,
+        elapsedMs: regenResult.elapsedMs ?? 0,
+        attempts: regenResult.attempts ?? 0,
+        error: regenResult.error ?? null,
+      }
+    : null;
+
+  return buildManifestItem({
+    slideId: target.slideId,
+    sourceImagePath,
+    outputPath,
+    beforeScore: target.score,
+    rootCause,
+    status: manifestStatus,
+    error: error ?? null,
+    elapsedMs: regenResult?.elapsedMs ?? 0,
+    attempts: regenResult?.attempts ?? 0,
+    timeoutMs: timeoutMs ?? 0,
+    retry: retry ?? 0,
+    tool: IMPROVEMENT_TOOLS.SMART_AUTO_FIX,
+    improvementPipeline: [...IMPROVEMENT_PIPELINE_SMART_AUTO_FIX],
+    regenerationAdapter: regenResult?.adapterId ?? DEFAULT_REGENERATION_ADAPTER_ID,
+    smartAutoFix: {
+      status: safResult?.status ?? "failed",
+      changedFiles: safResult?.changedFiles ?? [],
+      backedUpFiles: safResult?.backedUpFiles ?? [],
+      skippedFiles: safResult?.skippedFiles ?? [],
+      promptPath,
+      error: safResult?.error ?? null,
+    },
+    regeneration,
+  });
+}
+
+/**
+ * pipeline slide から Smart Auto Fix 入力 slide を組み立てる
+ * @param {object} target
+ * @param {object | null | undefined} slide
+ * @returns {object}
+ */
+function buildSafSlideInput(target, slide) {
+  const slideNumber = parseSlideNumber(target.slideId);
+  return {
+    fileName: `${target.slideId}.png`,
+    number: slideNumber,
+    score: target.score,
+    type: slide?.type ?? null,
+    improvements: [
+      ...(slide?.recommendations ?? []),
+      ...(slide?.issues ?? []),
+    ],
+    issues: slide?.issues ?? [],
+  };
+}
+
+/**
+ * TEXT rootCause: Smart Auto Fix → Regeneration Engine
+ * @param {object} target
+ * @param {object | null | undefined} slide
+ * @param {object} context
+ * @returns {Promise<{ item: object, metrics: object, limitZeroDetected: boolean, skipped: boolean }>}
+ */
+export async function processSmartAutoFixTarget(target, slide, context) {
+  let metrics = context.metrics;
+  const dryRun = context.dryRun ?? context.config?.dryRun ?? false;
+  const projectRoot = context.projectRoot ?? PROJECT_ROOT;
+  const fileName = `${target.slideId}.png`;
+  const sourceImagePath = `${SOURCE_IMAGE_DIR}/${fileName}`;
+  const outputPath = `${IMPROVED_OUTPUT_DIR}/${fileName}`;
+  const timeoutMs = context.config?.nanoBananaTimeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const retry = context.config?.nanoBananaRetry ?? DEFAULT_RETRY;
+  const rootCause = target.rootCause ?? "TEXT";
+
+  const safSlide = buildSafSlideInput(target, slide);
+
+  console.log(
+    `[QualityPipeline] [${dryRun ? "dry-run" : "apply"}] ${target.slideId}: smart_auto_fix → regeneration_engine`,
+  );
+
+  const safResult = await applySmartAutoFixForSlide(safSlide, {
+    apply: !dryRun,
+    projectRoot,
+  });
+
+  if (!dryRun && safResult.status === "failed") {
+    const item = buildSmartAutoFixManifestItem({
+      target,
+      sourceImagePath,
+      outputPath,
+      rootCause,
+      manifestStatus: "saf_failed",
+      safResult,
+      regenResult: null,
+      timeoutMs,
+      retry,
+      error: safResult.error ?? "Smart Auto Fix に失敗しました。",
+    });
+
+    return {
+      item: {
+        ...item,
+        action: target.action,
+        beforeScore: target.score,
+        autoFixable: target.autoFixable,
+      },
+      metrics,
+      limitZeroDetected: false,
+      skipped: true,
+    };
+  }
+
+  const promptPath =
+    safResult.promptPath ??
+    getSlideFilePaths(parseSlideNumber(target.slideId) ?? 0).promptMd;
+
+  const regenRequest = {
+    slideId: target.slideId,
+    promptPath,
+    sourceImagePath,
+    outputPath,
+    adapterId: DEFAULT_REGENERATION_ADAPTER_ID,
+    dryRun,
+    changedTextPaths: safResult.changedFiles ?? [],
+  };
+
+  let regenResult;
+  let limitZeroDetected = false;
+
+  if (dryRun) {
+    regenResult = await planRegeneration(regenRequest, {
+      projectRoot,
+      timeoutMs,
+      retry,
+    });
+  } else {
+    metrics = incrementApiCall(metrics, "nano_banana", PIPELINE_PHASES.IMPROVEMENT);
+    regenResult = await regenerateImage(
+      { ...regenRequest, dryRun: false },
+      {
+        projectRoot,
+        timeoutMs,
+        retry,
+      },
+    );
+
+    if (regenResult.status === "failed") {
+      const errorMessage = regenResult.error ?? "画像再生成に失敗しました。";
+      limitZeroDetected = isLimitZeroError(new Error(errorMessage));
+      metrics = recordFailedCall(
+        metrics,
+        "nano_banana",
+        PIPELINE_PHASES.IMPROVEMENT,
+        errorMessage,
+      );
+    }
+  }
+
+  let manifestStatus;
+  if (dryRun) {
+    manifestStatus = regenResult.status === "planned" ? "planned" : "failed";
+  } else if (regenResult.status === "improved") {
+    manifestStatus = "improved";
+  } else {
+    manifestStatus = "regen_failed";
+  }
+
+  const errorMessage =
+    manifestStatus === "failed" || manifestStatus === "regen_failed"
+      ? regenResult.error ?? safResult.error ?? null
+      : null;
+
+  const item = buildSmartAutoFixManifestItem({
+    target,
+    sourceImagePath,
+    outputPath,
+    rootCause,
+    manifestStatus,
+    safResult,
+    regenResult,
+    timeoutMs,
+    retry,
+    error: errorMessage,
+  });
+
+  if (!dryRun && manifestStatus === "improved") {
+    console.log(
+      `[QualityPipeline] [apply] ${target.slideId}: improved via smart_auto_fix + ${regenResult.adapterId}`,
+    );
+  } else if (!dryRun && manifestStatus === "regen_failed") {
+    console.log(
+      `[QualityPipeline] [apply] ${target.slideId}: regen_failed (${errorMessage})`,
+    );
+  } else if (dryRun && manifestStatus === "planned") {
+    console.log(
+      `  - ${target.slideId}: planned smart_auto_fix + ${regenResult.adapterId} regeneration`,
+    );
+  }
+
+  return {
+    item: {
+      ...item,
+      action: target.action,
+      beforeScore: target.score,
+      autoFixable: target.autoFixable,
+    },
+    metrics,
+    limitZeroDetected,
+    skipped: dryRun ? false : manifestStatus !== "improved",
   };
 }
 
@@ -853,7 +1141,6 @@ async function processNanoBananaTarget(target, slide, context) {
 function buildPlaceholderTargetResult(target) {
   const messageByTool = {
     manual_review: "手動確認が必要（autoFixable: false）",
-    smart_auto_fix: "Phase 4-D: smart_auto_fix は未接続（placeholder_prepared）",
     openai_regenerate: "Phase 4-D: openai_regenerate は未接続（placeholder_prepared）",
   };
 
@@ -863,8 +1150,7 @@ function buildPlaceholderTargetResult(target) {
   const status =
     target.tool === IMPROVEMENT_TOOLS.MANUAL_REVIEW
       ? "manual_review"
-      : target.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX ||
-          target.tool === IMPROVEMENT_TOOLS.OPENAI_REGENERATE
+      : target.tool === IMPROVEMENT_TOOLS.OPENAI_REGENERATE
         ? "placeholder_prepared"
         : "placeholder";
 
@@ -879,22 +1165,6 @@ function buildPlaceholderTargetResult(target) {
     status,
     error: message,
     autoFixable: target.autoFixable,
-  };
-}
-
-/**
- * smart_auto_fix 接続準備用 placeholder（Phase 4-D: 未実行）
- * @param {object} target
- * @param {object} slide
- * @param {object} context
- * @returns {Promise<object>}
- */
-async function processSmartAutoFixPlaceholder(target, slide, context) {
-  return {
-    item: buildPlaceholderTargetResult(target),
-    metrics: context.metrics,
-    limitZeroDetected: false,
-    skipped: true,
   };
 }
 
@@ -926,7 +1196,7 @@ export async function processImprovementTarget(target, slide, context) {
     case IMPROVEMENT_TOOLS.NANO_BANANA:
       return processNanoBananaTarget(target, slide, context);
     case IMPROVEMENT_TOOLS.SMART_AUTO_FIX:
-      return processSmartAutoFixPlaceholder(target, slide, context);
+      return processSmartAutoFixTarget(target, slide, context);
     case IMPROVEMENT_TOOLS.OPENAI_REGENERATE:
       return processOpenAiRegeneratePlaceholder(target, slide, context);
     case IMPROVEMENT_TOOLS.MANUAL_REVIEW:
@@ -976,15 +1246,25 @@ export async function applyImprovementPlan(plan, context) {
   /** @type {object[]} */
   const targetResults = [];
   let nanoBananaExecuted = 0;
+  let smartAutoFixExecuted = 0;
   let improvedCount = 0;
   let failedCount = 0;
   let skippedCount = 0;
+  const smartAutoFixMetrics = {
+    executedSmartAutoFix: 0,
+    successfulSmartAutoFix: 0,
+    failedSmartAutoFix: 0,
+    executedRegeneration: 0,
+    successfulRegeneration: 0,
+    failedRegeneration: 0,
+  };
 
   for (const target of plan.targets) {
     const slide = findSlideInSummary(context.state.scoreSummary, target.slideId);
     const processed = await processImprovementTarget(target, slide, {
       ...context,
       metrics,
+      dryRun: false,
     });
     metrics = processed.metrics;
     limitZeroDetected = limitZeroDetected || processed.limitZeroDetected;
@@ -1008,12 +1288,31 @@ export async function applyImprovementPlan(plan, context) {
       continue;
     }
 
+    if (target.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX) {
+      manifestItems.push(processed.item);
+      smartAutoFixExecuted += 1;
+      nanoBananaExecuted += 1;
+      accumulateSmartAutoFixMetrics(processed.item, smartAutoFixMetrics);
+
+      if (processed.item.status === "improved") {
+        improvedCount += 1;
+      } else if (
+        processed.item.status === "saf_failed" ||
+        processed.item.status === "regen_failed" ||
+        processed.item.status === "failed"
+      ) {
+        failedCount += 1;
+      } else {
+        skippedCount += 1;
+      }
+      continue;
+    }
+
     skippedCount += 1;
 
     if (
       target.tool !== IMPROVEMENT_TOOLS.MANUAL_REVIEW &&
-      (target.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX ||
-        target.tool === IMPROVEMENT_TOOLS.OPENAI_REGENERATE)
+      target.tool === IMPROVEMENT_TOOLS.OPENAI_REGENERATE
     ) {
       manifestItems.push(
         buildManifestItem({
@@ -1059,6 +1358,12 @@ export async function applyImprovementPlan(plan, context) {
     improvedCount,
     failedImproveCount: failedCount,
     manualReviewOnly: plan.autoFixableTargets === 0 && plan.manualReviewTargets > 0,
+    executedSmartAutoFix: smartAutoFixMetrics.executedSmartAutoFix,
+    successfulSmartAutoFix: smartAutoFixMetrics.successfulSmartAutoFix,
+    failedSmartAutoFix: smartAutoFixMetrics.failedSmartAutoFix,
+    executedRegeneration: smartAutoFixMetrics.executedRegeneration,
+    successfulRegeneration: smartAutoFixMetrics.successfulRegeneration,
+    failedRegeneration: smartAutoFixMetrics.failedRegeneration,
   });
 
   const status =
@@ -1095,6 +1400,59 @@ export async function applyImprovementPlan(plan, context) {
       placeholderCount: skippedCount,
     },
   };
+}
+
+/**
+ * manifest item が Gemini ReReview 対象かどうか
+ * @param {object | null | undefined} manifestItem
+ * @returns {boolean}
+ */
+export function isReReviewEligibleManifestItem(manifestItem) {
+  return manifestItem?.status === "improved";
+}
+
+/**
+ * manifest item から ReReview 結果 item に付与するメタデータ
+ * @param {object} manifestItem
+ * @returns {object}
+ */
+export function buildReReviewMetadataFromManifest(manifestItem) {
+  return {
+    tool: manifestItem.tool ?? null,
+    improvementPipeline: manifestItem.improvementPipeline ?? null,
+    regenerationAdapter:
+      manifestItem.regenerationAdapter ?? manifestItem.regeneration?.adapterId ?? null,
+    reviewSource: resolveReviewSourceFromManifestItem(manifestItem),
+  };
+}
+
+/**
+ * Smart Auto Fix 実行結果から metrics カウンタを加算する
+ * @param {object} item
+ * @param {object} counters
+ */
+function accumulateSmartAutoFixMetrics(item, counters) {
+  counters.executedSmartAutoFix += 1;
+
+  const safStatus = item.smartAutoFix?.status;
+  if (item.status === "saf_failed" || safStatus === "failed") {
+    counters.failedSmartAutoFix += 1;
+    return;
+  }
+
+  if (safStatus === "applied" || safStatus === "skipped" || item.status === "planned") {
+    counters.successfulSmartAutoFix += 1;
+  }
+
+  if (item.regeneration || item.status === "improved" || item.status === "regen_failed") {
+    counters.executedRegeneration += 1;
+  }
+
+  if (item.status === "improved") {
+    counters.successfulRegeneration += 1;
+  } else if (item.status === "regen_failed") {
+    counters.failedRegeneration += 1;
+  }
 }
 
 /**
@@ -1149,9 +1507,10 @@ export async function applyReReviewFromManifest(context, manifestPath = MANIFEST
       afterRootCause: null,
       error: null,
       reviewElapsedMs: 0,
+      ...buildReReviewMetadataFromManifest(manifestItem),
     };
 
-    if (manifestItem.status !== "improved") {
+    if (!isReReviewEligibleManifestItem(manifestItem)) {
       reviewItems.push({ ...baseItem, status: "skipped" });
       continue;
     }
@@ -1196,7 +1555,7 @@ export async function applyReReviewFromManifest(context, manifestPath = MANIFEST
       });
 
       console.log(
-        `[QualityPipeline] [apply] RE_REVIEW ${slideId}: reviewed score=${afterScore} (delta=${deltaScore >= 0 ? "+" : ""}${deltaScore})`,
+        `[QualityPipeline] [apply] RE_REVIEW ${slideId}: reviewed score=${afterScore} (delta=${deltaScore >= 0 ? "+" : ""}${deltaScore}, source=${baseItem.reviewSource})`,
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -1286,10 +1645,48 @@ export async function applyImprovementPlaceholder(plan, context) {
     `[QualityPipeline] [${mode}] IMPROVEMENT round ${plan.round}: ${plan.totalTargets} target(s) (${plan.autoFixableTargets} auto-fixable, ${plan.manualReviewTargets} manual)`,
   );
 
+  /** @type {object[]} */
+  const targetResults = [];
+  let metrics = context.metrics;
+  const smartAutoFixMetrics = {
+    executedSmartAutoFix: 0,
+    successfulSmartAutoFix: 0,
+    failedSmartAutoFix: 0,
+    executedRegeneration: 0,
+    successfulRegeneration: 0,
+    failedRegeneration: 0,
+  };
+
   for (const target of plan.targets) {
+    if (target.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX) {
+      const slide = findSlideInSummary(context.state.scoreSummary, target.slideId);
+      const processed = await processSmartAutoFixTarget(target, slide, {
+        ...context,
+        dryRun: true,
+        metrics,
+      });
+      metrics = processed.metrics;
+      targetResults.push(processed.item);
+      accumulateSmartAutoFixMetrics(processed.item, smartAutoFixMetrics);
+      continue;
+    }
+
     console.log(
       `  - ${target.slideId}: ${target.action} via ${target.tool} (${target.reason})`,
     );
+  }
+
+  if (smartAutoFixMetrics.executedSmartAutoFix > 0) {
+    metrics = recordImprovementExecutionMetrics(metrics, {
+      round: plan.round,
+      executedSmartAutoFix: smartAutoFixMetrics.executedSmartAutoFix,
+      successfulSmartAutoFix: smartAutoFixMetrics.successfulSmartAutoFix,
+      executedRegeneration: smartAutoFixMetrics.executedRegeneration,
+      successfulRegeneration: smartAutoFixMetrics.successfulRegeneration,
+      failedSmartAutoFix: smartAutoFixMetrics.failedSmartAutoFix,
+      failedRegeneration: smartAutoFixMetrics.failedRegeneration,
+      manualReviewOnly: false,
+    });
   }
 
   return {
@@ -1298,6 +1695,8 @@ export async function applyImprovementPlaceholder(plan, context) {
     plannedActions: plan.targets.length,
     autoFixableTargets: plan.autoFixableTargets,
     manualReviewTargets: plan.manualReviewTargets,
-    targets: plan.targets,
+    targets: targetResults.length > 0 ? targetResults : plan.targets,
+    targetResults,
+    metrics,
   };
 }

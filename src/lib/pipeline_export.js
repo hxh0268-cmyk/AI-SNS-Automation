@@ -6,7 +6,7 @@ import {
   SLIDE_TYPES,
 } from "./carousel.js";
 import { IMPROVED_OUTPUT_DIR } from "./nano_banana.js";
-import { extractScoreSnapshot } from "./pipeline_score.js";
+import { extractScoreSnapshot, REVIEW_SOURCE_SMART_AUTO_FIX, REVIEW_SOURCE_NANO_BANANA } from "./pipeline_score.js";
 import { PROJECT_ROOT } from "./pipeline_state.js";
 
 /** Instagram Package 出力先（プロジェクト相対） */
@@ -20,6 +20,12 @@ export const DEFAULT_REVIEW_RESULT_PATH = "reports/nano-banana-improve/review_re
 
 /** export manifest ファイル名 */
 export const EXPORT_MANIFEST_FILENAME = "export_manifest.json";
+
+/** ReReview 後に improved 採用を許容する scoreSummary source */
+const ADOPTABLE_REVIEW_SOURCES = new Set([
+  REVIEW_SOURCE_NANO_BANANA,
+  REVIEW_SOURCE_SMART_AUTO_FIX,
+]);
 
 /** 元画像ディレクトリ（プロジェクト相対） */
 const SOURCE_OUTPUT_DIR = "images/carousel/output";
@@ -157,19 +163,27 @@ export async function selectExportImages(state, config) {
       typeof reviewItem.beforeScore === "number" &&
       typeof reviewItem.afterScore === "number" &&
       reviewItem.afterScore >= reviewItem.beforeScore;
+    const reviewSourceAllowed =
+      !slideScore?.source || ADOPTABLE_REVIEW_SOURCES.has(slideScore.source);
 
     let source = "original";
     let sourcePath = originalPath;
     let selectionReason = "original_default";
 
-    if (manifestImproved && reviewScoreMaintained && improvedAvailable) {
+    if (manifestImproved && reviewScoreMaintained && improvedAvailable && reviewSourceAllowed) {
       source = "improved";
       sourcePath = improvedPath;
-      selectionReason = "improved_adopted";
+      selectionReason =
+        manifestItem?.tool === "smart_auto_fix" ||
+        (manifestItem?.improvementPipeline ?? []).includes("regeneration_engine")
+          ? "improved_adopted_text_chain"
+          : "improved_adopted";
     } else if (manifestImproved && !improvedAvailable) {
       selectionReason = "improved_file_missing";
     } else if (manifestImproved && !reviewScoreMaintained) {
       selectionReason = "re_review_score_not_improved";
+    } else if (manifestImproved && !reviewSourceAllowed) {
+      selectionReason = "re_review_source_not_allowed";
     }
 
     selections.push({
@@ -183,6 +197,10 @@ export async function selectExportImages(state, config) {
       improvedPath,
       adoptedImproved: source === "improved",
       selectionReason,
+      improvementTool: manifestItem?.tool ?? null,
+      improvementPipeline: manifestItem?.improvementPipeline ?? null,
+      regenerationAdapter: manifestItem?.regenerationAdapter ?? null,
+      reviewSource: reviewItem?.reviewSource ?? slideScore?.source ?? null,
       score: slideScore?.score ?? null,
       publishRecommended: slideScore?.publishRecommended ?? null,
       beforeScore: reviewItem?.beforeScore ?? manifestItem?.beforeScore ?? null,
@@ -237,7 +255,11 @@ function buildReviewSummaryMarkdown(scoreSummary, config, exportMeta) {
         : slide.passed
           ? "合格"
           : "改善が必要";
-      const sourceLabel = slide.source === "nano_banana_re_review" ? " (improved)" : "";
+      const sourceLabel =
+        slide.source === REVIEW_SOURCE_NANO_BANANA ||
+        slide.source === REVIEW_SOURCE_SMART_AUTO_FIX
+          ? " (improved)"
+          : "";
       return `- ${slide.slideId}: ${slide.score} / 100点（${status}）${sourceLabel}`;
     })
     .join("\n");

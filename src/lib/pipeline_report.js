@@ -17,7 +17,13 @@ export const REPORT_SCHEMA_VERSION = "1.0";
 export const REPORT_TOOL = "quality_pipeline_report";
 
 /** レポート生成バージョン */
-export const REPORT_VERSION = "v1.3.1";
+export const REPORT_VERSION = "v1.4.0";
+
+/** scoreSummary / ReReview で使う source 値 */
+const REVIEWED_SCORE_SOURCES = new Set([
+  "nano_banana_re_review",
+  "smart_auto_fix_re_review",
+]);
 
 /** apply 実行後に git status に出やすい output 副産物（commit 対象外） */
 export const OUTPUT_ARTIFACT_PATHS = [
@@ -330,6 +336,11 @@ function buildImprovementBySlideId(state) {
         rootCause: target.rootCause ?? null,
         error: target.error ?? null,
         action: target.action ?? null,
+        improvementPipeline: target.improvementPipeline ?? null,
+        regenerationAdapter:
+          target.regenerationAdapter ?? target.regeneration?.adapterId ?? null,
+        smartAutoFix: target.smartAutoFix ?? null,
+        regeneration: target.regeneration ?? null,
       });
     }
   }
@@ -371,8 +382,12 @@ function resolveRecommendation(params) {
     wasImprovementTarget,
   } = params;
 
-  if (improvementStatus === "failed") {
+  if (improvementStatus === "failed" || improvementStatus === "saf_failed" || improvementStatus === "regen_failed") {
     return "improvement_failed";
+  }
+
+  if (improvementStatus === "planned" && dryRun) {
+    return "review_pending";
   }
 
   if (typeof finalScore === "number") {
@@ -410,6 +425,15 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
   const exportBySlideId = buildExportSelectionBySlideId(exportManifest);
   const exportInfo = state.export ?? metrics.export ?? {};
 
+  const improvementHistory = state.improvement?.history ?? [];
+  const textChainConnected = improvementHistory.some((roundEntry) =>
+    (roundEntry.targets ?? []).some(
+      (target) =>
+        target.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX ||
+        (target.improvementPipeline ?? []).includes("regeneration_engine"),
+    ),
+  );
+
   const items = (scoreSummary.slides ?? []).map((slide) => {
     const improvement = improvementBySlideId.get(slide.slideId) ?? null;
     const exportSelection = exportBySlideId.get(slide.slideId) ?? null;
@@ -426,6 +450,10 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
 
     const wasImprovementTarget = improvement !== null;
 
+    const textChainSlide =
+      improvement?.tool === IMPROVEMENT_TOOLS.SMART_AUTO_FIX ||
+      (improvement?.improvementPipeline ?? []).includes("regeneration_engine");
+
     return {
       slideId: slide.slideId,
       beforeScore,
@@ -434,12 +462,19 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
       rootCause: improvement?.rootCause ?? slide.rootCause ?? null,
       improvementTool: improvement?.tool ?? null,
       improvementStatus: improvement?.improvementStatus ?? null,
+      improvementPipeline: improvement?.improvementPipeline ?? null,
+      regenerationAdapter: improvement?.regenerationAdapter ?? null,
+      smartAutoFixStatus: improvement?.smartAutoFix?.status ?? null,
+      regenerationStatus: improvement?.regeneration?.status ?? null,
+      textChainConnected: textChainSlide,
       reviewStatus:
-        improvement?.improvementStatus === "improved"
-          ? slide.source === "nano_banana_re_review"
-            ? "reviewed"
-            : "review_pending"
-          : null,
+        REVIEWED_SCORE_SOURCES.has(slide.source)
+          ? "reviewed"
+          : improvement?.improvementStatus === "planned"
+            ? "planned"
+            : improvement?.improvementStatus === "improved"
+              ? "review_pending"
+              : null,
       exportSource: exportSelection?.source ?? null,
       adoptedImproved: exportSelection?.adoptedImproved ?? false,
       publishRecommended: slide.publishRecommended ?? false,
@@ -473,6 +508,13 @@ export function buildPipelineReport({ state, metrics, exportManifest = null, con
     plannedActions: metrics.improvement?.plannedActions ?? 0,
     executedNanoBanana: metrics.improvement?.executedNanoBanana ?? 0,
     executedGeminiReReview: metrics.improvement?.executedGeminiReReview ?? 0,
+    executedSmartAutoFix: metrics.improvement?.executedSmartAutoFix ?? 0,
+    successfulSmartAutoFix: metrics.improvement?.successfulSmartAutoFix ?? 0,
+    failedSmartAutoFix: metrics.improvement?.failedSmartAutoFix ?? 0,
+    executedRegeneration: metrics.improvement?.executedRegeneration ?? 0,
+    successfulRegeneration: metrics.improvement?.successfulRegeneration ?? 0,
+    failedRegeneration: metrics.improvement?.failedRegeneration ?? 0,
+    textChainConnected,
     totalApiCalls: metrics.totalApiCalls ?? 0,
     failedCalls: metrics.failedCalls ?? 0,
     limitZeroDetected: metrics.limitZeroDetected ?? false,
@@ -583,6 +625,14 @@ export function buildPipelineReportMarkdown(report) {
     ["全スライド公開推奨", summary.allSlidesPublishRecommended ? "はい" : "いいえ"],
     ["改善ラウンド", `${summary.roundsExecuted}/${summary.maxRounds}`],
     ["改善停止理由", summary.improvementStopReason ?? "—"],
+    ["TEXT チェーン接続", summary.textChainConnected ? "はい" : "いいえ"],
+    ["Smart Auto Fix 実行", summary.executedSmartAutoFix ?? 0],
+    ["Smart Auto Fix 成功", summary.successfulSmartAutoFix ?? 0],
+    ["Smart Auto Fix 失敗", summary.failedSmartAutoFix ?? 0],
+    ["Regeneration 実行", summary.executedRegeneration ?? 0],
+    ["Regeneration 成功", summary.successfulRegeneration ?? 0],
+    ["Regeneration 失敗", summary.failedRegeneration ?? 0],
+    ["Gemini ReReview 実行", summary.executedGeminiReReview ?? 0],
     ["API 呼び出し", summary.totalApiCalls],
     ["API 失敗", summary.failedCalls],
     ["limit:0 検出", summary.limitZeroDetected ? "はい" : "いいえ"],
@@ -604,15 +654,32 @@ export function buildPipelineReportMarkdown(report) {
   ].join("\n");
 
   const slideTable = [
-    "| スライド | 改善前 | 改善後 | 差分 | rootCause | tool | export | 推奨 |",
-    "|----------|--------|--------|------|-----------|------|--------|------|",
+    "| スライド | 改善前 | 改善後 | 差分 | rootCause | tool | pipeline | export | 推奨 |",
+    "|----------|--------|--------|------|-----------|------|----------|--------|------|",
     ...items.map((item) => {
       const exportLabel = item.adoptedImproved
         ? "improved"
         : item.exportSource ?? "—";
-      return `| ${item.slideId} | ${formatScore(item.beforeScore)} | ${formatScore(item.afterScore)} | ${formatDelta(item.deltaScore)} | ${item.rootCause ?? "—"} | ${item.improvementTool ?? "—"} | ${exportLabel} | ${recommendationLabel(item.recommendation)} |`;
+      const pipelineLabel =
+        item.textChainConnected && item.improvementStatus === "planned"
+          ? "TEXT(planned)"
+          : item.textChainConnected
+            ? "TEXT"
+            : item.improvementPipeline?.join("→") ?? "—";
+      return `| ${item.slideId} | ${formatScore(item.beforeScore)} | ${formatScore(item.afterScore)} | ${formatDelta(item.deltaScore)} | ${item.rootCause ?? "—"} | ${item.improvementTool ?? "—"} | ${pipelineLabel} | ${exportLabel} | ${recommendationLabel(item.recommendation)} |`;
     }),
   ].join("\n");
+
+  const smartAutoFixItems = items.filter((item) => item.textChainConnected);
+  const smartAutoFixSection =
+    smartAutoFixItems.length > 0
+      ? `## Smart Auto Fix / TEXT チェーン\n\n| スライド | SAF | Regeneration | adapter | ReReview | before | after |\n|----------|-----|--------------|---------|----------|--------|-------|\n${smartAutoFixItems
+          .map(
+            (item) =>
+              `| ${item.slideId} | ${item.smartAutoFixStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationStatus ?? (item.improvementStatus === "planned" ? "planned" : "—")} | ${item.regenerationAdapter ?? "—"} | ${item.reviewStatus ?? "—"} | ${formatScore(item.beforeScore)} | ${formatScore(item.afterScore)} |`,
+          )
+          .join("\n")}\n`
+      : "";
 
   const warnings = [];
   if (!summary.allSlidesPublishRecommended && !summary.dryRun) {
@@ -684,7 +751,7 @@ version: ${report.version}
 ${summaryTable}
 
 ${warningsSection}
-${nextActionsSection}${apiKeySection ? `${apiKeySection}\n` : ""}${operationalSection}${outputArtifactSection}
+${nextActionsSection}${apiKeySection ? `${apiKeySection}\n` : ""}${operationalSection}${smartAutoFixSection}${outputArtifactSection}
 ## スライド別
 
 ${slideTable}

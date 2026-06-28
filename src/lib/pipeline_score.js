@@ -354,7 +354,8 @@ export function mergeReviewResultIntoScoreSummary(scoreSummary, reviewItems, con
     return {
       ...slide,
       score: reviewed.afterScore,
-      source: "nano_banana_re_review",
+      source:
+        reviewed.reviewSource ?? resolveReviewSource(null, reviewed),
       rootCause: reviewed.afterRootCause ?? slide.rootCause ?? null,
       issues: [],
       recommendations: [],
@@ -362,4 +363,54 @@ export function mergeReviewResultIntoScoreSummary(scoreSummary, reviewItems, con
   });
 
   return calculateScoreSummary(mergedSlides, config);
+}
+
+/** scoreSummary slide.source: Nano Banana 直呼び後の再レビュー */
+export const REVIEW_SOURCE_NANO_BANANA = "nano_banana_re_review";
+
+/** scoreSummary slide.source: Smart Auto Fix → Regeneration チェーン後の再レビュー */
+export const REVIEW_SOURCE_SMART_AUTO_FIX = "smart_auto_fix_re_review";
+
+/**
+ * manifest item から ReReview / scoreSummary 用 source を決定する
+ * @param {object | null | undefined} manifestItem
+ * @returns {string}
+ */
+export function resolveReviewSourceFromManifestItem(manifestItem) {
+  if (!manifestItem || typeof manifestItem !== "object") {
+    return REVIEW_SOURCE_NANO_BANANA;
+  }
+
+  const pipeline = manifestItem.improvementPipeline ?? [];
+  if (
+    manifestItem.tool === "smart_auto_fix" ||
+    pipeline.includes("smart_auto_fix") ||
+    pipeline.includes("regeneration_engine")
+  ) {
+    return REVIEW_SOURCE_SMART_AUTO_FIX;
+  }
+
+  if (manifestItem.tool === "nano_banana" || pipeline.includes("nano_banana")) {
+    return REVIEW_SOURCE_NANO_BANANA;
+  }
+
+  return REVIEW_SOURCE_NANO_BANANA;
+}
+
+/**
+ * review item / manifest から scoreSummary 用 source を決定する
+ * @param {object | null | undefined} manifestItem
+ * @param {object | null | undefined} reviewItem
+ * @returns {string}
+ */
+export function resolveReviewSource(manifestItem, reviewItem) {
+  if (reviewItem?.reviewSource) {
+    return reviewItem.reviewSource;
+  }
+
+  if (reviewItem?.tool || reviewItem?.improvementPipeline) {
+    return resolveReviewSourceFromManifestItem(reviewItem);
+  }
+
+  return resolveReviewSourceFromManifestItem(manifestItem);
 }

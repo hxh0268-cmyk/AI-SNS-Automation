@@ -42,6 +42,12 @@ export function createPipelineMetrics() {
       manualReviewTargets: 0,
       executedNanoBanana: 0,
       executedGeminiReReview: 0,
+      executedSmartAutoFix: 0,
+      successfulSmartAutoFix: 0,
+      failedSmartAutoFix: 0,
+      executedRegeneration: 0,
+      successfulRegeneration: 0,
+      failedRegeneration: 0,
       limitZeroDetected: false,
       stopReason: null,
       lastRound: null,
@@ -289,6 +295,12 @@ export function recordImprovementExecutionMetrics(metrics, summary) {
     manualReviewTargets: 0,
     executedNanoBanana: 0,
     executedGeminiReReview: 0,
+    executedSmartAutoFix: 0,
+    successfulSmartAutoFix: 0,
+    failedSmartAutoFix: 0,
+    executedRegeneration: 0,
+    successfulRegeneration: 0,
+    failedRegeneration: 0,
     limitZeroDetected: false,
     stopReason: null,
     lastRound: null,
@@ -364,6 +376,18 @@ export function recordImprovementExecutionMetrics(metrics, summary) {
         improvement.executedNanoBanana + (summary.nanoBananaExecuted ?? 0),
       executedGeminiReReview:
         improvement.executedGeminiReReview + (summary.geminiReReviewExecuted ?? 0),
+      executedSmartAutoFix:
+        improvement.executedSmartAutoFix + (summary.executedSmartAutoFix ?? 0),
+      successfulSmartAutoFix:
+        improvement.successfulSmartAutoFix + (summary.successfulSmartAutoFix ?? 0),
+      failedSmartAutoFix:
+        improvement.failedSmartAutoFix + (summary.failedSmartAutoFix ?? 0),
+      executedRegeneration:
+        improvement.executedRegeneration + (summary.executedRegeneration ?? 0),
+      successfulRegeneration:
+        improvement.successfulRegeneration + (summary.successfulRegeneration ?? 0),
+      failedRegeneration:
+        improvement.failedRegeneration + (summary.failedRegeneration ?? 0),
       limitZeroDetected,
       lastRound,
     },
@@ -385,6 +409,12 @@ export function recordImprovementRoundResult(metrics, lastRoundResult, stopReaso
     manualReviewTargets: 0,
     executedNanoBanana: 0,
     executedGeminiReReview: 0,
+    executedSmartAutoFix: 0,
+    successfulSmartAutoFix: 0,
+    failedSmartAutoFix: 0,
+    executedRegeneration: 0,
+    successfulRegeneration: 0,
+    failedRegeneration: 0,
     limitZeroDetected: false,
     stopReason: null,
     lastRound: null,

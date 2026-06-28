@@ -50,6 +50,68 @@ v1.2.1 では Nano Banana 画像改善レポート（`scripts/report_nano_banana
 | `doctor_report` | Doctor 診断 JSON 化（将来） |
 | `health_check_report` | Health Check 結果 JSON 化（将来） |
 | `image_review_report` | 画像レビュー統合レポート（将来） |
+| **`quality_pipeline_report`** | **`src/lib/pipeline_report.js`（v1.3+）** |
+
+---
+
+## quality_pipeline_report の追加フィールド（v1.4.0）
+
+`tool: "quality_pipeline_report"`、`version: "v1.4.0"` 以降、summary / items に以下が **任意フィールド** として追加されます（後方互換：追加のみ）。
+
+### summary 追加（v1.4）
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| `textChainConnected` | `boolean` | TEXT チェーン（Smart Auto Fix → Regeneration）が improvement history に存在するか |
+| `executedSmartAutoFix` | `number` | Smart Auto Fix 実行数（dry-run 時は planned 含む） |
+| `successfulSmartAutoFix` | `number` | Smart Auto Fix 成功数 |
+| `failedSmartAutoFix` | `number` | Smart Auto Fix 失敗数 |
+| `executedRegeneration` | `number` | Regeneration 実行数 |
+| `successfulRegeneration` | `number` | Regeneration 成功数 |
+| `failedRegeneration` | `number` | Regeneration 失敗数 |
+| `executedGeminiReReview` | `number` | Gemini ReReview 実行数 |
+
+### items[] 追加（v1.4）
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| `improvementPipeline` | `string[] \| null` | 例：`["smart_auto_fix", "regeneration_engine"]` |
+| `regenerationAdapter` | `string \| null` | 例：`"nano_banana"` |
+| `smartAutoFixStatus` | `string \| null` | 例：`planned` / `applied` / `skipped` |
+| `regenerationStatus` | `string \| null` | 例：`planned` / `improved` / `failed` |
+| `textChainConnected` | `boolean` | 当該スライドが TEXT チェーン対象か |
+| `source` | `string \| null` | scoreSummary source。`smart_auto_fix_re_review` / `nano_banana_re_review` 等 |
+
+### reviewStatus 値（v1.4 拡張）
+
+| 値 | 意味 |
+|----|------|
+| `reviewed` | ReReview 完了（`smart_auto_fix_re_review` または `nano_banana_re_review`） |
+| `planned` | dry-run 時の TEXT チェーン計画 |
+| `review_pending` | improved だが ReReview 未反映 |
+
+### metrics.json（pipeline_metrics）v1.4 追加
+
+`metrics.improvement` ブロックに以下を追加（累積）:
+
+| フィールド | 説明 |
+|------------|------|
+| `executedSmartAutoFix` | Smart Auto Fix 実行数 |
+| `successfulSmartAutoFix` | 成功数 |
+| `failedSmartAutoFix` | 失敗数 |
+| `executedRegeneration` | Regeneration 実行数 |
+| `successfulRegeneration` | 成功数 |
+| `failedRegeneration` | 失敗数 |
+
+### export_manifest selections[] 追加（v1.4）
+
+| フィールド | 説明 |
+|------------|------|
+| `improvementTool` | manifest tool（`smart_auto_fix` 等） |
+| `improvementPipeline` | 改善パイプライン |
+| `regenerationAdapter` | 使用 adapter |
+| `reviewSource` | ReReview source |
+| `selectionReason` | `improved_adopted_text_chain`（TEXT チェーン採用時） |
 
 ---
 
@@ -164,8 +226,10 @@ const tool = report.tool ?? "unknown";
 |----------|------|
 | [MANIFEST_SCHEMA.md](./MANIFEST_SCHEMA.md) | manifest.json スキーマ |
 | [CLI_EXIT_CODES.md](./CLI_EXIT_CODES.md) | CLI 終了コード |
+| [V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md](./V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md) | v1.4 Smart Auto Fix 統合 |
 | [CHANGELOG.md](./CHANGELOG.md) | バージョン履歴 |
 
 ---
 
-*スキーマ初版：v1.2.1（schemaVersion `"1.0"`、tool `nano_banana_image_improvement_report`）*
+*スキーマ初版：v1.2.1（schemaVersion `"1.0"`、tool `nano_banana_image_improvement_report`）*  
+*v1.4.0 追記：tool `quality_pipeline_report` の summary / items / metrics / export 拡張*
