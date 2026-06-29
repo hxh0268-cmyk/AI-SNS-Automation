@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "../health_check.js";
 import {
   applyImprovementPlaceholder,
   applyImprovementPlan,
@@ -73,16 +74,110 @@ function buildPlaceholderResult(phase, context, extraData = {}) {
 }
 
 /**
+ * health check stdout から件数を regex 抽出する（JSON パース失敗時の fallback）
+ * @param {string} output
+ * @returns {{ okCount: number, warningCount: number, errorCount: number }}
+ */
+export function parseHealthCheckCountsFromStdout(output) {
+  const errorMatch = output.match(/Error:\s*(\d+)\s*件/);
+  const warningMatch = output.match(/Warning:\s*(\d+)\s*件/);
+  const okMatch = output.match(/OK:\s*(\d+)\s*件/);
+
+  return {
+    okCount: okMatch ? Number(okMatch[1]) : 0,
+    warningCount: warningMatch ? Number(warningMatch[1]) : 0,
+    errorCount: errorMatch ? Number(errorMatch[1]) : 0,
+  };
+}
+
+/**
+ * health check stdout から JSON ブロックをパースする
+ * @param {string} output
+ * @returns {{ parsed: boolean, okCount: number, warningCount: number, errorCount: number, items: object[] }}
+ */
+export function parseHealthCheckStdout(output) {
+  const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+  if (markerIndex >= 0) {
+    const jsonText = output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim();
+    try {
+      const payload = JSON.parse(jsonText);
+      if (
+        payload &&
+        typeof payload.ok === "number" &&
+        typeof payload.warning === "number" &&
+        typeof payload.error === "number" &&
+        Array.isArray(payload.items)
+      ) {
+        return {
+          parsed: true,
+          okCount: payload.ok,
+          warningCount: payload.warning,
+          errorCount: payload.error,
+          items: payload.items,
+        };
+      }
+    } catch {
+      // fallback to regex below
+    }
+  }
+
+  const counts = parseHealthCheckCountsFromStdout(output);
+  return {
+    parsed: false,
+    ...counts,
+    items: [],
+  };
+}
+
+/**
+ * health check 実行結果から metrics 用 summary を組み立てる
+ * @param {ReturnType<typeof parseHealthCheckStdout>} parsed
+ * @returns {object}
+ */
+export function buildHealthCheckSummaryData(parsed) {
+  const items = parsed.items ?? [];
+  const errors = items.filter((item) => item.status === "error");
+  const okCount = parsed.okCount ?? 0;
+  const warningCount = parsed.warningCount ?? 0;
+  const errorCount = parsed.errorCount ?? 0;
+
+  return {
+    ok: errorCount === 0,
+    okCount,
+    warningCount,
+    errorCount,
+    items,
+    errors,
+    jsonParsed: parsed.parsed,
+  };
+}
+
+/**
+ * HEALTH_CHECK 失敗時に個別エラーをログ出力する
+ * @param {object[]} errors
+ */
+function logHealthCheckErrors(errors) {
+  for (const item of errors) {
+    console.log(
+      `[QualityPipeline] [apply] HEALTH_CHECK: ❌ ${item.label}: ${item.detail}`,
+    );
+  }
+}
+
+/**
  * health check を subprocess で実行する
- * @returns {Promise<{ ok: boolean, errorCount: number, warningCount: number, okCount: number, stdout: string }>}
+ * @returns {Promise<{ ok: boolean, errorCount: number, warningCount: number, okCount: number, stdout: string, healthCheck: object }>}
  */
 async function runHealthCheckSubprocess() {
   const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
 
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [scriptPath], {
+    const child = spawn(process.execPath, [scriptPath, "--json"], {
       cwd: PROJECT_ROOT,
-      env: process.env,
+      env: {
+        ...process.env,
+        HEALTH_CHECK_JSON: "1",
+      },
     });
 
     let stdout = "";
@@ -99,20 +194,17 @@ async function runHealthCheckSubprocess() {
     child.on("error", reject);
 
     child.on("close", () => {
-      const errorMatch = stdout.match(/Error:\s*(\d+)\s*件/);
-      const warningMatch = stdout.match(/Warning:\s*(\d+)\s*件/);
-      const okMatch = stdout.match(/OK:\s*(\d+)\s*件/);
-
-      const errorCount = errorMatch ? Number(errorMatch[1]) : 0;
-      const warningCount = warningMatch ? Number(warningMatch[1]) : 0;
-      const okCount = okMatch ? Number(okMatch[1]) : 0;
+      const combined = stdout + stderr;
+      const parsed = parseHealthCheckStdout(combined);
+      const healthCheck = buildHealthCheckSummaryData(parsed);
 
       resolve({
-        ok: errorCount === 0,
-        errorCount,
-        warningCount,
-        okCount,
-        stdout: stdout + stderr,
+        ok: healthCheck.errorCount === 0,
+        errorCount: healthCheck.errorCount,
+        warningCount: healthCheck.warningCount,
+        okCount: healthCheck.okCount,
+        stdout: combined,
+        healthCheck,
       });
     });
   });
@@ -127,15 +219,10 @@ async function runHealthCheckPhase(context) {
   console.log("[QualityPipeline] [apply] HEALTH_CHECK: Health Check を実行します");
 
   const result = await runHealthCheckSubprocess();
-
-  const summary = {
-    ok: result.ok,
-    errorCount: result.errorCount,
-    warningCount: result.warningCount,
-    okCount: result.okCount,
-  };
+  const summary = result.healthCheck;
 
   if (!result.ok) {
+    logHealthCheckErrors(summary.errors ?? []);
     return {
       phase: PIPELINE_PHASES.HEALTH_CHECK,
       status: "failed",

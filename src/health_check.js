@@ -9,6 +9,9 @@ const PROJECT_ROOT = path.resolve(__dirname, "..");
 
 const ENV_FILE = path.join(PROJECT_ROOT, ".env");
 
+/** pipeline 側が stdout から JSON を抽出するためのマーカー */
+export const HEALTH_CHECK_JSON_MARKER = "__HEALTH_CHECK_JSON__:";
+
 const ICON = {
   ok: "✅ OK",
   warning: "⚠ Warning",
@@ -48,9 +51,22 @@ function printResult(label, status, detail) {
 }
 
 /**
+ * JSON 出力モードかどうか
+ * @returns {boolean}
+ */
+function isJsonOutputMode() {
+  return (
+    process.argv.includes("--json") ||
+    process.env.HEALTH_CHECK_JSON === "1"
+  );
+}
+
+/**
  * メイン処理
  */
 async function main() {
+  const jsonMode = isJsonOutputMode();
+
   console.log("========================================");
   console.log("Health Check（動作環境の確認）");
   console.log("========================================");
@@ -60,6 +76,8 @@ async function main() {
   console.log("");
 
   const counts = { ok: 0, warning: 0, error: 0 };
+  /** @type {{ status: "ok" | "warning" | "error", label: string, detail: string }[]} */
+  const items = [];
 
   /**
    * @param {"ok" | "warning" | "error"} status
@@ -68,6 +86,7 @@ async function main() {
    */
   function record(status, label, detail) {
     counts[status] += 1;
+    items.push({ status, label, detail });
     printResult(label, status, detail);
     console.log("");
   }
@@ -240,6 +259,17 @@ async function main() {
     );
   } else {
     console.log("すべて問題ありません。npm run daily を実行できます。");
+  }
+
+  if (jsonMode) {
+    console.log(
+      `${HEALTH_CHECK_JSON_MARKER}${JSON.stringify({
+        ok: counts.ok,
+        warning: counts.warning,
+        error: counts.error,
+        items,
+      })}`,
+    );
   }
 }
 

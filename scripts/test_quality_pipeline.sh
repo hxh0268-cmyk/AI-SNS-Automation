@@ -1681,5 +1681,270 @@ console.log("nightly-apply workflow contract ok");
 EOF
 pass "nightly-apply workflow contract"
 
+echo "-- Test 40: health_check.js JSON output --"
+node --input-type=module <<'EOF'
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
+
+const output = await new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [scriptPath, "--json"], {
+    cwd: PROJECT_ROOT,
+    env: { ...process.env, HEALTH_CHECK_JSON: "1" },
+  });
+  let text = "";
+  child.stdout.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.on("error", reject);
+  child.on("close", () => resolve(text));
+});
+
+if (!output.includes("Health Check（動作環境の確認）")) {
+  throw new Error("human-readable health check output must be preserved");
+}
+
+const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+if (markerIndex < 0) {
+  throw new Error("JSON marker not found in health_check --json output");
+}
+
+const payload = JSON.parse(output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim());
+for (const field of ["ok", "warning", "error", "items"]) {
+  if (!(field in payload)) {
+    throw new Error(`JSON payload missing field: ${field}`);
+  }
+}
+if (!Array.isArray(payload.items) || payload.items.length === 0) {
+  throw new Error("JSON items must be a non-empty array");
+}
+for (const item of payload.items) {
+  for (const field of ["status", "label", "detail"]) {
+    if (!(field in item)) {
+      throw new Error(`JSON item missing field: ${field}`);
+    }
+  }
+}
+
+console.log("health_check JSON output ok");
+EOF
+pass "health_check.js JSON output"
+
+echo "-- Test 41: parseHealthCheckStdout / buildHealthCheckSummaryData --"
+node --input-type=module <<'EOF'
+import {
+  buildHealthCheckSummaryData,
+  parseHealthCheckStdout,
+  parseHealthCheckCountsFromStdout,
+} from "./src/lib/pipeline_phase_handlers.js";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+
+const sampleJson = {
+  ok: 2,
+  warning: 1,
+  error: 1,
+  items: [
+    { status: "ok", label: "OPENAI_API_KEY", detail: "設定されています。" },
+    { status: "error", label: ".env ファイル", detail: "見つかりません。" },
+  ],
+};
+const stdout =
+  "OK: 2 件\nWarning: 1 件\nError: 1 件\n" +
+  `${HEALTH_CHECK_JSON_MARKER}${JSON.stringify(sampleJson)}`;
+
+const parsed = parseHealthCheckStdout(stdout);
+if (!parsed.parsed) {
+  throw new Error("expected JSON parse success");
+}
+if (parsed.errorCount !== 1 || parsed.okCount !== 2 || parsed.warningCount !== 1) {
+  throw new Error("unexpected parsed counts");
+}
+
+const summary = buildHealthCheckSummaryData(parsed);
+if (!Array.isArray(summary.errors) || summary.errors.length !== 1) {
+  throw new Error("expected one error in healthCheck.errors");
+}
+if (summary.errors[0].label !== ".env ファイル") {
+  throw new Error("unexpected error label");
+}
+if (!Array.isArray(summary.items) || summary.items.length !== 2) {
+  throw new Error("expected healthCheck.items");
+}
+
+const fallbackStdout = "OK: 3 件\nWarning: 0 件\nError: 2 件\n";
+const fallbackParsed = parseHealthCheckStdout(fallbackStdout);
+if (fallbackParsed.parsed) {
+  throw new Error("expected regex fallback when JSON marker absent");
+}
+const fallbackCounts = parseHealthCheckCountsFromStdout(fallbackStdout);
+if (fallbackCounts.errorCount !== 2 || fallbackCounts.okCount !== 3) {
+  throw new Error("regex fallback counts mismatch");
+}
+const fallbackSummary = buildHealthCheckSummaryData(fallbackParsed);
+if (fallbackSummary.errors.length !== 0) {
+  throw new Error("fallback summary must have empty errors without items");
+}
+
+console.log("health check parser ok");
+EOF
+pass "parseHealthCheckStdout / buildHealthCheckSummaryData"
+
+echo "-- Test 42: healthCheck.errors metrics contract --"
+node --input-type=module <<'EOF'
+import { buildHealthCheckSummaryData } from "./src/lib/pipeline_phase_handlers.js";
+
+const summary = buildHealthCheckSummaryData({
+  parsed: true,
+  okCount: 1,
+  warningCount: 0,
+  errorCount: 1,
+  items: [
+    {
+      status: "error",
+      label: "GEMINI_API_KEY",
+      detail: "未設定です。.env に GEMINI_API_KEY=... を追加してください。",
+    },
+  ],
+});
+
+const expectedKeys = [
+  "ok",
+  "okCount",
+  "warningCount",
+  "errorCount",
+  "items",
+  "errors",
+  "jsonParsed",
+];
+for (const key of expectedKeys) {
+  if (!(key in summary)) {
+    throw new Error(`healthCheck summary missing key: ${key}`);
+  }
+}
+if (summary.errors.length !== 1) {
+  throw new Error("expected errors array length 1");
+}
+
+// metrics.byPhase.HEALTH_CHECK.summary への保存契約（applyPhaseResult spread）
+const phaseSummary = {
+  status: "failed",
+  message: "Health Check failed: Error 1 件",
+  healthCheck: summary,
+};
+if (!phaseSummary.healthCheck.errors?.[0]?.detail.includes("未設定")) {
+  throw new Error("phase summary must retain healthCheck.errors detail");
+}
+
+console.log("healthCheck metrics contract ok");
+EOF
+pass "healthCheck.errors metrics contract"
+
+echo "-- Test 43: health check output must not leak API key values --"
+FAKE_OPENAI_KEY="sk-test-fake-openai-key-do-not-log-v190"
+FAKE_GEMINI_KEY="AIzaSyFakeGeminiKeyForTestV190Only"
+node --input-type=module <<EOF
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
+const fakeOpenAi = "${FAKE_OPENAI_KEY}";
+const fakeGemini = "${FAKE_GEMINI_KEY}";
+
+const output = await new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [scriptPath, "--json"], {
+    cwd: PROJECT_ROOT,
+    env: {
+      ...process.env,
+      HEALTH_CHECK_JSON: "1",
+      OPENAI_API_KEY: fakeOpenAi,
+      GEMINI_API_KEY: fakeGemini,
+    },
+  });
+  let text = "";
+  child.stdout.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.on("error", reject);
+  child.on("close", () => resolve(text));
+});
+
+if (output.includes(fakeOpenAi)) {
+  throw new Error("OPENAI_API_KEY value leaked in health check output");
+}
+if (output.includes(fakeGemini)) {
+  throw new Error("GEMINI_API_KEY value leaked in health check output");
+}
+
+const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+const payload = JSON.parse(
+  output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim(),
+);
+const serialized = JSON.stringify(payload);
+if (serialized.includes(fakeOpenAi) || serialized.includes(fakeGemini)) {
+  throw new Error("API key values leaked in health check JSON");
+}
+
+console.log("health check secret redaction ok");
+EOF
+pass "health check output must not leak API key values"
+
+echo "-- Test 44: nightly-apply failure summary health check errors contract --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const nightlyPath = path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml");
+const workflow = fs.readFileSync(nightlyPath, "utf-8");
+
+function assertContains(label, haystack, needle) {
+  if (!haystack.includes(needle)) {
+    throw new Error(`${label}: expected to include ${JSON.stringify(needle)}`);
+  }
+}
+
+const failureStep = workflow.match(
+  /name: Create failure summary[\s\S]*?(?=\n      - name:)/,
+);
+if (!failureStep) {
+  throw new Error("Create failure summary step not found");
+}
+
+assertContains(
+  "metrics.json path",
+  failureStep[0],
+  'METRICS_FILE="reports/quality-pipeline/latest/metrics.json"',
+);
+assertContains(
+  "health check errors heading",
+  failureStep[0],
+  "### Health Check Errors",
+);
+assertContains(
+  "metrics healthCheck.errors path",
+  failureStep[0],
+  "metrics?.byPhase?.HEALTH_CHECK?.summary?.healthCheck?.errors",
+);
+assertContains(
+  "error item format",
+  failureStep[0],
+  "${item.label}: ${item.detail}",
+);
+
+console.log("nightly failure summary health check contract ok");
+EOF
+pass "nightly-apply failure summary health check errors contract"
+
 echo ""
 echo "All quality pipeline tests passed."

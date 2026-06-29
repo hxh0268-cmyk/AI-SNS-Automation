@@ -43,6 +43,15 @@ function printRunSummary(params) {
   console.log(`  completed steps: ${result.state.completedSteps.length}`);
   console.log(`  failed steps: ${result.state.failedSteps.length}`);
 
+  const healthCheckErrors =
+    result.metrics?.byPhase?.HEALTH_CHECK?.summary?.healthCheck?.errors ?? [];
+  if (healthCheckErrors.length > 0) {
+    console.log("  health check errors:");
+    for (const item of healthCheckErrors) {
+      console.log(`    - ${item.label}: ${item.detail}`);
+    }
+  }
+
   if (
     scoreSummary.averageScore !== null &&
     scoreSummary.minScore !== null &&

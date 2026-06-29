@@ -714,7 +714,8 @@ schedule 実行時は常に `resume=false`（通常 apply）です。
 |--------|------|
 | **main branch guard** | job 条件 `github.ref == 'refs/heads/main'` + `Verify main branch` ステップ |
 | **Secrets check** | `OPENAI_API_KEY` 必須、`GEMINI_API_KEY` または `NANO_BANANA_API_KEY` のいずれか必須 |
-| **failure summary** | 失敗時 `reports/quality-pipeline/latest/failure-summary.md` を生成（`if: failure()`） |
+| **failure summary** | 失敗時 `reports/quality-pipeline/latest/failure-summary.md` を生成（`if: failure()`）。HEALTH_CHECK 失敗時は `metrics.json` の個別エラーを **Health Check Errors** 節に列挙（v1.9） |
+| **Health Check 可視化**（v1.9） | apply 失敗時、workflow ログ・Summary・`metrics.json` artifact から Health Check 個別エラーを確認可能 |
 | **artifact upload** | `if: always()` — 成功・失敗問わず調査用成果物を保存 |
 
 #### Artifacts 保存対象
@@ -731,6 +732,8 @@ Artifact 名: `nightly-apply-<run_id>`（保持 14 日、`if-no-files-found: war
 | `reports/quality-pipeline/latest/failure-summary.md` | 失敗時サマリー（失敗時のみ生成） |
 
 失敗後の再開は **workflow_dispatch** で `resume=true` を ON にして手動実行してください。
+
+**HEALTH_CHECK 失敗時（v1.9）:** workflow ログに `[QualityPipeline] [apply] HEALTH_CHECK: ❌ <label>: <detail>` が出力されます。Summary 末尾の `health check errors:` 節、`metrics.json` の `byPhase.HEALTH_CHECK.summary.healthCheck.errors`、および artifact の `failure-summary.md`（**Health Check Errors** 節）でも同じ個別項目を確認できます。
 
 ---
 

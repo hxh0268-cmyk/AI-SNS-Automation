@@ -4,6 +4,38 @@
 
 ---
 
+## v1.9.0 — Health Check エラー可視化
+
+Nightly Apply で Quality Pipeline が **HEALTH_CHECK** で失敗した際、これまで「Health Check failed: Error N 件」のみだった表示を、**個別エラー項目**まで確認できるようにしました。
+
+### 追加・変更内容
+
+| 項目 | 内容 |
+|------|------|
+| `health_check.js` | `items[]` 構造化蓄積、`--json` / `HEALTH_CHECK_JSON=1` で JSON 出力（human-readable 出力は維持） |
+| `pipeline_phase_handlers.js` | JSON パース + regex fallback、`healthCheck.errors` を metrics に保存、失敗時ログ出力 |
+| `run_quality_pipeline.js` | Summary に `health check errors:` 一覧を表示 |
+| `nightly-apply.yml` | failure summary が `metrics.json` から **Health Check Errors** を列挙 |
+| テスト | Test 40–44 追加（JSON 契約・metrics 契約・Secret 非露出・workflow 契約） |
+
+### セキュリティ
+
+- API キー・Secret **値**は JSON / ログ / artifact に出力しない（label / detail のみ）
+
+### 変更なし（意図的）
+
+- v1.8.2 Secrets OR 条件 / main branch guard / schedule / artifacts
+- `.env` 不在を Warning に降格（別 issue）
+- `--skip-health-check` / `doctor.js` 共通化
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **44 PASS**（実装後 `npm test` で確認） |
+
+---
+
 ## v1.8.2 — 運用品質パッチ（Nightly Apply Secrets OR 条件）
 
 Nightly Apply Workflow の Secrets Check を **アプリケーション本体の仕様** に合わせました。nano_banana adapter は `NANO_BANANA_API_KEY` **または** `GEMINI_API_KEY` のどちらかで動作するため、両キーを単独必須にしません。
