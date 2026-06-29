@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.7.0**（GitHub Actions / CI）
+**v1.8.0**（Nightly Apply Workflow）
 
 ---
 
@@ -21,7 +21,99 @@
 | v1.4.1 | 運用品質パッチ | ✅ 完了 | report / README / CLI 運用案内強化 |
 | v1.5.0 | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
 | v1.6.0 | Resume Execution | ✅ 完了 | `--resume` 途中再開、`state.json` checkpoint、latest archive スキップ |
-| **v1.7.0** | **GitHub Actions / CI** | **✅ 完了** | **`--stop-before-phase`、CI workflow、Artifacts、npm test** |
+| v1.7.0 | GitHub Actions / CI | ✅ 完了 | `--stop-before-phase`、dry-run CI workflow、Artifacts、npm test |
+| **v1.8.0** | **Nightly Apply Workflow** | **✅ 完了** | **apply nightly workflow、Secrets チェック、failure summary、resume dispatch** |
+
+---
+
+### v1.8.0 で追加（Nightly Apply Workflow）
+
+#### Nightly Apply Workflow
+
+**主な追加機能**
+
+- **apply 専用 workflow** … `.github/workflows/nightly-apply.yml`
+- **dry-run CI との分離** … `quality-pipeline-ci.yml` は変更なし（Secrets 不要）
+- **必須 Secrets** … `OPENAI_API_KEY` / `GEMINI_API_KEY`
+- **schedule** … JST 03:00（UTC 18:00）
+- **workflow_dispatch** … input `resume`（boolean、デフォルト false）
+- **通常 apply** … `--apply --clean-latest`
+- **Resume apply** … `--apply --resume`（`--clean-latest` なし）
+- **安全設計** … main guard / Secrets check / failure summary / `if: always()` artifacts
+- **テスト** … Test 39（**39 PASS**）
+
+**Artifacts 保存対象**
+
+- `report.md` / `report.json` / `metrics.json` / `state.json` / `export/` / `failure-summary.md`
+
+### 品質状況（v1.8.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **39 PASS** |
+| GitHub Actions dry-run CI | **Green 完走**（Secrets 不要） |
+| Nightly Apply Workflow | workflow 定義・contract test 済み |
+
+**確認済み**
+
+- `npm test` … **PASS**（39 tests）
+- `npm run quality-pipeline:dry-run` … **PASS**
+- Test 39 nightly-apply workflow contract … **PASS**
+
+### v1.8.0 完成済み機能一覧
+
+| 機能 | 状態 |
+|------|------|
+| Smart Auto Fix | ✅ |
+| Regeneration Engine | ✅ |
+| Nano Banana Adapter | ✅ |
+| OpenAI Adapter | ✅ |
+| Gemini ReReview | ✅ |
+| scoreSummary | ✅ |
+| Resume Execution | ✅ |
+| `--stop-before-phase` | ✅ |
+| GitHub Actions dry-run CI | ✅ |
+| Nightly Apply Workflow | ✅ |
+| report.json | ✅ |
+| report.md | ✅ |
+| metrics.json | ✅ |
+| state.json | ✅ |
+| export | ✅ |
+| failure-summary.md（workflow） | ✅ |
+| latest archive | ✅ |
+| dry-run | ✅ |
+| apply | ✅ |
+| CLI help | ✅ |
+
+### 未実装一覧（v1.8.0 時点）
+
+| 項目 | 状態 |
+|------|------|
+| Pipeline Notification | 未実装 |
+| 自動リリース | 未実装 |
+
+### 次期バージョン
+
+**Next Release: v1.9.0**
+
+候補例:
+
+- Pipeline Notification
+- 自動リリース
+- apply workflow の追加パラメータ（from-phase / max-rounds 等）
+
+### v1.8.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| nightly-apply.yml 追加 | ✅ |
+| Secrets チェック | ✅ |
+| main branch guard | ✅ |
+| failure summary | ✅ |
+| resume workflow_dispatch input | ✅ |
+| Artifacts（if: always） | ✅ |
+| Test 39 workflow contract | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 
@@ -76,25 +168,14 @@
 | apply | ✅ |
 | CLI help | ✅ |
 
-### 未実装一覧（v1.7.0 時点）
+### 未実装一覧（v1.7.0 時点・履歴）
 
 | 項目 | 状態 |
 |------|------|
-| CI apply（API キー使用） | 未実装 |
-| Nightly apply pipeline | 未実装 |
+| Nightly apply pipeline | v1.8.0 で実装済み |
+| CI apply（API キー使用） | v1.8.0 Nightly Apply Workflow で実装（dry-run CI とは分離） |
 
-### 次期バージョン
-
-**Next Release: v1.8.0**
-
-候補例:
-
-- CI apply workflow（Secrets 必須・手動 dispatch）
-- Nightly Pipeline
-- Pipeline Notification
-- 自動リリース
-
-### v1.7.0 完成判定
+### v1.7.0 完成判定（履歴）
 
 | 項目 | 状態 |
 |------|------|

@@ -4,6 +4,61 @@
 
 ---
 
+## v1.8.0 — Nightly Apply Workflow
+
+dry-run CI（v1.7）とは別に、**apply 専用**の Nightly Apply Workflow を GitHub Actions 上に追加しました。Secrets 検証・main ブランチガード・失敗 summary・Artifacts 保存により、安全に nightly apply と手動 resume を運用できます。
+
+### 追加機能
+
+| 項目 | 内容 |
+|------|------|
+| Nightly Apply Workflow | `.github/workflows/nightly-apply.yml` |
+| トリガー | `workflow_dispatch` / `schedule`（JST 03:00 = UTC 18:00） |
+| 必須 Secrets | `OPENAI_API_KEY` / `GEMINI_API_KEY`（apply 前に検証） |
+| 通常 apply | `npm run quality-pipeline -- --apply --clean-latest` |
+| Resume apply | `workflow_dispatch` input `resume=true` → `--apply --resume`（`--clean-latest` なし） |
+| main branch guard | job 条件 + `Verify main branch` ステップ |
+| failure summary | 失敗時 `failure-summary.md` 生成（`if: failure()`） |
+| Artifacts | `if: always()`、`if-no-files-found: warn`、保持 14 日 |
+| テスト | Test 39 追加（**39 PASS**）— nightly-apply workflow contract |
+
+### 設計判断
+
+- **dry-run CI と apply workflow を分離** — `quality-pipeline-ci.yml` は Secrets 不要のまま維持
+- **`--resume` と `--clean-latest` は併用しない** — resume 時は `state.json` を保持
+- **Secret 値はログに出さない** — 不足時は Secret 名のみ表示
+- **失敗時も Artifacts 保存** — `failure-summary.md` 含む調査用成果物を `if: always()` で upload
+
+### 新規ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `.github/workflows/nightly-apply.yml` | Nightly Apply Workflow |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `scripts/test_quality_pipeline.sh` | Test 39（nightly-apply workflow contract） |
+| `README.md` | v1.8 Nightly Apply / CI 役割分離 |
+| `docs/CHANGELOG.md` | 本エントリ |
+| `docs/VERSION.md` | v1.8.0 |
+
+### 変更なし（意図的）
+
+- `.github/workflows/quality-pipeline-ci.yml`
+- `scripts/run_daily.sh`
+- Smart Auto Fix / Regeneration Engine 中核
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **39 PASS** |
+| `npm run quality-pipeline:dry-run` | **exit 0** |
+
+---
+
 ## v1.7.0 — GitHub Actions / CI
 
 Quality Pipeline を GitHub Actions 上で **Secrets なし** に自動検証できるようにしました。`--stop-before-phase` による意図的中断と `--resume` による自然再開を CI で確認し、成果物を Artifacts として保存します。

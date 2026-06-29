@@ -1537,4 +1537,90 @@ EOF
 pass "resume artifacts"
 
 echo ""
+echo "-- Test 39: nightly-apply workflow contract --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const nightlyPath = path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml");
+const ciPath = path.join(PROJECT_ROOT, ".github/workflows/quality-pipeline-ci.yml");
+
+if (!fs.existsSync(nightlyPath)) {
+  throw new Error("missing .github/workflows/nightly-apply.yml");
+}
+
+const workflow = fs.readFileSync(nightlyPath, "utf-8");
+
+function assertContains(label, haystack, needle) {
+  if (!haystack.includes(needle)) {
+    throw new Error(`${label}: expected to include ${JSON.stringify(needle)}`);
+  }
+}
+
+assertContains("workflow name", workflow, "name: Nightly Apply Workflow");
+assertContains("workflow_dispatch", workflow, "workflow_dispatch:");
+assertContains("resume input", workflow, "inputs:");
+assertContains("resume input name", workflow, "resume:");
+assertContains("resume input type", workflow, "type: boolean");
+assertContains("resume input default", workflow, "default: false");
+assertContains("resume description", workflow, "description: Resume from previous state.json");
+assertContains("schedule", workflow, "schedule:");
+assertContains("cron", workflow, 'cron: "0 18 * * *"');
+assertContains("job-level main guard", workflow, "if: github.ref == 'refs/heads/main'");
+assertContains("verify main step", workflow, "name: Verify main branch");
+assertContains("secrets step", workflow, "name: Check required secrets");
+assertContains("OPENAI_API_KEY check", workflow, "OPENAI_API_KEY");
+assertContains("GEMINI_API_KEY check", workflow, "GEMINI_API_KEY");
+assertContains("apply clean-latest command", workflow, "npm run quality-pipeline -- --apply --clean-latest");
+assertContains("apply resume command", workflow, "npm run quality-pipeline -- --apply --resume");
+assertContains("failure summary step", workflow, "name: Create failure summary");
+assertContains("failure summary artifact", workflow, "reports/quality-pipeline/latest/failure-summary.md");
+assertContains("upload always", workflow, "if: always()");
+assertContains("if-no-files-found warn", workflow, "if-no-files-found: warn");
+assertContains("retention-days 14", workflow, "retention-days: 14");
+
+const resumeBranch = workflow.match(
+  /if \[ "\$\{RESUME\}" = "true" \]; then[\s\S]*?else/,
+);
+if (!resumeBranch) {
+  throw new Error("resume branch not found in apply step");
+}
+const resumeCommands = resumeBranch[0]
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line.startsWith("npm run quality-pipeline"));
+if (resumeCommands.length !== 1) {
+  throw new Error(`expected one resume npm command, got ${resumeCommands.length}`);
+}
+if (!resumeCommands[0].includes("--apply --resume")) {
+  throw new Error(`unexpected resume command: ${resumeCommands[0]}`);
+}
+if (resumeCommands[0].includes("--clean-latest")) {
+  throw new Error("resume npm command must not include --clean-latest");
+}
+
+if (!fs.existsSync(ciPath)) {
+  throw new Error("missing .github/workflows/quality-pipeline-ci.yml");
+}
+const ci = fs.readFileSync(ciPath, "utf-8");
+assertContains("ci workflow name", ci, "name: Quality Pipeline CI");
+assertContains("ci npm test step", ci, "run: npm test");
+assertContains("ci dry-run step", ci, "quality-pipeline:dry-run");
+assertContains("ci stop-before-phase", ci, "--stop-before-phase report");
+assertContains("ci resume dry-run", ci, "quality-pipeline:dry-run -- --resume");
+assertContains("ci upload step", ci, "name: Upload quality pipeline reports");
+assertContains("ci upload artifact action", ci, "actions/upload-artifact@v4");
+if (ci.includes("Nightly Apply Workflow")) {
+  throw new Error("quality-pipeline-ci.yml must not contain Nightly Apply Workflow content");
+}
+if (ci.includes("nightly-apply-")) {
+  throw new Error("quality-pipeline-ci.yml must not contain nightly-apply artifact naming");
+}
+
+console.log("nightly-apply workflow contract ok");
+EOF
+pass "nightly-apply workflow contract"
+
+echo ""
 echo "All quality pipeline tests passed."

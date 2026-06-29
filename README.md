@@ -359,7 +359,7 @@ git clean -fd output/carousel/improved/
 - POST_GENERATION 〜 IMAGE_GENERATION フェーズは **placeholder**（未接続）
 - **TEXT rootCause** は v1.4 で Smart Auto Fix チェーン接続済み（下記 v1.4 参照）
 - **PROMPT / openai_regenerate** は **placeholder のまま**
-- GitHub Actions 連携は未実装
+- GitHub Actions 連携は v1.7（dry-run CI）/ v1.8（Nightly Apply）で実装済み
 
 設計詳細: [docs/V1.3_QUALITY_PIPELINE_DESIGN.md](docs/V1.3_QUALITY_PIPELINE_DESIGN.md)
 
@@ -447,7 +447,8 @@ dry-run 時、TEXT 対象は `status: planned` として report / metrics に記
 | 項目 | 状態 |
 |------|------|
 | `openai_regenerate` | placeholder のまま |
-| GitHub Actions | 未実装 |
+| GitHub Actions（dry-run CI） | v1.7 `.github/workflows/quality-pipeline-ci.yml` |
+| GitHub Actions（Nightly Apply） | v1.8 `.github/workflows/nightly-apply.yml` |
 | `run_daily.sh` | **変更なし**（v1.0〜v1.4 維持） |
 
 設計詳細: [docs/V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md](docs/V1.4_SMART_AUTO_FIX_INTEGRATION_DESIGN.md)
@@ -536,7 +537,7 @@ dry-run 後は `reports/quality-pipeline/latest/report.md` で adapter 選択と
 ### テスト
 
 ```bash
-npm run test:quality-pipeline   # 38 PASS
+npm run test:quality-pipeline   # 39 PASS
 npm test                        # 同上（CI エイリアス）
 ```
 
@@ -604,7 +605,7 @@ CLI Summary では `resume: enabled` と `workspace: --resume（latest を archi
 ### テスト
 
 ```bash
-npm run test:quality-pipeline   # 38 PASS
+npm run test:quality-pipeline   # 39 PASS
 npm test                        # 同上
 ```
 
@@ -638,25 +639,97 @@ Resume 完了後は `status: completed`、`stopReason: null`、`stopBeforePhase:
 
 ---
 
-## GitHub Actions / CI（v1.7）
+## GitHub Actions（v1.7 / v1.8）
 
-Quality Pipeline の品質ゲートを GitHub Actions 上で自動実行します。**API キー不要**（dry-run のみ）で Green になる構成です。
+Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離されています。
+
+| Workflow | ファイル | 目的 | API キー |
+|----------|----------|------|----------|
+| **Quality Pipeline CI**（v1.7） | `.github/workflows/quality-pipeline-ci.yml` | dry-run 品質ゲート（test / stop / resume） | **不要** |
+| **Nightly Apply Workflow**（v1.8） | `.github/workflows/nightly-apply.yml` | 本番 apply（定期 / 手動） | **必須** |
+
+### Quality Pipeline CI（v1.7）
+
+**API キー不要**（dry-run のみ）で Green になる PR / push 向け CI です。
 
 | 項目 | 内容 |
 |------|------|
-| ファイル | `.github/workflows/quality-pipeline-ci.yml` |
 | トリガー | `push` / `pull_request`（main）/ `workflow_dispatch` / `schedule` |
 | Node.js | 20.x |
 | Secrets | **不要** |
 
 CI 実行内容:
 
-1. `npm test`（38 PASS）
+1. `npm test`（39 PASS）
 2. `quality-pipeline:dry-run -- --stop-before-phase report`
 3. `quality-pipeline:dry-run -- --resume`
 4. Artifacts として `reports/quality-pipeline/latest/` を保存
 
 GitHub Actions の Run 詳細 → **Artifacts** → `quality-pipeline-reports-<run_id>` から成果物をダウンロードできます。
+
+### Nightly Apply Workflow（v1.8）
+
+**apply 専用**の nightly workflow です。dry-run CI とは独立しており、Repository Secrets が設定されている環境でのみ apply を実行します。
+
+| 項目 | 内容 |
+|------|------|
+| ファイル | `.github/workflows/nightly-apply.yml` |
+| トリガー | `workflow_dispatch` / `schedule` |
+| スケジュール | **JST 03:00**（cron: `0 18 * * *` UTC） |
+| Node.js | 20.x |
+| 対象ブランチ | **main のみ**（job 条件 `if: github.ref == 'refs/heads/main'` + `Verify main branch` ステップ） |
+
+#### 必須 GitHub Secrets
+
+Repository Settings → Secrets and variables → Actions に以下を登録してください。
+
+| Secret | 用途 |
+|--------|------|
+| `OPENAI_API_KEY` | OpenAI API（画像再生成等） |
+| `GEMINI_API_KEY` | Gemini API（再レビュー等） |
+
+apply 実行前に workflow 内で **Secret 名のみ** を検証し、不足時は apply を実行せず失敗します（Secret 値はログに出力しません）。
+
+#### 実行モード
+
+| モード | 条件 | コマンド |
+|--------|------|----------|
+| **通常 apply** | schedule / `workflow_dispatch`（resume=false） | `npm run quality-pipeline -- --apply --clean-latest` |
+| **Resume apply** | `workflow_dispatch`（resume=true） | `npm run quality-pipeline -- --apply --resume` |
+
+`workflow_dispatch` input:
+
+| Input | 型 | デフォルト | 説明 |
+|-------|-----|-----------|------|
+| `resume` | boolean | `false` | `Resume from previous state.json` |
+
+**`--resume` と `--clean-latest` は併用しません。** resume 時は既存 `state.json` を保持するため `--clean-latest` を付けません（pipeline CLI でも併用不可）。
+
+schedule 実行時は常に `resume=false`（通常 apply）です。
+
+#### 安全設計
+
+| ガード | 内容 |
+|--------|------|
+| **main branch guard** | job 条件 `github.ref == 'refs/heads/main'` + `Verify main branch` ステップ |
+| **Secrets check** | `OPENAI_API_KEY` / `GEMINI_API_KEY` を apply 前に検証 |
+| **failure summary** | 失敗時 `reports/quality-pipeline/latest/failure-summary.md` を生成（`if: failure()`） |
+| **artifact upload** | `if: always()` — 成功・失敗問わず調査用成果物を保存 |
+
+#### Artifacts 保存対象
+
+Artifact 名: `nightly-apply-<run_id>`（保持 14 日、`if-no-files-found: warn`）
+
+| パス | 内容 |
+|------|------|
+| `reports/quality-pipeline/latest/report.md` | 人間向けレポート |
+| `reports/quality-pipeline/latest/report.json` | 構造化レポート |
+| `reports/quality-pipeline/latest/metrics.json` | metrics |
+| `reports/quality-pipeline/latest/state.json` | resume checkpoint |
+| `reports/quality-pipeline/latest/export/` | export 成果物 |
+| `reports/quality-pipeline/latest/failure-summary.md` | 失敗時サマリー（失敗時のみ生成） |
+
+失敗後の再開は **workflow_dispatch** で `resume=true` を ON にして手動実行してください。
 
 ---
 
@@ -1291,7 +1364,8 @@ AI-SNS-Automation/
 | 品質パイプライン（v1.4） | TEXT rootCause → Smart Auto Fix チェーン接続 |
 | 品質パイプライン（v1.5） | Regeneration adapter 切替（`nano_banana` / `openai`） |
 | 品質パイプライン（v1.6） | `--resume` による途中再開（`state.json` checkpoint） |
-| 品質パイプライン（v1.7） | `--stop-before-phase`、GitHub Actions CI、Artifacts |
+| 品質パイプライン（v1.7） | `--stop-before-phase`、GitHub Actions dry-run CI、Artifacts |
+| 品質パイプライン（v1.8） | Nightly Apply Workflow、Secrets チェック、failure summary |
 
 ---
 

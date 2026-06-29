@@ -1,0 +1,146 @@
+name: Nightly Apply Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      resume:
+        description: Resume from previous state.json
+        type: boolean
+        default: false
+  schedule:
+    # JST 03:00 = UTC 18:00 (前日)
+    - cron: "0 18 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  nightly-apply:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check required secrets
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          missing=()
+          if [ -z "${OPENAI_API_KEY}" ]; then
+            missing+=("OPENAI_API_KEY")
+          fi
+          if [ -z "${GEMINI_API_KEY}" ]; then
+            missing+=("GEMINI_API_KEY")
+          fi
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "Error: Missing required GitHub Secrets: ${missing[*]}"
+            echo "Configure them in Repository Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Required GitHub Secrets are configured: OPENAI_API_KEY, GEMINI_API_KEY"
+
+      - name: Verify main branch
+        env:
+          CURRENT_REF: ${{ github.ref }}
+        run: |
+          if [ "${CURRENT_REF}" != "refs/heads/main" ]; then
+            echo "Error: Nightly Apply Workflow must run on main branch. Current ref: ${CURRENT_REF}"
+            exit 1
+          fi
+          echo "Verified branch: refs/heads/main"
+
+      - name: Run quality pipeline apply
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RESUME: ${{ github.event.inputs.resume }}
+        run: |
+          if [ "${RESUME}" = "true" ]; then
+            echo "Running quality pipeline apply with --resume (no --clean-latest)"
+            npm run quality-pipeline -- --apply --resume
+          else
+            echo "Running quality pipeline apply with --clean-latest"
+            npm run quality-pipeline -- --apply --clean-latest
+          fi
+
+      - name: Create failure summary
+        if: failure()
+        env:
+          WORKFLOW_NAME: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          mkdir -p reports/quality-pipeline/latest
+
+          missing_secrets=()
+          if [ -z "${OPENAI_API_KEY}" ]; then
+            missing_secrets+=("OPENAI_API_KEY")
+          fi
+          if [ -z "${GEMINI_API_KEY}" ]; then
+            missing_secrets+=("GEMINI_API_KEY")
+          fi
+
+          {
+            echo "# Nightly Apply Workflow — Failure Summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Workflow | ${WORKFLOW_NAME} |"
+            echo "| Run ID | ${RUN_ID} |"
+            echo "| Ref | ${REF} |"
+            echo "| Commit SHA | ${SHA} |"
+            echo "| Actor | ${ACTOR} |"
+            echo ""
+            echo "## Possible causes"
+            echo ""
+            if [ "${#missing_secrets[@]}" -gt 0 ]; then
+              echo "- Missing required GitHub Secrets: ${missing_secrets[*]}"
+            fi
+            if [ "${REF}" != "refs/heads/main" ]; then
+              echo "- Workflow was not on main branch (expected \`refs/heads/main\`, got \`${REF}\`)"
+            fi
+            if [ "${#missing_secrets[@]}" -eq 0 ] && [ "${REF}" = "refs/heads/main" ]; then
+              echo "- \`npm ci\` or \`quality-pipeline --apply\` may have failed — review the workflow log for the first failing step"
+              echo "- API quota limits, pipeline phase errors, or environment issues during apply"
+            fi
+            echo ""
+            echo "## Next steps"
+            echo ""
+            echo "1. Download the \`nightly-apply-${RUN_ID}\` artifact from this workflow run"
+            echo "2. Inspect \`state.json\`, \`report.json\`, \`metrics.json\`, and \`report.md\` if present"
+            echo "3. Review \`reports/quality-pipeline/latest/export/\` for partial export output"
+            echo "4. Fix the root cause and re-run via workflow_dispatch or wait for the next schedule"
+          } > reports/quality-pipeline/latest/failure-summary.md
+
+          echo "Created reports/quality-pipeline/latest/failure-summary.md"
+
+      - name: Upload quality pipeline reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-apply-${{ github.run_id }}
+          path: |
+            reports/quality-pipeline/latest/report.md
+            reports/quality-pipeline/latest/report.json
+            reports/quality-pipeline/latest/metrics.json
+            reports/quality-pipeline/latest/state.json
+            reports/quality-pipeline/latest/failure-summary.md
+            reports/quality-pipeline/latest/export/
+          retention-days: 14
+          if-no-files-found: warn
