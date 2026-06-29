@@ -4,6 +4,43 @@
 
 ---
 
+## v1.8.2 — 運用品質パッチ（Nightly Apply Secrets OR 条件）
+
+Nightly Apply Workflow の Secrets Check を **アプリケーション本体の仕様** に合わせました。nano_banana adapter は `NANO_BANANA_API_KEY` **または** `GEMINI_API_KEY` のどちらかで動作するため、両キーを単独必須にしません。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| 必須 Secrets | `OPENAI_API_KEY` のみ単独必須 |
+| OR 条件 | `GEMINI_API_KEY` / `NANO_BANANA_API_KEY` は **どちらか一方** があれば OK |
+| apply env | 3 キーすべて注入（v1.8.1 維持） |
+| failure summary | OPENAI 未設定と GEMINI/NANO 両方未設定を分けて表示 |
+| テスト | Test 39 を OR 条件仕様に更新 |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `.github/workflows/nightly-apply.yml` | Secrets Check / failure summary の OR 条件化 |
+| `scripts/test_quality_pipeline.sh` | Test 39 更新 |
+| `README.md` | Secrets 説明修正 |
+| `docs/CHANGELOG.md` | 本エントリ |
+| `docs/VERSION.md` | v1.8.2 |
+
+### 変更なし（意図的）
+
+- main branch guard / schedule / resume input / artifacts upload
+- `.github/workflows/quality-pipeline-ci.yml`
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **39 PASS** |
+
+---
+
 ## v1.8.1 — 運用品質パッチ（Nightly Apply Secrets）
 
 Nightly Apply Workflow が **nano_banana adapter**（デフォルト）の apply 実行に必要な `NANO_BANANA_API_KEY` を正しく扱えるようにしました。

@@ -679,17 +679,17 @@ GitHub Actions の Run 詳細 → **Artifacts** → `quality-pipeline-reports-<r
 | Node.js | 20.x |
 | 対象ブランチ | **main のみ**（job 条件 `if: github.ref == 'refs/heads/main'` + `Verify main branch` ステップ） |
 
-#### 必須 GitHub Secrets
+#### GitHub Secrets（Nightly Apply）
 
 Repository Settings → Secrets and variables → Actions に以下を登録してください。
 
-| Secret | 用途 |
-|--------|------|
-| `OPENAI_API_KEY` | OpenAI API（画像再生成等） |
-| `GEMINI_API_KEY` | Gemini API（再レビュー等） |
-| `NANO_BANANA_API_KEY` | Nano Banana API（デフォルト adapter の画像改善） |
+| 区分 | Secret | 用途 |
+|------|--------|------|
+| **必須** | `OPENAI_API_KEY` | OpenAI API（画像再生成等） |
+| **いずれか必須** | `GEMINI_API_KEY` | Gemini API（再レビュー・Nano Banana 代替キー） |
+| **いずれか必須** | `NANO_BANANA_API_KEY` | Nano Banana API（デフォルト adapter の画像改善） |
 
-apply 実行前に workflow 内で **Secret 名のみ** を検証し、不足時は apply を実行せず失敗します（Secret 値はログに出力しません）。
+nano_banana adapter（デフォルト）は **`NANO_BANANA_API_KEY` または `GEMINI_API_KEY` のどちらか一方** があれば動作します。apply 実行前に workflow 内で **Secret 名のみ** を検証し、不足時は apply を実行せず失敗します（Secret 値はログに出力しません）。
 
 #### 実行モード
 
@@ -713,7 +713,7 @@ schedule 実行時は常に `resume=false`（通常 apply）です。
 | ガード | 内容 |
 |--------|------|
 | **main branch guard** | job 条件 `github.ref == 'refs/heads/main'` + `Verify main branch` ステップ |
-| **Secrets check** | `OPENAI_API_KEY` / `GEMINI_API_KEY` / `NANO_BANANA_API_KEY` を apply 前に検証 |
+| **Secrets check** | `OPENAI_API_KEY` 必須、`GEMINI_API_KEY` または `NANO_BANANA_API_KEY` のいずれか必須 |
 | **failure summary** | 失敗時 `reports/quality-pipeline/latest/failure-summary.md` を生成（`if: failure()`） |
 | **artifact upload** | `if: always()` — 成功・失敗問わず調査用成果物を保存 |
 

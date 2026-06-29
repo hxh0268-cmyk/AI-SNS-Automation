@@ -1583,8 +1583,17 @@ if (!secretsStep) {
 if (!secretsStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
   throw new Error("NANO_BANANA_API_KEY must be injected in Check required secrets env");
 }
-if (!secretsStep[0].includes('missing+=("NANO_BANANA_API_KEY")')) {
-  throw new Error("NANO_BANANA_API_KEY must be validated in Check required secrets");
+if (!secretsStep[0].includes('GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}')) {
+  throw new Error("GEMINI_API_KEY must be injected in Check required secrets env");
+}
+if (!secretsStep[0].includes('[ -z "${GEMINI_API_KEY}" ] && [ -z "${NANO_BANANA_API_KEY}" ]')) {
+  throw new Error("Check required secrets must use GEMINI_API_KEY or NANO_BANANA_API_KEY OR condition");
+}
+if (secretsStep[0].includes('missing+=("NANO_BANANA_API_KEY")')) {
+  throw new Error("NANO_BANANA_API_KEY must not be individually required in Check required secrets");
+}
+if (secretsStep[0].includes('missing+=("GEMINI_API_KEY")')) {
+  throw new Error("GEMINI_API_KEY must not be individually required in Check required secrets");
 }
 
 const applyStep = workflow.match(
@@ -1596,6 +1605,9 @@ if (!applyStep) {
 if (!applyStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
   throw new Error("NANO_BANANA_API_KEY must be injected in apply step env");
 }
+if (!applyStep[0].includes('GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}')) {
+  throw new Error("GEMINI_API_KEY must be injected in apply step env");
+}
 
 const failureSummaryStep = workflow.match(
   /name: Create failure summary[\s\S]*?(?=\n      - name:)/,
@@ -1606,8 +1618,17 @@ if (!failureSummaryStep) {
 if (!failureSummaryStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
   throw new Error("NANO_BANANA_API_KEY must be injected in failure summary env");
 }
-if (!failureSummaryStep[0].includes('missing_secrets+=("NANO_BANANA_API_KEY")')) {
-  throw new Error("NANO_BANANA_API_KEY must be checked in failure summary");
+if (!failureSummaryStep[0].includes('[ -z "${GEMINI_API_KEY}" ] && [ -z "${NANO_BANANA_API_KEY}" ]')) {
+  throw new Error("failure summary must use GEMINI_API_KEY or NANO_BANANA_API_KEY OR condition");
+}
+if (failureSummaryStep[0].includes('missing_secrets+=("NANO_BANANA_API_KEY")')) {
+  throw new Error("NANO_BANANA_API_KEY must not be individually required in failure summary");
+}
+if (failureSummaryStep[0].includes('missing_secrets+=("GEMINI_API_KEY")')) {
+  throw new Error("GEMINI_API_KEY must not be individually required in failure summary");
+}
+if (!failureSummaryStep[0].includes("OPENAI_API_KEY is not set")) {
+  throw new Error("failure summary must report OPENAI_API_KEY separately");
 }
 
 assertContains("apply clean-latest command", workflow, "npm run quality-pipeline -- --apply --clean-latest");
