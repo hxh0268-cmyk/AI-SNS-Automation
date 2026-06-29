@@ -792,9 +792,10 @@ npm run health-check
 
 | 確認項目 | 説明 |
 |----------|------|
-| `.env` | API キー設定ファイルがあるか |
-| `OPENAI_API_KEY` | 画像生成用のキーが設定されているか |
-| `GEMINI_API_KEY` | レビュー・カルーセル用のキーが設定されているか |
+| `.env` | API キー設定ファイルがあるか（GitHub Actions では Secrets 注入時は未作成でも可 — v1.9.2） |
+| `OPENAI_API_KEY` | 画像生成用のキーが設定されているか（**必須**） |
+| `GEMINI_API_KEY` | レビュー・カルーセル用のキー（`NANO_BANANA_API_KEY` との **いずれか必須** — v1.8.2 / v1.9.2） |
+| `NANO_BANANA_API_KEY` | Nano Banana 画像改善用のキー（`GEMINI_API_KEY` との **いずれか必須** — v1.9.2） |
 | `prompts/` | プロンプト用フォルダがあるか |
 | `content/` | 投稿データ用フォルダがあるか |
 | `content/research/` | Genspark リサーチ用フォルダがあるか |
@@ -827,6 +828,7 @@ Error: （件数）
 - Error が 1 つでもあると、`npm run daily` は途中で失敗する可能性が高いです
 - `health-check` 自体は **Error があっても最後まで実行** し、終了コードは常に 0 です（確認用コマンドのため）
 - API キーの値そのものは表示しません（安全のため）
+- **GitHub Actions（v1.9.2）:** `GITHUB_ACTIONS=true` のときは `.env` がなくても Error にしません。Secrets から `OPENAI_API_KEY`（必須）と `GEMINI_API_KEY` または `NANO_BANANA_API_KEY`（いずれか必須）が `process.env` にあれば通過します
 
 ---
 

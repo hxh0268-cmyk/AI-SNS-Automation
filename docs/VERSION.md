@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.9.1**（Nightly Apply YAML 修正パッチ）
+**v1.9.2**（GitHub Actions Health Check パッチ）
 
 ---
 
@@ -26,7 +26,41 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.9.1** | **運用品質パッチ** | **✅ 完了** | **Nightly Apply failure summary heredoc の YAML 修正** |
+| v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+| **v1.9.2** | **運用品質パッチ** | **✅ 完了** | **GHA 環境で .env なし Health Check 通過（Secrets 注入時）** |
+
+---
+
+### v1.9.2 で追加（運用品質パッチ）
+
+#### GitHub Actions Health Check
+
+- **`GITHUB_ACTIONS=true`** … `.env` 未作成でも Error にしない
+- **API キー** … `OPENAI_API_KEY` 必須 + `GEMINI_API_KEY` / `NANO_BANANA_API_KEY` OR 条件
+- **ローカル** … `.env` 未作成時は従来どおり Error
+- **Test 45–47** … GHA / ローカル / Secrets 不足の 3 パターン
+
+### 品質状況（v1.9.2 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **47 PASS** |
+
+**確認済み**
+
+- `npm test` … **PASS**（47 tests）
+- Test 45–47 GitHub Actions Health Check … **PASS**
+
+### v1.9.2 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| GHA .env 非必須 | ✅ |
+| OPENAI 必須 | ✅ |
+| GEMINI / NANO OR 条件 | ✅ |
+| ローカル .env 必須維持 | ✅ |
+| Test 45–47 | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 

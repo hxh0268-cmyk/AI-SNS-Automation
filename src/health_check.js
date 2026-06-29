@@ -51,6 +51,14 @@ function printResult(label, status, detail) {
 }
 
 /**
+ * GitHub Actions 実行環境かどうか
+ * @returns {boolean}
+ */
+export function isGitHubActionsEnv() {
+  return process.env.GITHUB_ACTIONS === "true";
+}
+
+/**
  * JSON 出力モードかどうか
  * @returns {boolean}
  */
@@ -91,6 +99,7 @@ async function main() {
     console.log("");
   }
 
+  const isGitHubActions = isGitHubActionsEnv();
   const hasEnvFile = await pathExists(ENV_FILE, "file");
 
   if (hasEnvFile) {
@@ -99,6 +108,12 @@ async function main() {
       "ok",
       ".env ファイル",
       "設定ファイルが見つかりました。",
+    );
+  } else if (isGitHubActions) {
+    record(
+      "ok",
+      ".env ファイル",
+      "見つかりませんが、GitHub Actions では Repository Secrets が process.env に注入されるため問題ありません。",
     );
   } else {
     record(
@@ -115,11 +130,17 @@ async function main() {
       "OPENAI_API_KEY",
       "設定されています（画像生成に使用します）。",
     );
-  } else if (!hasEnvFile) {
+  } else if (!hasEnvFile && !isGitHubActions) {
     record(
       "error",
       "OPENAI_API_KEY",
       ".env がないため確認できません。先に .env を作成してください。",
+    );
+  } else if (isGitHubActions) {
+    record(
+      "error",
+      "OPENAI_API_KEY",
+      "未設定です。GitHub Actions では OPENAI_API_KEY Secret が必要です。",
     );
   } else {
     record(
@@ -130,24 +151,50 @@ async function main() {
   }
 
   const geminiKey = process.env.GEMINI_API_KEY?.trim();
+  const nanoBananaKey = process.env.NANO_BANANA_API_KEY?.trim();
+  const imageKeyMissingDetail =
+    "未設定です。GEMINI_API_KEY または NANO_BANANA_API_KEY のいずれかが必要です。";
+  const imageKeyMissingEnvDetail =
+    ".env がないため確認できません。先に .env を作成してください。";
+
   if (geminiKey) {
     record(
       "ok",
       "GEMINI_API_KEY",
       "設定されています（レビュー・カルーセル・画像レビューに使用します）。",
     );
-  } else if (!hasEnvFile) {
+  } else if (nanoBananaKey) {
     record(
-      "error",
+      "ok",
       "GEMINI_API_KEY",
-      ".env がないため確認できません。先に .env を作成してください。",
+      "未設定ですが、NANO_BANANA_API_KEY が設定されているため問題ありません。",
     );
+  } else if (!hasEnvFile && !isGitHubActions) {
+    record("error", "GEMINI_API_KEY", imageKeyMissingEnvDetail);
+  } else if (isGitHubActions) {
+    record("error", "GEMINI_API_KEY", imageKeyMissingDetail);
   } else {
+    record("error", "GEMINI_API_KEY", imageKeyMissingDetail);
+  }
+
+  if (nanoBananaKey) {
     record(
-      "error",
-      "GEMINI_API_KEY",
-      "未設定です。.env に GEMINI_API_KEY=... を追加してください。",
+      "ok",
+      "NANO_BANANA_API_KEY",
+      "設定されています（Nano Banana 画像改善に使用します）。",
     );
+  } else if (geminiKey) {
+    record(
+      "ok",
+      "NANO_BANANA_API_KEY",
+      "未設定ですが、GEMINI_API_KEY が設定されているため問題ありません。",
+    );
+  } else if (!hasEnvFile && !isGitHubActions) {
+    record("error", "NANO_BANANA_API_KEY", imageKeyMissingEnvDetail);
+  } else if (isGitHubActions) {
+    record("error", "NANO_BANANA_API_KEY", imageKeyMissingDetail);
+  } else {
+    record("error", "NANO_BANANA_API_KEY", imageKeyMissingDetail);
   }
 
   const checks = [

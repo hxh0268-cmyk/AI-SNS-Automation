@@ -4,6 +4,32 @@
 
 ---
 
+## v1.9.2 — 運用品質パッチ（GitHub Actions Health Check）
+
+GitHub Actions 環境では `.env` ファイルを必須にせず、Repository Secrets から `process.env` に注入された API キーで Health Check を通過できるようにしました。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| `.env` | ローカル: 従来どおり未作成時 Error / GHA: `GITHUB_ACTIONS=true` 時は Error にしない |
+| API キー | `OPENAI_API_KEY` 必須、`GEMINI_API_KEY` または `NANO_BANANA_API_KEY` いずれか必須（v1.8.2 OR 条件） |
+| `NANO_BANANA_API_KEY` | Health Check 項目として追加 |
+| テスト | Test 45–47 追加 |
+
+### 変更なし（意図的）
+
+- Nightly Apply Secrets OR 条件（workflow 側）
+- Health Check JSON / failure summary 仕様
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **47 PASS**（実装後 `npm test` で確認） |
+
+---
+
 ## v1.9.1 — 運用品質パッチ（Nightly Apply YAML 修正）
 
 v1.9.0 で追加した Nightly Apply failure summary 内の `node <<'NODE'` heredoc が **YAML ブロック外に漏れ**、GitHub Actions が workflow file invalid で 0 秒終了する問題を修正しました。

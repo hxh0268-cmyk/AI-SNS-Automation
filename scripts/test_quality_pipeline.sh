@@ -1974,5 +1974,178 @@ console.log("nightly failure summary health check contract ok");
 EOF
 pass "nightly-apply failure summary health check errors contract"
 
+# Tests 45–47: .env 不在時の Health Check（.env を一時退避）
+HEALTH_CHECK_ENV_BACKUP=""
+if [ -f .env ]; then
+  HEALTH_CHECK_ENV_BACKUP=".env.health-check-test.backup"
+  mv .env "${HEALTH_CHECK_ENV_BACKUP}"
+fi
+restore_health_check_env() {
+  if [ -n "${HEALTH_CHECK_ENV_BACKUP}" ] && [ -f "${HEALTH_CHECK_ENV_BACKUP}" ]; then
+    mv "${HEALTH_CHECK_ENV_BACKUP}" .env
+    HEALTH_CHECK_ENV_BACKUP=""
+  fi
+}
+trap restore_health_check_env EXIT
+
+echo "-- Test 45: GitHub Actions health check without .env file --"
+node --input-type=module <<'EOF'
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
+
+function parsePayload(output) {
+  const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+  if (markerIndex < 0) {
+    throw new Error("JSON marker not found");
+  }
+  return JSON.parse(output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim());
+}
+
+function findItem(payload, label) {
+  return payload.items.find((item) => item.label === label);
+}
+
+const output = await new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [scriptPath, "--json"], {
+    cwd: PROJECT_ROOT,
+    env: {
+      PATH: process.env.PATH ?? "",
+      HOME: process.env.HOME ?? "",
+      GITHUB_ACTIONS: "true",
+      HEALTH_CHECK_JSON: "1",
+      OPENAI_API_KEY: "sk-test-gha-openai-v192",
+      GEMINI_API_KEY: "test-gha-gemini-v192",
+    },
+  });
+  let text = "";
+  child.stdout.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.on("error", reject);
+  child.on("close", () => resolve(text));
+});
+
+const payload = parsePayload(output);
+const envItem = findItem(payload, ".env ファイル");
+if (!envItem || envItem.status !== "ok") {
+  throw new Error(`expected .env ファイル ok in GitHub Actions without .env, got ${envItem?.status}`);
+}
+if (payload.error > 0) {
+  throw new Error(`expected zero errors in Test 45, got ${payload.error}`);
+}
+
+console.log("GitHub Actions health check without .env ok");
+EOF
+pass "GitHub Actions health check without .env file"
+
+echo "-- Test 46: local health check requires .env file --"
+node --input-type=module <<'EOF'
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
+
+const output = await new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [scriptPath, "--json"], {
+    cwd: PROJECT_ROOT,
+    env: {
+      PATH: process.env.PATH ?? "",
+      HOME: process.env.HOME ?? "",
+      HEALTH_CHECK_JSON: "1",
+    },
+  });
+  let text = "";
+  child.stdout.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.on("error", reject);
+  child.on("close", () => resolve(text));
+});
+
+const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+const payload = JSON.parse(output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim());
+const envItem = payload.items.find((item) => item.label === ".env ファイル");
+if (!envItem || envItem.status !== "error") {
+  throw new Error(`expected .env ファイル error locally without .env, got ${envItem?.status}`);
+}
+if (payload.error === 0) {
+  throw new Error("expected at least one error locally without .env");
+}
+
+console.log("local health check requires .env ok");
+EOF
+pass "local health check requires .env file"
+
+echo "-- Test 47: GitHub Actions health check fails when secrets missing --"
+node --input-type=module <<'EOF'
+import { spawn } from "node:child_process";
+import path from "node:path";
+import { HEALTH_CHECK_JSON_MARKER } from "./src/health_check.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const scriptPath = path.join(PROJECT_ROOT, "src/health_check.js");
+
+const output = await new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [scriptPath, "--json"], {
+    cwd: PROJECT_ROOT,
+    env: {
+      PATH: process.env.PATH ?? "",
+      HOME: process.env.HOME ?? "",
+      GITHUB_ACTIONS: "true",
+      HEALTH_CHECK_JSON: "1",
+    },
+  });
+  let text = "";
+  child.stdout.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    text += chunk.toString();
+  });
+  child.on("error", reject);
+  child.on("close", () => resolve(text));
+});
+
+const markerIndex = output.lastIndexOf(HEALTH_CHECK_JSON_MARKER);
+const payload = JSON.parse(output.slice(markerIndex + HEALTH_CHECK_JSON_MARKER.length).trim());
+const envItem = payload.items.find((item) => item.label === ".env ファイル");
+if (!envItem || envItem.status !== "ok") {
+  throw new Error(`expected .env ファイル ok in GitHub Actions, got ${envItem?.status}`);
+}
+const openaiItem = payload.items.find((item) => item.label === "OPENAI_API_KEY");
+if (!openaiItem || openaiItem.status !== "error") {
+  throw new Error(`expected OPENAI_API_KEY error when secrets missing, got ${openaiItem?.status}`);
+}
+const geminiItem = payload.items.find((item) => item.label === "GEMINI_API_KEY");
+const nanoItem = payload.items.find((item) => item.label === "NANO_BANANA_API_KEY");
+if (
+  (!geminiItem || geminiItem.status !== "error") &&
+  (!nanoItem || nanoItem.status !== "error")
+) {
+  throw new Error("expected GEMINI_API_KEY or NANO_BANANA_API_KEY error when secrets missing");
+}
+if (payload.error === 0) {
+  throw new Error("expected errors when GitHub Actions secrets are missing");
+}
+
+console.log("GitHub Actions health check missing secrets ok");
+EOF
+pass "GitHub Actions health check fails when secrets missing"
+
+restore_health_check_env
+trap - EXIT
+
 echo ""
 echo "All quality pipeline tests passed."
