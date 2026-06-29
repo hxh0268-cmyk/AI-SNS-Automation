@@ -127,24 +127,24 @@ jobs:
             METRICS_FILE="reports/quality-pipeline/latest/metrics.json"
             if [ -f "${METRICS_FILE}" ]; then
               node <<'NODE'
-const fs = require("node:fs");
-const metricsPath = "reports/quality-pipeline/latest/metrics.json";
-try {
-  const metrics = JSON.parse(fs.readFileSync(metricsPath, "utf8"));
-  const errors =
-    metrics?.byPhase?.HEALTH_CHECK?.summary?.healthCheck?.errors ?? [];
-  if (errors.length > 0) {
-    console.log("");
-    console.log("### Health Check Errors");
-    console.log("");
-    for (const item of errors) {
-      console.log(`- ${item.label}: ${item.detail}`);
-    }
-  }
-} catch {
-  // metrics parse failure — keep generic guidance only
-}
-NODE
+          const fs = require("node:fs");
+          const metricsPath = "reports/quality-pipeline/latest/metrics.json";
+          try {
+            const metrics = JSON.parse(fs.readFileSync(metricsPath, "utf8"));
+            const errors =
+              metrics?.byPhase?.HEALTH_CHECK?.summary?.healthCheck?.errors ?? [];
+            if (errors.length > 0) {
+              console.log("");
+              console.log("### Health Check Errors");
+              console.log("");
+              for (const item of errors) {
+                console.log(`- ${item.label}: ${item.detail}`);
+              }
+            }
+          } catch {
+            // metrics parse failure — keep generic guidance only
+          }
+          NODE
             fi
             echo ""
             echo "## Next steps"

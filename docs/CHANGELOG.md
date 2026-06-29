@@ -4,6 +4,32 @@
 
 ---
 
+## v1.9.1 — 運用品質パッチ（Nightly Apply YAML 修正）
+
+v1.9.0 で追加した Nightly Apply failure summary 内の `node <<'NODE'` heredoc が **YAML ブロック外に漏れ**、GitHub Actions が workflow file invalid で 0 秒終了する問題を修正しました。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| heredoc インデント | `Create failure summary` ステップ内の Node.js heredoc 全行を `run: \|` ブロック内に正しくインデント |
+| YAML 検証 | workflow が valid YAML として読み込まれることを確認 |
+| テスト | Test 44 拡張（heredoc インデント検出 + Ruby YAML parse） |
+
+### 変更なし（意図的）
+
+- v1.8.2 Secrets OR 条件
+- v1.9.0 Health Check Errors 出力仕様
+- workflow_dispatch / schedule / main guard / artifacts
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **44 PASS**（実装後 `npm test` で確認） |
+
+---
+
 ## v1.9.0 — Health Check エラー可視化
 
 Nightly Apply で Quality Pipeline が **HEALTH_CHECK** で失敗した際、これまで「Health Check failed: Error N 件」のみだった表示を、**個別エラー項目**まで確認できるようにしました。

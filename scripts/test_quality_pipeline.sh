@@ -1942,6 +1942,34 @@ assertContains(
   "${item.label}: ${item.detail}",
 );
 
+// heredoc 内行が run: | ブロック外に漏れていないこと（YAML invalid 防止）
+const heredocMatch = failureStep[0].match(/node <<'NODE'\n([\s\S]*?)\n\s*NODE/);
+if (!heredocMatch) {
+  throw new Error("node <<'NODE' heredoc block not found in failure summary step");
+}
+const heredocBody = heredocMatch[1];
+for (const [index, line] of heredocBody.split("\n").entries()) {
+  if (!line.trim()) {
+    continue;
+  }
+  if (!/^ {10,}/.test(line)) {
+    throw new Error(
+      `heredoc line ${index + 1} is under-indented for run block (need >=10 spaces): ${JSON.stringify(line)}`,
+    );
+  }
+}
+
+// Ruby YAML で workflow 全体が valid であること
+import { execSync } from "node:child_process";
+try {
+  execSync(
+    `ruby -ryaml -e "YAML.load_file('${nightlyPath.replace(/'/g, "'\\''")}')"`,
+    { stdio: "pipe" },
+  );
+} catch (error) {
+  throw new Error(`nightly-apply.yml must be valid YAML: ${error.stderr?.toString() ?? error.message}`);
+}
+
 console.log("nightly failure summary health check contract ok");
 EOF
 pass "nightly-apply failure summary health check errors contract"
