@@ -4,6 +4,43 @@
 
 ---
 
+## v1.8.1 — 運用品質パッチ（Nightly Apply Secrets）
+
+Nightly Apply Workflow が **nano_banana adapter**（デフォルト）の apply 実行に必要な `NANO_BANANA_API_KEY` を正しく扱えるようにしました。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| 必須 Secrets | `NANO_BANANA_API_KEY` を追加（`OPENAI_API_KEY` / `GEMINI_API_KEY` と併せて apply 前に検証） |
+| apply env | `NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}` を注入 |
+| failure summary | `NANO_BANANA_API_KEY` 不足を Possible causes に反映 |
+| テスト | Test 39 を更新（検証・env 注入・summary 反映を確認） |
+
+### 更新ファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `.github/workflows/nightly-apply.yml` | NANO_BANANA_API_KEY 対応 |
+| `scripts/test_quality_pipeline.sh` | Test 39 更新 |
+| `README.md` | Nightly Apply 必須 Secrets 追記 |
+| `docs/CHANGELOG.md` | 本エントリ |
+| `docs/VERSION.md` | v1.8.1 |
+
+### 変更なし（意図的）
+
+- v1.8.0 の workflow 設計（main guard / schedule / resume input / artifacts）
+- `.github/workflows/quality-pipeline-ci.yml`
+- `scripts/run_daily.sh`
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **39 PASS** |
+
+---
+
 ## v1.8.0 — Nightly Apply Workflow
 
 dry-run CI（v1.7）とは別に、**apply 専用**の Nightly Apply Workflow を GitHub Actions 上に追加しました。Secrets 検証・main ブランチガード・失敗 summary・Artifacts 保存により、安全に nightly apply と手動 resume を運用できます。

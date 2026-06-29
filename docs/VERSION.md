@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.8.0**（Nightly Apply Workflow）
+**v1.8.1**（Nightly Apply Secrets パッチ）
 
 ---
 
@@ -22,7 +22,40 @@
 | v1.5.0 | OpenAI Regeneration Adapter | ✅ 完了 | Regeneration adapter 切替（nano_banana / openai）、report / metrics 反映 |
 | v1.6.0 | Resume Execution | ✅ 完了 | `--resume` 途中再開、`state.json` checkpoint、latest archive スキップ |
 | v1.7.0 | GitHub Actions / CI | ✅ 完了 | `--stop-before-phase`、dry-run CI workflow、Artifacts、npm test |
-| **v1.8.0** | **Nightly Apply Workflow** | **✅ 完了** | **apply nightly workflow、Secrets チェック、failure summary、resume dispatch** |
+| v1.8.0 | Nightly Apply Workflow | ✅ 完了 | apply nightly workflow、Secrets チェック、failure summary、resume dispatch |
+| **v1.8.1** | **運用品質パッチ** | **✅ 完了** | **Nightly Apply に `NANO_BANANA_API_KEY` 対応** |
+
+---
+
+### v1.8.1 で追加（運用品質パッチ）
+
+#### Nightly Apply Secrets 修正
+
+- **必須 Secrets** … `NANO_BANANA_API_KEY` を Nightly Apply Workflow に追加
+- **apply env 注入** … nano_banana adapter の apply 実行をサポート
+- **failure summary** … Secret 不足検出に `NANO_BANANA_API_KEY` を含める
+- **Test 39 更新** … workflow contract で検証・env 注入・summary 反映を確認
+
+### 品質状況（v1.8.1 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **39 PASS** |
+
+**確認済み**
+
+- `npm test` … **PASS**（39 tests）
+- Test 39 nightly-apply workflow contract（NANO_BANANA_API_KEY 含む） … **PASS**
+
+### v1.8.1 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| NANO_BANANA_API_KEY Secrets チェック | ✅ |
+| apply env 注入 | ✅ |
+| failure summary 反映 | ✅ |
+| Test 39 更新 | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 

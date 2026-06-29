@@ -1572,6 +1572,44 @@ assertContains("verify main step", workflow, "name: Verify main branch");
 assertContains("secrets step", workflow, "name: Check required secrets");
 assertContains("OPENAI_API_KEY check", workflow, "OPENAI_API_KEY");
 assertContains("GEMINI_API_KEY check", workflow, "GEMINI_API_KEY");
+assertContains("NANO_BANANA_API_KEY check", workflow, "NANO_BANANA_API_KEY");
+
+const secretsStep = workflow.match(
+  /name: Check required secrets[\s\S]*?(?=\n      - name:)/,
+);
+if (!secretsStep) {
+  throw new Error("Check required secrets step not found");
+}
+if (!secretsStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
+  throw new Error("NANO_BANANA_API_KEY must be injected in Check required secrets env");
+}
+if (!secretsStep[0].includes('missing+=("NANO_BANANA_API_KEY")')) {
+  throw new Error("NANO_BANANA_API_KEY must be validated in Check required secrets");
+}
+
+const applyStep = workflow.match(
+  /name: Run quality pipeline apply[\s\S]*?(?=\n      - name:)/,
+);
+if (!applyStep) {
+  throw new Error("Run quality pipeline apply step not found");
+}
+if (!applyStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
+  throw new Error("NANO_BANANA_API_KEY must be injected in apply step env");
+}
+
+const failureSummaryStep = workflow.match(
+  /name: Create failure summary[\s\S]*?(?=\n      - name:)/,
+);
+if (!failureSummaryStep) {
+  throw new Error("Create failure summary step not found");
+}
+if (!failureSummaryStep[0].includes('NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}')) {
+  throw new Error("NANO_BANANA_API_KEY must be injected in failure summary env");
+}
+if (!failureSummaryStep[0].includes('missing_secrets+=("NANO_BANANA_API_KEY")')) {
+  throw new Error("NANO_BANANA_API_KEY must be checked in failure summary");
+}
+
 assertContains("apply clean-latest command", workflow, "npm run quality-pipeline -- --apply --clean-latest");
 assertContains("apply resume command", workflow, "npm run quality-pipeline -- --apply --resume");
 assertContains("failure summary step", workflow, "name: Create failure summary");
