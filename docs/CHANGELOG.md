@@ -4,6 +4,37 @@
 
 ---
 
+## v1.11.0 — 保守更新（upload-artifact Node.js 24 対応）
+
+GitHub Actions の **Node.js 20 runtime warning** を完全解消するため、`actions/upload-artifact` を Node.js 24 対応版に更新しました。Quality Pipeline の挙動・終了コード・Nightly Apply・Step Summary の仕様は変更していません。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| actions/upload-artifact | `v4` → `v7`（Node.js 24 対応） |
+| 対象 workflow | `.github/workflows/quality-pipeline-ci.yml` / `.github/workflows/nightly-apply.yml` |
+| with オプション | 既存のまま維持 |
+| README | Node.js 20 Warning 解消方針を追記 |
+
+### 変更なし（意図的）
+
+- `actions/checkout@v5` / `actions/setup-node@v6`
+- `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`（導入しない）
+- Quality Pipeline の実行ロジック
+- exit code 0 / 1 / 3 / 4 の意味
+- Nightly Apply の Workflow Success / Failure 判定
+- Node.js 実行バージョン（`node-version: "20"`）
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS**（実装後 `bash scripts/test_quality_pipeline.sh` で確認） |
+| YAML Validation | **PASS** |
+
+---
+
 ## v1.10.0 — 保守更新（GitHub Actions runtime maintenance）
 
 GitHub Actions の保守性向上のため、workflow 内で使用している Actions を更新しました。Node.js 20 runtime warning への対応を目的とした保守リリースで、Quality Pipeline の挙動・終了コード・Nightly Apply・Step Summary の仕様は変更していません。

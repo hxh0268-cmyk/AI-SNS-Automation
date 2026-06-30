@@ -643,7 +643,7 @@ Resume 完了後は `status: completed`、`stopReason: null`、`stopBeforePhase:
 
 Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離されています。
 
-**Actions runtime maintenance（v1.10.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。`actions/checkout@v5` / `actions/setup-node@v6` / `actions/upload-artifact@v4` を使用します。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
+**Actions runtime maintenance（v1.10.0 / v1.11.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。`actions/checkout@v5` / `actions/setup-node@v6` / `actions/upload-artifact@v7` を使用します（v1.11.0 で `upload-artifact` を Node.js 24 対応版に更新し、Node.js 20 runtime warning を解消）。`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` は使用しません。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
 
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|

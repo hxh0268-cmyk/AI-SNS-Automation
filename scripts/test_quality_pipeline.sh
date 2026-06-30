@@ -1669,7 +1669,7 @@ assertContains("ci dry-run step", ci, "quality-pipeline:dry-run");
 assertContains("ci stop-before-phase", ci, "--stop-before-phase report");
 assertContains("ci resume dry-run", ci, "quality-pipeline:dry-run -- --resume");
 assertContains("ci upload step", ci, "name: Upload quality pipeline reports");
-assertContains("ci upload artifact action", ci, "actions/upload-artifact@v4");
+assertContains("ci upload artifact action", ci, "actions/upload-artifact@v7");
 if (ci.includes("Nightly Apply Workflow")) {
   throw new Error("quality-pipeline-ci.yml must not contain Nightly Apply Workflow content");
 }
