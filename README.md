@@ -737,6 +737,18 @@ Artifact 名: `nightly-apply-<run_id>`（保持 14 日、`if-no-files-found: war
 
 **apply 成功判定（v1.9.3）:** 全スライド公開推奨（`ALL_SLIDES_PUBLISH_RECOMMENDED`）かつ API 失敗なしの場合、Summary は `status: completed` / `final phase: COMPLETE` / `failed steps: 0` / `outcome: success` / **終了コード 0** となり、GitHub Actions workflow も Success で終了します。以前の HEALTH_CHECK 失敗で残った stale `failedSteps` は成功時に自動クリアされます。
 
+**Workflow 成否と品質判定（v1.9.4）:** GitHub Actions の **Success** は「Workflow が正常に完了した」という意味です。品質不足（`publishRecommended=false`）で pipeline が **終了コード 3**（品質改善推奨）を返した場合でも、**Workflow は Success** で終了します（システムエラーではありません）。公開可否は Step Summary / ログの **Quality status** と **publishRecommended** を確認してください。
+
+| Pipeline 終了コード | 意味 | Nightly Apply Workflow |
+|---------------------|------|------------------------|
+| **0** | 公開推奨 | Success |
+| **3** | 品質改善推奨（publish 未達） | Success |
+| **1** | Health Check / 設定エラー | Failure |
+| **4** | 内部エラー | Failure |
+| その他 | 想定外 | Failure |
+
+終了コード 3 時の Summary には `Workflow result: Success` / `Quality status: Improvement Recommended` / `publishRecommended=false` / `exit code 3` が表示されます。
+
 ---
 
 ## 事前準備

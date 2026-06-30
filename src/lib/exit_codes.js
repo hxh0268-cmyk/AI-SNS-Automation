@@ -6,7 +6,7 @@ import { IMPROVEMENT_STOP_REASONS } from "./pipeline_improvement.js";
  * 0 = 正常終了
  * 1 = 入力エラー・設定エラー
  * 2 = APIエラー（対象すべて失敗）
- * 3 = 部分成功・一部失敗あり
+ * 3 = 部分成功・品質改善推奨（publish 未達など — システムエラーではない）
  * 4 = 内部エラー
  */
 export const EXIT_CODES = {
@@ -16,7 +16,7 @@ export const EXIT_CODES = {
   INPUT_ERROR: 1,
   /** API エラー（改善 / 再レビュー対象がすべて失敗） */
   API_ERROR: 2,
-  /** 部分成功（一部成功・一部 failed / failed_review）— 完全失敗ではなく要確認 */
+  /** 部分成功（品質不足・改善推奨 — Nightly Apply では Workflow Success 扱い） */
   PARTIAL_SUCCESS: 3,
   /** 想定外の内部エラー */
   INTERNAL_ERROR: 4,
@@ -141,7 +141,7 @@ export function describeExitCode(code) {
       return "APIエラー";
     case EXIT_CODES.PARTIAL_SUCCESS:
     case PIPELINE_EXIT_CODES.PARTIAL_SUCCESS:
-      return "部分成功・要確認";
+      return "品質改善推奨（publish 未達）";
     case EXIT_CODES.INTERNAL_ERROR:
     case PIPELINE_EXIT_CODES.UNEXPECTED_ERROR:
       return "内部エラー";
@@ -284,4 +284,26 @@ export function getPipelineExitCode(result) {
   }
 
   return PIPELINE_EXIT_CODES.PARTIAL_SUCCESS;
+}
+
+/**
+ * Nightly Apply workflow 上で Success 扱いとなる pipeline 終了コードか
+ * （0 = 公開推奨、3 = 品質改善推奨 — いずれもシステムエラーではない）
+ * @param {number} code
+ * @returns {boolean}
+ */
+export function isNightlyApplyWorkflowSuccessExitCode(code) {
+  return (
+    code === PIPELINE_EXIT_CODES.SUCCESS ||
+    code === PIPELINE_EXIT_CODES.PARTIAL_SUCCESS
+  );
+}
+
+/**
+ * 品質改善推奨（publish 未達）の終了コードか
+ * @param {number} code
+ * @returns {boolean}
+ */
+export function isPipelineImprovementRecommendedExitCode(code) {
+  return code === PIPELINE_EXIT_CODES.PARTIAL_SUCCESS;
 }

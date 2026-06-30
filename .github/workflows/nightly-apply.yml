@@ -69,12 +69,25 @@ jobs:
           NANO_BANANA_API_KEY: ${{ secrets.NANO_BANANA_API_KEY }}
           RESUME: ${{ github.event.inputs.resume }}
         run: |
+          set +e
           if [ "${RESUME}" = "true" ]; then
             echo "Running quality pipeline apply with --resume (no --clean-latest)"
             npm run quality-pipeline -- --apply --resume
           else
             echo "Running quality pipeline apply with --clean-latest"
             npm run quality-pipeline -- --apply --clean-latest
+          fi
+          PIPELINE_EXIT_CODE=$?
+          set -e
+          echo "PIPELINE_EXIT_CODE=${PIPELINE_EXIT_CODE}" >> "$GITHUB_ENV"
+          if [ "${PIPELINE_EXIT_CODE}" -eq 0 ]; then
+            echo "Quality Pipeline completed successfully."
+          elif [ "${PIPELINE_EXIT_CODE}" -eq 3 ]; then
+            echo "Quality Pipeline completed with improvement recommended."
+            exit 0
+          else
+            echo "Quality Pipeline failed with exit code ${PIPELINE_EXIT_CODE}."
+            exit "${PIPELINE_EXIT_CODE}"
           fi
 
       - name: Create failure summary

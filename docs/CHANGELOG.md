@@ -4,6 +4,33 @@
 
 ---
 
+## v1.9.4 — 運用品質パッチ（Workflow 成否と品質判定の分離）
+
+GitHub Actions の **Workflow 成否** と Quality Pipeline の **品質判定** を分離しました。終了コード **3**（品質改善推奨 / `publishRecommended=false`）はシステムエラーではないため、Nightly Apply では **Workflow Success** 扱いに変更しています。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| Nightly Apply | 終了コード 0 / 3 → Workflow Success、1 / 4 / その他 → Failure |
+| Summary | 終了コード 3 時に Improvement Recommended / `publishRecommended=false` を明示 |
+| exit code 3 | 意味は変更なし（品質改善推奨）— GHA 側の解釈のみ変更 |
+| テスト | Test 51–53 追加 |
+
+### 変更なし（意図的）
+
+- v1.8.2 Secrets OR 条件
+- Health Check Error（exit 1）/ 内部エラー（exit 4）は Failure 維持
+- pipeline 本体の exit code 3 判定ロジック
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS**（実装後 `npm test` で確認） |
+
+---
+
 ## v1.9.3 — 運用品質パッチ（Pipeline 成功判定整合）
 
 Quality Pipeline が **全スライド公開推奨（ALL_SLIDES_PUBLISH_RECOMMENDED）** など成功条件を満たしているにもかかわらず、`status: failed` / `failed steps: 1` / **exit code 4** で終了する不整合を修正しました。

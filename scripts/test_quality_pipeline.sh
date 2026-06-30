@@ -2318,10 +2318,142 @@ if (applyStep[0].includes("|| true")) {
 if (!applyStep[0].includes("npm run quality-pipeline -- --apply")) {
   throw new Error("apply step must run quality-pipeline apply");
 }
+if (!applyStep[0].includes("PIPELINE_EXIT_CODE")) {
+  throw new Error("apply step must capture PIPELINE_EXIT_CODE");
+}
+if (!applyStep[0].includes('elif [ "${PIPELINE_EXIT_CODE}" -eq 3 ]')) {
+  throw new Error("apply step must treat exit code 3 as workflow success");
+}
 
 console.log("nightly apply exit propagation contract ok");
 EOF
 pass "nightly-apply workflow propagates pipeline exit code"
+
+echo "-- Test 51: publishRecommended=false yields exit 3 and workflow success --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import {
+  getPipelineExitCode,
+  isNightlyApplyWorkflowSuccessExitCode,
+  isPipelineImprovementRecommendedExitCode,
+  PIPELINE_EXIT_CODES,
+} from "./src/lib/exit_codes.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const exitCode = getPipelineExitCode({
+  state: {
+    failedSteps: [],
+    scoreSummary: {
+      allSlidesPassed: true,
+      allSlidesPublishRecommended: false,
+    },
+  },
+  metrics: {},
+  dryRun: false,
+  healthCheckFailed: false,
+  allSlidesPassed: true,
+  allSlidesPublishRecommended: false,
+});
+
+if (exitCode !== PIPELINE_EXIT_CODES.PARTIAL_SUCCESS) {
+  throw new Error(`expected exit code 3, got ${exitCode}`);
+}
+if (!isNightlyApplyWorkflowSuccessExitCode(exitCode)) {
+  throw new Error("exit code 3 must be treated as workflow success");
+}
+if (!isPipelineImprovementRecommendedExitCode(exitCode)) {
+  throw new Error("exit code 3 must be improvement recommended");
+}
+
+const runScript = fs.readFileSync(
+  path.join(PROJECT_ROOT, "scripts/run_quality_pipeline.js"),
+  "utf-8",
+);
+if (!runScript.includes("quality status: Improvement Recommended")) {
+  throw new Error("run_quality_pipeline.js must log improvement recommended status");
+}
+if (!runScript.includes("GITHUB_STEP_SUMMARY")) {
+  throw new Error("run_quality_pipeline.js must write GitHub Step Summary");
+}
+
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml"),
+  "utf-8",
+);
+if (!workflow.includes("improvement recommended")) {
+  throw new Error("nightly-apply must handle exit code 3 as success");
+}
+
+console.log("publishRecommended=false workflow success contract ok");
+EOF
+pass "publishRecommended=false yields exit 3 and workflow success"
+
+echo "-- Test 52: Health Check error yields exit 1 and workflow failure --"
+node --input-type=module <<'EOF'
+import {
+  getPipelineExitCode,
+  isNightlyApplyWorkflowSuccessExitCode,
+  PIPELINE_EXIT_CODES,
+} from "./src/lib/exit_codes.js";
+
+const exitCode = getPipelineExitCode({
+  state: { failedSteps: [], scoreSummary: {} },
+  metrics: {
+    byPhase: {
+      HEALTH_CHECK: {
+        summary: {
+          healthCheck: {
+            errors: [{ label: "OPENAI_API_KEY", detail: "missing" }],
+          },
+        },
+      },
+    },
+  },
+  dryRun: false,
+  healthCheckFailed: true,
+});
+
+if (exitCode !== PIPELINE_EXIT_CODES.CONFIG_ERROR) {
+  throw new Error(`expected exit code 1, got ${exitCode}`);
+}
+if (isNightlyApplyWorkflowSuccessExitCode(exitCode)) {
+  throw new Error("exit code 1 must not be treated as workflow success");
+}
+
+console.log("health check error workflow failure contract ok");
+EOF
+pass "Health Check error yields exit 1 and workflow failure"
+
+echo "-- Test 53: internal error yields exit 4 and workflow failure --"
+node --input-type=module <<'EOF'
+import {
+  getPipelineExitCode,
+  isNightlyApplyWorkflowSuccessExitCode,
+  PIPELINE_EXIT_CODES,
+} from "./src/lib/exit_codes.js";
+
+const exitCode = getPipelineExitCode({
+  state: {
+    failedSteps: [{ step: "IMPROVE", error: "unexpected" }],
+    scoreSummary: {},
+  },
+  metrics: {},
+  dryRun: false,
+  healthCheckFailed: false,
+  error: new Error("unexpected"),
+});
+
+if (exitCode !== PIPELINE_EXIT_CODES.UNEXPECTED_ERROR) {
+  throw new Error(`expected exit code 4, got ${exitCode}`);
+}
+if (isNightlyApplyWorkflowSuccessExitCode(exitCode)) {
+  throw new Error("exit code 4 must not be treated as workflow success");
+}
+
+console.log("internal error workflow failure contract ok");
+EOF
+pass "internal error yields exit 4 and workflow failure"
 
 echo ""
 echo "All quality pipeline tests passed."

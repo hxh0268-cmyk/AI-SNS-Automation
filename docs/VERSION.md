@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.9.3**（Pipeline 成功判定整合パッチ）
+**v1.9.4**（Workflow 成否と品質判定の分離）
 
 ---
 
@@ -28,7 +28,35 @@
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
-| **v1.9.3** | **運用品質パッチ** | **✅ 完了** | **成功条件と status / exit code の整合** |
+| **v1.9.4** | **運用品質パッチ** | **✅ 完了** | **Workflow 成否と品質判定の分離** |
+| v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
+
+---
+
+### v1.9.4 で追加（Workflow 成否と品質判定の分離）
+
+#### Nightly Apply 成否仕様
+
+- **exit code 0 / 3** … Workflow Success（3 は品質改善推奨 — システムエラーではない）
+- **exit code 1 / 4** … Workflow Failure（Health Check / 内部エラー）
+- **Summary** … 終了コード 3 時 `Improvement Recommended` / `publishRecommended=false` を明示
+- **Test 51–53** … 改善推奨 Success / Health Check Failure / 内部エラー Failure
+
+### 品質状況（v1.9.4 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS** |
+
+### v1.9.4 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Nightly Apply exit 3 → Success | ✅ |
+| Summary 改善推奨表示 | ✅ |
+| Health Check / 内部エラー Failure 維持 | ✅ |
+| Test 51–53 | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 

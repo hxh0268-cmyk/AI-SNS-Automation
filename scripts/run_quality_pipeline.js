@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+import fs from "node:fs";
 import {
   describeExitCode,
   getErrorExitCode,
+  PIPELINE_EXIT_CODES,
 } from "../src/lib/exit_codes.js";
 import {
   createPipelineConfig,
@@ -42,11 +44,24 @@ function printRunSummary(params) {
   console.log(`  final phase: ${result.state.phase}`);
   if (
     !config.dryRun &&
-    result.exitCode === 0 &&
+    result.exitCode === PIPELINE_EXIT_CODES.SUCCESS &&
     result.state.status === "completed" &&
     result.state.phase === "COMPLETE"
   ) {
     console.log("  outcome: success (all slides publish recommended)");
+  }
+  if (
+    !config.dryRun &&
+    result.exitCode === PIPELINE_EXIT_CODES.PARTIAL_SUCCESS
+  ) {
+    console.log("  workflow result (Nightly Apply): Success");
+    console.log("  quality status: Improvement Recommended");
+    console.log(
+      `  publishRecommended: ${scoreSummary.allSlidesPublishRecommended}`,
+    );
+    console.log(
+      "  note: exit code 3 = quality improvement recommended (not a system error)",
+    );
   }
   console.log(`  completed steps: ${result.state.completedSteps.length}`);
   console.log(`  failed steps: ${result.state.failedSteps.length}`);
@@ -167,6 +182,56 @@ function printRunSummary(params) {
   );
 }
 
+/**
+ * GitHub Actions Step Summary に品質ステータスを追記する
+ * @param {object} params
+ */
+function writeGitHubStepSummary(params) {
+  const { config, result } = params;
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+
+  if (config.dryRun || !summaryPath) {
+    return;
+  }
+
+  const { scoreSummary } = result.state;
+  const exitCode = result.exitCode;
+
+  if (exitCode === PIPELINE_EXIT_CODES.PARTIAL_SUCCESS) {
+    fs.appendFileSync(
+      summaryPath,
+      `## Nightly Apply — Quality Summary
+
+| Field | Value |
+|-------|-------|
+| Workflow result | Success |
+| Quality status | Improvement Recommended |
+| publishRecommended | ${scoreSummary.allSlidesPublishRecommended} |
+| exit code | 3 |
+| Note | システムエラーではありません。追加改善を推奨します |
+
+`,
+    );
+    return;
+  }
+
+  if (exitCode === PIPELINE_EXIT_CODES.SUCCESS) {
+    fs.appendFileSync(
+      summaryPath,
+      `## Nightly Apply — Quality Summary
+
+| Field | Value |
+|-------|-------|
+| Workflow result | Success |
+| Quality status | Publish Recommended |
+| publishRecommended | ${scoreSummary.allSlidesPublishRecommended} |
+| exit code | 0 |
+
+`,
+    );
+  }
+}
+
 async function main() {
   const args = parsePipelineArgs(process.argv);
 
@@ -200,6 +265,7 @@ async function main() {
   const result = await runPipeline(config, { hooks });
 
   printRunSummary({ config, result });
+  writeGitHubStepSummary({ config, result });
   process.exitCode = result.exitCode;
 }
 
