@@ -4,6 +4,41 @@
 
 ---
 
+## v1.20.0 — 保守更新（Scheduled Performance Trend Collection）
+
+Performance Trend Analysis workflow に **週1回の低頻度 schedule** と **concurrency 保護** を追加しました。`workflow_dispatch` 手動実行は維持し、`workflow_run` はセキュリティ上の理由で保留します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| schedule | `23 20 * * 1`（月曜 20:23 UTC = 火曜 05:23 JST） |
+| workflow_dispatch | **維持** |
+| concurrency | `performance-trend-${{ github.workflow }}` |
+| workflow_run | **未導入**（設計候補として保留） |
+| permissions | `contents: read` / `actions: read` 維持 |
+| Test 70–74 | schedule / dispatch / cron / concurrency / no workflow_run |
+
+### 設計判断
+
+- **毎時 `:00` を避ける** — schedule 混雑による遅延・drop 対策
+- **workflow_run 保留** — privilege escalation / cache poisoning リスク
+- **schema 1.2 維持** — `collection.trigger` に `schedule` が入る
+
+### 影響範囲
+
+- `.github/workflows/performance-trend.yml` のみ（既存 CI/Nightly workflow 非変更）
+- ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **74 PASS**（Test 70–74 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.19.0 — 保守更新（GitHub Actions Automated Performance Trend Collection）
 
 GitHub Actions 上で Performance Trend Analysis を **workflow_dispatch** 実行できる最小基盤を追加しました。既存のローカル gh CLI / fixture 解析は維持します。

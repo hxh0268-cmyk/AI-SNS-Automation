@@ -2,9 +2,11 @@ name: Performance Trend Analysis
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "23 20 * * 1"
 
 concurrency:
-  group: performance-trend-${{ github.workflow }}-${{ github.ref }}
+  group: performance-trend-${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:

@@ -3431,5 +3431,125 @@ console.log("Step Summary output generation ok");
 EOF
 pass "Step Summary output generation"
 
+echo "-- Test 70: performance-trend.yml schedule exists --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflowPath = path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml");
+const workflow = fs.readFileSync(workflowPath, "utf8");
+
+if (!workflow.includes("schedule:")) {
+  throw new Error("performance-trend.yml must define schedule trigger");
+}
+if (!workflow.includes('cron: "23 20 * * 1"')) {
+  throw new Error('performance-trend.yml must use cron "23 20 * * 1"');
+}
+
+console.log("performance-trend.yml schedule ok");
+EOF
+pass "performance-trend.yml schedule exists"
+
+echo "-- Test 71: workflow_dispatch is preserved --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+
+if (!workflow.includes("workflow_dispatch:")) {
+  throw new Error("performance-trend.yml must preserve workflow_dispatch");
+}
+
+console.log("workflow_dispatch preserved ok");
+EOF
+pass "workflow_dispatch is preserved"
+
+echo "-- Test 72: cron minute is not zero --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+
+const cronMatch = workflow.match(/cron:\s*"([^"]+)"/);
+if (!cronMatch) {
+  throw new Error("expected cron expression in performance-trend.yml");
+}
+const fields = cronMatch[1].trim().split(/\s+/);
+if (fields.length < 5) {
+  throw new Error(`invalid cron expression: ${cronMatch[1]}`);
+}
+const minute = fields[0];
+if (minute === "0" || minute === "00") {
+  throw new Error("cron minute must not be zero to avoid hourly congestion");
+}
+
+console.log("cron minute not zero ok");
+EOF
+pass "cron minute is not zero"
+
+echo "-- Test 73: concurrency exists --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+
+if (!workflow.includes("concurrency:")) {
+  throw new Error("performance-trend.yml must define concurrency");
+}
+if (!workflow.includes("group: performance-trend-${{ github.workflow }}")) {
+  throw new Error("performance-trend.yml must use performance-trend workflow concurrency group");
+}
+if (!workflow.includes("cancel-in-progress: false")) {
+  throw new Error("performance-trend.yml must set cancel-in-progress: false");
+}
+
+console.log("concurrency ok");
+EOF
+pass "concurrency exists"
+
+echo "-- Test 74: workflow_run is not present --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+
+const onSection = workflow.match(/^on:\n([\s\S]*?)(?:\n\S|\njobs:)/m);
+if (!onSection) {
+  throw new Error("unable to parse on: section");
+}
+if (/^\s*workflow_run:/m.test(onSection[1])) {
+  throw new Error("performance-trend.yml must not define workflow_run trigger");
+}
+
+console.log("workflow_run absent ok");
+EOF
+pass "workflow_run is not present"
+
 echo ""
 echo "All quality pipeline tests passed."

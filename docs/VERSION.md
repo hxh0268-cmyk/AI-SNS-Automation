@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.19.0**（GitHub Actions Automated Performance Trend Collection）
+**v1.20.0**（Scheduled Performance Trend Collection）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.19.0** | **保守更新** | **✅ 完了** | **GitHub Actions 自動 Performance Trend Collection** |
+| **v1.20.0** | **保守更新** | **✅ 完了** | **Scheduled Performance Trend Collection** |
+| v1.19.0 | 保守更新 | ✅ 完了 | GitHub Actions 自動 Performance Trend Collection |
 | v1.18.0 | 保守更新 | ✅ 完了 | Artifact metadata / retention awareness |
 | v1.17.0 | 保守更新 | ✅ 完了 | gh CLI ローカル Performance Trend Analysis |
 | v1.16.0 | 保守更新 | ✅ 完了 | performance-observation.json artifact 基盤 |
@@ -45,6 +46,48 @@
 ---
 
 
+### v1.20.0 で追加（Scheduled Performance Trend Collection）
+
+#### schedule
+
+- **cron** … `23 20 * * 1`（月曜 20:23 UTC = 火曜 05:23 JST）
+- **workflow_dispatch** … 手動実行維持
+- **毎時 `:00` 回避** … 混雑・遅延・drop 対策
+
+#### concurrency / security
+
+- **concurrency group** … `performance-trend-${{ github.workflow }}`
+- **workflow_run 未導入** … privilege escalation / cache poisoning リスク
+- **permissions** … `contents: read` / `actions: read` 維持
+
+#### v1.21.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| workflow_run opt-in design | CI/Nightly 完了後の自動 trend 収集（セキュリティ設計完了後） |
+| advanced scheduled trend policy | 複数 schedule / 条件付き実行が必要になった場合 |
+| REST API 直接集計（gh 非依存） | CI / サービスアカウントからの自動実行 |
+
+### 品質状況（v1.20.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **74 PASS** |
+| npm test | **PASS** |
+
+### v1.20.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| weekly schedule | ✅ |
+| workflow_dispatch 維持 | ✅ |
+| concurrency | ✅ |
+| workflow_run 非導入 | ✅ |
+| Test 70–74 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.19.0 で追加（GitHub Actions Automated Performance Trend Collection）
 
 #### performance-trend.yml
@@ -62,15 +105,15 @@
 - **collection.workflowRunId** / **sourceWorkflow** / **collectedAt**
 - **schema 1.1 互換** … ローカル gh-cli / fixture は 1.1 のまま
 
-#### v1.20.0 以降の候補
+#### v1.20.0 で導入済み / 以降候補
 
-| 候補 | 導入条件 |
-|------|----------|
-| workflow_run automation | CI/Nightly 完了後の自動 trend 収集が必要になった場合 |
-| scheduled trend collection | 定期 trend レポートが必要になった場合 |
-| REST API 直接集計（gh 非依存） | CI / サービスアカウントからの自動実行 |
+| 候補 | 状態 |
+|------|------|
+| scheduled trend collection | ✅ v1.20.0 で週1回 schedule 導入 |
+| workflow_run automation | v1.21.0 以降（opt-in 設計後） |
+| REST API 直接集計（gh 非依存） | 未着手 |
 
-### 品質状況（v1.19.0 最新）
+### 品質状況（v1.19.0）
 
 | 項目 | 結果 |
 |------|------|

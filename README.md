@@ -696,6 +696,31 @@ node scripts/gha_analyze_performance_trend.js --fixture-dir path/to/fixtures
 | 0 件 | 明確なエラーで終了 |
 | REST API | **v1.18.0** — artifact metadata は `gh api --paginate` を使用 |
 | GitHub Actions 自動実行 | **v1.19.0** — `performance-trend.yml`（`workflow_dispatch`） |
+| 定期実行（v1.20.0） | **週1回 schedule** — 月曜 20:23 UTC（火曜 05:23 JST） |
+
+### Scheduled Performance Trend Collection（v1.20.0）
+
+v1.19.0 の Performance Trend workflow に **安全な低頻度 schedule** を追加しました。`workflow_dispatch` による手動実行は維持します。
+
+```yaml
+# performance-trend.yml
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 20 * * 1"   # 毎週月曜 20:23 UTC = 火曜 05:23 JST
+```
+
+| 項目 | 内容 |
+|------|------|
+| 手動実行 | `workflow_dispatch` **維持**（Actions UI / `gh workflow run`） |
+| 定期実行 | 週1回 — `23 20 * * 1`（**UTC 基準**） |
+| 日本時間 | 毎週**火曜 05:23 JST**（月曜 20:23 UTC + 9h） |
+| 毎時ちょうどを避ける理由 | GitHub Actions は毎時 `:00` に schedule が集中しやすく、**遅延・drop** の可能性があるため分を `23` にずらす |
+| workflow_run | **今回未導入** — 後続 workflow が secrets / write token に触れる **privilege escalation / cache poisoning** リスクのため設計候補として保留 |
+| permissions | `contents: read` / `actions: read`（**最小権限維持**） |
+| concurrency | `performance-trend-${{ github.workflow }}` — 同一 workflow の**重複実行を防止**（`cancel-in-progress: false`） |
+| schema | **1.2 維持** — `collection.trigger` は `workflow_dispatch` または `schedule` |
+| artifact / cache | v1.19.0 方針維持 — setup-node cache は npm 用、入力は quality-pipeline-reports、出力は performance-trend |
 
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
@@ -710,7 +735,7 @@ gh workflow run performance-trend.yml
 | 項目 | 内容 |
 |------|------|
 | Workflow | `.github/workflows/performance-trend.yml`（**新規** — 既存 workflow は未変更） |
-| トリガー | `workflow_dispatch` のみ（schedule / workflow_run は未実装） |
+| トリガー | `workflow_dispatch` + **schedule**（v1.20.0 — 週1回） |
 | permissions | `contents: read` / `actions: read`（最小権限） |
 | 認証 | `GH_TOKEN: ${{ github.token }}` を trend 解析に渡す |
 | 実行内容 | `npm test` → quality pipeline tests → trend 解析 → artifact upload |
