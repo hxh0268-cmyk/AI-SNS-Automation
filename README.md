@@ -1399,3 +1399,16 @@ AI-SNS-Automation/
 - **Gemini 無料枠には 1 日の上限があります。** 上限に達した日は、翌日以降に再実行するか、キャッシュを活用してください
 - **`npm run daily` は途中で止まることがあります。** エラーメッセージと `logs/daily.log` を確認し、対処方法に従ってください
 - **生成ファイルの多くは `.gitignore` で除外されています。** 別 PC に移す場合は、生成物ではなく `.env` とソースコードを共有してください
+
+## Dependabot
+
+このリポジトリでは Dependabot により依存関係の更新を自動検知します。
+
+対象 ecosystem:
+
+- GitHub Actions
+- npm
+
+毎週月曜日の午前中（Asia/Tokyo）に更新を確認します。
+
+初期リリースでは Auto Merge / Grouped Updates は導入せず、Dependabot PR は手動レビューと CI 確認後にマージする運用とします。

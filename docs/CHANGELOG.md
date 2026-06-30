@@ -1112,3 +1112,20 @@ npm run export-instagram   # 投稿素材の出力
 ---
 
 *詳しい使い方は [README.md](../README.md) を参照してください。*
+
+## v1.12.0 - Dependabot 依存関係自動更新設定
+
+### 追加
+
+- `.github/dependabot.yml` を追加
+- GitHub Actions の依存関係更新検知を有効化
+- npm パッケージの依存関係更新検知を有効化
+- 毎週月曜日の午前中（Asia/Tokyo）に更新確認
+- Dependabot PR 上限を ecosystem ごとに 5 件へ制限
+
+### 設計判断
+
+- 初期リリースでは Auto Merge は導入しない
+- 初期リリースでは Grouped Updates は導入しない
+- 初期リリースでは ignore 設定は追加しない
+- GitHub Actions と npm は分離管理し、安全にレビューできる状態を優先する

@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.11.0**（upload-artifact Node.js 24 対応）
+**v1.12.0**（Dependabot 依存関係自動更新設定）
 
 ---
 
@@ -26,12 +26,35 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.11.0** | **保守更新** | **✅ 完了** | **upload-artifact v7 — Node.js 20 Warning 解消** |
+| **v1.12.0** | **保守更新** | **✅ 完了** | **Dependabot による GitHub Actions / npm 依存関係更新検知** |
+| v1.11.0 | 保守更新 | ✅ 完了 | upload-artifact v7 — Node.js 20 Warning 解消 |
 | v1.10.0 | 保守更新 | ✅ 完了 | GitHub Actions runtime maintenance（checkout v5 / setup-node v6） |
 | v1.9.4 | 運用品質パッチ | ✅ 完了 | Workflow 成否と品質判定の分離 |
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+
+### v1.12.0 で追加（Dependabot 依存関係自動更新設定）
+
+- `.github/dependabot.yml` を追加
+- GitHub Actions の依存関係更新を weekly で検知
+- npm パッケージの依存関係更新を weekly で検知
+- 実行タイムゾーンは `Asia/Tokyo`
+- open pull requests limit は ecosystem ごとに 5
+- 初期リリースでは Auto Merge / Grouped Updates / ignore は未導入
+
+### 品質状況（v1.12.0 最新）
+
+- Dependabot 設定追加
+- GitHub Actions / npm を分離管理
+- 手動レビュー前提の安全運用
+
+### v1.12.0 完成判定
+
+Dependabot による依存関係自動更新設定を追加済み。
 
 ---
 
