@@ -661,7 +661,10 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 | Summary（人間向け） | workflow Run 詳細 → **Summary** タブ → **Performance / Cache Observation**（v1.15.0 維持） |
 | Artifact JSON（比較用） | `reports/quality-pipeline/latest/performance-observation.json` — 過去 run との **手動比較** 用 |
 | 比較方法（v1.16.0） | 各 run の artifact から JSON を DL し、同一 `cache.packageLockHash` の run 間で `durations.npmCiSeconds` 等を比較 |
-| 自動集計 | **v1.16.0 では未実装** — gh CLI / REST API による trend analysis は **v1.17.0 以降候補** |
+| 自動集計（v1.17.0） | **gh CLI ローカル分析** — `node scripts/gha_analyze_performance_trend.js`（REST API 自動集計は v1.18.0 以降） |
+| Trend 出力 | `reports/performance-trend/latest/trend-report.md`（人間向け） / `trend-data.json`（machine-readable） |
+| gh CLI フロー | `gh auth status` → `gh run list --json` → `gh run download` → `performance-observation.json` 解析 |
+| テスト | fixture モード（`--fixture-dir`）— **gh 実通信なし** |
 | 実行時間 | **Step timings** 表 + JSON `durations` / `stepTimings` |
 | cache 効果の読み方 | 同一 **package-lock hash**（生 SHA-256）の run 間で `npmCiSeconds` を比較。**cache-hit 厳密取得は未実装** |
 | node_modules | **setup-node cache は npm パッケージキャッシュのみ** — `node_modules` はキャッシュしない（毎回 `npm ci`） |
@@ -669,6 +672,28 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 | Dependabot 後 | lockfile 更新 PR では **初回 CI で npm ci が遅い** ことがある（正常） |
 | 失敗時 artifact | CI upload を **`if: always()`** に変更 — 失敗 run でも `performance-observation.json` を確認可能 |
 | 品質判定（Nightly） | Summary + JSON の `workflow.pipelineExitCode`（`number \| null`）/ `qualityStatus` |
+
+### Performance Trend Analysis（v1.17.0）
+
+v1.16.0 の `performance-observation.json` を **gh CLI** で収集し、ローカルで trend レポートを生成します。Workflow YAML は変更しません。
+
+```bash
+# 本番（gh CLI — 要 gh auth login）
+node scripts/gha_analyze_performance_trend.js
+
+# テスト / オフライン（fixture — gh 実通信なし）
+node scripts/gha_analyze_performance_trend.js --fixture-dir path/to/fixtures
+```
+
+| 項目 | 内容 |
+|------|------|
+| 認証 | `gh auth status` で確認（未認証時はエラー終了） |
+| Run 取得 | `gh run list --json databaseId,...` |
+| Artifact | `gh run download <run-id>` → `performance-observation.json` |
+| 出力 | `reports/performance-trend/latest/trend-report.md` / `trend-data.json` |
+| 欠落 Run | warning として skip — 1 件以上有効 observation があれば report 生成 |
+| 0 件 | 明確なエラーで終了 |
+| REST API | **v1.17.0 では未使用** — v1.18.0 以降候補 |
 
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|

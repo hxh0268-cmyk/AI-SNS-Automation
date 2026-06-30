@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.16.0**（Workflow Performance Trend Analysis Foundation）
+**v1.17.0**（gh CLI Performance Trend Analysis）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.16.0** | **保守更新** | **✅ 完了** | **performance-observation.json artifact 基盤** |
+| **v1.17.0** | **保守更新** | **✅ 完了** | **gh CLI ローカル Performance Trend Analysis** |
+| v1.16.0 | 保守更新 | ✅ 完了 | performance-observation.json artifact 基盤 |
 | v1.15.0 | 保守更新 | ✅ 完了 | Performance / Cache Observation Summary |
 | v1.14.0 | 保守更新 | ✅ 完了 | Step Summary + 主要ステップ実行時間計測 |
 | v1.13.0 | 保守更新 | ✅ 完了 | setup-node npm cache 最適化（package-lock.json） |
@@ -42,6 +43,43 @@
 ---
 
 
+### v1.17.0 で追加（gh CLI Performance Trend Analysis）
+
+#### gha_analyze_performance_trend.js
+
+- **gh auth status** … 認証確認
+- **gh run list --json** … 直近 Run 取得
+- **gh run download** … artifact から `performance-observation.json` 取得
+- **出力** … `trend-report.md` / `trend-data.json`
+- **fixture モード** … テスト用（gh 実通信なし）
+
+#### v1.18.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| GitHub REST API trend analysis | gh CLI 以外での横断集計が必要になった場合 |
+| cache hit/miss 厳密可視化 | setup-node cache ログの構造化 |
+| グラフ / ダッシュボード | trend-data.json の可視化 |
+
+### 品質状況（v1.17.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **60 PASS** |
+| npm test | **PASS** |
+
+### v1.17.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| gha_analyze_performance_trend.js | ✅ |
+| fixture テスト（gh 非通信） | ✅ |
+| Workflow YAML 変更なし | ✅ |
+| Test 57–60 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.16.0 で追加（Workflow Performance Trend Analysis Foundation）
 
 #### performance-observation.json
@@ -53,15 +91,15 @@
 - **CI artifact upload** … `if: always()` — 失敗 run でも JSON 確認可能
 - **手動比較** … artifact DL して packageLockHash + durations を run 間比較
 
-#### v1.17.0 以降の候補
+#### v1.17.0 以降の候補（REST API）
 
 | 候補 | 導入条件 |
 |------|----------|
-| gh CLI / REST API trend analysis | 複数 run の JSON を自動収集・集計したい場合 |
+| gh CLI / REST API trend analysis | 複数 run の JSON を自動収集・集計したい場合（v1.17.0 で gh CLI ローカル分析導入済み — REST API は v1.18.0 以降） |
 | cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
 | グラフ / ダッシュボード | trend 基盤の上に可視化を載せる場合 |
 
-### 品質状況（v1.16.0 最新）
+### 品質状況（v1.16.0）
 
 | 項目 | 結果 |
 |------|------|

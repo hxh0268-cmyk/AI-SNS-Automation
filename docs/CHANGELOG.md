@@ -4,6 +4,41 @@
 
 ---
 
+## v1.17.0 — 保守更新（gh CLI Performance Trend Analysis）
+
+v1.16.0 の `performance-observation.json` を **gh CLI** でローカル収集・集計する `scripts/gha_analyze_performance_trend.js` を追加しました。REST API 自動集計は v1.18.0 以降に回します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| 分析スクリプト | `scripts/gha_analyze_performance_trend.js` |
+| 出力 | `trend-report.md` / `trend-data.json` |
+| gh CLI | `gh auth status` / `gh run list` / `gh run download` |
+| fixture モード | `--fixture-dir`（テスト用、gh 実通信なし） |
+| Test 57–60 | trend 生成 / skip / report / contract |
+
+### 設計判断
+
+- **Workflow YAML 変更なし**
+- **REST API 未使用** — v1.18.0 以降候補
+- **欠落 observation** — warning + skip
+- **0 件 valid** — エラー終了
+
+### 影響範囲
+
+- 新規スクリプト + ドキュメント + テスト
+- `reports/performance-trend/latest/`（Git 管理外 — `reports/` で ignore 済み）
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **60 PASS**（Test 57–60 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.16.0 — 保守更新（Workflow Performance Trend Analysis Foundation）
 
 v1.15.0 の Performance / Cache Observation 情報を **machine-readable JSON artifact** として保存する基盤を追加しました。Summary Markdown 表示は維持し、大規模な gh CLI / REST API 集計は v1.17.0 以降に回します。

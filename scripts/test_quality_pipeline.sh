@@ -2634,5 +2634,251 @@ console.log("performance-observation.json contract ok");
 EOF
 pass "performance-observation.json contract"
 
+echo "-- Test 57: build trend-data.json from multiple observations --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  analyzePerformanceTrend,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+function sampleObservation(params) {
+  return {
+    schemaVersion: "1.0",
+    generatedAt: params.generatedAt ?? "2026-06-01T00:00:00.000Z",
+    workflow: {
+      name: "Quality Pipeline CI",
+      runId: params.runId,
+      jobResult: "success",
+    },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: params.hash ?? "abc123def456",
+    },
+    durations: {
+      npmCiSeconds: params.npmCiSeconds,
+      npmTestSeconds: 30,
+    },
+    stepTimings: [],
+  };
+}
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-fixture-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-output-"));
+fs.mkdirSync(path.join(fixtureDir, "run-1001"), { recursive: true });
+fs.mkdirSync(path.join(fixtureDir, "run-1002"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-1001", "performance-observation.json"),
+  JSON.stringify(sampleObservation({ runId: "1001", npmCiSeconds: 10 })),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-1002", "performance-observation.json"),
+  JSON.stringify(sampleObservation({ runId: "1002", npmCiSeconds: 14 })),
+);
+
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const trendData = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+if (trendData.summary.runsAnalyzed !== 2) {
+  throw new Error(`expected 2 analyzed runs, got ${trendData.summary.runsAnalyzed}`);
+}
+if (!trendData.trendObservation["abc123def456"]) {
+  throw new Error("expected trendObservation grouped by packageLockHash");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("multiple observations trend-data ok");
+EOF
+pass "build trend-data.json from multiple observations"
+
+echo "-- Test 58: skip missing observations safely --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  analyzePerformanceTrend,
+  collectFromFixtureDir,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+function sampleObservation(runId) {
+  return {
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId, jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "hash123",
+    },
+    durations: { npmCiSeconds: 11 },
+    stepTimings: [],
+  };
+}
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-skip-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-skip-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-2001"), { recursive: true });
+fs.mkdirSync(path.join(fixtureDir, "run-2002"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-2001", "performance-observation.json"),
+  JSON.stringify(sampleObservation("2001")),
+);
+
+const collected = collectFromFixtureDir(fixtureDir);
+if (collected.observations.length !== 1) {
+  throw new Error(`expected 1 observation, got ${collected.observations.length}`);
+}
+if (collected.warnings.length !== 1) {
+  throw new Error(`expected 1 warning, got ${collected.warnings.length}`);
+}
+
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+if (!fs.existsSync(result.reportPath)) {
+  throw new Error("expected trend-report.md when at least one observation exists");
+}
+
+const emptyFixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-empty-"));
+fs.mkdirSync(path.join(emptyFixtureDir, "run-empty"), { recursive: true });
+let zeroError = false;
+try {
+  analyzePerformanceTrend({ fixtureDir: emptyFixtureDir, outputDir });
+} catch (error) {
+  zeroError =
+    error instanceof Error &&
+    error.message.includes("No valid performance-observation.json");
+}
+if (!zeroError) {
+  throw new Error("expected error when zero valid observations");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(emptyFixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("missing observation skip ok");
+EOF
+pass "skip missing observations safely"
+
+echo "-- Test 59: trend-report.md includes required sections --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { analyzePerformanceTrend } from "./scripts/gha_analyze_performance_trend.js";
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-report-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-report-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-3001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-3001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "3001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "reporthash",
+    },
+    durations: { npmCiSeconds: 9 },
+    stepTimings: [],
+  }),
+);
+
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const report = fs.readFileSync(result.reportPath, "utf8");
+for (const section of [
+  "## Summary",
+  "## Recent Runs",
+  "## Trend Observation",
+  "## Notes",
+]) {
+  if (!report.includes(section)) {
+    throw new Error(`trend-report.md missing section: ${section}`);
+  }
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("trend-report sections ok");
+EOF
+pass "trend-report.md includes required sections"
+
+echo "-- Test 60: trend-data.json contract validation --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  analyzePerformanceTrend,
+  buildTrendData,
+  validateTrendDataContract,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+const errors = validateTrendDataContract({});
+if (errors.length === 0) {
+  throw new Error("expected contract errors for empty object");
+}
+
+const trendData = buildTrendData({
+  source: "fixture",
+  observations: [
+    {
+      schemaVersion: "1.0",
+      generatedAt: "2026-06-01T00:00:00.000Z",
+      workflow: { name: "CI", runId: "1", jobResult: "success" },
+      cache: { packageLockHash: "abc" },
+      durations: { npmCiSeconds: 5 },
+    },
+  ],
+  warnings: [],
+  runsRequested: 1,
+});
+const contractErrors = validateTrendDataContract(trendData);
+if (contractErrors.length > 0) {
+  throw new Error(`unexpected contract errors: ${contractErrors.join(", ")}`);
+}
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-contract-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-trend-contract-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-4001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-4001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "4001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "contracthash",
+    },
+    durations: { npmCiSeconds: 7 },
+    stepTimings: [],
+  }),
+);
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const written = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+const writtenErrors = validateTrendDataContract(written);
+if (writtenErrors.length > 0) {
+  throw new Error(`written trend-data contract errors: ${writtenErrors.join(", ")}`);
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("trend-data contract ok");
+EOF
+pass "trend-data.json contract validation"
+
 echo ""
 echo "All quality pipeline tests passed."
