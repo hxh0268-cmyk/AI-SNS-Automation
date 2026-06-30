@@ -4,6 +4,27 @@
 
 ---
 
+## v1.13.0 — 保守更新（GitHub Actions npm cache 最適化）
+
+GitHub 公式仕様に基づき、`actions/setup-node@v6` の **npm cache** を両 workflow で明示的に最適化しました。`npm ci` およびテスト / apply の挙動は変更していません。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| setup-node | `cache: npm` + `cache-dependency-path: package-lock.json` |
+| 対象 workflow | `.github/workflows/quality-pipeline-ci.yml` / `.github/workflows/nightly-apply.yml` |
+| README | npm cache 運用（cache key、Dependabot 初回 miss、破損時の削除手順）を追記 |
+
+### 変更なし（意図的）
+
+- `node-version: "20"` / `npm ci` / テスト・apply ステップ
+- `actions/cache` 直接利用なし
+- `node_modules` キャッシュなし
+- `.github/dependabot.yml`
+
+---
+
 ## v1.12.1 — 運用品質パッチ（Dependabot 運用ドキュメント強化）
 
 v1.12.0 で導入した Dependabot 設定（`.github/dependabot.yml`）は変更せず、GitHub 公式仕様に基づく **運用ドキュメント** を README / VERSION に強化しました。

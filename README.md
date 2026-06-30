@@ -645,6 +645,15 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 
 **Actions runtime maintenance（v1.10.0 / v1.11.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。`actions/checkout@v5` / `actions/setup-node@v6` / `actions/upload-artifact@v7` を使用します（v1.11.0 で `upload-artifact` を Node.js 24 対応版に更新し、Node.js 20 runtime warning を解消）。`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` は使用しません。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
 
+**npm cache 最適化（v1.13.0）:** 両 workflow の `actions/setup-node@v6` で GitHub 公式の **npm cache** を有効化しています（`cache: npm`）。`cache-dependency-path` には **`package-lock.json`** を指定し、lockfile の内容に基づいて cache key が決まります。`package-lock.json` が変更されると cache key が切り替わり、新しい依存関係セット用の cache が使われます。**`node_modules` はキャッシュしません** — 依存関係のインストールは従来どおり **`npm ci`** です。`actions/cache` の直接利用は行っていません。
+
+| 項目 | 内容 |
+|------|------|
+| キャッシュ対象 | npm パッケージキャッシュ（setup-node 組み込み） |
+| cache key 根拠 | `package-lock.json`（`cache-dependency-path`） |
+| Dependabot PR 初回 | cache miss は正常（新 lockfile では未キャッシュ） |
+| cache 破損時 | GitHub リポジトリ **Settings → Actions → Caches** から該当 cache を削除し、workflow を再実行 |
+
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|
 | **Quality Pipeline CI**（v1.7） | `.github/workflows/quality-pipeline-ci.yml` | dry-run 品質ゲート（test / stop / resume） | **不要** |

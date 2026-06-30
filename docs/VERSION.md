@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.12.1**（Dependabot 運用品質向上）
+**v1.13.0**（GitHub Actions npm cache 最適化）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.12.1** | **運用品質パッチ** | **✅ 完了** | **Dependabot 運用ドキュメント強化** |
+| **v1.13.0** | **保守更新** | **✅ 完了** | **setup-node npm cache 最適化（package-lock.json）** |
+| v1.12.1 | 運用品質パッチ | ✅ 完了 | Dependabot 運用ドキュメント強化 |
 | v1.12.0 | 保守更新 | ✅ 完了 | Dependabot による GitHub Actions / npm 依存関係更新検知 |
 | v1.11.0 | 保守更新 | ✅ 完了 | upload-artifact v7 — Node.js 20 Warning 解消 |
 | v1.10.0 | 保守更新 | ✅ 完了 | GitHub Actions runtime maintenance（checkout v5 / setup-node v6） |
@@ -37,6 +38,43 @@
 
 ---
 
+
+### v1.13.0 で追加（GitHub Actions npm cache 最適化）
+
+#### setup-node npm cache
+
+- **`cache: npm`** … GitHub 公式の npm キャッシュ（`actions/setup-node@v6` 組み込み）
+- **`cache-dependency-path: package-lock.json`** … lockfile 変更で cache key が切り替わる
+- **`node_modules` 非キャッシュ** … インストールは `npm ci` 維持
+- **`actions/cache` 直接利用なし**
+
+#### v1.14.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| cache hit/miss 可視化 | workflow ログや Summary でキャッシュ効率を確認したい場合 |
+| 実行時間計測 | CI / Nightly Apply の step 時間を継続監視したい場合 |
+| Grouped Updates（Dependabot） | PR 数増加でレビュー負荷が高い場合 |
+| ignore（Dependabot） | 特定依存で継続失敗・非互換が出た場合 |
+| Auto Merge | CI 安定・レビュー基準・権限設計が固まった後 |
+
+### 品質状況（v1.13.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS** |
+| npm test | **PASS** |
+
+### v1.13.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| setup-node npm cache | ✅ |
+| cache-dependency-path 明示 | ✅ |
+| npm ci / workflow 挙動維持 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
 
 ### v1.12.1 で追加（Dependabot 運用品質向上）
 
@@ -49,7 +87,7 @@
 - CI 失敗時の確認順（更新種別 → 差分 → 原因切り分け → merge / ignore 検討）
 - 将来導入候補の整理（Grouped Updates / ignore / reviewers / Auto Merge 等）
 
-#### v1.13.0 以降の候補
+#### v1.13.0 以降の候補（Dependabot 関連）
 
 | 候補 | 導入条件 |
 |------|----------|
@@ -59,7 +97,7 @@
 | reviewers / assignees | 複数人運用時 |
 | Dependabot secrets | Dependabot PR で secrets 必須 CI が必要になった場合 |
 
-### 品質状況（v1.12.1 最新）
+### 品質状況（v1.12.1）
 
 - `.github/dependabot.yml` 変更なし
 - README / CHANGELOG / VERSION 更新済み
