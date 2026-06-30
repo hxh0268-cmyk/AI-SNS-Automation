@@ -693,7 +693,27 @@ node scripts/gha_analyze_performance_trend.js --fixture-dir path/to/fixtures
 | 出力 | `reports/performance-trend/latest/trend-report.md` / `trend-data.json` |
 | 欠落 Run | warning として skip — 1 件以上有効 observation があれば report 生成 |
 | 0 件 | 明確なエラーで終了 |
-| REST API | **v1.17.0 では未使用** — v1.18.0 以降候補 |
+| REST API | **v1.18.0** — artifact metadata は `gh api --paginate` を使用（完全自動 Trend は v1.19.0 以降） |
+
+### Artifact Metadata / Retention Awareness（v1.18.0）
+
+`gha_analyze_performance_trend.js` に **GitHub Actions artifact metadata** 取得を追加しました。`gh run download` だけでは得られない `expires_at` / `expired` / `digest` / `size_in_bytes` を trend レポートに反映します。
+
+```bash
+# gh api で artifact metadata を取得（要 Actions read permission on private repo）
+gh api repos/{owner}/{repo}/actions/runs/{run_id}/artifacts --paginate
+```
+
+| 項目 | 内容 |
+|------|------|
+| metadata 取得 | `gh api repos/{owner}/{repo}/actions/runs/{run_id}/artifacts --paginate` |
+| download との関係 | `gh run download` はファイル取得のみ — retention metadata は **gh api 必須** |
+| token 権限 | private repo では **Actions read** が必要 |
+| `expired: true` | warning + skip（observation 取得しない） |
+| `expires_at` 欠落 | metadata warning — trend analysis は継続 |
+| metadata 取得失敗 | warning — 可能な限り `gh run download` で継続 |
+| 出力追加 | trend-report **Artifact Metadata** セクション / trend-data `metadataWarnings` |
+| fixture | `run-*/artifacts.json` で metadata をテスト（gh 実通信なし） |
 
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|

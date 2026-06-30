@@ -4,6 +4,41 @@
 
 ---
 
+## v1.18.0 — 保守更新（Artifact Metadata / Retention Awareness）
+
+Performance Trend Analysis に **GitHub Actions artifact metadata / retention awareness** を追加しました。`gh api --paginate` で `expires_at` / `expired` / `digest` 等を取得し、trend レポートに反映します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| artifact metadata | `gh api repos/{owner}/{repo}/actions/runs/{run_id}/artifacts --paginate` |
+| retention | `expired: true` → skip / `expires_at` 欠落 → metadata warning |
+| trend 出力 | Artifact Metadata セクション / `metadataWarnings` / `recentRuns[].artifact` |
+| 既存互換 | `gh run download` / fixture モード維持 |
+| Test 61–64 | metadata 正常 / expired skip / expires_at 欠落 / pagination |
+
+### 設計判断
+
+- **Workflow YAML 変更なし**
+- **metadata 取得失敗** — warning、可能な限り trend 継続
+- **GitHub Actions 上完全自動 Trend** — v1.19.0 以降候補
+- **REST API 直接実装** — gh api 経由（private repo は Actions read 必要）
+
+### 影響範囲
+
+- `scripts/gha_analyze_performance_trend.js` 拡張
+- ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **64 PASS**（Test 61–64 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.17.0 — 保守更新（gh CLI Performance Trend Analysis）
 
 v1.16.0 の `performance-observation.json` を **gh CLI** でローカル収集・集計する `scripts/gha_analyze_performance_trend.js` を追加しました。REST API 自動集計は v1.18.0 以降に回します。

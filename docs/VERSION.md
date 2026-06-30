@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.17.0**（gh CLI Performance Trend Analysis）
+**v1.18.0**（Artifact Metadata / Retention Awareness）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.17.0** | **保守更新** | **✅ 完了** | **gh CLI ローカル Performance Trend Analysis** |
+| **v1.18.0** | **保守更新** | **✅ 完了** | **Artifact metadata / retention awareness** |
+| v1.17.0 | 保守更新 | ✅ 完了 | gh CLI ローカル Performance Trend Analysis |
 | v1.16.0 | 保守更新 | ✅ 完了 | performance-observation.json artifact 基盤 |
 | v1.15.0 | 保守更新 | ✅ 完了 | Performance / Cache Observation Summary |
 | v1.14.0 | 保守更新 | ✅ 完了 | Step Summary + 主要ステップ実行時間計測 |
@@ -43,6 +44,42 @@
 ---
 
 
+### v1.18.0 で追加（Artifact Metadata / Retention Awareness）
+
+#### gh api artifact metadata
+
+- **`gh api .../artifacts --paginate`** … expires_at / expired / digest / size_in_bytes
+- **expired artifact** … warning + skip
+- **expires_at 欠落** … metadata warning、trend 継続
+- **metadata 取得失敗** … warning、`gh run download` で継続
+- **trend-data.json** … schemaVersion 1.1、`metadataWarnings`、`recentRuns[].artifact`
+
+#### v1.19.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| GitHub Actions 上完全自動 Trend Analysis | workflow 内で trend 生成・公開が必要になった場合 |
+| REST API 直接集計（gh 非依存） | CI / サービスアカウントからの自動実行 |
+
+### 品質状況（v1.18.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **64 PASS** |
+| npm test | **PASS** |
+
+### v1.18.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| gh api artifact metadata | ✅ |
+| expired / expires_at 処理 | ✅ |
+| gh run download 互換維持 | ✅ |
+| Test 61–64 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.17.0 で追加（gh CLI Performance Trend Analysis）
 
 #### gha_analyze_performance_trend.js
@@ -53,15 +90,15 @@
 - **出力** … `trend-report.md` / `trend-data.json`
 - **fixture モード** … テスト用（gh 実通信なし）
 
-#### v1.18.0 以降の候補
+#### v1.18.0 以降の候補（REST API / automation）
 
 | 候補 | 導入条件 |
 |------|----------|
-| GitHub REST API trend analysis | gh CLI 以外での横断集計が必要になった場合 |
+| GitHub REST API trend analysis | gh CLI 以外での横断集計が必要になった場合（v1.18.0 で gh api metadata 導入済み — 完全自動は v1.19.0 以降） |
 | cache hit/miss 厳密可視化 | setup-node cache ログの構造化 |
 | グラフ / ダッシュボード | trend-data.json の可視化 |
 
-### 品質状況（v1.17.0 最新）
+### 品質状況（v1.17.0）
 
 | 項目 | 結果 |
 |------|------|

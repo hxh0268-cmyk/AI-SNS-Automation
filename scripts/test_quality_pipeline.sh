@@ -2840,6 +2840,7 @@ const trendData = buildTrendData({
     },
   ],
   warnings: [],
+  metadataWarnings: [],
   runsRequested: 1,
 });
 const contractErrors = validateTrendDataContract(trendData);
@@ -2879,6 +2880,279 @@ fs.rmSync(outputDir, { recursive: true, force: true });
 console.log("trend-data contract ok");
 EOF
 pass "trend-data.json contract validation"
+
+echo "-- Test 61: artifact metadata fixture normal case --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { analyzePerformanceTrend } from "./scripts/gha_analyze_performance_trend.js";
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-normal-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-normal-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-5001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-5001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "5001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "meta-hash",
+    },
+    durations: { npmCiSeconds: 8 },
+    stepTimings: [],
+  }),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-5001", "artifacts.json"),
+  JSON.stringify({
+    artifacts: [
+      {
+        id: 123,
+        name: "quality-pipeline-reports-5001",
+        size_in_bytes: 10850,
+        expired: false,
+        expires_at: "2026-09-28T00:00:00Z",
+        archive_download_url: "https://api.github.com/repos/o/r/actions/artifacts/123/zip",
+        digest: "sha256:abcdef",
+      },
+    ],
+  }),
+);
+
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const trendData = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+const run = trendData.recentRuns[0];
+if (!run.artifact || run.artifact.name !== "quality-pipeline-reports-5001") {
+  throw new Error("expected artifact metadata on recentRuns");
+}
+const report = fs.readFileSync(result.reportPath, "utf8");
+if (!report.includes("## Artifact Metadata")) {
+  throw new Error("expected Artifact Metadata section");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("artifact metadata normal case ok");
+EOF
+pass "artifact metadata fixture normal case"
+
+echo "-- Test 62: expired artifact is skipped --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { collectFromFixtureDir } from "./scripts/gha_analyze_performance_trend.js";
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-expired-"));
+fs.mkdirSync(path.join(fixtureDir, "run-6001"), { recursive: true });
+fs.mkdirSync(path.join(fixtureDir, "run-6002"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-6001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "6001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "hash-a",
+    },
+    durations: { npmCiSeconds: 8 },
+    stepTimings: [],
+  }),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-6001", "artifacts.json"),
+  JSON.stringify({
+    artifacts: [
+      {
+        id: 1,
+        name: "quality-pipeline-reports-6001",
+        size_in_bytes: 100,
+        expired: true,
+        expires_at: "2026-01-01T00:00:00Z",
+      },
+    ],
+  }),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-6002", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "6002", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "hash-b",
+    },
+    durations: { npmCiSeconds: 9 },
+    stepTimings: [],
+  }),
+);
+
+const collected = collectFromFixtureDir(fixtureDir);
+if (collected.observations.length !== 1) {
+  throw new Error(`expected 1 observation after expired skip, got ${collected.observations.length}`);
+}
+if (!collected.warnings.some((w) => w.kind === "artifact-expired")) {
+  throw new Error("expected artifact-expired warning");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+console.log("expired artifact skip ok");
+EOF
+pass "expired artifact is skipped"
+
+echo "-- Test 63: missing expires_at emits metadata warning --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { analyzePerformanceTrend } from "./scripts/gha_analyze_performance_trend.js";
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-no-expires-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-no-expires-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-7001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-7001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "7001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "hash-c",
+    },
+    durations: { npmCiSeconds: 7 },
+    stepTimings: [],
+  }),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-7001", "artifacts.json"),
+  JSON.stringify({
+    artifacts: [
+      {
+        id: 2,
+        name: "quality-pipeline-reports-7001",
+        size_in_bytes: 200,
+        expired: false,
+      },
+    ],
+  }),
+);
+
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const trendData = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+if (trendData.metadataWarnings.length === 0) {
+  throw new Error("expected metadata warning for missing expires_at");
+}
+if (trendData.summary.runsAnalyzed !== 1) {
+  throw new Error("expected trend analysis to continue with missing expires_at");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("missing expires_at warning ok");
+EOF
+pass "missing expires_at emits metadata warning"
+
+echo "-- Test 64: paginated artifacts fixture --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  parseFixtureArtifacts,
+  parsePaginatedArtifactsResponse,
+  selectPerformanceArtifact,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+const pageOne = {
+  artifacts: [
+    {
+      id: 10,
+      name: "other-artifact",
+      size_in_bytes: 50,
+      expired: false,
+      expires_at: "2026-09-01T00:00:00Z",
+    },
+  ],
+};
+const pageTwo = {
+  artifacts: [
+    {
+      id: 11,
+      name: "quality-pipeline-reports-8001",
+      size_in_bytes: 150,
+      expired: false,
+      expires_at: "2026-10-01T00:00:00Z",
+      digest: "sha256:page2",
+    },
+  ],
+};
+
+const paginatedOutput = `${JSON.stringify(pageOne)}${JSON.stringify(pageTwo)}`;
+const parsed = parsePaginatedArtifactsResponse(paginatedOutput);
+if (parsed.length !== 2) {
+  throw new Error(`expected 2 artifacts from paginated output, got ${parsed.length}`);
+}
+const fromFixture = parseFixtureArtifacts([pageOne, pageTwo]);
+const selected = selectPerformanceArtifact(fromFixture);
+if (selected?.name !== "quality-pipeline-reports-8001") {
+  throw new Error("expected performance artifact selected from paginated fixture");
+}
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-page-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-meta-page-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-8001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-8001", "artifacts.json"),
+  JSON.stringify([pageOne, pageTwo]),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-8001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "8001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "hash-d",
+    },
+    durations: { npmCiSeconds: 6 },
+    stepTimings: [],
+  }),
+);
+
+const { analyzePerformanceTrend } = await import("./scripts/gha_analyze_performance_trend.js");
+const result = analyzePerformanceTrend({ fixtureDir, outputDir });
+const trendData = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+if (trendData.recentRuns[0].artifact?.name !== "quality-pipeline-reports-8001") {
+  throw new Error("expected paginated artifact metadata in trend output");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("paginated artifacts fixture ok");
+EOF
+pass "paginated artifacts fixture"
 
 echo ""
 echo "All quality pipeline tests passed."

@@ -5,17 +5,23 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const TREND_DATA_SCHEMA_VERSION = "1.0";
+export const TREND_DATA_SCHEMA_VERSION = "1.1";
 export const DEFAULT_OUTPUT_DIR = path.join(
   "reports",
   "performance-trend",
   "latest",
 );
 export const OBSERVATION_FILENAME = "performance-observation.json";
+export const FIXTURE_ARTIFACTS_FILENAME = "artifacts.json";
 
 export const DEFAULT_WORKFLOWS = [
   ".github/workflows/quality-pipeline-ci.yml",
   ".github/workflows/nightly-apply.yml",
+];
+
+export const ARTIFACT_NAME_PATTERNS = [
+  /^quality-pipeline-reports-/,
+  /^nightly-apply-/,
 ];
 
 /**
@@ -41,6 +47,198 @@ export function isValidObservation(observation) {
   }
   const workflow = /** @type {Record<string, unknown>} */ (record.workflow);
   return typeof workflow.runId === "string" && workflow.runId.length > 0;
+}
+
+/**
+ * @param {Record<string, unknown>} apiArtifact
+ * @returns {Record<string, unknown>}
+ */
+export function normalizeArtifactRecord(apiArtifact) {
+  return {
+    id: typeof apiArtifact.id === "number" ? apiArtifact.id : null,
+    name: typeof apiArtifact.name === "string" ? apiArtifact.name : null,
+    sizeInBytes:
+      typeof apiArtifact.size_in_bytes === "number" ? apiArtifact.size_in_bytes : null,
+    expired: apiArtifact.expired === true,
+    expiresAt:
+      typeof apiArtifact.expires_at === "string" ? apiArtifact.expires_at : null,
+    archiveDownloadUrl:
+      typeof apiArtifact.archive_download_url === "string"
+        ? apiArtifact.archive_download_url
+        : null,
+    digest: typeof apiArtifact.digest === "string" ? apiArtifact.digest : null,
+  };
+}
+
+/**
+ * @param {string} output
+ * @returns {Array<Record<string, unknown>>}
+ */
+export function parsePaginatedArtifactsResponse(output) {
+  /** @type {Array<Record<string, unknown>>} */
+  const artifacts = [];
+  const trimmed = output.trim();
+  if (!trimmed) {
+    return artifacts;
+  }
+
+  let depth = 0;
+  let start = -1;
+  for (let i = 0; i < trimmed.length; i += 1) {
+    const char = trimmed[i];
+    if (char === "{") {
+      if (depth === 0) {
+        start = i;
+      }
+      depth += 1;
+    } else if (char === "}") {
+      depth -= 1;
+      if (depth === 0 && start >= 0) {
+        const chunk = trimmed.slice(start, i + 1);
+        const parsed = JSON.parse(chunk);
+        if (Array.isArray(parsed.artifacts)) {
+          artifacts.push(...parsed.artifacts);
+        } else if (parsed.id && parsed.name) {
+          artifacts.push(parsed);
+        }
+        start = -1;
+      }
+    }
+  }
+
+  return artifacts;
+}
+
+/**
+ * @param {unknown} fixtureContent
+ * @returns {Array<Record<string, unknown>>}
+ */
+export function parseFixtureArtifacts(fixtureContent) {
+  if (Array.isArray(fixtureContent)) {
+    return fixtureContent.flatMap((page) => {
+      if (page && typeof page === "object" && Array.isArray(page.artifacts)) {
+        return page.artifacts;
+      }
+      if (page && typeof page === "object" && page.id && page.name) {
+        return [page];
+      }
+      return [];
+    });
+  }
+  if (
+    fixtureContent &&
+    typeof fixtureContent === "object" &&
+    Array.isArray(/** @type {Record<string, unknown>} */ (fixtureContent).artifacts)
+  ) {
+    return /** @type {Record<string, unknown>} */ (fixtureContent).artifacts;
+  }
+  return [];
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} artifacts
+ * @returns {Record<string, unknown> | null}
+ */
+export function selectPerformanceArtifact(artifacts) {
+  for (const pattern of ARTIFACT_NAME_PATTERNS) {
+    const match = artifacts.find(
+      (artifact) =>
+        typeof artifact.name === "string" && pattern.test(artifact.name),
+    );
+    if (match) {
+      return match;
+    }
+  }
+  return artifacts[0] ?? null;
+}
+
+/**
+ * @param {object} params
+ * @param {Record<string, unknown> | null} params.rawArtifact
+ * @param {string} params.runId
+ * @returns {{
+ *   artifact: Record<string, unknown> | null,
+ *   skip: boolean,
+ *   warnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   metadataWarnings: Array<{ runId?: string, message: string, kind?: string }>,
+ * }}
+ */
+export function evaluateArtifactMetadata(params) {
+  const { rawArtifact, runId } = params;
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const warnings = [];
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const metadataWarnings = [];
+
+  if (!rawArtifact) {
+    return { artifact: null, skip: false, warnings, metadataWarnings };
+  }
+
+  const artifact = normalizeArtifactRecord(rawArtifact);
+
+  if (artifact.expired === true) {
+    warnings.push({
+      runId,
+      kind: "artifact-expired",
+      message: `artifact "${artifact.name}" is expired — skipped`,
+    });
+    return { artifact, skip: true, warnings, metadataWarnings };
+  }
+
+  if (!artifact.expiresAt) {
+    metadataWarnings.push({
+      runId,
+      kind: "artifact-expires-at-missing",
+      message: `artifact "${artifact.name}" missing expires_at`,
+    });
+  }
+
+  return { artifact, skip: false, warnings, metadataWarnings };
+}
+
+/**
+ * @param {object} params
+ * @param {string} params.runId
+ * @param {string} [params.repo]
+ * @param {typeof execSync} [params.execSyncImpl]
+ * @returns {{ artifacts: Array<Record<string, unknown>>, error: string | null }}
+ */
+export function fetchRunArtifactsFromApi(params) {
+  const execSyncImpl = params.execSyncImpl ?? execSync;
+  const repo = params.repo ?? resolveGhRepo(execSyncImpl);
+  if (!repo) {
+    return { artifacts: [], error: "unable to resolve repository for gh api" };
+  }
+
+  try {
+    const cmd =
+      `gh api repos/${repo}/actions/runs/${params.runId}/artifacts --paginate`;
+    const output = execSyncImpl(cmd, { encoding: "utf8", stdio: "pipe" });
+    return {
+      artifacts: parsePaginatedArtifactsResponse(output),
+      error: null,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { artifacts: [], error: message };
+  }
+}
+
+/**
+ * @param {typeof execSync} [execSyncImpl]
+ * @returns {string | null}
+ */
+export function resolveGhRepo(execSyncImpl = execSync) {
+  try {
+    const output = execSyncImpl("gh repo view --json nameWithOwner -q .nameWithOwner", {
+      encoding: "utf8",
+      stdio: "pipe",
+    });
+    const repo = output.trim();
+    return repo.length > 0 ? repo : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -101,17 +299,29 @@ export function buildTrendObservation(observations) {
  * @param {object} params
  * @param {"fixture" | "gh-cli"} params.source
  * @param {Array<Record<string, unknown>>} params.observations
- * @param {Array<{ runId?: string, message: string }>} params.warnings
+ * @param {Array<{ runId?: string, message: string, kind?: string }>} params.warnings
+ * @param {Array<{ runId?: string, message: string, kind?: string }>} [params.metadataWarnings]
  * @param {number} params.runsRequested
  * @returns {Record<string, unknown>}
  */
 export function buildTrendData(params) {
-  const { source, observations, warnings, runsRequested } = params;
+  const {
+    source,
+    observations,
+    warnings,
+    metadataWarnings = [],
+    runsRequested,
+  } = params;
+
+  const skippedExpiredArtifacts = warnings.filter(
+    (warning) => warning.kind === "artifact-expired",
+  ).length;
 
   const recentRuns = observations.map((observation) => {
     const workflow = /** @type {Record<string, unknown>} */ (observation.workflow);
     const cache = /** @type {Record<string, unknown>} */ (observation.cache);
     const durations = /** @type {Record<string, unknown>} */ (observation.durations);
+    const artifact = /** @type {Record<string, unknown> | undefined} */ (observation.artifact);
     return {
       runId: workflow.runId,
       workflowName: workflow.name ?? null,
@@ -123,6 +333,7 @@ export function buildTrendData(params) {
       generatedAt: observation.generatedAt ?? null,
       packageLockHash:
         typeof cache.packageLockHash === "string" ? cache.packageLockHash : null,
+      artifact: artifact ?? null,
       durations: {
         npmCiSeconds:
           typeof durations.npmCiSeconds === "number" ? durations.npmCiSeconds : null,
@@ -150,8 +361,11 @@ export function buildTrendData(params) {
       runsRequested,
       runsAnalyzed: observations.length,
       runsSkipped: warnings.length,
+      metadataWarningCount: metadataWarnings.length,
+      skippedExpiredArtifacts,
     },
     warnings,
+    metadataWarnings,
     recentRuns,
     trendObservation: buildTrendObservation(observations),
   };
@@ -167,6 +381,9 @@ export function buildTrendReport(trendData) {
     trendData.recentRuns ?? []
   );
   const warnings = /** @type {Array<Record<string, string>>} */ (trendData.warnings ?? []);
+  const metadataWarnings = /** @type {Array<Record<string, string>>} */ (
+    trendData.metadataWarnings ?? []
+  );
   const trendObservation = /** @type {Record<string, Record<string, unknown>>} */ (
     trendData.trendObservation ?? {}
   );
@@ -182,6 +399,8 @@ export function buildTrendReport(trendData) {
     `| Runs requested | ${summary.runsRequested ?? 0} |`,
     `| Runs analyzed | ${summary.runsAnalyzed ?? 0} |`,
     `| Runs skipped | ${summary.runsSkipped ?? 0} |`,
+    `| Metadata warnings | ${summary.metadataWarningCount ?? 0} |`,
+    `| Skipped expired artifacts | ${summary.skippedExpiredArtifacts ?? 0} |`,
     `| Generated at | ${trendData.generatedAt ?? ""} |`,
     "",
     "## Recent Runs",
@@ -202,6 +421,31 @@ export function buildTrendReport(trendData) {
         `| ${run.runId} | ${run.workflowName ?? "—"} | ${run.jobResult ?? "—"} | ${durations.npmCiSeconds ?? "—"} | ${hashShort} |`,
       );
     }
+  }
+
+  lines.push("", "## Artifact Metadata", "");
+  lines.push(
+    "| Run ID | Artifact name | Size (bytes) | Expired | Expires at | Digest |",
+    "|--------|---------------|--------------|---------|------------|--------|",
+  );
+
+  let artifactRows = 0;
+  for (const run of recentRuns) {
+    const artifact = /** @type {Record<string, unknown> | null} */ (run.artifact ?? null);
+    if (!artifact) {
+      continue;
+    }
+    artifactRows += 1;
+    const digest =
+      typeof artifact.digest === "string" && artifact.digest.length > 16
+        ? `${artifact.digest.slice(0, 16)}…`
+        : (artifact.digest ?? "—");
+    lines.push(
+      `| ${run.runId} | ${artifact.name ?? "—"} | ${artifact.sizeInBytes ?? "—"} | ${artifact.expired ?? "—"} | ${artifact.expiresAt ?? "—"} | ${digest} |`,
+    );
+  }
+  if (artifactRows === 0) {
+    lines.push("| (none) | — | — | — | — | — |");
   }
 
   lines.push("", "## Trend Observation", "");
@@ -225,11 +469,20 @@ export function buildTrendReport(trendData) {
   lines.push(
     "- Compare runs with the same package-lock hash to estimate npm cache benefit.",
   );
-  lines.push("- Strict cache-hit detection is not available in v1.17.0.");
-  lines.push("- REST API aggregation is deferred to v1.18.0+.");
+  lines.push("- gh run download alone does not expose expires_at / expired / digest metadata.");
+  lines.push("- Artifact metadata uses gh api with Actions read permission on private repos.");
+  lines.push("- Strict cache-hit detection is not available in v1.18.0.");
+  lines.push("- GitHub Actions fully automated trend analysis is deferred to v1.19.0+.");
   if (warnings.length > 0) {
     lines.push("", "### Warnings", "");
     for (const warning of warnings) {
+      const prefix = warning.runId ? `Run ${warning.runId}: ` : "";
+      lines.push(`- ${prefix}${warning.message}`);
+    }
+  }
+  if (metadataWarnings.length > 0) {
+    lines.push("", "### Metadata Warnings", "");
+    for (const warning of metadataWarnings) {
       const prefix = warning.runId ? `Run ${warning.runId}: ` : "";
       lines.push(`- ${prefix}${warning.message}`);
     }
@@ -255,6 +508,7 @@ export function validateTrendDataContract(trendData) {
     "source",
     "summary",
     "warnings",
+    "metadataWarnings",
     "recentRuns",
     "trendObservation",
   ];
@@ -269,24 +523,114 @@ export function validateTrendDataContract(trendData) {
   if (!Array.isArray(record.warnings)) {
     errors.push("warnings must be an array");
   }
+  if (!Array.isArray(record.metadataWarnings)) {
+    errors.push("metadataWarnings must be an array");
+  }
   if (!Array.isArray(record.recentRuns)) {
     errors.push("recentRuns must be an array");
   }
   if (!record.trendObservation || typeof record.trendObservation !== "object") {
     errors.push("trendObservation must be an object");
   }
+  const summary = record.summary;
+  if (!summary || typeof summary !== "object") {
+    errors.push("summary must be an object");
+  } else {
+    const summaryRecord = /** @type {Record<string, unknown>} */ (summary);
+    if (!("metadataWarningCount" in summaryRecord)) {
+      errors.push("summary.metadataWarningCount is required");
+    }
+    if (!("skippedExpiredArtifacts" in summaryRecord)) {
+      errors.push("summary.skippedExpiredArtifacts is required");
+    }
+  }
   return errors;
 }
 
 /**
+ * @param {string} runDir
+ * @returns {Array<Record<string, unknown>> | null}
+ */
+export function loadFixtureArtifacts(runDir) {
+  const artifactsPath = path.join(runDir, FIXTURE_ARTIFACTS_FILENAME);
+  if (!fs.existsSync(artifactsPath)) {
+    return null;
+  }
+  return parseFixtureArtifacts(JSON.parse(fs.readFileSync(artifactsPath, "utf8")));
+}
+
+/**
+ * @param {object} params
+ * @param {string} params.runId
+ * @param {string} params.runDirName
+ * @param {Array<Record<string, unknown>> | null} [params.fixtureArtifacts]
+ * @param {typeof execSync} [params.execSyncImpl]
+ * @param {string} [params.repo]
+ * @returns {{
+ *   artifact: Record<string, unknown> | null,
+ *   skip: boolean,
+ *   warnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   metadataWarnings: Array<{ runId?: string, message: string, kind?: string }>,
+ * }}
+ */
+export function resolveRunArtifactMetadata(params) {
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const warnings = [];
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const metadataWarnings = [];
+
+  if (params.fixtureArtifacts) {
+    const rawArtifact = selectPerformanceArtifact(params.fixtureArtifacts);
+    return evaluateArtifactMetadata({
+      rawArtifact,
+      runId: params.runId,
+    });
+  }
+
+  const fetched = fetchRunArtifactsFromApi({
+    runId: params.runId,
+    repo: params.repo,
+    execSyncImpl: params.execSyncImpl,
+  });
+
+  if (fetched.error) {
+    metadataWarnings.push({
+      runId: params.runId,
+      kind: "artifact-metadata-fetch-failed",
+      message: `artifact metadata fetch failed — continuing with gh run download (${fetched.error})`,
+    });
+    return { artifact: null, skip: false, warnings, metadataWarnings };
+  }
+
+  const rawArtifact = selectPerformanceArtifact(fetched.artifacts);
+  const evaluated = evaluateArtifactMetadata({
+    rawArtifact,
+    runId: params.runId,
+  });
+  return {
+    artifact: evaluated.artifact,
+    skip: evaluated.skip,
+    warnings: [...warnings, ...evaluated.warnings],
+    metadataWarnings: [...metadataWarnings, ...evaluated.metadataWarnings],
+  };
+}
+
+/**
  * @param {string} fixtureDir
- * @returns {{ observations: Array<Record<string, unknown>>, warnings: Array<{ runId?: string, message: string }>, runsRequested: number }}
+ * @returns {{
+ *   observations: Array<Record<string, unknown>>,
+ *   warnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   metadataWarnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   runsRequested: number,
+ * }}
  */
 export function collectFromFixtureDir(fixtureDir) {
   /** @type {Array<Record<string, unknown>>} */
   const observations = [];
-  /** @type {Array<{ runId?: string, message: string }>} */
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
   const warnings = [];
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const metadataWarnings = [];
   let runsRequested = 0;
 
   if (!fs.existsSync(fixtureDir)) {
@@ -301,10 +645,25 @@ export function collectFromFixtureDir(fixtureDir) {
 
   for (const runDirName of entries) {
     runsRequested += 1;
-    const observationPath = path.join(fixtureDir, runDirName, OBSERVATION_FILENAME);
+    const runDir = path.join(fixtureDir, runDirName);
+    const runId = runDirName.replace(/^run-/, "");
+    const fixtureArtifacts = loadFixtureArtifacts(runDir);
+    const artifactMeta = resolveRunArtifactMetadata({
+      runId,
+      runDirName,
+      fixtureArtifacts,
+    });
+    warnings.push(...artifactMeta.warnings);
+    metadataWarnings.push(...artifactMeta.metadataWarnings);
+
+    if (artifactMeta.skip) {
+      continue;
+    }
+
+    const observationPath = path.join(runDir, OBSERVATION_FILENAME);
     if (!fs.existsSync(observationPath)) {
       warnings.push({
-        runId: runDirName,
+        runId,
         message: `${OBSERVATION_FILENAME} not found — skipped`,
       });
       continue;
@@ -313,9 +672,9 @@ export function collectFromFixtureDir(fixtureDir) {
     let parsed;
     try {
       parsed = JSON.parse(fs.readFileSync(observationPath, "utf8"));
-    } catch (error) {
+    } catch {
       warnings.push({
-        runId: runDirName,
+        runId,
         message: `invalid JSON in ${OBSERVATION_FILENAME} — skipped`,
       });
       continue;
@@ -323,16 +682,20 @@ export function collectFromFixtureDir(fixtureDir) {
 
     if (!isValidObservation(parsed)) {
       warnings.push({
-        runId: runDirName,
+        runId,
         message: `invalid observation schema — skipped`,
       });
       continue;
     }
 
-    observations.push(/** @type {Record<string, unknown>} */ (parsed));
+    const observation = /** @type {Record<string, unknown>} */ (parsed);
+    if (artifactMeta.artifact) {
+      observation.artifact = artifactMeta.artifact;
+    }
+    observations.push(observation);
   }
 
-  return { observations, warnings, runsRequested };
+  return { observations, warnings, metadataWarnings, runsRequested };
 }
 
 /**
@@ -379,7 +742,12 @@ export function findObservationFile(searchRoot) {
  * @param {number} [params.limit]
  * @param {string[]} [params.workflows]
  * @param {string} [params.repo]
- * @returns {{ observations: Array<Record<string, unknown>>, warnings: Array<{ runId?: string, message: string }>, runsRequested: number }}
+ * @returns {{
+ *   observations: Array<Record<string, unknown>>,
+ *   warnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   metadataWarnings: Array<{ runId?: string, message: string, kind?: string }>,
+ *   runsRequested: number,
+ * }}
  */
 export function collectFromGhCli(params = {}) {
   const execSyncImpl = params.execSyncImpl ?? execSync;
@@ -395,8 +763,10 @@ export function collectFromGhCli(params = {}) {
 
   /** @type {Array<Record<string, unknown>>} */
   const observations = [];
-  /** @type {Array<{ runId?: string, message: string }>} */
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
   const warnings = [];
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const metadataWarnings = [];
   let runsRequested = 0;
 
   for (const workflow of workflows) {
@@ -408,6 +778,19 @@ export function collectFromGhCli(params = {}) {
     for (const run of runs) {
       runsRequested += 1;
       const runId = String(run.databaseId);
+      const artifactMeta = resolveRunArtifactMetadata({
+        runId,
+        runDirName: runId,
+        execSyncImpl,
+        repo: params.repo,
+      });
+      warnings.push(...artifactMeta.warnings);
+      metadataWarnings.push(...artifactMeta.metadataWarnings);
+
+      if (artifactMeta.skip) {
+        continue;
+      }
+
       const tempDir = path.join(
         "reports",
         "performance-trend",
@@ -461,19 +844,24 @@ export function collectFromGhCli(params = {}) {
         continue;
       }
 
-      observations.push(/** @type {Record<string, unknown>} */ (parsed));
+      const observation = /** @type {Record<string, unknown>} */ (parsed);
+      if (artifactMeta.artifact) {
+        observation.artifact = artifactMeta.artifact;
+      }
+      observations.push(observation);
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
   }
 
-  return { observations, warnings, runsRequested };
+  return { observations, warnings, metadataWarnings, runsRequested };
 }
 
 /**
  * @param {object} params
  * @param {"fixture" | "gh-cli"} params.source
  * @param {Array<Record<string, unknown>>} params.observations
- * @param {Array<{ runId?: string, message: string }>} params.warnings
+ * @param {Array<{ runId?: string, message: string, kind?: string }>} params.warnings
+ * @param {Array<{ runId?: string, message: string, kind?: string }>} [params.metadataWarnings]
  * @param {number} params.runsRequested
  * @param {string} [params.outputDir]
  * @returns {{ trendData: Record<string, unknown>, reportPath: string, dataPath: string }}
@@ -484,6 +872,7 @@ export function writeTrendOutputs(params) {
     source: params.source,
     observations: params.observations,
     warnings: params.warnings,
+    metadataWarnings: params.metadataWarnings,
     runsRequested: params.runsRequested,
   });
   const report = buildTrendReport(trendData);
@@ -530,6 +919,7 @@ export function analyzePerformanceTrend(options = {}) {
     source,
     observations: collected.observations,
     warnings: collected.warnings,
+    metadataWarnings: collected.metadataWarnings,
     runsRequested: collected.runsRequested,
     outputDir: options.outputDir,
   });
@@ -568,8 +958,9 @@ Options:
 Production flow (gh CLI):
   1. gh auth status
   2. gh run list --json ...
-  3. gh run download <run-id>
-  4. Parse performance-observation.json from artifacts
+  3. gh api repos/{owner}/{repo}/actions/runs/{run_id}/artifacts --paginate
+  4. gh run download <run-id>
+  5. Parse performance-observation.json from artifacts
 
 Outputs:
   reports/performance-trend/latest/trend-report.md
