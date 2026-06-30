@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.14.0**（GitHub Actions CI 可観測性向上）
+**v1.15.0**（GitHub Actions CI Performance Observation Summary）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.14.0** | **保守更新** | **✅ 完了** | **Step Summary + 主要ステップ実行時間計測** |
+| **v1.15.0** | **保守更新** | **✅ 完了** | **Performance / Cache Observation Summary** |
+| v1.14.0 | 保守更新 | ✅ 完了 | Step Summary + 主要ステップ実行時間計測 |
 | v1.13.0 | 保守更新 | ✅ 完了 | setup-node npm cache 最適化（package-lock.json） |
 | v1.12.1 | 運用品質パッチ | ✅ 完了 | Dependabot 運用ドキュメント強化 |
 | v1.12.0 | 保守更新 | ✅ 完了 | Dependabot による GitHub Actions / npm 依存関係更新検知 |
@@ -39,6 +40,41 @@
 
 ---
 
+
+### v1.15.0 で追加（GitHub Actions CI Performance Observation Summary）
+
+#### Performance / Cache Observation
+
+- **Summary セクション拡張** … Node / npm version、npm cache enabled、cache-dependency-path、package-lock hash
+- **npm ci duration** … Step timings と連携してハイライト
+- **Nightly** … apply duration、job result、pipeline exit code、quality status を Performance セクションに整理
+- **cache-hit 厳密取得** … 未実装（run 間比較で間接確認）
+
+#### v1.16.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
+| 実行時間トレンド | gh CLI / REST API で複数 run を集計したい場合 |
+
+### 品質状況（v1.15.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **55 PASS** |
+| npm test | **PASS** |
+
+### v1.15.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Performance / Cache Observation（両 workflow） | ✅ |
+| npm ci duration ハイライト | ✅ |
+| Workflow 成否 / exit code 維持 | ✅ |
+| Test 55 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
 
 ### v1.14.0 で追加（GitHub Actions CI 可観測性向上）
 
@@ -53,11 +89,11 @@
 
 | 候補 | 導入条件 |
 |------|----------|
-| cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
-| 実行時間トレンド | 複数 run の Duration を集計・可視化したい場合 |
+| cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合（v1.15.0 で Performance / Cache Observation 導入済み — 厳密取得は v1.16.0 以降） |
+| 実行時間トレンド | 複数 run の Duration を集計・可視化したい場合（v1.15.0 で npm ci / apply duration ハイライト導入済み） |
 | Grouped Updates（Dependabot） | PR 数増加でレビュー負荷が高い場合 |
 
-### 品質状況（v1.14.0 最新）
+### 品質状況（v1.14.0）
 
 | 項目 | 結果 |
 |------|------|

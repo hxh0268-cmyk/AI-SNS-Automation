@@ -108,6 +108,20 @@ jobs:
           PIPELINE_EXIT_CODE: ${{ env.PIPELINE_EXIT_CODE }}
         run: |
           timing_file="${RUNNER_TEMP}/gha-step-timing.tsv"
+          lookup_timing() {
+            local step_name="$1"
+            if [ ! -f "$timing_file" ]; then
+              echo "—"
+              return
+            fi
+            while IFS='|' read -r name dur stat; do
+              if [ "$name" = "$step_name" ]; then
+                echo "${dur}s"
+                return
+              fi
+            done < "$timing_file"
+            echo "—"
+          }
           pipeline_code="${PIPELINE_EXIT_CODE:-n/a}"
           if [ "$pipeline_code" = "0" ]; then
             quality_status="Publish Recommended"
@@ -117,6 +131,14 @@ jobs:
             quality_status="(not reached)"
           else
             quality_status="Failed / Error"
+          fi
+          npm_ci_duration="$(lookup_timing "npm ci")"
+          apply_duration="$(lookup_timing "quality-pipeline apply")"
+          node_version="$(node -v 2>/dev/null || echo n/a)"
+          npm_version="$(npm -v 2>/dev/null || echo n/a)"
+          lock_hash="n/a"
+          if [ -f package-lock.json ]; then
+            lock_hash="$(sha256sum package-lock.json | awk '{print $1}')"
           fi
           {
             echo "## Nightly Apply — Run Summary"
@@ -141,9 +163,24 @@ jobs:
               echo "| (none) | — | — |"
             fi
             echo ""
+            echo "### Performance / Cache Observation"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Node version | ${node_version} |"
+            echo "| npm version | ${npm_version} |"
+            echo "| npm cache enabled | yes (setup-node) |"
+            echo "| cache-dependency-path | package-lock.json |"
+            echo "| package-lock hash | \`${lock_hash}\` |"
+            echo "| npm ci duration | ${npm_ci_duration} |"
+            echo "| apply duration | ${apply_duration} |"
+            echo "| Job result | ${JOB_STATUS} |"
+            echo "| Pipeline exit code | ${pipeline_code} |"
+            echo "| Quality status | ${quality_status} |"
+            echo "| cache observation note | setup-node caches npm package cache only (not node_modules). Compare npm ci duration across runs with the same package-lock hash; Dependabot lockfile updates may increase npm ci time on first run. Strict cache-hit is not logged in v1.15.0. |"
+            echo ""
             echo "### Notes"
             echo ""
-            echo "- npm cache: compare \`npm ci\` duration across runs (strict cache-hit is not logged in v1.14.0)."
             echo "- exit code 3 = improvement recommended (workflow may still succeed)."
             echo "- Failure details: see the workflow log and \`failure-summary.md\` artifact if present."
           } >> "$GITHUB_STEP_SUMMARY"

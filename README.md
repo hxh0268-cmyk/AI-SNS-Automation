@@ -654,13 +654,16 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 | Dependabot PR 初回 | cache miss は正常（新 lockfile では未キャッシュ） |
 | cache 破損時 | GitHub リポジトリ **Settings → Actions → Caches** から該当 cache を削除し、workflow を再実行 |
 
-**CI 可観測性（v1.14.0）:** 両 workflow に **GitHub Actions Step Summary**（`GITHUB_STEP_SUMMARY`）を追加しました。失敗時も Summary が残るよう、Summary ステップは **`if: always()`** です。`npm ci` / `npm test` / quality pipeline dry-run・apply など主要ステップの **実行時間（秒）** を Markdown テーブルで表示します。
+**CI 可観測性（v1.14.0 / v1.15.0）:** 両 workflow に **GitHub Actions Step Summary**（`GITHUB_STEP_SUMMARY`）を追加しました。失敗時も Summary が残るよう、Summary ステップは **`if: always()`** です。v1.14.0 で **Step timings**（主要ステップの実行時間）を、v1.15.0 で **Performance / Cache Observation**（Node / npm バージョン、cache 設定、`package-lock` hash、`npm ci` duration のハイライト）を追加しました。
 
 | 項目 | 内容 |
 |------|------|
-| Summary の見方 | workflow Run 詳細 → **Summary** タブ（各 job の末尾ステップで出力） |
-| 実行時間 | **Step timings** 表の Duration (s) — ステップごとの簡易計測 |
-| cache 効果 | v1.14.0 では **cache-hit の厳密取得は未実装**。`npm ci` の Duration を run 間で比較する間接的な確認 |
+| Summary の見方 | workflow Run 詳細 → **Summary** タブ → **Performance / Cache Observation** セクション |
+| 実行時間 | **Step timings** 表 + **npm ci duration** / **apply duration**（Nightly）のハイライト |
+| cache 効果の読み方 | **同一 package-lock hash** の run 間で `npm ci duration` を比較（短いほど cache 効果の可能性）。**cache-hit 厳密取得は v1.15.0 でも未実装** |
+| node_modules | **setup-node cache は npm パッケージキャッシュのみ** — `node_modules` はキャッシュしない（毎回 `npm ci`） |
+| lockfile 変更 | `package-lock.json` 変更で cache key が変わり、初回 run は **cache miss 相当** で `npm ci` が遅くなることがある |
+| Dependabot 後 | lockfile 更新 PR では **初回 CI で npm ci が遅い** ことがある（正常）。同一 hash の 2 回目以降で比較 |
 | 失敗時 | Job result と Step timings の Status を Summary で確認し、詳細は **workflow ログ** の最初の failing step を参照 |
 | 品質判定（Nightly） | Summary に Pipeline exit code / Quality status を表示（v1.9.4 仕様と整合） |
 

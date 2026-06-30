@@ -2488,5 +2488,45 @@ console.log("workflow Step Summary observability contract ok");
 EOF
 pass "workflow Step Summary observability contract"
 
+echo "-- Test 55: Performance / Cache Observation summary contract --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const ciPath = path.join(PROJECT_ROOT, ".github/workflows/quality-pipeline-ci.yml");
+const nightlyPath = path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml");
+const ci = fs.readFileSync(ciPath, "utf-8");
+const nightly = fs.readFileSync(nightlyPath, "utf-8");
+
+for (const [label, workflow] of [
+  ["quality-pipeline-ci.yml", ci],
+  ["nightly-apply.yml", nightly],
+]) {
+  if (!workflow.includes("Performance / Cache Observation")) {
+    throw new Error(`${label} must include Performance / Cache Observation section`);
+  }
+  if (!workflow.includes("npm ci duration")) {
+    throw new Error(`${label} must include npm ci duration in summary`);
+  }
+  if (
+    !workflow.includes("package-lock hash") &&
+    !workflow.includes("lock_hash")
+  ) {
+    throw new Error(`${label} must include package-lock hash in summary`);
+  }
+  if (!workflow.includes("cache-dependency-path")) {
+    throw new Error(`${label} must reference cache-dependency-path in summary`);
+  }
+}
+
+if (!nightly.includes("apply duration")) {
+  throw new Error("nightly-apply.yml must include apply duration in summary");
+}
+
+console.log("Performance / Cache Observation summary contract ok");
+EOF
+pass "Performance / Cache Observation summary contract"
+
 echo ""
 echo "All quality pipeline tests passed."

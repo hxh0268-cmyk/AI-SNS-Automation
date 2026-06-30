@@ -4,6 +4,43 @@
 
 ---
 
+## v1.15.0 — 保守更新（GitHub Actions CI Performance Observation Summary）
+
+v1.14.0 の Step Summary を拡張し、**Performance / Cache Observation** セクションを両 workflow に追加しました。cache 制御そのものは変更せず、Summary 上での可観測性向上に集中しています。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Performance / Cache Observation | Node / npm version、npm cache enabled、cache-dependency-path、package-lock hash |
+| npm ci duration | Step timings と連携して Summary にハイライト表示 |
+| Nightly Apply | apply duration、job result、pipeline exit code、quality status を Performance セクションに整理 |
+| README | Summary 確認項目、cache 効果の読み方、Dependabot 後の npm ci 遅延を追記 |
+| Test 55 | Performance / Cache Observation 契約テスト追加 |
+
+### 設計判断
+
+- **setup-node cache 維持** — `actions/cache` への全面移行はしない
+- **cache-hit 厳密取得は未実装** — `npm ci duration` + `package-lock hash` の run 間比較で間接確認
+- **gh CLI / REST API 履歴分析は未実装** — 将来 v1.16.0 以降候補
+- **Workflow 成否 / exit code ロジックは変更なし**
+
+### 影響範囲
+
+- `.github/workflows/quality-pipeline-ci.yml` — Summary 拡張のみ
+- `.github/workflows/nightly-apply.yml` — Summary 拡張のみ
+- ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **55 PASS**（Test 55 含む） |
+| npm test | **PASS** |
+| YAML Validation | **PASS** |
+
+---
+
 ## v1.14.0 — 保守更新（GitHub Actions CI 可観測性向上）
 
 両 workflow に **GitHub Actions Step Summary** を追加し、主要ステップの実行時間を Markdown テーブルで可視化しました。Workflow 成否判定・exit code 方針は変更していません。
