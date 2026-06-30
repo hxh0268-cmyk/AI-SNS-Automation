@@ -4,6 +4,34 @@
 
 ---
 
+## v1.9.3 — 運用品質パッチ（Pipeline 成功判定整合）
+
+Quality Pipeline が **全スライド公開推奨（ALL_SLIDES_PUBLISH_RECOMMENDED）** など成功条件を満たしているにもかかわらず、`status: failed` / `failed steps: 1` / **exit code 4** で終了する不整合を修正しました。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| 成功判定 | `isPipelineSuccessfulOutcome()` を追加（score / stopReason / lastRound / failedCalls） |
+| state 確定 | 成功時 `finalizeSuccessfulPipelineState()` で `completed` / `COMPLETE` / `failedSteps` クリア |
+| exit code | 成功条件優先で **0**、`failedSteps` 残存時 **4** |
+| Summary | 成功時 `outcome: success` を表示 |
+| テスト | Test 48–50 追加 |
+
+### 変更なし（意図的）
+
+- v1.8.2 Secrets OR 条件
+- v1.9.x Health Check 仕様
+- Nightly Apply workflow 構造
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **50 PASS**（実装後 `npm test` で確認） |
+
+---
+
 ## v1.9.2 — 運用品質パッチ（GitHub Actions Health Check）
 
 GitHub Actions 環境では `.env` ファイルを必須にせず、Repository Secrets から `process.env` に注入された API キーで Health Check を通過できるようにしました。

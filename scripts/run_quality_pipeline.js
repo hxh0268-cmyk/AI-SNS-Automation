@@ -40,6 +40,14 @@ function printRunSummary(params) {
   }
   console.log(`  status: ${result.state.status}`);
   console.log(`  final phase: ${result.state.phase}`);
+  if (
+    !config.dryRun &&
+    result.exitCode === 0 &&
+    result.state.status === "completed" &&
+    result.state.phase === "COMPLETE"
+  ) {
+    console.log("  outcome: success (all slides publish recommended)");
+  }
   console.log(`  completed steps: ${result.state.completedSteps.length}`);
   console.log(`  failed steps: ${result.state.failedSteps.length}`);
 

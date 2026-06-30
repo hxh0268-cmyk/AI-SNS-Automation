@@ -2147,5 +2147,181 @@ pass "GitHub Actions health check fails when secrets missing"
 restore_health_check_env
 trap - EXIT
 
+echo "-- Test 48: successful apply outcome resolves to exit 0 --"
+node --input-type=module <<'EOF'
+import {
+  getPipelineExitCode,
+  isPipelineSuccessfulOutcome,
+  PIPELINE_EXIT_CODES,
+} from "./src/lib/exit_codes.js";
+import { IMPROVEMENT_STOP_REASONS } from "./src/lib/pipeline_improvement.js";
+import {
+  createInitialPipelineState,
+  finalizeSuccessfulPipelineState,
+} from "./src/lib/pipeline_state.js";
+
+const config = {
+  targetScore: 90,
+  passingScore: 80,
+  maxRounds: 3,
+  dryRun: false,
+  fromPhase: "INIT",
+};
+
+const state = {
+  ...createInitialPipelineState(config),
+  status: "failed",
+  phase: "FAILED",
+  failedSteps: [
+    {
+      phase: "HEALTH_CHECK",
+      reason: "Health Check failed: Error 1 件",
+      at: "2026-01-01T00:00:00.000Z",
+    },
+  ],
+  scoreSummary: {
+    targetScore: 90,
+    passingScore: 80,
+    averageScore: 91.8,
+    minScore: 90,
+    allSlidesPassed: true,
+    allSlidesPublishRecommended: true,
+    slides: [],
+  },
+  improvement: {
+    roundsExecuted: 1,
+    maxRounds: 3,
+    stopReason: IMPROVEMENT_STOP_REASONS.ALL_SLIDES_PUBLISH_RECOMMENDED,
+    history: [],
+  },
+};
+
+const metrics = {
+  failedCalls: 0,
+  improvement: {
+    stopReason: IMPROVEMENT_STOP_REASONS.ALL_SLIDES_PUBLISH_RECOMMENDED,
+    lastRound: {
+      failedActions: 0,
+      successfulActions: 4,
+    },
+  },
+};
+
+const outcomeParams = {
+  state,
+  metrics,
+  improvementStopReason: IMPROVEMENT_STOP_REASONS.ALL_SLIDES_PUBLISH_RECOMMENDED,
+  healthCheckFailed: false,
+  dryRun: false,
+  allSlidesPublishRecommended: true,
+  allSlidesPassed: true,
+};
+
+if (!isPipelineSuccessfulOutcome(outcomeParams)) {
+  throw new Error("expected successful pipeline outcome");
+}
+
+const exitCode = getPipelineExitCode(outcomeParams);
+if (exitCode !== PIPELINE_EXIT_CODES.SUCCESS) {
+  throw new Error(`expected exit code 0, got ${exitCode}`);
+}
+
+const finalized = finalizeSuccessfulPipelineState(state);
+if (finalized.status !== "completed") {
+  throw new Error(`expected status completed, got ${finalized.status}`);
+}
+if (finalized.phase !== "COMPLETE") {
+  throw new Error(`expected final phase COMPLETE, got ${finalized.phase}`);
+}
+if (finalized.failedSteps.length !== 0) {
+  throw new Error("expected failedSteps to be cleared on success finalize");
+}
+
+console.log("successful apply outcome ok");
+EOF
+pass "successful apply outcome resolves to exit 0"
+
+echo "-- Test 49: failedSteps remain failed with exit 4 --"
+node --input-type=module <<'EOF'
+import {
+  getPipelineExitCode,
+  isPipelineSuccessfulOutcome,
+  PIPELINE_EXIT_CODES,
+} from "./src/lib/exit_codes.js";
+import { createInitialPipelineState } from "./src/lib/pipeline_state.js";
+
+const config = {
+  targetScore: 90,
+  passingScore: 80,
+  maxRounds: 3,
+  dryRun: false,
+  fromPhase: "INIT",
+};
+
+const state = {
+  ...createInitialPipelineState(config),
+  status: "failed",
+  phase: "FAILED",
+  failedSteps: [
+    {
+      phase: "HEALTH_CHECK",
+      reason: "Health Check failed: Error 1 件",
+      at: "2026-01-01T00:00:00.000Z",
+    },
+  ],
+};
+
+const params = {
+  state,
+  metrics: { failedCalls: 0 },
+  dryRun: false,
+  healthCheckFailed: false,
+  allSlidesPublishRecommended: false,
+  allSlidesPassed: false,
+};
+
+if (isPipelineSuccessfulOutcome(params)) {
+  throw new Error("expected unsuccessful pipeline outcome");
+}
+
+const exitCode = getPipelineExitCode(params);
+if (exitCode !== PIPELINE_EXIT_CODES.UNEXPECTED_ERROR) {
+  throw new Error(`expected exit code 4, got ${exitCode}`);
+}
+
+console.log("failedSteps failed outcome ok");
+EOF
+pass "failedSteps remain failed with exit 4"
+
+echo "-- Test 50: nightly-apply workflow propagates pipeline exit code --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const nightlyPath = path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml");
+const workflow = fs.readFileSync(nightlyPath, "utf-8");
+
+const applyStep = workflow.match(
+  /name: Run quality pipeline apply[\s\S]*?(?=\n      - name:)/,
+);
+if (!applyStep) {
+  throw new Error("Run quality pipeline apply step not found");
+}
+
+if (applyStep[0].includes("continue-on-error: true")) {
+  throw new Error("apply step must not use continue-on-error: true");
+}
+if (applyStep[0].includes("|| true")) {
+  throw new Error("apply step must not mask failures with || true");
+}
+if (!applyStep[0].includes("npm run quality-pipeline -- --apply")) {
+  throw new Error("apply step must run quality-pipeline apply");
+}
+
+console.log("nightly apply exit propagation contract ok");
+EOF
+pass "nightly-apply workflow propagates pipeline exit code"
+
 echo ""
 echo "All quality pipeline tests passed."

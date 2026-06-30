@@ -269,6 +269,20 @@ export function appendFailedStep(state, phase, reason) {
 }
 
 /**
+ * 成功条件を満たした apply 実行の pipeline state を確定する
+ * @param {object} state
+ * @returns {object}
+ */
+export function finalizeSuccessfulPipelineState(state) {
+  return updatePipelineState(state, {
+    status: "completed",
+    phase: PIPELINE_PHASES.COMPLETE,
+    failedSteps: [],
+    lastError: null,
+  });
+}
+
+/**
  * 改善ラウンド結果を state に記録する
  * @param {object} state
  * @param {object} entry

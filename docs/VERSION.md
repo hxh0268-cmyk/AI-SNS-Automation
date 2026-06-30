@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.9.2**（GitHub Actions Health Check パッチ）
+**v1.9.3**（Pipeline 成功判定整合パッチ）
 
 ---
 
@@ -27,7 +27,35 @@
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
-| **v1.9.2** | **運用品質パッチ** | **✅ 完了** | **GHA 環境で .env なし Health Check 通過（Secrets 注入時）** |
+| v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
+| **v1.9.3** | **運用品質パッチ** | **✅ 完了** | **成功条件と status / exit code の整合** |
+
+---
+
+### v1.9.3 で追加（Pipeline 成功判定整合）
+
+#### 成功判定と exit code
+
+- **`isPipelineSuccessfulOutcome()`** … `ALL_SLIDES_PUBLISH_RECOMMENDED` 等で成功判定
+- **`finalizeSuccessfulPipelineState()`** … stale `failedSteps` をクリアし `completed` / `COMPLETE` に確定
+- **exit code** … 成功 **0** / `failedSteps` 残存 **4**
+- **Test 48–50** … 成功・失敗・Nightly Apply exit 伝播
+
+### 品質状況（v1.9.3 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **50 PASS** |
+
+### v1.9.3 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| 成功判定関数 | ✅ |
+| state 確定 | ✅ |
+| exit code 整合 | ✅ |
+| Test 48–50 | ✅ |
+| ドキュメント更新 | ✅ |
 
 ---
 

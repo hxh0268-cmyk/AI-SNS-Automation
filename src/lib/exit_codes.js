@@ -1,3 +1,5 @@
+import { IMPROVEMENT_STOP_REASONS } from "./pipeline_improvement.js";
+
 /**
  * CLI 終了コード定義
  *
@@ -158,23 +160,81 @@ export const PIPELINE_EXIT_CODES = {
 };
 
 /**
+ * apply 実行が成功扱いとなるか（stale failedSteps は除外して判定）
+ * @param {object} params
+ * @param {object} [params.state]
+ * @param {object} [params.metrics]
+ * @param {string | null} [params.improvementStopReason]
+ * @param {boolean} [params.healthCheckFailed]
+ * @param {boolean} [params.dryRun]
+ * @returns {boolean}
+ */
+export function isPipelineSuccessfulOutcome(params) {
+  if (params.dryRun) {
+    return false;
+  }
+
+  if (params.healthCheckFailed) {
+    return false;
+  }
+
+  const scoreSummary = params.state?.scoreSummary ?? {};
+  if (!scoreSummary.allSlidesPassed || !scoreSummary.allSlidesPublishRecommended) {
+    return false;
+  }
+
+  const stopReason =
+    params.improvementStopReason ??
+    params.state?.improvement?.stopReason ??
+    params.metrics?.improvement?.stopReason ??
+    null;
+
+  if (stopReason !== IMPROVEMENT_STOP_REASONS.ALL_SLIDES_PUBLISH_RECOMMENDED) {
+    return false;
+  }
+
+  const lastRound = params.metrics?.improvement?.lastRound;
+  if (lastRound && (lastRound.failedActions ?? 0) > 0) {
+    return false;
+  }
+
+  if ((params.metrics?.failedCalls ?? 0) > 0) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * 品質パイプライン実行結果から終了コードを決定する
  * @param {object} result
  * @param {unknown} [result.error]
  * @param {unknown} [result.configError]
+ * @param {object} [result.state]
+ * @param {object} [result.metrics]
  * @param {boolean} [result.limitZeroDetected]
  * @param {boolean} [result.allSlidesPublishRecommended]
  * @param {boolean} [result.allSlidesPassed]
  * @param {boolean} [result.dryRun]
+ * @param {boolean} [result.healthCheckFailed]
+ * @param {string | null} [result.improvementStopReason]
  * @returns {number}
  */
 export function getPipelineExitCode(result) {
-  if (result.error) {
-    return PIPELINE_EXIT_CODES.UNEXPECTED_ERROR;
+  if (isPipelineSuccessfulOutcome(result)) {
+    return PIPELINE_EXIT_CODES.SUCCESS;
   }
 
   if (result.configError || result.healthCheckFailed) {
     return PIPELINE_EXIT_CODES.CONFIG_ERROR;
+  }
+
+  if ((result.state?.failedSteps?.length ?? 0) > 0) {
+    return PIPELINE_EXIT_CODES.UNEXPECTED_ERROR;
+  }
+
+  if (result.error) {
+    return PIPELINE_EXIT_CODES.UNEXPECTED_ERROR;
   }
 
   if (result.dryRun) {

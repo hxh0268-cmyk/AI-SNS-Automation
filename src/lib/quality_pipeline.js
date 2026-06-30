@@ -1,4 +1,4 @@
-import { getPipelineExitCode } from "./exit_codes.js";
+import { getPipelineExitCode, isPipelineSuccessfulOutcome } from "./exit_codes.js";
 import {
   buildLastRoundResult,
   createImprovementPlan,
@@ -19,6 +19,7 @@ import { extractScoreSnapshot } from "./pipeline_score.js";
 import {
   appendCompletedStep,
   appendFailedStep,
+  finalizeSuccessfulPipelineState,
   createInitialPipelineState,
   DEFAULT_PIPELINE_STATE_DIR,
   readPipelineState,
@@ -933,6 +934,25 @@ export async function runPipeline(config, options = {}) {
     await hooks.onFailure({ config: effectiveConfig, state, metrics, error });
   } finally {
     metrics = finishMetrics(metrics);
+
+    const resolvedImprovementStopReason =
+      improvementStopReason ??
+      state.improvement?.stopReason ??
+      metrics.improvement?.stopReason ??
+      null;
+
+    if (
+      isPipelineSuccessfulOutcome({
+        state,
+        metrics,
+        improvementStopReason: resolvedImprovementStopReason,
+        healthCheckFailed,
+        dryRun: config.dryRun,
+      })
+    ) {
+      state = finalizeSuccessfulPipelineState(state);
+      pipelineError = null;
+    }
 
     statePath = await writePipelineState(state, outputDir);
     metricsPath = await writePipelineMetrics(metrics, outputDir);
