@@ -1402,7 +1402,7 @@ AI-SNS-Automation/
 
 ## Dependabot
 
-このリポジトリでは Dependabot により依存関係の更新を自動検知します。
+このリポジトリでは Dependabot により依存関係の更新を自動検知します（設定: `.github/dependabot.yml` — v1.12.0 導入）。
 
 対象 ecosystem:
 
@@ -1411,4 +1411,29 @@ AI-SNS-Automation/
 
 毎週月曜日の午前中（Asia/Tokyo）に更新を確認します。
 
-初期リリースでは Auto Merge / Grouped Updates は導入せず、Dependabot PR は手動レビューと CI 確認後にマージする運用とします。
+### CI との関係（v1.12.1）
+
+- **Dependabot PR は GitHub Actions CI の対象**になります。Quality Pipeline CI（`.github/workflows/quality-pipeline-ci.yml`）が PR 上で実行され、`npm test` および dry-run 検証が走ります。
+- **Dependabot 起点の workflow では `GITHUB_TOKEN` は read-only 前提**です（[GitHub 公式仕様](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions)）。write 権限が必要なステップは Dependabot PR では失敗する可能性があります。
+- **GitHub Actions secrets は Dependabot PR では利用できません。** API キー等が必要な workflow ステップを Dependabot PR で動かす場合は、別途 **Dependabot secrets** の設定が必要です（今回未導入）。
+- **現在の CI は secrets 不使用前提**（dry-run のみ、API キー不要）のため、現状の Dependabot PR 運用では大きな問題はありません。Nightly Apply（secrets 必須）は Dependabot PR では通常トリガーされません。
+
+### CI が失敗した場合の確認順
+
+1. **更新種別を確認** — npm dependency update か GitHub Actions update か
+2. **差分を確認** — `package-lock.json` / workflow file（`.github/workflows/*.yml`）の変更内容
+3. **失敗原因を切り分け** — CI failure が breaking change 由来か、権限 / secrets 由来か
+4. **問題がなければ merge** — 手動レビューと CI 成功を確認してマージ
+5. **繰り返し失敗する依存関係** — 次回以降 `.github/dependabot.yml` への **ignore** 導入を検討
+
+### 将来導入候補（v1.12.1 時点では未導入）
+
+| 機能 | 導入タイミング |
+|------|----------------|
+| **Grouped Updates** | PR 数が増えてレビュー負荷が高くなったら |
+| **ignore** | 特定依存関係で継続的な失敗・非互換が出たら |
+| **reviewers / assignees** | 複数人運用になったら |
+| **Auto Merge** | CI 安定・レビュー基準・権限設計が固まってから |
+| **Dependabot secrets** | Dependabot PR 上で secrets 必須の CI を走らせる必要が出たら |
+
+v1.12.0 時点と同様、**Auto Merge / Grouped Updates / reviewers / assignees / ignore / Dependabot secrets は未導入**です。Dependabot PR は手動レビューと CI 確認後にマージする運用とします。

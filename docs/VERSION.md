@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.12.0**（Dependabot 依存関係自動更新設定）
+**v1.12.1**（Dependabot 運用品質向上）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.12.0** | **保守更新** | **✅ 完了** | **Dependabot による GitHub Actions / npm 依存関係更新検知** |
+| **v1.12.1** | **運用品質パッチ** | **✅ 完了** | **Dependabot 運用ドキュメント強化** |
+| v1.12.0 | 保守更新 | ✅ 完了 | Dependabot による GitHub Actions / npm 依存関係更新検知 |
 | v1.11.0 | 保守更新 | ✅ 完了 | upload-artifact v7 — Node.js 20 Warning 解消 |
 | v1.10.0 | 保守更新 | ✅ 完了 | GitHub Actions runtime maintenance（checkout v5 / setup-node v6） |
 | v1.9.4 | 運用品質パッチ | ✅ 完了 | Workflow 成否と品質判定の分離 |
@@ -37,6 +38,42 @@
 ---
 
 
+### v1.12.1 で追加（Dependabot 運用品質向上）
+
+#### ドキュメント強化（設定変更なし）
+
+- Dependabot PR は GitHub Actions CI の対象であることを明記
+- Dependabot 起点 workflow の `GITHUB_TOKEN` read-only 前提
+- GitHub Actions secrets は Dependabot PR 非利用 — 必要時は Dependabot secrets
+- 現 CI は secrets 不使用のため Dependabot PR 運用上の問題は小さい
+- CI 失敗時の確認順（更新種別 → 差分 → 原因切り分け → merge / ignore 検討）
+- 将来導入候補の整理（Grouped Updates / ignore / reviewers / Auto Merge 等）
+
+#### v1.13.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| Grouped Updates | PR 数増加でレビュー負荷が高い場合 |
+| ignore | 特定依存で継続失敗・非互換が出た場合 |
+| Auto Merge | CI 安定・レビュー基準・権限設計が固まった後 |
+| reviewers / assignees | 複数人運用時 |
+| Dependabot secrets | Dependabot PR で secrets 必須 CI が必要になった場合 |
+
+### 品質状況（v1.12.1 最新）
+
+- `.github/dependabot.yml` 変更なし
+- README / CHANGELOG / VERSION 更新済み
+
+### v1.12.1 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Dependabot 運用ドキュメント | ✅ |
+| dependabot.yml 変更なし | ✅ |
+| 将来導入候補整理 | ✅ |
+
+---
+
 ### v1.12.0 で追加（Dependabot 依存関係自動更新設定）
 
 - `.github/dependabot.yml` を追加
@@ -46,7 +83,7 @@
 - open pull requests limit は ecosystem ごとに 5
 - 初期リリースでは Auto Merge / Grouped Updates / ignore は未導入
 
-### 品質状況（v1.12.0 最新）
+### 品質状況（v1.12.0）
 
 - Dependabot 設定追加
 - GitHub Actions / npm を分離管理

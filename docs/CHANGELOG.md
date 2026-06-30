@@ -4,6 +4,26 @@
 
 ---
 
+## v1.12.1 — 運用品質パッチ（Dependabot 運用ドキュメント強化）
+
+v1.12.0 で導入した Dependabot 設定（`.github/dependabot.yml`）は変更せず、GitHub 公式仕様に基づく **運用ドキュメント** を README / VERSION に強化しました。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| README | Dependabot PR と CI の関係、secrets / GITHUB_TOKEN 制約、CI 失敗時の確認順を追記 |
+| 設定変更 | **なし**（`.github/dependabot.yml` は v1.12.0 のまま） |
+| 将来導入候補 | Grouped Updates / ignore / reviewers / assignees / Auto Merge / Dependabot secrets を整理 |
+
+### 変更なし（意図的）
+
+- `.github/dependabot.yml`
+- Auto Merge / Grouped Updates / reviewers / assignees / ignore / Dependabot secrets
+- Quality Pipeline の実行ロジック・CI workflow
+
+---
+
 ## v1.11.0 — 保守更新（upload-artifact Node.js 24 対応）
 
 GitHub Actions の **Node.js 20 runtime warning** を完全解消するため、`actions/upload-artifact` を Node.js 24 対応版に更新しました。Quality Pipeline の挙動・終了コード・Nightly Apply・Step Summary の仕様は変更していません。
