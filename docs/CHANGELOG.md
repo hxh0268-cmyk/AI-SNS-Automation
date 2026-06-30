@@ -4,6 +4,42 @@
 
 ---
 
+## v1.19.0 — 保守更新（GitHub Actions Automated Performance Trend Collection）
+
+GitHub Actions 上で Performance Trend Analysis を **workflow_dispatch** 実行できる最小基盤を追加しました。既存のローカル gh CLI / fixture 解析は維持します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| 新規 workflow | `.github/workflows/performance-trend.yml` |
+| 既存 workflow | **変更なし** |
+| 認証 | `GH_TOKEN: ${{ github.token }}` |
+| permissions | `contents: read` / `actions: read` |
+| schema 1.2 | `collection.mode` / `trigger` / `workflowRunId` / `sourceWorkflow` / `collectedAt` |
+| Step Summary | Performance Trend Analysis 概要 |
+| Test 65–69 | GHA env / GH_TOKEN / fixture / schema / Step Summary |
+
+### 設計判断
+
+- **schedule / workflow_run 未実装** — v1.20.0 以降候補
+- **schema 1.1 互換維持** — ローカル解析は 1.1、GHA 実行は 1.2
+- **最小権限** — actions read のみ追加
+
+### 影響範囲
+
+- 新規 workflow + `gha_analyze_performance_trend.js` 最小拡張
+- ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **69 PASS**（Test 65–69 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.18.0 — 保守更新（Artifact Metadata / Retention Awareness）
 
 Performance Trend Analysis に **GitHub Actions artifact metadata / retention awareness** を追加しました。`gh api --paginate` で `expires_at` / `expired` / `digest` 等を取得し、trend レポートに反映します。

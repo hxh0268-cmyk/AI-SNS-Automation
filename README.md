@@ -661,7 +661,8 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 | Summary（人間向け） | workflow Run 詳細 → **Summary** タブ → **Performance / Cache Observation**（v1.15.0 維持） |
 | Artifact JSON（比較用） | `reports/quality-pipeline/latest/performance-observation.json` — 過去 run との **手動比較** 用 |
 | 比較方法（v1.16.0） | 各 run の artifact から JSON を DL し、同一 `cache.packageLockHash` の run 間で `durations.npmCiSeconds` 等を比較 |
-| 自動集計（v1.17.0） | **gh CLI ローカル分析** — `node scripts/gha_analyze_performance_trend.js`（REST API 自動集計は v1.18.0 以降） |
+| 自動集計（v1.17.0） | **gh CLI ローカル分析** — `node scripts/gha_analyze_performance_trend.js` |
+| 自動集計（v1.19.0） | **GitHub Actions workflow** — `.github/workflows/performance-trend.yml`（`workflow_dispatch`） |
 | Trend 出力 | `reports/performance-trend/latest/trend-report.md`（人間向け） / `trend-data.json`（machine-readable） |
 | gh CLI フロー | `gh auth status` → `gh run list --json` → `gh run download` → `performance-observation.json` 解析 |
 | テスト | fixture モード（`--fixture-dir`）— **gh 実通信なし** |
@@ -693,7 +694,49 @@ node scripts/gha_analyze_performance_trend.js --fixture-dir path/to/fixtures
 | 出力 | `reports/performance-trend/latest/trend-report.md` / `trend-data.json` |
 | 欠落 Run | warning として skip — 1 件以上有効 observation があれば report 生成 |
 | 0 件 | 明確なエラーで終了 |
-| REST API | **v1.18.0** — artifact metadata は `gh api --paginate` を使用（完全自動 Trend は v1.19.0 以降） |
+| REST API | **v1.18.0** — artifact metadata は `gh api --paginate` を使用 |
+| GitHub Actions 自動実行 | **v1.19.0** — `performance-trend.yml`（`workflow_dispatch`） |
+
+### GitHub Actions Automated Performance Trend Collection（v1.19.0）
+
+GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。
+
+```bash
+# GitHub UI: Actions → Performance Trend Analysis → Run workflow
+# または gh CLI:
+gh workflow run performance-trend.yml
+```
+
+| 項目 | 内容 |
+|------|------|
+| Workflow | `.github/workflows/performance-trend.yml`（**新規** — 既存 workflow は未変更） |
+| トリガー | `workflow_dispatch` のみ（schedule / workflow_run は未実装） |
+| permissions | `contents: read` / `actions: read`（最小権限） |
+| 認証 | `GH_TOKEN: ${{ github.token }}` を trend 解析に渡す |
+| 実行内容 | `npm test` → quality pipeline tests → trend 解析 → artifact upload |
+| 出力 artifact | `performance-trend-<run_id>`（`trend-report.md` / `trend-data.json`） |
+| Step Summary | `GITHUB_STEP_SUMMARY` に概要（runs analyzed / warnings 等） |
+| schema | GitHub Actions 実行時は **trend-data.json schema 1.2**（`collection.*` 付与） |
+
+#### ローカル解析との違い
+
+| | ローカル（v1.17–1.18） | GitHub Actions（v1.19.0） |
+|--|------------------------|---------------------------|
+| 実行場所 | 開発者マシン | GitHub Actions runner |
+| 認証 | `gh auth login` | `GH_TOKEN`（`github.token`） |
+| schema | 1.1（`collection` なし） | 1.2（`collection.mode` 等） |
+| 出力保存 | `reports/performance-trend/latest/` | 同上 + workflow artifact |
+| 用途 | 開発・デバッグ | 定期/手動の CI 上トレンド収集 |
+
+#### artifact と cache の役割分離
+
+| 種別 | 役割 |
+|------|------|
+| **setup-node cache** | `npm ci` 高速化（npm パッケージキャッシュのみ — trend workflow でも使用） |
+| **quality-pipeline-reports-\*** | 各 CI/Nightly run の `performance-observation.json` 等（**入力データ**） |
+| **performance-trend-\*** | trend 解析結果（**出力レポート** — retention 30 日） |
+
+> **注意:** private repo では `actions: read` が必要です。`gh run download` だけでは artifact retention metadata が足りないため、v1.18.0 以降は `gh api --paginate` も併用します。
 
 ### Artifact Metadata / Retention Awareness（v1.18.0）
 
@@ -717,6 +760,7 @@ gh api repos/{owner}/{repo}/actions/runs/{run_id}/artifacts --paginate
 
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|
+| **Performance Trend Analysis**（v1.19.0） | `.github/workflows/performance-trend.yml` | trend 自動収集（手動 dispatch） | **不要**（`github.token`） |
 | **Quality Pipeline CI**（v1.7） | `.github/workflows/quality-pipeline-ci.yml` | dry-run 品質ゲート（test / stop / resume） | **不要** |
 | **Nightly Apply Workflow**（v1.8） | `.github/workflows/nightly-apply.yml` | 本番 apply（定期 / 手動） | **必須** |
 

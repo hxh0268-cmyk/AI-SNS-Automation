@@ -1,0 +1,52 @@
+name: Performance Trend Analysis
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: performance-trend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  trend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm test
+        run: npm test
+
+      - name: Run quality pipeline tests
+        run: bash scripts/test_quality_pipeline.sh
+
+      - name: Run performance trend analysis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/gha_analyze_performance_trend.js --github-actions
+
+      - name: Upload performance trend reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: performance-trend-${{ github.run_id }}
+          path: |
+            reports/performance-trend/latest/trend-report.md
+            reports/performance-trend/latest/trend-data.json
+          retention-days: 30
+          if-no-files-found: warn

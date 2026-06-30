@@ -3154,5 +3154,282 @@ console.log("paginated artifacts fixture ok");
 EOF
 pass "paginated artifacts fixture"
 
+echo "-- Test 65: GitHub Actions mode env validation --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { validateGitHubActionsEnv } from "./scripts/gha_analyze_performance_trend.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflowPath = path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml");
+const workflow = fs.readFileSync(workflowPath, "utf8");
+
+if (!workflow.includes("workflow_dispatch:")) {
+  throw new Error("performance-trend.yml must support workflow_dispatch");
+}
+if (!workflow.includes("contents: read") || !workflow.includes("actions: read")) {
+  throw new Error("performance-trend.yml must use contents: read and actions: read");
+}
+if (!workflow.includes("GH_TOKEN: ${{ github.token }}")) {
+  throw new Error("performance-trend.yml must pass GH_TOKEN from github.token");
+}
+if (!workflow.includes("gha_analyze_performance_trend.js")) {
+  throw new Error("performance-trend.yml must invoke gha_analyze_performance_trend.js");
+}
+
+const invalid = validateGitHubActionsEnv({});
+if (invalid.valid) {
+  throw new Error("expected invalid env for empty object");
+}
+if (invalid.errors.length === 0) {
+  throw new Error("expected validation errors");
+}
+
+const valid = validateGitHubActionsEnv({
+  GITHUB_ACTIONS: "true",
+  GITHUB_REPOSITORY: "owner/repo",
+  GITHUB_RUN_ID: "999",
+  GITHUB_WORKFLOW: "Performance Trend Analysis",
+  GITHUB_EVENT_NAME: "workflow_dispatch",
+  GH_TOKEN: "test-token",
+});
+if (!valid.valid) {
+  throw new Error(`expected valid GHA env, got: ${valid.errors.join(", ")}`);
+}
+
+console.log("GitHub Actions mode env validation ok");
+EOF
+pass "GitHub Actions mode env validation"
+
+echo "-- Test 66: GH_TOKEN missing warning or fallback --"
+node --input-type=module <<'EOF'
+import { resolveGhAuthContext } from "./scripts/gha_analyze_performance_trend.js";
+
+const missingToken = resolveGhAuthContext({
+  GITHUB_ACTIONS: "true",
+  GITHUB_REPOSITORY: "owner/repo",
+});
+if (!missingToken.warnings.some((w) => w.kind === "gh-token-missing")) {
+  throw new Error("expected gh-token-missing warning when GH_TOKEN absent in GHA");
+}
+
+const withToken = resolveGhAuthContext({
+  GITHUB_ACTIONS: "true",
+  GH_TOKEN: "ghs_test",
+  GITHUB_REPOSITORY: "owner/repo",
+});
+if (withToken.warnings.length !== 0) {
+  throw new Error("expected no warnings when GH_TOKEN is set");
+}
+if (!withToken.ghEnv?.GH_TOKEN) {
+  throw new Error("expected ghEnv to include GH_TOKEN");
+}
+
+const local = resolveGhAuthContext({});
+if (local.warnings.some((w) => w.kind === "gh-token-missing")) {
+  throw new Error("local mode should not warn about missing GH_TOKEN");
+}
+
+console.log("GH_TOKEN missing warning ok");
+EOF
+pass "GH_TOKEN missing warning or fallback"
+
+echo "-- Test 67: workflow artifact collection fixture --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildCollectionMetadata,
+  collectFromFixtureDir,
+  writeTrendOutputs,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-gha-fixture-"));
+const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "perf-gha-fixture-out-"));
+fs.mkdirSync(path.join(fixtureDir, "run-9001"), { recursive: true });
+fs.writeFileSync(
+  path.join(fixtureDir, "run-9001", "performance-observation.json"),
+  JSON.stringify({
+    schemaVersion: "1.0",
+    generatedAt: "2026-06-01T00:00:00.000Z",
+    workflow: { name: "Quality Pipeline CI", runId: "9001", jobResult: "success" },
+    runtime: { nodeVersion: "v20.19.0", npmVersion: "10.8.2" },
+    cache: {
+      enabled: true,
+      provider: "setup-node",
+      dependencyPath: "package-lock.json",
+      packageLockHash: "gha-hash",
+    },
+    durations: { npmCiSeconds: 11 },
+    stepTimings: [],
+  }),
+);
+fs.writeFileSync(
+  path.join(fixtureDir, "run-9001", "artifacts.json"),
+  JSON.stringify({
+    artifacts: [
+      {
+        id: 99,
+        name: "quality-pipeline-reports-9001",
+        size_in_bytes: 500,
+        expired: false,
+        expires_at: "2026-12-01T00:00:00Z",
+      },
+    ],
+  }),
+);
+
+const collected = collectFromFixtureDir(fixtureDir);
+const collection = buildCollectionMetadata({
+  GITHUB_ACTIONS: "true",
+  GITHUB_REPOSITORY: "owner/repo",
+  GITHUB_RUN_ID: "12345",
+  GITHUB_WORKFLOW: "Performance Trend Analysis",
+  GITHUB_EVENT_NAME: "workflow_dispatch",
+});
+const result = writeTrendOutputs({
+  source: "github-actions",
+  observations: collected.observations,
+  warnings: collected.warnings,
+  metadataWarnings: collected.metadataWarnings,
+  runsRequested: collected.runsRequested,
+  collection,
+  outputDir,
+});
+
+const trendData = JSON.parse(fs.readFileSync(result.dataPath, "utf8"));
+if (trendData.source !== "github-actions") {
+  throw new Error("expected source github-actions");
+}
+if (trendData.collection?.mode !== "github-actions") {
+  throw new Error("expected collection.mode github-actions");
+}
+if (trendData.recentRuns[0].artifact?.name !== "quality-pipeline-reports-9001") {
+  throw new Error("expected workflow artifact metadata in trend output");
+}
+
+fs.rmSync(fixtureDir, { recursive: true, force: true });
+fs.rmSync(outputDir, { recursive: true, force: true });
+console.log("workflow artifact collection fixture ok");
+EOF
+pass "workflow artifact collection fixture"
+
+echo "-- Test 68: trend-data schema compatibility --"
+node --input-type=module <<'EOF'
+import {
+  buildTrendData,
+  TREND_DATA_SCHEMA_VERSION,
+  TREND_DATA_SCHEMA_VERSION_LEGACY,
+  validateTrendDataContract,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+const observation = {
+  schemaVersion: "1.0",
+  generatedAt: "2026-06-01T00:00:00.000Z",
+  workflow: { name: "CI", runId: "1", jobResult: "success" },
+  cache: { packageLockHash: "abc" },
+  durations: { npmCiSeconds: 5 },
+};
+
+const legacy = buildTrendData({
+  source: "gh-cli",
+  observations: [observation],
+  warnings: [],
+  metadataWarnings: [],
+  runsRequested: 1,
+});
+if (legacy.schemaVersion !== TREND_DATA_SCHEMA_VERSION_LEGACY) {
+  throw new Error(`expected schema ${TREND_DATA_SCHEMA_VERSION_LEGACY}, got ${legacy.schemaVersion}`);
+}
+const legacyErrors = validateTrendDataContract(legacy);
+if (legacyErrors.length > 0) {
+  throw new Error(`legacy schema errors: ${legacyErrors.join(", ")}`);
+}
+
+const extended = buildTrendData({
+  source: "github-actions",
+  observations: [observation],
+  warnings: [],
+  metadataWarnings: [],
+  runsRequested: 1,
+  collection: {
+    mode: "github-actions",
+    trigger: "workflow_dispatch",
+    workflowRunId: "42",
+    sourceWorkflow: "Performance Trend Analysis",
+    collectedAt: "2026-06-01T00:00:00.000Z",
+  },
+});
+if (extended.schemaVersion !== TREND_DATA_SCHEMA_VERSION) {
+  throw new Error(`expected schema ${TREND_DATA_SCHEMA_VERSION}, got ${extended.schemaVersion}`);
+}
+const extendedErrors = validateTrendDataContract(extended);
+if (extendedErrors.length > 0) {
+  throw new Error(`extended schema errors: ${extendedErrors.join(", ")}`);
+}
+
+console.log("trend-data schema compatibility ok");
+EOF
+pass "trend-data schema compatibility"
+
+echo "-- Test 69: Step Summary output generation --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildPerformanceTrendStepSummary,
+  buildTrendData,
+  writePerformanceTrendStepSummary,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+const trendData = buildTrendData({
+  source: "github-actions",
+  observations: [
+    {
+      schemaVersion: "1.0",
+      generatedAt: "2026-06-01T00:00:00.000Z",
+      workflow: { name: "Quality Pipeline CI", runId: "1", jobResult: "success" },
+      cache: { packageLockHash: "abc" },
+      durations: { npmCiSeconds: 5 },
+    },
+  ],
+  warnings: [],
+  metadataWarnings: [],
+  runsRequested: 1,
+  collection: {
+    mode: "github-actions",
+    trigger: "workflow_dispatch",
+    workflowRunId: "99",
+    sourceWorkflow: "Performance Trend Analysis",
+    collectedAt: "2026-06-01T00:00:00.000Z",
+  },
+});
+
+const summary = buildPerformanceTrendStepSummary(trendData);
+if (!summary.includes("## Performance Trend Analysis")) {
+  throw new Error("expected Performance Trend Analysis heading");
+}
+if (!summary.includes("Runs analyzed")) {
+  throw new Error("expected runs analyzed in step summary");
+}
+if (!summary.includes("github-actions")) {
+  throw new Error("expected mode in step summary");
+}
+
+const summaryPath = path.join(os.tmpdir(), `perf-trend-summary-${Date.now()}.md`);
+writePerformanceTrendStepSummary(trendData, summaryPath);
+const written = fs.readFileSync(summaryPath, "utf8");
+if (!written.includes("trend-data.json")) {
+  throw new Error("expected output paths in written step summary");
+}
+fs.rmSync(summaryPath, { force: true });
+
+console.log("Step Summary output generation ok");
+EOF
+pass "Step Summary output generation"
+
 echo ""
 echo "All quality pipeline tests passed."

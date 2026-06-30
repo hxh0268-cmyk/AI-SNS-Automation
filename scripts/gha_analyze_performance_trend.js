@@ -5,7 +5,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const TREND_DATA_SCHEMA_VERSION = "1.1";
+export const TREND_DATA_SCHEMA_VERSION = "1.2";
+export const TREND_DATA_SCHEMA_VERSION_LEGACY = "1.1";
+export const SUPPORTED_TREND_DATA_SCHEMA_VERSIONS = ["1.1", "1.2"];
 export const DEFAULT_OUTPUT_DIR = path.join(
   "reports",
   "performance-trend",
@@ -201,11 +203,17 @@ export function evaluateArtifactMetadata(params) {
  * @param {string} params.runId
  * @param {string} [params.repo]
  * @param {typeof execSync} [params.execSyncImpl]
+ * @param {NodeJS.ProcessEnv} [params.env]
  * @returns {{ artifacts: Array<Record<string, unknown>>, error: string | null }}
  */
 export function fetchRunArtifactsFromApi(params) {
   const execSyncImpl = params.execSyncImpl ?? execSync;
-  const repo = params.repo ?? resolveGhRepo(execSyncImpl);
+  const execOptions = {
+    encoding: "utf8",
+    stdio: "pipe",
+    env: params.env ?? process.env,
+  };
+  const repo = params.repo ?? resolveGhRepo(execSyncImpl, params.env);
   if (!repo) {
     return { artifacts: [], error: "unable to resolve repository for gh api" };
   }
@@ -213,7 +221,7 @@ export function fetchRunArtifactsFromApi(params) {
   try {
     const cmd =
       `gh api repos/${repo}/actions/runs/${params.runId}/artifacts --paginate`;
-    const output = execSyncImpl(cmd, { encoding: "utf8", stdio: "pipe" });
+    const output = execSyncImpl(cmd, execOptions);
     return {
       artifacts: parsePaginatedArtifactsResponse(output),
       error: null,
@@ -226,13 +234,15 @@ export function fetchRunArtifactsFromApi(params) {
 
 /**
  * @param {typeof execSync} [execSyncImpl]
+ * @param {NodeJS.ProcessEnv} [env]
  * @returns {string | null}
  */
-export function resolveGhRepo(execSyncImpl = execSync) {
+export function resolveGhRepo(execSyncImpl = execSync, env = process.env) {
   try {
     const output = execSyncImpl("gh repo view --json nameWithOwner -q .nameWithOwner", {
       encoding: "utf8",
       stdio: "pipe",
+      env,
     });
     const repo = output.trim();
     return repo.length > 0 ? repo : null;
@@ -296,12 +306,109 @@ export function buildTrendObservation(observations) {
 }
 
 /**
+ * @param {NodeJS.ProcessEnv} [env]
+ * @returns {{
+ *   isGitHubActions: boolean,
+ *   ghToken: string | null,
+ *   repo: string | null,
+ *   workflowRunId: string | null,
+ *   sourceWorkflow: string | null,
+ *   trigger: string | null,
+ *   ghEnv: NodeJS.ProcessEnv | undefined,
+ *   warnings: Array<{ message: string, kind?: string }>,
+ * }}
+ */
+export function resolveGhAuthContext(env = process.env) {
+  /** @type {Array<{ message: string, kind?: string }>} */
+  const warnings = [];
+  const isGitHubActions = env.GITHUB_ACTIONS === "true";
+  const ghToken = env.GH_TOKEN ?? env.GITHUB_TOKEN ?? null;
+
+  if (isGitHubActions && !ghToken) {
+    warnings.push({
+      kind: "gh-token-missing",
+      message:
+        "GH_TOKEN is not set in GitHub Actions — gh CLI may fail without Actions read token",
+    });
+  }
+
+  /** @type {NodeJS.ProcessEnv | undefined} */
+  let ghEnv;
+  if (ghToken) {
+    ghEnv = { ...env, GH_TOKEN: ghToken };
+  }
+
+  return {
+    isGitHubActions,
+    ghToken,
+    repo: typeof env.GITHUB_REPOSITORY === "string" ? env.GITHUB_REPOSITORY : null,
+    workflowRunId: typeof env.GITHUB_RUN_ID === "string" ? env.GITHUB_RUN_ID : null,
+    sourceWorkflow: typeof env.GITHUB_WORKFLOW === "string" ? env.GITHUB_WORKFLOW : null,
+    trigger: typeof env.GITHUB_EVENT_NAME === "string" ? env.GITHUB_EVENT_NAME : null,
+    ghEnv,
+    warnings,
+  };
+}
+
+/**
+ * @param {NodeJS.ProcessEnv} [env]
+ * @returns {{
+ *   valid: boolean,
+ *   errors: string[],
+ *   warnings: Array<{ message: string, kind?: string }>,
+ * }}
+ */
+export function validateGitHubActionsEnv(env = process.env) {
+  /** @type {string[]} */
+  const errors = [];
+  const authContext = resolveGhAuthContext(env);
+
+  if (env.GITHUB_ACTIONS !== "true") {
+    errors.push("GITHUB_ACTIONS must be true");
+  }
+  if (!authContext.repo) {
+    errors.push("GITHUB_REPOSITORY is required");
+  }
+  if (!authContext.workflowRunId) {
+    errors.push("GITHUB_RUN_ID is required");
+  }
+  if (!authContext.sourceWorkflow) {
+    errors.push("GITHUB_WORKFLOW is required");
+  }
+  if (!authContext.trigger) {
+    errors.push("GITHUB_EVENT_NAME is required");
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings: authContext.warnings,
+  };
+}
+
+/**
+ * @param {NodeJS.ProcessEnv} [env]
+ * @returns {Record<string, string | null>}
+ */
+export function buildCollectionMetadata(env = process.env) {
+  const authContext = resolveGhAuthContext(env);
+  return {
+    mode: authContext.isGitHubActions ? "github-actions" : "local",
+    trigger: authContext.trigger,
+    workflowRunId: authContext.workflowRunId,
+    sourceWorkflow: authContext.sourceWorkflow,
+    collectedAt: new Date().toISOString(),
+  };
+}
+
+/**
  * @param {object} params
- * @param {"fixture" | "gh-cli"} params.source
+ * @param {"fixture" | "gh-cli" | "github-actions"} params.source
  * @param {Array<Record<string, unknown>>} params.observations
  * @param {Array<{ runId?: string, message: string, kind?: string }>} params.warnings
  * @param {Array<{ runId?: string, message: string, kind?: string }>} [params.metadataWarnings]
  * @param {number} params.runsRequested
+ * @param {Record<string, string | null>} [params.collection]
  * @returns {Record<string, unknown>}
  */
 export function buildTrendData(params) {
@@ -311,6 +418,7 @@ export function buildTrendData(params) {
     warnings,
     metadataWarnings = [],
     runsRequested,
+    collection,
   } = params;
 
   const skippedExpiredArtifacts = warnings.filter(
@@ -353,10 +461,15 @@ export function buildTrendData(params) {
     };
   });
 
+  const schemaVersion = collection
+    ? TREND_DATA_SCHEMA_VERSION
+    : TREND_DATA_SCHEMA_VERSION_LEGACY;
+
   return {
-    schemaVersion: TREND_DATA_SCHEMA_VERSION,
+    schemaVersion,
     generatedAt: new Date().toISOString(),
     source,
+    ...(collection ? { collection } : {}),
     summary: {
       runsRequested,
       runsAnalyzed: observations.length,
@@ -471,8 +584,15 @@ export function buildTrendReport(trendData) {
   );
   lines.push("- gh run download alone does not expose expires_at / expired / digest metadata.");
   lines.push("- Artifact metadata uses gh api with Actions read permission on private repos.");
-  lines.push("- Strict cache-hit detection is not available in v1.18.0.");
-  lines.push("- GitHub Actions fully automated trend analysis is deferred to v1.19.0+.");
+  lines.push("- Strict cache-hit detection is not available in v1.19.0.");
+  if (trendData.collection) {
+    const collection = /** @type {Record<string, unknown>} */ (trendData.collection);
+    lines.push(
+      `- Collected via ${collection.mode ?? "unknown"} (trigger: ${collection.trigger ?? "—"}, run: ${collection.workflowRunId ?? "—"}).`,
+    );
+  } else {
+    lines.push("- Local gh CLI / fixture analysis — use workflow_dispatch for automated collection.");
+  }
   if (warnings.length > 0) {
     lines.push("", "### Warnings", "");
     for (const warning of warnings) {
@@ -517,8 +637,29 @@ export function validateTrendDataContract(trendData) {
       errors.push(`missing key: ${key}`);
     }
   }
-  if (record.schemaVersion !== TREND_DATA_SCHEMA_VERSION) {
-    errors.push(`schemaVersion must be ${TREND_DATA_SCHEMA_VERSION}`);
+  if (!SUPPORTED_TREND_DATA_SCHEMA_VERSIONS.includes(String(record.schemaVersion))) {
+    errors.push(
+      `schemaVersion must be one of: ${SUPPORTED_TREND_DATA_SCHEMA_VERSIONS.join(", ")}`,
+    );
+  }
+  if (record.schemaVersion === TREND_DATA_SCHEMA_VERSION) {
+    const collection = record.collection;
+    if (!collection || typeof collection !== "object") {
+      errors.push("collection is required for schemaVersion 1.2");
+    } else {
+      const collectionRecord = /** @type {Record<string, unknown>} */ (collection);
+      for (const key of [
+        "mode",
+        "trigger",
+        "workflowRunId",
+        "sourceWorkflow",
+        "collectedAt",
+      ]) {
+        if (!(key in collectionRecord)) {
+          errors.push(`collection.${key} is required for schemaVersion 1.2`);
+        }
+      }
+    }
   }
   if (!Array.isArray(record.warnings)) {
     errors.push("warnings must be an array");
@@ -566,6 +707,7 @@ export function loadFixtureArtifacts(runDir) {
  * @param {Array<Record<string, unknown>> | null} [params.fixtureArtifacts]
  * @param {typeof execSync} [params.execSyncImpl]
  * @param {string} [params.repo]
+ * @param {NodeJS.ProcessEnv} [params.ghEnv]
  * @returns {{
  *   artifact: Record<string, unknown> | null,
  *   skip: boolean,
@@ -591,6 +733,7 @@ export function resolveRunArtifactMetadata(params) {
     runId: params.runId,
     repo: params.repo,
     execSyncImpl: params.execSyncImpl,
+    env: params.ghEnv,
   });
 
   if (fetched.error) {
@@ -742,6 +885,8 @@ export function findObservationFile(searchRoot) {
  * @param {number} [params.limit]
  * @param {string[]} [params.workflows]
  * @param {string} [params.repo]
+ * @param {NodeJS.ProcessEnv} [params.ghEnv]
+ * @param {boolean} [params.skipAuthCheck]
  * @returns {{
  *   observations: Array<Record<string, unknown>>,
  *   warnings: Array<{ runId?: string, message: string, kind?: string }>,
@@ -754,11 +899,15 @@ export function collectFromGhCli(params = {}) {
   const limit = params.limit ?? 10;
   const workflows = params.workflows ?? DEFAULT_WORKFLOWS;
   const repoFlag = params.repo ? `--repo ${params.repo}` : "";
+  const execEnv = params.ghEnv ?? process.env;
+  const execOptions = { encoding: "utf8", stdio: "pipe", env: execEnv };
 
-  try {
-    execSyncImpl("gh auth status", { stdio: "pipe" });
-  } catch {
-    throw new Error("gh auth status failed — authenticate with `gh auth login` first");
+  if (!params.skipAuthCheck) {
+    try {
+      execSyncImpl("gh auth status", execOptions);
+    } catch {
+      throw new Error("gh auth status failed — authenticate with `gh auth login` first");
+    }
   }
 
   /** @type {Array<Record<string, unknown>>} */
@@ -773,7 +922,7 @@ export function collectFromGhCli(params = {}) {
     const listCmd =
       `gh run list ${repoFlag} --workflow "${workflow}" --limit ${limit} ` +
       `--json databaseId,workflowName,conclusion,createdAt,displayTitle`.trim();
-    const runs = JSON.parse(execSyncImpl(listCmd, { encoding: "utf8" }));
+    const runs = JSON.parse(execSyncImpl(listCmd, execOptions));
 
     for (const run of runs) {
       runsRequested += 1;
@@ -783,6 +932,7 @@ export function collectFromGhCli(params = {}) {
         runDirName: runId,
         execSyncImpl,
         repo: params.repo,
+        ghEnv: execEnv,
       });
       warnings.push(...artifactMeta.warnings);
       metadataWarnings.push(...artifactMeta.metadataWarnings);
@@ -801,9 +951,7 @@ export function collectFromGhCli(params = {}) {
       fs.mkdirSync(tempDir, { recursive: true });
 
       try {
-        execSyncImpl(`gh run download ${runId} ${repoFlag} -D "${tempDir}"`, {
-          stdio: "pipe",
-        });
+        execSyncImpl(`gh run download ${runId} ${repoFlag} -D "${tempDir}"`, execOptions);
       } catch {
         warnings.push({
           runId,
@@ -857,13 +1005,64 @@ export function collectFromGhCli(params = {}) {
 }
 
 /**
+ * @param {Record<string, unknown>} trendData
+ * @returns {string}
+ */
+export function buildPerformanceTrendStepSummary(trendData) {
+  const summary = /** @type {Record<string, number>} */ (trendData.summary ?? {});
+  const collection = /** @type {Record<string, unknown>} */ (trendData.collection ?? {});
+  const lines = [
+    "## Performance Trend Analysis",
+    "",
+    "| Field | Value |",
+    "|-------|-------|",
+    `| Source | ${trendData.source ?? "unknown"} |`,
+    `| Schema | ${trendData.schemaVersion ?? "unknown"} |`,
+    `| Mode | ${collection.mode ?? "—"} |`,
+    `| Trigger | ${collection.trigger ?? "—"} |`,
+    `| Collector run ID | ${collection.workflowRunId ?? "—"} |`,
+    `| Runs requested | ${summary.runsRequested ?? 0} |`,
+    `| Runs analyzed | ${summary.runsAnalyzed ?? 0} |`,
+    `| Runs skipped | ${summary.runsSkipped ?? 0} |`,
+    `| Metadata warnings | ${summary.metadataWarningCount ?? 0} |`,
+    `| Skipped expired artifacts | ${summary.skippedExpiredArtifacts ?? 0} |`,
+    `| Generated at | ${trendData.generatedAt ?? ""} |`,
+    "",
+    "### Outputs",
+    "",
+    "- `reports/performance-trend/latest/trend-report.md`",
+    "- `reports/performance-trend/latest/trend-data.json`",
+    "",
+  ];
+  return `${lines.join("\n")}`;
+}
+
+/**
+ * @param {Record<string, unknown>} trendData
+ * @param {string} [summaryPath]
+ * @returns {boolean}
+ */
+export function writePerformanceTrendStepSummary(
+  trendData,
+  summaryPath = process.env.GITHUB_STEP_SUMMARY,
+) {
+  if (!summaryPath) {
+    return false;
+  }
+  fs.appendFileSync(summaryPath, buildPerformanceTrendStepSummary(trendData));
+  return true;
+}
+
+/**
  * @param {object} params
- * @param {"fixture" | "gh-cli"} params.source
+ * @param {"fixture" | "gh-cli" | "github-actions"} params.source
  * @param {Array<Record<string, unknown>>} params.observations
  * @param {Array<{ runId?: string, message: string, kind?: string }>} params.warnings
  * @param {Array<{ runId?: string, message: string, kind?: string }>} [params.metadataWarnings]
  * @param {number} params.runsRequested
+ * @param {Record<string, string | null>} [params.collection]
  * @param {string} [params.outputDir]
+ * @param {boolean} [params.writeStepSummary]
  * @returns {{ trendData: Record<string, unknown>, reportPath: string, dataPath: string }}
  */
 export function writeTrendOutputs(params) {
@@ -874,6 +1073,7 @@ export function writeTrendOutputs(params) {
     warnings: params.warnings,
     metadataWarnings: params.metadataWarnings,
     runsRequested: params.runsRequested,
+    collection: params.collection,
   });
   const report = buildTrendReport(trendData);
   fs.mkdirSync(outputDir, { recursive: true });
@@ -881,6 +1081,9 @@ export function writeTrendOutputs(params) {
   const dataPath = path.join(outputDir, "trend-data.json");
   fs.writeFileSync(reportPath, report);
   fs.writeFileSync(dataPath, `${JSON.stringify(trendData, null, 2)}\n`);
+  if (params.writeStepSummary) {
+    writePerformanceTrendStepSummary(trendData);
+  }
   return { trendData, reportPath, dataPath };
 }
 
@@ -891,15 +1094,50 @@ export function writeTrendOutputs(params) {
  * @param {number} [options.limit]
  * @param {string} [options.repo]
  * @param {typeof execSync} [options.execSyncImpl]
+ * @param {boolean} [options.githubActions]
  * @returns {{ trendData: Record<string, unknown>, reportPath: string, dataPath: string }}
  */
 export function analyzePerformanceTrend(options = {}) {
   let source;
   let collected;
+  /** @type {Record<string, string | null> | undefined} */
+  let collection;
+  /** @type {Array<{ runId?: string, message: string, kind?: string }>} */
+  const envMetadataWarnings = [];
+
+  const githubActionsMode =
+    options.githubActions === true ||
+    (options.githubActions !== false &&
+      !options.fixtureDir &&
+      process.env.GITHUB_ACTIONS === "true");
 
   if (options.fixtureDir) {
     source = "fixture";
     collected = collectFromFixtureDir(options.fixtureDir);
+  } else if (githubActionsMode) {
+    const envValidation = validateGitHubActionsEnv(process.env);
+    if (!envValidation.valid) {
+      throw new Error(
+        `GitHub Actions environment invalid: ${envValidation.errors.join(", ")}`,
+      );
+    }
+    for (const warning of envValidation.warnings) {
+      envMetadataWarnings.push({
+        kind: warning.kind,
+        message: warning.message,
+      });
+    }
+
+    const authContext = resolveGhAuthContext(process.env);
+    source = "github-actions";
+    collection = buildCollectionMetadata(process.env);
+    collected = collectFromGhCli({
+      execSyncImpl: options.execSyncImpl,
+      limit: options.limit,
+      repo: options.repo ?? authContext.repo ?? undefined,
+      ghEnv: authContext.ghEnv,
+      skipAuthCheck: Boolean(authContext.ghToken),
+    });
   } else {
     source = "gh-cli";
     collected = collectFromGhCli({
@@ -919,9 +1157,11 @@ export function analyzePerformanceTrend(options = {}) {
     source,
     observations: collected.observations,
     warnings: collected.warnings,
-    metadataWarnings: collected.metadataWarnings,
+    metadataWarnings: [...envMetadataWarnings, ...collected.metadataWarnings],
     runsRequested: collected.runsRequested,
+    collection,
     outputDir: options.outputDir,
+    writeStepSummary: githubActionsMode,
   });
 }
 
@@ -938,6 +1178,10 @@ function parseArgs(argv) {
       args.limit = Number(argv[++i]);
     } else if (token === "--repo") {
       args.repo = argv[++i];
+    } else if (token === "--github-actions") {
+      args.githubActions = true;
+    } else if (token === "--no-github-actions") {
+      args.githubActions = false;
     } else if (token === "--help") {
       args.help = true;
     }
@@ -953,7 +1197,14 @@ Options:
   --output-dir <path>    Output directory (default: reports/performance-trend/latest)
   --limit <n>            gh run list limit per workflow (default: 10)
   --repo <owner/repo>    Target repository for gh CLI
+  --github-actions       Force GitHub Actions mode (schema 1.2 + Step Summary)
+  --no-github-actions    Disable auto GitHub Actions detection
   --help                 Show this help
+
+GitHub Actions flow:
+  1. Set GH_TOKEN (github.token) with actions: read
+  2. gh run list / gh api artifacts / gh run download
+  3. Write trend outputs + GITHUB_STEP_SUMMARY
 
 Production flow (gh CLI):
   1. gh auth status
@@ -982,6 +1233,7 @@ function main() {
       outputDir: typeof args.outputDir === "string" ? args.outputDir : undefined,
       limit: typeof args.limit === "number" ? args.limit : undefined,
       repo: typeof args.repo === "string" ? args.repo : undefined,
+      githubActions: args.githubActions === true ? true : args.githubActions === false ? false : undefined,
     });
     console.log(`Wrote ${result.reportPath}`);
     console.log(`Wrote ${result.dataPath}`);

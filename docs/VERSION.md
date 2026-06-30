@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.18.0**（Artifact Metadata / Retention Awareness）
+**v1.19.0**（GitHub Actions Automated Performance Trend Collection）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.18.0** | **保守更新** | **✅ 完了** | **Artifact metadata / retention awareness** |
+| **v1.19.0** | **保守更新** | **✅ 完了** | **GitHub Actions 自動 Performance Trend Collection** |
+| v1.18.0 | 保守更新 | ✅ 完了 | Artifact metadata / retention awareness |
 | v1.17.0 | 保守更新 | ✅ 完了 | gh CLI ローカル Performance Trend Analysis |
 | v1.16.0 | 保守更新 | ✅ 完了 | performance-observation.json artifact 基盤 |
 | v1.15.0 | 保守更新 | ✅ 完了 | Performance / Cache Observation Summary |
@@ -44,6 +45,51 @@
 ---
 
 
+### v1.19.0 で追加（GitHub Actions Automated Performance Trend Collection）
+
+#### performance-trend.yml
+
+- **workflow_dispatch** … 手動実行のみ（schedule / workflow_run は未実装）
+- **permissions** … `contents: read` / `actions: read`
+- **GH_TOKEN** … `${{ github.token }}` を trend 解析に渡す
+- **artifact upload** … `performance-trend-<run_id>`（30 日 retention）
+- **Step Summary** … runs analyzed / warnings 概要
+
+#### trend-data.json schema 1.2
+
+- **collection.mode** … `github-actions`
+- **collection.trigger** … `workflow_dispatch` 等
+- **collection.workflowRunId** / **sourceWorkflow** / **collectedAt**
+- **schema 1.1 互換** … ローカル gh-cli / fixture は 1.1 のまま
+
+#### v1.20.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| workflow_run automation | CI/Nightly 完了後の自動 trend 収集が必要になった場合 |
+| scheduled trend collection | 定期 trend レポートが必要になった場合 |
+| REST API 直接集計（gh 非依存） | CI / サービスアカウントからの自動実行 |
+
+### 品質状況（v1.19.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **69 PASS** |
+| npm test | **PASS** |
+
+### v1.19.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| performance-trend.yml | ✅ |
+| GH_TOKEN / permissions | ✅ |
+| schema 1.2 + 1.1 互換 | ✅ |
+| 既存 workflow 非変更 | ✅ |
+| Test 65–69 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.18.0 で追加（Artifact Metadata / Retention Awareness）
 
 #### gh api artifact metadata
@@ -54,14 +100,14 @@
 - **metadata 取得失敗** … warning、`gh run download` で継続
 - **trend-data.json** … schemaVersion 1.1、`metadataWarnings`、`recentRuns[].artifact`
 
-#### v1.19.0 以降の候補
+#### v1.20.0 以降の候補（automation / schedule）
 
 | 候補 | 導入条件 |
 |------|----------|
 | GitHub Actions 上完全自動 Trend Analysis | workflow 内で trend 生成・公開が必要になった場合 |
 | REST API 直接集計（gh 非依存） | CI / サービスアカウントからの自動実行 |
 
-### 品質状況（v1.18.0 最新）
+### 品質状況（v1.18.0）
 
 | 項目 | 結果 |
 |------|------|
@@ -94,7 +140,7 @@
 
 | 候補 | 導入条件 |
 |------|----------|
-| GitHub REST API trend analysis | gh CLI 以外での横断集計が必要になった場合（v1.18.0 で gh api metadata 導入済み — 完全自動は v1.19.0 以降） |
+| GitHub REST API trend analysis | gh CLI 以外での横断集計が必要になった場合（v1.19.0 で GHA workflow 導入済み — workflow_run / schedule は v1.20.0 以降） |
 | cache hit/miss 厳密可視化 | setup-node cache ログの構造化 |
 | グラフ / ダッシュボード | trend-data.json の可視化 |
 
