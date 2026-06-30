@@ -1664,7 +1664,8 @@ if (!fs.existsSync(ciPath)) {
 }
 const ci = fs.readFileSync(ciPath, "utf-8");
 assertContains("ci workflow name", ci, "name: Quality Pipeline CI");
-assertContains("ci npm test step", ci, "run: npm test");
+assertContains("ci npm test step", ci, "name: Run tests");
+assertContains("ci npm test command", ci, "npm test");
 assertContains("ci dry-run step", ci, "quality-pipeline:dry-run");
 assertContains("ci stop-before-phase", ci, "--stop-before-phase report");
 assertContains("ci resume dry-run", ci, "quality-pipeline:dry-run -- --resume");
@@ -2454,6 +2455,38 @@ if (isNightlyApplyWorkflowSuccessExitCode(exitCode)) {
 console.log("internal error workflow failure contract ok");
 EOF
 pass "internal error yields exit 4 and workflow failure"
+
+echo "-- Test 54: workflow Step Summary observability contract --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+for (const rel of [
+  ".github/workflows/quality-pipeline-ci.yml",
+  ".github/workflows/nightly-apply.yml",
+]) {
+  const workflow = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf-8");
+  if (!workflow.includes("name: Write workflow summary")) {
+    throw new Error(`${rel} must define Write workflow summary step`);
+  }
+  if (!workflow.includes("if: always()")) {
+    throw new Error(`${rel} must use if: always() for summary step`);
+  }
+  if (!workflow.includes("GITHUB_STEP_SUMMARY")) {
+    throw new Error(`${rel} must write GITHUB_STEP_SUMMARY`);
+  }
+  if (!workflow.includes("gha-step-timing.tsv")) {
+    throw new Error(`${rel} must record step timings`);
+  }
+  if (!workflow.includes("cache-dependency-path: package-lock.json")) {
+    throw new Error(`${rel} must keep cache-dependency-path`);
+  }
+}
+
+console.log("workflow Step Summary observability contract ok");
+EOF
+pass "workflow Step Summary observability contract"
 
 echo ""
 echo "All quality pipeline tests passed."

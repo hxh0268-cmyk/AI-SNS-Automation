@@ -4,6 +4,29 @@
 
 ---
 
+## v1.14.0 — 保守更新（GitHub Actions CI 可観測性向上）
+
+両 workflow に **GitHub Actions Step Summary** を追加し、主要ステップの実行時間を Markdown テーブルで可視化しました。Workflow 成否判定・exit code 方針は変更していません。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| Step Summary | `GITHUB_STEP_SUMMARY` に Run Summary / Step timings テーブルを出力 |
+| 失敗時 | Summary ステップ `if: always()` — 失敗後も Summary 残存 |
+| 実行時間 | `npm ci` / `npm test` / quality pipeline dry-run・apply を簡易計測 |
+| README | Summary 確認方法、実行時間の見方、cache 効果の位置づけを追記 |
+
+### 変更なし（意図的）
+
+- Workflow 成否判定 / exit code 0・3・1・4 方針
+- `setup-node@v6` + `cache: npm` + `cache-dependency-path: package-lock.json`
+- `npm ci` / テスト・apply の処理内容
+- cache-hit 厳密取得（将来 v1.15.0 以降候補）
+- `actions/cache` / `node_modules` キャッシュ
+
+---
+
 ## v1.13.0 — 保守更新（GitHub Actions npm cache 最適化）
 
 GitHub 公式仕様に基づき、`actions/setup-node@v6` の **npm cache** を両 workflow で明示的に最適化しました。`npm ci` およびテスト / apply の挙動は変更していません。

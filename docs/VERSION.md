@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.13.0**（GitHub Actions npm cache 最適化）
+**v1.14.0**（GitHub Actions CI 可観測性向上）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.13.0** | **保守更新** | **✅ 完了** | **setup-node npm cache 最適化（package-lock.json）** |
+| **v1.14.0** | **保守更新** | **✅ 完了** | **Step Summary + 主要ステップ実行時間計測** |
+| v1.13.0 | 保守更新 | ✅ 完了 | setup-node npm cache 最適化（package-lock.json） |
 | v1.12.1 | 運用品質パッチ | ✅ 完了 | Dependabot 運用ドキュメント強化 |
 | v1.12.0 | 保守更新 | ✅ 完了 | Dependabot による GitHub Actions / npm 依存関係更新検知 |
 | v1.11.0 | 保守更新 | ✅ 完了 | upload-artifact v7 — Node.js 20 Warning 解消 |
@@ -39,6 +40,43 @@
 ---
 
 
+### v1.14.0 で追加（GitHub Actions CI 可観測性向上）
+
+#### Step Summary
+
+- **`GITHUB_STEP_SUMMARY`** … Run Summary + Step timings（Markdown テーブル）
+- **`if: always()`** … 失敗時も Summary 残存
+- **実行時間計測** … npm ci / npm test / quality pipeline dry-run・apply
+- **cache-hit 厳密取得** … v1.14.0 では未実装（`npm ci` Duration の run 間比較で間接確認）
+
+#### v1.15.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
+| 実行時間トレンド | 複数 run の Duration を集計・可視化したい場合 |
+| Grouped Updates（Dependabot） | PR 数増加でレビュー負荷が高い場合 |
+
+### 品質状況（v1.14.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **54 PASS** |
+| npm test | **PASS** |
+| YAML Validation | **PASS** |
+
+### v1.14.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Step Summary（両 workflow） | ✅ |
+| if: always() | ✅ |
+| 実行時間計測 | ✅ |
+| Workflow 成否 / exit code 維持 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.13.0 で追加（GitHub Actions npm cache 最適化）
 
 #### setup-node npm cache
@@ -48,17 +86,17 @@
 - **`node_modules` 非キャッシュ** … インストールは `npm ci` 維持
 - **`actions/cache` 直接利用なし**
 
-#### v1.14.0 以降の候補
+#### v1.14.0 以降の候補（npm cache 関連）
 
 | 候補 | 導入条件 |
 |------|----------|
-| cache hit/miss 可視化 | workflow ログや Summary でキャッシュ効率を確認したい場合 |
-| 実行時間計測 | CI / Nightly Apply の step 時間を継続監視したい場合 |
+| cache hit/miss 可視化 | workflow ログや Summary でキャッシュ効率を確認したい場合（v1.14.0 で簡易版導入済み — 厳密取得は v1.15.0 以降） |
+| 実行時間計測 | CI / Nightly Apply の step 時間を継続監視したい場合（v1.14.0 で Step timings 導入済み） |
 | Grouped Updates（Dependabot） | PR 数増加でレビュー負荷が高い場合 |
 | ignore（Dependabot） | 特定依存で継続失敗・非互換が出た場合 |
 | Auto Merge | CI 安定・レビュー基準・権限設計が固まった後 |
 
-### 品質状況（v1.13.0 最新）
+### 品質状況（v1.13.0）
 
 | 項目 | 結果 |
 |------|------|
