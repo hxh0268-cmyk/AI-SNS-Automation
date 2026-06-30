@@ -184,10 +184,18 @@ jobs:
             echo ""
             echo "- Failure details: see the workflow log for the first failing step."
           } >> "$GITHUB_STEP_SUMMARY"
+          PO_TIMING_FILE="${timing_file}" \
+          PO_VARIANT=ci \
+          GHA_WORKFLOW_NAME="${{ github.workflow }}" \
+          GHA_RUN_ID="${{ github.run_id }}" \
+          JOB_STATUS="${JOB_STATUS}" \
+          node scripts/gha_write_performance_observation.js
 
       - name: Upload quality pipeline reports
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: quality-pipeline-reports-${{ github.run_id }}
           path: reports/quality-pipeline/latest/
           retention-days: 14
+          if-no-files-found: warn

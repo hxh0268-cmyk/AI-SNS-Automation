@@ -654,18 +654,21 @@ Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離
 | Dependabot PR 初回 | cache miss は正常（新 lockfile では未キャッシュ） |
 | cache 破損時 | GitHub リポジトリ **Settings → Actions → Caches** から該当 cache を削除し、workflow を再実行 |
 
-**CI 可観測性（v1.14.0 / v1.15.0）:** 両 workflow に **GitHub Actions Step Summary**（`GITHUB_STEP_SUMMARY`）を追加しました。失敗時も Summary が残るよう、Summary ステップは **`if: always()`** です。v1.14.0 で **Step timings**（主要ステップの実行時間）を、v1.15.0 で **Performance / Cache Observation**（Node / npm バージョン、cache 設定、`package-lock` hash、`npm ci` duration のハイライト）を追加しました。
+**CI 可観測性（v1.14.0 / v1.15.0 / v1.16.0）:** 両 workflow に **GitHub Actions Step Summary**（`GITHUB_STEP_SUMMARY`）を追加しました。v1.16.0 では Summary の内容を **machine-readable** な `performance-observation.json` として artifact にも保存します。
 
 | 項目 | 内容 |
 |------|------|
-| Summary の見方 | workflow Run 詳細 → **Summary** タブ → **Performance / Cache Observation** セクション |
-| 実行時間 | **Step timings** 表 + **npm ci duration** / **apply duration**（Nightly）のハイライト |
-| cache 効果の読み方 | **同一 package-lock hash** の run 間で `npm ci duration` を比較（短いほど cache 効果の可能性）。**cache-hit 厳密取得は v1.15.0 でも未実装** |
+| Summary（人間向け） | workflow Run 詳細 → **Summary** タブ → **Performance / Cache Observation**（v1.15.0 維持） |
+| Artifact JSON（比較用） | `reports/quality-pipeline/latest/performance-observation.json` — 過去 run との **手動比較** 用 |
+| 比較方法（v1.16.0） | 各 run の artifact から JSON を DL し、同一 `cache.packageLockHash` の run 間で `durations.npmCiSeconds` 等を比較 |
+| 自動集計 | **v1.16.0 では未実装** — gh CLI / REST API による trend analysis は **v1.17.0 以降候補** |
+| 実行時間 | **Step timings** 表 + JSON `durations` / `stepTimings` |
+| cache 効果の読み方 | 同一 **package-lock hash**（生 SHA-256）の run 間で `npmCiSeconds` を比較。**cache-hit 厳密取得は未実装** |
 | node_modules | **setup-node cache は npm パッケージキャッシュのみ** — `node_modules` はキャッシュしない（毎回 `npm ci`） |
 | lockfile 変更 | `package-lock.json` 変更で cache key が変わり、初回 run は **cache miss 相当** で `npm ci` が遅くなることがある |
-| Dependabot 後 | lockfile 更新 PR では **初回 CI で npm ci が遅い** ことがある（正常）。同一 hash の 2 回目以降で比較 |
-| 失敗時 | Job result と Step timings の Status を Summary で確認し、詳細は **workflow ログ** の最初の failing step を参照 |
-| 品質判定（Nightly） | Summary に Pipeline exit code / Quality status を表示（v1.9.4 仕様と整合） |
+| Dependabot 後 | lockfile 更新 PR では **初回 CI で npm ci が遅い** ことがある（正常） |
+| 失敗時 artifact | CI upload を **`if: always()`** に変更 — 失敗 run でも `performance-observation.json` を確認可能 |
+| 品質判定（Nightly） | Summary + JSON の `workflow.pipelineExitCode`（`number \| null`）/ `qualityStatus` |
 
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|

@@ -2528,5 +2528,111 @@ console.log("Performance / Cache Observation summary contract ok");
 EOF
 pass "Performance / Cache Observation summary contract"
 
+echo "-- Test 56: performance-observation.json contract --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildObservation,
+  parsePipelineExitCode,
+} from "./scripts/gha_write_performance_observation.js";
+import { PROJECT_ROOT } from "./src/lib/pipeline_state.js";
+
+const ciPath = path.join(PROJECT_ROOT, ".github/workflows/quality-pipeline-ci.yml");
+const nightlyPath = path.join(PROJECT_ROOT, ".github/workflows/nightly-apply.yml");
+const ci = fs.readFileSync(ciPath, "utf-8");
+const nightly = fs.readFileSync(nightlyPath, "utf-8");
+
+for (const [label, workflow] of [
+  ["quality-pipeline-ci.yml", ci],
+  ["nightly-apply.yml", nightly],
+]) {
+  if (!workflow.includes("gha_write_performance_observation.js")) {
+    throw new Error(`${label} must invoke gha_write_performance_observation.js`);
+  }
+}
+
+if (!nightly.includes("reports/quality-pipeline/latest/performance-observation.json")) {
+  throw new Error("nightly-apply.yml artifact path must include performance-observation.json");
+}
+
+const scriptPath = path.join(PROJECT_ROOT, "scripts/gha_write_performance_observation.js");
+if (!fs.readFileSync(scriptPath, "utf-8").includes("performance-observation.json")) {
+  throw new Error("gha_write_performance_observation.js must write performance-observation.json");
+}
+
+if (!ci.match(/name: Upload quality pipeline reports[\s\S]*if: always\(\)/)) {
+  throw new Error("quality-pipeline-ci.yml upload step must use if: always()");
+}
+
+const timingFile = path.join(os.tmpdir(), `gha-timing-${Date.now()}.tsv`);
+fs.writeFileSync(
+  timingFile,
+  [
+    "npm ci|12|success",
+    "npm test|34|success",
+    "quality-pipeline dry-run (stop-before-phase)|20|success",
+    "quality-pipeline dry-run (resume)|8|success",
+  ].join("\n"),
+);
+
+process.env.PO_VARIANT = "ci";
+process.env.PO_TIMING_FILE = timingFile;
+process.env.GHA_WORKFLOW_NAME = "Quality Pipeline CI";
+process.env.GHA_RUN_ID = "123";
+process.env.JOB_STATUS = "success";
+
+const ciObservation = buildObservation();
+const requiredCiKeys = [
+  "schemaVersion",
+  "generatedAt",
+  "workflow",
+  "runtime",
+  "cache",
+  "durations",
+  "stepTimings",
+];
+for (const key of requiredCiKeys) {
+  if (!(key in ciObservation)) {
+    throw new Error(`CI observation missing key: ${key}`);
+  }
+}
+if (ciObservation.durations.npmCiSeconds !== 12) {
+  throw new Error(`expected npmCiSeconds 12, got ${ciObservation.durations.npmCiSeconds}`);
+}
+if (ciObservation.cache.dependencyPath !== "package-lock.json") {
+  throw new Error("cache.dependencyPath must be package-lock.json");
+}
+if (ciObservation.workflow.pipelineExitCode !== undefined) {
+  throw new Error("CI observation must not include pipelineExitCode");
+}
+
+process.env.PO_VARIANT = "nightly";
+process.env.PIPELINE_EXIT_CODE = "3";
+fs.writeFileSync(timingFile, "npm ci|10|success\nquality-pipeline apply|400|success\n");
+
+const nightlyObservation = buildObservation();
+if (nightlyObservation.workflow.pipelineExitCode !== 3) {
+  throw new Error(`expected pipelineExitCode 3, got ${nightlyObservation.workflow.pipelineExitCode}`);
+}
+if (nightlyObservation.workflow.qualityStatus !== "Improvement Recommended") {
+  throw new Error(`unexpected qualityStatus: ${nightlyObservation.workflow.qualityStatus}`);
+}
+if (nightlyObservation.durations.applySeconds !== 400) {
+  throw new Error(`expected applySeconds 400, got ${nightlyObservation.durations.applySeconds}`);
+}
+if (parsePipelineExitCode("") !== null) {
+  throw new Error("parsePipelineExitCode('') must return null");
+}
+if (parsePipelineExitCode("1") !== 1) {
+  throw new Error("parsePipelineExitCode('1') must return 1");
+}
+
+fs.unlinkSync(timingFile);
+console.log("performance-observation.json contract ok");
+EOF
+pass "performance-observation.json contract"
+
 echo ""
 echo "All quality pipeline tests passed."

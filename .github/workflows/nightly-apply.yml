@@ -184,6 +184,13 @@ jobs:
             echo "- exit code 3 = improvement recommended (workflow may still succeed)."
             echo "- Failure details: see the workflow log and \`failure-summary.md\` artifact if present."
           } >> "$GITHUB_STEP_SUMMARY"
+          PO_TIMING_FILE="${timing_file}" \
+          PO_VARIANT=nightly \
+          GHA_WORKFLOW_NAME="${{ github.workflow }}" \
+          GHA_RUN_ID="${{ github.run_id }}" \
+          JOB_STATUS="${JOB_STATUS}" \
+          PIPELINE_EXIT_CODE="${PIPELINE_EXIT_CODE:-}" \
+          node scripts/gha_write_performance_observation.js
 
       - name: Create failure summary
         if: failure()
@@ -276,6 +283,7 @@ jobs:
             reports/quality-pipeline/latest/metrics.json
             reports/quality-pipeline/latest/state.json
             reports/quality-pipeline/latest/failure-summary.md
+            reports/quality-pipeline/latest/performance-observation.json
             reports/quality-pipeline/latest/export/
           retention-days: 14
           if-no-files-found: warn

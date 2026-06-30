@@ -4,6 +4,44 @@
 
 ---
 
+## v1.16.0 — 保守更新（Workflow Performance Trend Analysis Foundation）
+
+v1.15.0 の Performance / Cache Observation 情報を **machine-readable JSON artifact** として保存する基盤を追加しました。Summary Markdown 表示は維持し、大規模な gh CLI / REST API 集計は v1.17.0 以降に回します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Artifact JSON | `reports/quality-pipeline/latest/performance-observation.json` |
+| 生成 | `Write workflow summary`（`if: always()`）内で `scripts/gha_write_performance_observation.js` |
+| CI artifact | upload を **`if: always()`** に変更 — 失敗 run でも JSON 確認可能 |
+| Nightly artifact | `path:` に `performance-observation.json` を追加 |
+| Test 56 | JSON contract テスト追加 |
+
+### 設計判断
+
+- **Summary 維持** — v1.15.0 Markdown 表示は変更なし
+- **pipelineExitCode** — JSON では `number \| null`（`"n/a"` 文字列は使わない）
+- **packageLockHash** — 生 SHA-256（`sha256:` プレフィックスなし、Summary と一致）
+- **手動比較** — v1.16.0 では artifact DL + JSON 比較のみ
+- **gh CLI / REST API 自動集計** — v1.17.0 以降候補
+
+### 影響範囲
+
+- `.github/workflows/quality-pipeline-ci.yml`
+- `.github/workflows/nightly-apply.yml`
+- `scripts/gha_write_performance_observation.js`（新規）
+- ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **56 PASS**（Test 56 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.15.0 — 保守更新（GitHub Actions CI Performance Observation Summary）
 
 v1.14.0 の Step Summary を拡張し、**Performance / Cache Observation** セクションを両 workflow に追加しました。cache 制御そのものは変更せず、Summary 上での可観測性向上に集中しています。

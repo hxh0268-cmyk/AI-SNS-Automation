@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.15.0**（GitHub Actions CI Performance Observation Summary）
+**v1.16.0**（Workflow Performance Trend Analysis Foundation）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.15.0** | **保守更新** | **✅ 完了** | **Performance / Cache Observation Summary** |
+| **v1.16.0** | **保守更新** | **✅ 完了** | **performance-observation.json artifact 基盤** |
+| v1.15.0 | 保守更新 | ✅ 完了 | Performance / Cache Observation Summary |
 | v1.14.0 | 保守更新 | ✅ 完了 | Step Summary + 主要ステップ実行時間計測 |
 | v1.13.0 | 保守更新 | ✅ 完了 | setup-node npm cache 最適化（package-lock.json） |
 | v1.12.1 | 運用品質パッチ | ✅ 完了 | Dependabot 運用ドキュメント強化 |
@@ -40,6 +41,44 @@
 
 ---
 
+
+### v1.16.0 で追加（Workflow Performance Trend Analysis Foundation）
+
+#### performance-observation.json
+
+- **Artifact パス** … `reports/quality-pipeline/latest/performance-observation.json`
+- **schemaVersion** … `"1.0"`
+- **CI durations** … npmCiSeconds / npmTestSeconds / dry-run 2 種
+- **Nightly durations** … npmCiSeconds / applySeconds + pipelineExitCode（number \| null）
+- **CI artifact upload** … `if: always()` — 失敗 run でも JSON 確認可能
+- **手動比較** … artifact DL して packageLockHash + durations を run 間比較
+
+#### v1.17.0 以降の候補
+
+| 候補 | 導入条件 |
+|------|----------|
+| gh CLI / REST API trend analysis | 複数 run の JSON を自動収集・集計したい場合 |
+| cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
+| グラフ / ダッシュボード | trend 基盤の上に可視化を載せる場合 |
+
+### 品質状況（v1.16.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **56 PASS** |
+| npm test | **PASS** |
+
+### v1.16.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| performance-observation.json（両 workflow） | ✅ |
+| CI artifact if: always() | ✅ |
+| Summary v1.15.0 維持 | ✅ |
+| Test 56 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
 
 ### v1.15.0 で追加（GitHub Actions CI Performance Observation Summary）
 
@@ -57,7 +96,7 @@
 | cache hit/miss 厳密可視化 | setup-node cache ログの構造化が必要になった場合 |
 | 実行時間トレンド | gh CLI / REST API で複数 run を集計したい場合 |
 
-### 品質状況（v1.15.0 最新）
+### 品質状況（v1.15.0）
 
 | 項目 | 結果 |
 |------|------|
