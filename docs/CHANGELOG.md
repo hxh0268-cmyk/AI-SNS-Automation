@@ -4,6 +4,35 @@
 
 ---
 
+## v1.10.0 — 保守更新（GitHub Actions runtime maintenance）
+
+GitHub Actions の保守性向上のため、workflow 内で使用している Actions を更新しました。Node.js 20 runtime warning への対応を目的とした保守リリースで、Quality Pipeline の挙動・終了コード・Nightly Apply・Step Summary の仕様は変更していません。
+
+### 修正内容
+
+| 項目 | 内容 |
+|------|------|
+| actions/checkout | `v4` → `v5` |
+| actions/setup-node | `v4` → `v6` |
+| actions/upload-artifact | `v4` 維持 |
+| 対象 workflow | `.github/workflows/quality-pipeline-ci.yml` / `.github/workflows/nightly-apply.yml` |
+| README | 利用 Actions バージョンと保守更新内容を追記 |
+
+### 変更なし（意図的）
+
+- Quality Pipeline の実行ロジック
+- exit code 0 / 1 / 3 / 4 の意味
+- Nightly Apply の Workflow Success / Failure 判定
+- GitHub Step Summary の表示仕様
+- Node.js 実行バージョン（`node-version: "20"`）
+
+### テスト結果
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS**（実装後 `bash scripts/test_quality_pipeline.sh` で確認） |
+
+
 ## v1.9.4 — 運用品質パッチ（Workflow 成否と品質判定の分離）
 
 GitHub Actions の **Workflow 成否** と Quality Pipeline の **品質判定** を分離しました。終了コード **3**（品質改善推奨 / `publishRecommended=false`）はシステムエラーではないため、Nightly Apply では **Workflow Success** 扱いに変更しています。

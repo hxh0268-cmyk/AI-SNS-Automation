@@ -643,6 +643,8 @@ Resume 完了後は `status: completed`、`stopReason: null`、`stopBeforePhase:
 
 Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離されています。
 
+**Actions runtime maintenance（v1.10.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。`actions/checkout@v5` / `actions/setup-node@v6` / `actions/upload-artifact@v4` を使用します。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
+
 | Workflow | ファイル | 目的 | API キー |
 |----------|----------|------|----------|
 | **Quality Pipeline CI**（v1.7） | `.github/workflows/quality-pipeline-ci.yml` | dry-run 品質ゲート（test / stop / resume） | **不要** |

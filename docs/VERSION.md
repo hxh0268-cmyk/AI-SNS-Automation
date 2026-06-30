@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.9.4**（Workflow 成否と品質判定の分離）
+**v1.10.0**（GitHub Actions runtime maintenance）
 
 ---
 
@@ -26,12 +26,46 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
-| v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
-| **v1.9.4** | **運用品質パッチ** | **✅ 完了** | **Workflow 成否と品質判定の分離** |
+| **v1.10.0** | **保守更新** | **✅ 完了** | **GitHub Actions runtime maintenance（checkout v5 / setup-node v6）** |
+| v1.9.4 | 運用品質パッチ | ✅ 完了 | Workflow 成否と品質判定の分離 |
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
+| v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
+| v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
 
 ---
+
+### v1.10.0 で追加（GitHub Actions runtime maintenance）
+
+#### Actions 更新
+
+- **`actions/checkout`** … `v4` → `v5`
+- **`actions/setup-node`** … `v4` → `v6`
+- **`actions/upload-artifact`** … `v4` 維持
+
+#### 変更なし
+
+- Quality Pipeline の実行ロジック
+- exit code 0 / 1 / 3 / 4 の意味
+- Nightly Apply の Workflow Success / Failure 判定
+- GitHub Step Summary の表示仕様
+- Node.js 実行バージョン（`node-version: "20"`）
+
+### 品質状況（v1.10.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **53 PASS** |
+
+### v1.10.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| checkout v5 / setup-node v6 更新 | ✅ |
+| upload-artifact v4 維持 | ✅ |
+| Workflow ロジック変更なし | ✅ |
+| 53 Tests PASS | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
 
 ### v1.9.4 で追加（Workflow 成否と品質判定の分離）
 
