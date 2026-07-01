@@ -4050,5 +4050,101 @@ console.log("VERSION v1.24.0 ok");
 EOF
 pass "VERSION updated to v1.24.0"
 
+
+echo "-- Test 99: content generation CLI exists --"
+test -f scripts/run_content_generation.js
+test -x scripts/run_content_generation.js
+pass "content generation CLI exists"
+
+echo "-- Test 100: content generation lib exists --"
+test -f src/lib/content_generation.js
+grep -q "CONTENT_GENERATION_SCHEMA" src/lib/content_generation.js
+pass "content generation lib exists"
+
+echo "-- Test 101: content ideas prompt exists --"
+test -f prompts/content_ideas.md
+grep -q "Content Ideas Prompt" prompts/content_ideas.md
+pass "content ideas prompt exists"
+
+echo "-- Test 102: content generation dry-run exits 0 --"
+node scripts/run_content_generation.js --dry-run >/tmp/content_generation_dry_run.log
+grep -q "\[ContentGeneration\] dry-run complete" /tmp/content_generation_dry_run.log
+pass "content generation dry-run exits 0"
+
+echo "-- Test 103: content ideas markdown generated --"
+test -f output/content-ideas/latest/content-ideas.md
+grep -q "# Content Ideas" output/content-ideas/latest/content-ideas.md
+grep -q "飲食店店長が今日から使えるChatGPT活用5選" output/content-ideas/latest/content-ideas.md
+pass "content ideas markdown generated"
+
+echo "-- Test 104: content ideas json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/content-ideas/latest/content-ideas.json", "utf8"));
+if (data.schema !== "content-generation/1.0") {
+  throw new Error("content ideas schema must be content-generation/1.0");
+}
+if (data.mode !== "dry-run") {
+  throw new Error("content generation mode must be dry-run");
+}
+if (data.generator !== "mock") {
+  throw new Error("content generation generator must be mock");
+}
+if (!Array.isArray(data.ideas) || data.ideas.length !== 3) {
+  throw new Error("content generation must generate exactly 3 mock ideas");
+}
+console.log("content ideas json ok");
+EOF
+pass "content ideas json generated"
+
+echo "-- Test 105: content generation report generated --"
+test -f reports/content-generation/latest/report.md
+test -f reports/content-generation/latest/report.json
+grep -q "# Content Generation Report" reports/content-generation/latest/report.md
+grep -q "No external API key is required" reports/content-generation/latest/report.md
+pass "content generation report generated"
+
+echo "-- Test 106: content generation lib unit contract --"
+node --input-type=module <<'EOF'
+import {
+  CONTENT_GENERATION_SCHEMA,
+  buildContentGenerationReport,
+  buildContentIdeasData,
+  buildContentIdeasMarkdown
+} from "./src/lib/content_generation.js";
+
+const data = buildContentIdeasData({
+  prompt: {
+    path: "prompts/content_ideas.md",
+    content: "mock prompt"
+  },
+  generatedAt: "2026-07-01T00:00:00.000Z"
+});
+
+if (CONTENT_GENERATION_SCHEMA !== "content-generation/1.0") {
+  throw new Error("schema constant mismatch");
+}
+if (data.ideas.length !== 3) {
+  throw new Error("mock ideas length mismatch");
+}
+
+const markdown = buildContentIdeasMarkdown(data);
+if (!markdown.includes("# Content Ideas")) {
+  throw new Error("content ideas markdown heading missing");
+}
+
+const report = buildContentGenerationReport(data);
+if (report.schema !== "content-generation-report/1.0") {
+  throw new Error("report schema mismatch");
+}
+if (report.ideasGenerated !== 3) {
+  throw new Error("report ideasGenerated mismatch");
+}
+
+console.log("content generation lib contract ok");
+EOF
+pass "content generation lib unit contract"
+
 echo ""
 echo "All quality pipeline tests passed."
