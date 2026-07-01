@@ -4,6 +4,40 @@
 
 ---
 
+## v1.21.0 — 保守更新（workflow_run Opt-in Design Review）
+
+Performance Trend Analysis に **`workflow_run` opt-in 設計レビュー** を追加しました。本番 workflow への `workflow_run` 導入は行わず、セキュリティ方針と将来 experimental 導入条件を明文化します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| workflow_run design review | README に opt-in / security policy を追加 |
+| workflow_run 本番導入 | **保留**（`performance-trend.yml` 非変更） |
+| schedule / workflow_dispatch | **継続** |
+| schema | **1.2 維持** |
+| security policy | artifact 隔離 / cache 非信頼 / 最小 permissions / read-only API |
+| Test 75–79 | workflow_run 非存在 / schedule / dispatch / README 設計レビュー |
+
+### 設計判断
+
+- **workflow_run 本番未導入** — privilege escalation / cache poisoning リスク
+- **schedule 実績確認後に再検討** — v1.22.0 experimental prototype 候補
+- **既存挙動変更なし** — workflow YAML / trend 解析ロジック非変更
+
+### 影響範囲
+
+- ドキュメント / テストのみ
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **79 PASS**（Test 75–79 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.20.0 — 保守更新（Scheduled Performance Trend Collection）
 
 Performance Trend Analysis workflow に **週1回の低頻度 schedule** と **concurrency 保護** を追加しました。`workflow_dispatch` 手動実行は維持し、`workflow_run` はセキュリティ上の理由で保留します。

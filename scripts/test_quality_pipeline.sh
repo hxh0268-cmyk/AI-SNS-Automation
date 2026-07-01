@@ -3551,5 +3551,101 @@ console.log("workflow_run absent ok");
 EOF
 pass "workflow_run is not present"
 
+echo "-- Test 75: performance-trend.yml has no workflow_run --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+if (/^\s*workflow_run:/m.test(workflow)) {
+  throw new Error("performance-trend.yml must not include workflow_run in v1.21.0");
+}
+console.log("no workflow_run ok");
+EOF
+pass "performance-trend.yml has no workflow_run"
+
+echo "-- Test 76: performance-trend.yml schedule exists --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+if (!workflow.includes("schedule:") || !workflow.includes('cron: "23 20 * * 1"')) {
+  throw new Error("performance-trend.yml must preserve weekly schedule");
+}
+console.log("schedule preserved ok");
+EOF
+pass "performance-trend.yml schedule exists"
+
+echo "-- Test 77: performance-trend.yml workflow_dispatch exists --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend.yml"),
+  "utf8",
+);
+if (!workflow.includes("workflow_dispatch:")) {
+  throw new Error("performance-trend.yml must preserve workflow_dispatch");
+}
+console.log("workflow_dispatch preserved ok");
+EOF
+pass "performance-trend.yml workflow_dispatch exists"
+
+echo "-- Test 78: README workflow_run Opt-in Design Review section --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const readme = fs.readFileSync(path.join(PROJECT_ROOT, "README.md"), "utf8");
+if (!readme.includes("workflow_run Opt-in Design Review")) {
+  throw new Error("README must include workflow_run Opt-in Design Review section");
+}
+if (!readme.includes("workflow_run` を本番導入しません")) {
+  throw new Error("README must state workflow_run is not production-enabled in v1.21.0");
+}
+console.log("README design review section ok");
+EOF
+pass "README workflow_run Opt-in Design Review section"
+
+echo "-- Test 79: README security and schema policy keywords --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const readme = fs.readFileSync(path.join(PROJECT_ROOT, "README.md"), "utf8");
+const required = [
+  "cache poisoning",
+  "privilege escalation",
+  "opt-in",
+  "schema",
+  "1.2",
+];
+for (const keyword of required) {
+  if (!readme.toLowerCase().includes(keyword.toLowerCase())) {
+    throw new Error(`README must mention: ${keyword}`);
+  }
+}
+console.log("README security policy keywords ok");
+EOF
+pass "README security and schema policy keywords"
+
 echo ""
 echo "All quality pipeline tests passed."

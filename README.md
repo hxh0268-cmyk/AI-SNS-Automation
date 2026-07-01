@@ -722,6 +722,36 @@ on:
 | schema | **1.2 維持** — `collection.trigger` は `workflow_dispatch` または `schedule` |
 | artifact / cache | v1.19.0 方針維持 — setup-node cache は npm 用、入力は quality-pipeline-reports、出力は performance-trend |
 
+### workflow_run Opt-in Design Review（v1.21.0）
+
+v1.21.0 では **`workflow_run` を本番導入しません**。`performance-trend.yml` は v1.20.0 のまま（`workflow_dispatch` + `schedule` + concurrency）を継続します。本リリースは **設計レビューとセキュリティ方針の明文化** が目的です。
+
+| 項目 | v1.21.0 方針 |
+|------|----------------|
+| workflow_run 本番導入 | **しない** |
+| schedule / workflow_dispatch | **継続** |
+| schema | **1.2 維持**（既存挙動変更なし） |
+| permissions | `contents: read` / `actions: read`（最小権限維持） |
+
+#### 将来の experimental workflow としての opt-in 検討
+
+`workflow_run` は CI/Nightly 完了直後に trend を走らせられるが、**信頼境界をまたぐ**ため別 workflow（opt-in / disabled-by-default）として段階導入を検討します。
+
+| トピック | 設計方針 |
+|---------|----------|
+| activity types | `completed` / `requested` / `in_progress` 等 — **本番導入時は `types: [completed]` 必須** |
+| conclusion filter | **`conclusion: success`（または同等 filter）必須** — 失敗 run からの連鎖を避ける |
+| default branch | workflow 定義は **default branch 上** に存在する必要あり |
+| chain depth | GitHub Actions の **workflow_run 連鎖深度制限** を考慮（無限連鎖を設計しない） |
+| artifact 取得 | artifact は信頼境界をまたぐ — **workspace 直下で直接実行・展開しない** |
+| 隔離領域 | `$RUNNER_TEMP` 等の **隔離領域** へ download / 展開してから解析 |
+| cache | **workflow_run 経由の cache は信頼しない** — cache poisoning 対策 |
+| secrets / write | **secrets 不使用** / **write permission 不使用** — privilege escalation 防止 |
+| API / gh CLI | **read-only** metadata / artifact retrieval に限定 |
+| 再検討条件 | **schedule 実績**（週次 run の安定性・artifact 品質）を確認してから workflow_run を再評価 |
+
+> **opt-in:** 本番 `performance-trend.yml` には `workflow_run` を追加せず、v1.22.0 以降で **experimental workflow**（`workflow_dispatch` 限定または disabled-by-default）として試験する方針です。
+
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
 GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。
