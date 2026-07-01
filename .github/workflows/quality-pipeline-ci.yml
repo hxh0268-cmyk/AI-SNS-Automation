@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: npm
@@ -193,7 +193,7 @@ jobs:
 
       - name: Upload quality pipeline reports
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: quality-pipeline-reports-${{ github.run_id }}
           path: reports/quality-pipeline/latest/

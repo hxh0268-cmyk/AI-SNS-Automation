@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.23.0**（Node24 Migration Readiness）
+**v1.24.0**（GitHub Actions Node24 Production Readiness）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.23.0** | **保守更新** | **✅ 完了** | **Node24 Migration Readiness（experimental upload-artifact v6）** |
+| **v1.24.0** | **保守更新** | **✅ 完了** | **GitHub Actions Node24 Production Readiness** |
+| v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
 | v1.21.0 | 保守更新 | ✅ 完了 | workflow_run opt-in design review |
 | v1.20.0 | 保守更新 | ✅ 完了 | Scheduled Performance Trend Collection |
@@ -49,6 +50,44 @@
 ---
 
 
+### v1.24.0 で追加（GitHub Actions Node24 Production Readiness）
+
+#### 本番 workflow Node24-ready
+
+- **checkout@v5** / **setup-node@v5** / **upload-artifact@v6**
+- **setup-node cache** … npm + package-lock.json 維持
+- **upload-artifact@v7** … 今回見送り
+- **runner v2.327.1+** … 実行要件
+- **experimental workflow** … 非変更
+
+#### v1.25.0 以降の候補（Phase2）
+
+| 候補 | 方針 |
+|------|------|
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+| workflow_run 本番可否 | experimental + schedule 実績を踏まえて再評価 |
+| upload-artifact@v7 再評価 | Node24 安定後に v7 移行可否を判断 |
+
+### 品質状況（v1.24.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **98 PASS** |
+| npm test | **PASS** |
+
+### v1.24.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| 本番 Node24-ready Actions | ✅ |
+| experimental 非変更 | ✅ |
+| setup-node cache 維持 | ✅ |
+| schema / permissions 維持 | ✅ |
+| Test 94–98 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.23.0 で追加（Node24 Migration Readiness）
 
 #### experimental upload-artifact v6
@@ -66,7 +105,7 @@
 | checkout / setup-node evaluation | checkout v5 / setup-node v5 の Node24 互換検証 |
 | workflow_run 本番可否 | experimental + schedule 実績を踏まえて再評価 |
 
-### 品質状況（v1.23.0 最新）
+### 品質状況（v1.23.0）
 
 | 項目 | 結果 |
 |------|------|

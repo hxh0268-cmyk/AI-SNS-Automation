@@ -643,7 +643,7 @@ Resume 完了後は `status: completed`、`stopReason: null`、`stopBeforePhase:
 
 Quality Pipeline 向け GitHub Actions は **2 つの workflow** に役割分離されています。
 
-**Actions runtime maintenance（v1.10.0 / v1.11.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。`actions/checkout@v5` / `actions/setup-node@v6` / `actions/upload-artifact@v7` を使用します（v1.11.0 で `upload-artifact` を Node.js 24 対応版に更新し、Node.js 20 runtime warning を解消）。`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` は使用しません。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
+**Actions runtime maintenance（v1.10.0–v1.24.0）:** GitHub Actions の保守性向上のため、workflow 内の Actions を更新しています。**v1.24.0** 本番 workflow では `actions/checkout@v5` / `actions/setup-node@v5` / `actions/upload-artifact@v6`（Node24-ready）を使用します。`upload-artifact@v7` は今回見送り、`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` は使用しません。Quality Pipeline の挙動、終了コード、Nightly Apply、Step Summary の仕様は変更ありません。
 
 **npm cache 最適化（v1.13.0）:** 両 workflow の `actions/setup-node@v6` で GitHub 公式の **npm cache** を有効化しています（`cache: npm`）。`cache-dependency-path` には **`package-lock.json`** を指定し、lockfile の内容に基づいて cache key が決まります。`package-lock.json` が変更されると cache key が切り替わり、新しい依存関係セット用の cache が使われます。**`node_modules` はキャッシュしません** — 依存関係のインストールは従来どおり **`npm ci`** です。`actions/cache` の直接利用は行っていません。
 
@@ -786,7 +786,7 @@ gh workflow run performance-trend-experimental.yml \
 | **Artifact 信頼境界** | 他 workflow の artifact を workspace 直下で展開しない方針（v1.21.0 設計レビュー） |
 | **段階導入** | experimental は **手動 dispatch のみ** — schedule 実績と並行して評価 |
 
-> v1.24.0 以降で、experimental 実績を踏まえた本番 Node24 / checkout / setup-node 評価を行います。
+> v1.24.0 で本番 Node24-ready を完了。Experimental workflow は v1.23.0 構成を維持します。
 
 ### Node24 Migration Readiness（v1.23.0）
 
@@ -797,10 +797,30 @@ GitHub Actions **Node.js 24 runtime** への移行準備として、**experiment
 | 更新対象 | `.github/workflows/performance-trend-experimental.yml` のみ |
 | upload-artifact@v6 | **Node24 runtime** 対応 Actions |
 | runner 要件 | **v2.327.1 以上**（Node24 Actions 実行に必要） |
-| 本番 workflow | `performance-trend.yml` / `quality-pipeline-ci.yml` / `nightly-apply.yml` — **非変更**（`upload-artifact@v7` 維持） |
-| FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 | **今回未使用** |
-| 次フェーズ候補 | `checkout@v5` / `setup-node@v5` の Node24 互換評価（v1.24.0） |
+| 本番 workflow | v1.23.0 時点では非変更 — **v1.24.0 で Node24-ready に更新** |
+| FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 | **未使用** |
 | schema | **1.2 維持** |
+
+### GitHub Actions Node24 Production Readiness（v1.24.0）
+
+本番 workflow（Quality Pipeline CI / Nightly Apply / Performance Trend Analysis）を **Node24-ready** に更新し、GitHub Actions 基盤を一区切りの安定版としました。**Experimental workflow は変更しません**。
+
+| 項目 | 内容 |
+|------|------|
+| 対象 | `quality-pipeline-ci.yml` / `nightly-apply.yml` / `performance-trend.yml` |
+| checkout | **`actions/checkout@v5`** |
+| setup-node | **`actions/setup-node@v5`** + `cache: npm` / `cache-dependency-path: package-lock.json` |
+| upload-artifact | **`actions/upload-artifact@v6`**（Node24 runtime） |
+| upload-artifact@v7 | **今回見送り** — v6 で Node24-ready を優先 |
+| runner 要件 | **v2.327.1 以上** |
+| Experimental | `performance-trend-experimental.yml` — **非変更**（v1.23.0 構成維持） |
+| schema / permissions / workflow_run | **既存維持** — trend schema 1.2、最小 permissions、workflow_run 未導入 |
+
+#### setup-node@v5 cache 注意点
+
+- **npm パッケージキャッシュのみ** — `node_modules` はキャッシュしない（毎回 `npm ci`）
+- **cache key** は `package-lock.json` 内容に依存 — lockfile 更新後の初回 run は miss 相当になりうる
+- **workflow_run 経由の cache は信頼しない** 方針は v1.21.0 以降も継続
 
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 

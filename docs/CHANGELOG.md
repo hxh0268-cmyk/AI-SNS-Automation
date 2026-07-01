@@ -4,6 +4,41 @@
 
 ---
 
+## v1.24.0 — 保守更新（GitHub Actions Node24 Production Readiness）
+
+本番 workflow を **Node24-ready**（`checkout@v5` / `setup-node@v5` / `upload-artifact@v6`）に更新し、GitHub Actions 基盤を安定版として一区切りしました。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| 本番 workflow | `quality-pipeline-ci.yml` / `nightly-apply.yml` / `performance-trend.yml` |
+| Actions | checkout@v5 / setup-node@v5 / upload-artifact@v6 |
+| setup-node cache | `cache: npm` / `cache-dependency-path: package-lock.json` 維持 |
+| upload-artifact@v7 | **見送り** |
+| Experimental | **非変更** |
+| schema / permissions / workflow_run | **既存維持** |
+| Test 94–98 | Node24 production / docs / experimental unchanged / VERSION |
+
+### 設計判断
+
+- **安定性最優先** — v1.23.0 experimental 実績を踏まえ本番適用
+- **upload-artifact@v6** — Node24 runtime、v7 は今回未採用
+- **FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 未使用**
+
+### 影響範囲
+
+- 本番 workflow 3 ファイル + ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **98 PASS**（Test 94–98 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.23.0 — 保守更新（Node24 Migration Readiness）
 
 GitHub Actions **Node.js 24 Migration Readiness** として、experimental workflow のみ `upload-artifact@v6` を先行適用しました。本番 workflow は変更しません。

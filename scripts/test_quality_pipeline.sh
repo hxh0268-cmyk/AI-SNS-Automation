@@ -1670,7 +1670,7 @@ assertContains("ci dry-run step", ci, "quality-pipeline:dry-run");
 assertContains("ci stop-before-phase", ci, "--stop-before-phase report");
 assertContains("ci resume dry-run", ci, "quality-pipeline:dry-run -- --resume");
 assertContains("ci upload step", ci, "name: Upload quality pipeline reports");
-assertContains("ci upload artifact action", ci, "actions/upload-artifact@v7");
+assertContains("ci upload artifact action", ci, "actions/upload-artifact@v6");
 if (ci.includes("Nightly Apply Workflow")) {
   throw new Error("quality-pipeline-ci.yml must not contain Nightly Apply Workflow content");
 }
@@ -3842,9 +3842,8 @@ console.log("experimental upload-artifact v6 ok");
 EOF
 pass "experimental workflow uses upload-artifact v6"
 
-echo "-- Test 90: production workflows unchanged and do not use upload-artifact v6 --"
+echo "-- Test 90: production workflows use upload-artifact v6 --"
 node --input-type=module <<'EOF'
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -3857,25 +3856,18 @@ const productionWorkflows = [
 ];
 
 for (const rel of productionWorkflows) {
-  const diff = execSync(`git diff -- "${rel}"`, {
-    cwd: PROJECT_ROOT,
-    encoding: "utf8",
-  });
-  if (diff.trim().length > 0) {
-    throw new Error(`${rel} must remain unchanged in v1.23.0`);
-  }
   const workflow = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf8");
-  if (workflow.includes("upload-artifact@v6")) {
-    throw new Error(`${rel} must not use upload-artifact@v6`);
+  if (!workflow.includes("upload-artifact@v6")) {
+    throw new Error(`${rel} must use upload-artifact@v6`);
   }
-  if (!workflow.includes("upload-artifact@v7")) {
-    throw new Error(`${rel} must continue using upload-artifact@v7`);
+  if (workflow.includes("upload-artifact@v7")) {
+    throw new Error(`${rel} must not use upload-artifact@v7`);
   }
 }
 
-console.log("production workflows unchanged ok");
+console.log("production upload-artifact v6 ok");
 EOF
-pass "production workflows unchanged and do not use upload-artifact v6"
+pass "production workflows use upload-artifact v6"
 
 echo "-- Test 91: FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 is not used --"
 node --input-type=module <<'EOF'
@@ -3923,7 +3915,7 @@ console.log("README Node24 migration readiness ok");
 EOF
 pass "README documents Node24 migration readiness and runner v2.327.1 requirement"
 
-echo "-- Test 93: VERSION updated to v1.23.0 --"
+echo "-- Test 93: VERSION documents v1.23.0 in history --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -3931,15 +3923,132 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.23.0**（Node24 Migration Readiness）")) {
-  throw new Error("docs/VERSION.md current version must be v1.23.0");
+if (!versionDoc.includes("v1.23.0")) {
+  throw new Error("docs/VERSION.md must document v1.23.0 in version history");
 }
-if (!versionDoc.includes("v1.24.0")) {
-  throw new Error("docs/VERSION.md must mention v1.24.0 next candidate");
+if (!versionDoc.includes("Node24 Migration Readiness")) {
+  throw new Error("docs/VERSION.md must document v1.23.0 Node24 Migration Readiness");
 }
-console.log("VERSION v1.23.0 ok");
+console.log("VERSION v1.23.0 history ok");
 EOF
-pass "VERSION updated to v1.23.0"
+pass "VERSION documents v1.23.0 in history"
+
+echo "-- Test 94: production workflows use Node24-ready action versions --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const productionWorkflows = [
+  ".github/workflows/performance-trend.yml",
+  ".github/workflows/quality-pipeline-ci.yml",
+  ".github/workflows/nightly-apply.yml",
+];
+
+for (const rel of productionWorkflows) {
+  const workflow = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf8");
+  if (!workflow.includes("actions/checkout@v5")) {
+    throw new Error(`${rel} must use actions/checkout@v5`);
+  }
+  if (!workflow.includes("actions/setup-node@v5")) {
+    throw new Error(`${rel} must use actions/setup-node@v5`);
+  }
+  if (!workflow.includes("actions/upload-artifact@v6")) {
+    throw new Error(`${rel} must use actions/upload-artifact@v6`);
+  }
+  if (!workflow.includes("cache: npm") || !workflow.includes("cache-dependency-path: package-lock.json")) {
+    throw new Error(`${rel} must preserve setup-node npm cache settings`);
+  }
+}
+
+console.log("production Node24-ready actions ok");
+EOF
+pass "production workflows use Node24-ready action versions"
+
+echo "-- Test 95: checkout/setup-node/upload-artifact versions documented --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const readme = fs.readFileSync(path.join(PROJECT_ROOT, "README.md"), "utf8");
+const required = [
+  "Node24 Production Readiness",
+  "actions/checkout@v5",
+  "actions/setup-node@v5",
+  "actions/upload-artifact@v6",
+  "upload-artifact@v7",
+];
+for (const keyword of required) {
+  if (!readme.includes(keyword)) {
+    throw new Error(`README must document: ${keyword}`);
+  }
+}
+console.log("README action versions documented ok");
+EOF
+pass "checkout/setup-node/upload-artifact versions documented"
+
+echo "-- Test 96: runner v2.327.1+ requirement documented --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const readme = fs.readFileSync(path.join(PROJECT_ROOT, "README.md"), "utf8");
+if (!readme.includes("v2.327.1")) {
+  throw new Error("README must document runner v2.327.1+ requirement");
+}
+if (!readme.includes("setup-node@v5")) {
+  throw new Error("README must document setup-node@v5 cache notes in v1.24.0 section");
+}
+console.log("runner requirement documented ok");
+EOF
+pass "runner v2.327.1+ requirement documented"
+
+echo "-- Test 97: experimental workflow unchanged --"
+node --input-type=module <<'EOF'
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const rel = ".github/workflows/performance-trend-experimental.yml";
+const diff = execSync(`git diff -- "${rel}"`, {
+  cwd: PROJECT_ROOT,
+  encoding: "utf8",
+});
+if (diff.trim().length > 0) {
+  throw new Error("performance-trend-experimental.yml must remain unchanged in v1.24.0");
+}
+const workflow = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf8");
+if (!workflow.includes("actions/upload-artifact@v6")) {
+  throw new Error("experimental workflow must still use upload-artifact@v6");
+}
+console.log("experimental workflow unchanged ok");
+EOF
+pass "experimental workflow unchanged"
+
+echo "-- Test 98: VERSION updated to v1.24.0 --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
+if (!versionDoc.includes("**v1.24.0**（GitHub Actions Node24 Production Readiness）")) {
+  throw new Error("docs/VERSION.md current version must be v1.24.0");
+}
+if (!versionDoc.includes("v1.25.0")) {
+  throw new Error("docs/VERSION.md must mention v1.25.0 Phase2 candidate");
+}
+console.log("VERSION v1.24.0 ok");
+EOF
+pass "VERSION updated to v1.24.0"
 
 echo ""
 echo "All quality pipeline tests passed."
