@@ -4,6 +4,40 @@
 
 ---
 
+## v1.23.0 — 保守更新（Node24 Migration Readiness）
+
+GitHub Actions **Node.js 24 Migration Readiness** として、experimental workflow のみ `upload-artifact@v6` を先行適用しました。本番 workflow は変更しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| experimental | `upload-artifact@v5` → **`@v6`**（Node24 runtime） |
+| 本番 workflow | **非変更**（`upload-artifact@v7` 維持） |
+| FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 | **未使用** |
+| runner 要件 | v2.327.1 以上（ドキュメント化） |
+| schema | **1.2 維持** |
+| Test 89–93 | v6 experimental / 本番非変更 / Node24 docs / VERSION |
+
+### 設計判断
+
+- **experimental のみ更新** — 最小リスクで Node24 Actions を検証
+- **本番は安定性優先** — CI / Nightly / performance-trend.yml は現行維持
+- **checkout / setup-node** — v1.24.0 以降で評価
+
+### 影響範囲
+
+- experimental workflow + ドキュメント / テスト
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **93 PASS**（Test 89–93 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.22.0 — 保守更新（Performance Trend Experimental Workflow）
 
 `workflow_run` を本番導入せず、**手動 opt-in の experimental workflow** で Performance Trend を安全に評価できる基盤を追加しました。

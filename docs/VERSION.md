@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.22.0**（Performance Trend Experimental Workflow）
+**v1.23.0**（Node24 Migration Readiness）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.22.0** | **保守更新** | **✅ 完了** | **Performance Trend Experimental workflow** |
+| **v1.23.0** | **保守更新** | **✅ 完了** | **Node24 Migration Readiness（experimental upload-artifact v6）** |
+| v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
 | v1.21.0 | 保守更新 | ✅ 完了 | workflow_run opt-in design review |
 | v1.20.0 | 保守更新 | ✅ 完了 | Scheduled Performance Trend Collection |
 | v1.19.0 | 保守更新 | ✅ 完了 | GitHub Actions 自動 Performance Trend Collection |
@@ -48,6 +49,42 @@
 ---
 
 
+### v1.23.0 で追加（Node24 Migration Readiness）
+
+#### experimental upload-artifact v6
+
+- **upload-artifact@v6** … Node24 runtime（experimental workflow のみ）
+- **runner v2.327.1+** … 実行要件
+- **本番 workflow 非変更** … upload-artifact@v7 維持
+- **FORCE_JAVASCRIPT_ACTIONS_TO_NODE24** … 未使用
+
+#### v1.24.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| GitHub Actions Node24 production readiness | 本番 workflow への upload-artifact / runtime 移行評価 |
+| checkout / setup-node evaluation | checkout v5 / setup-node v5 の Node24 互換検証 |
+| workflow_run 本番可否 | experimental + schedule 実績を踏まえて再評価 |
+
+### 品質状況（v1.23.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **93 PASS** |
+| npm test | **PASS** |
+
+### v1.23.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| experimental upload-artifact v6 | ✅ |
+| 本番 workflow 非変更 | ✅ |
+| FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 未使用 | ✅ |
+| Test 89–93 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.22.0 で追加（Performance Trend Experimental Workflow）
 
 #### performance-trend-experimental.yml
@@ -68,7 +105,7 @@
 | schema 1.3 検討 | `sourceWorkflowRunId` / `sourceWorkflowConclusion` を trend-data に反映 |
 | experimental → production promotion | 条件付き本番統合 |
 
-### 品質状況（v1.22.0 最新）
+### 品質状況（v1.22.0）
 
 | 項目 | 結果 |
 |------|------|

@@ -3824,5 +3824,122 @@ console.log("schema 1.2 maintained ok");
 EOF
 pass "schema remains 1.2 / no schema 1.3 change"
 
+echo "-- Test 89: experimental workflow uses upload-artifact v6 --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("actions/upload-artifact@v6")) {
+  throw new Error("experimental workflow must use actions/upload-artifact@v6");
+}
+console.log("experimental upload-artifact v6 ok");
+EOF
+pass "experimental workflow uses upload-artifact v6"
+
+echo "-- Test 90: production workflows unchanged and do not use upload-artifact v6 --"
+node --input-type=module <<'EOF'
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const productionWorkflows = [
+  ".github/workflows/performance-trend.yml",
+  ".github/workflows/quality-pipeline-ci.yml",
+  ".github/workflows/nightly-apply.yml",
+];
+
+for (const rel of productionWorkflows) {
+  const diff = execSync(`git diff -- "${rel}"`, {
+    cwd: PROJECT_ROOT,
+    encoding: "utf8",
+  });
+  if (diff.trim().length > 0) {
+    throw new Error(`${rel} must remain unchanged in v1.23.0`);
+  }
+  const workflow = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf8");
+  if (workflow.includes("upload-artifact@v6")) {
+    throw new Error(`${rel} must not use upload-artifact@v6`);
+  }
+  if (!workflow.includes("upload-artifact@v7")) {
+    throw new Error(`${rel} must continue using upload-artifact@v7`);
+  }
+}
+
+console.log("production workflows unchanged ok");
+EOF
+pass "production workflows unchanged and do not use upload-artifact v6"
+
+echo "-- Test 91: FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 is not used --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflowsDir = path.join(PROJECT_ROOT, ".github/workflows");
+for (const file of fs.readdirSync(workflowsDir)) {
+  if (!file.endsWith(".yml") && !file.endsWith(".yaml")) {
+    continue;
+  }
+  const content = fs.readFileSync(path.join(workflowsDir, file), "utf8");
+  if (content.includes("FORCE_JAVASCRIPT_ACTIONS_TO_NODE24")) {
+    throw new Error(`${file} must not use FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`);
+  }
+}
+console.log("FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 not used ok");
+EOF
+pass "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 is not used"
+
+echo "-- Test 92: README documents Node24 migration readiness --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const readme = fs.readFileSync(path.join(PROJECT_ROOT, "README.md"), "utf8");
+const required = [
+  "Node24 Migration Readiness",
+  "upload-artifact@v6",
+  "Node24 runtime",
+  "v2.327.1",
+  "experimental workflow",
+  "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24",
+];
+for (const keyword of required) {
+  if (!readme.includes(keyword)) {
+    throw new Error(`README must mention: ${keyword}`);
+  }
+}
+console.log("README Node24 migration readiness ok");
+EOF
+pass "README documents Node24 migration readiness and runner v2.327.1 requirement"
+
+echo "-- Test 93: VERSION updated to v1.23.0 --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
+if (!versionDoc.includes("**v1.23.0**（Node24 Migration Readiness）")) {
+  throw new Error("docs/VERSION.md current version must be v1.23.0");
+}
+if (!versionDoc.includes("v1.24.0")) {
+  throw new Error("docs/VERSION.md must mention v1.24.0 next candidate");
+}
+console.log("VERSION v1.23.0 ok");
+EOF
+pass "VERSION updated to v1.23.0"
+
 echo ""
 echo "All quality pipeline tests passed."

@@ -45,7 +45,7 @@ jobs:
         run: node scripts/gha_analyze_performance_trend.js --github-actions
 
       - name: Upload experimental performance trend reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: performance-trend-experimental-${{ github.run_id }}
           path: |

@@ -767,7 +767,7 @@ v1.21.0 では **`workflow_run` を本番導入しません**。`performance-tre
 | secrets | **不使用** |
 | cache | **不使用**（setup-node に npm cache なし — cache poisoning 回避） |
 | concurrency | `performance-trend-experimental-${{ github.workflow }}` |
-| artifact | `performance-trend-experimental-<run_id>`（**retention 7 日**） |
+| artifact | `performance-trend-experimental-<run_id>`（**retention 7 日**、`upload-artifact@v6` — v1.23.0） |
 | schema | **1.2 維持** — `gha_analyze_performance_trend.js` は今回非変更 |
 
 ```bash
@@ -786,7 +786,21 @@ gh workflow run performance-trend-experimental.yml \
 | **Artifact 信頼境界** | 他 workflow の artifact を workspace 直下で展開しない方針（v1.21.0 設計レビュー） |
 | **段階導入** | experimental は **手動 dispatch のみ** — schedule 実績と並行して評価 |
 
-> v1.23.0 以降で、experimental 実績を踏まえた `workflow_run` 本番可否を再検討します。
+> v1.24.0 以降で、experimental 実績を踏まえた本番 Node24 / checkout / setup-node 評価を行います。
+
+### Node24 Migration Readiness（v1.23.0）
+
+GitHub Actions **Node.js 24 runtime** への移行準備として、**experimental workflow のみ** `upload-artifact@v6` を先行適用します。本番 workflow は安定性優先で現行バージョンを維持します。
+
+| 項目 | 内容 |
+|------|------|
+| 更新対象 | `.github/workflows/performance-trend-experimental.yml` のみ |
+| upload-artifact@v6 | **Node24 runtime** 対応 Actions |
+| runner 要件 | **v2.327.1 以上**（Node24 Actions 実行に必要） |
+| 本番 workflow | `performance-trend.yml` / `quality-pipeline-ci.yml` / `nightly-apply.yml` — **非変更**（`upload-artifact@v7` 維持） |
+| FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 | **今回未使用** |
+| 次フェーズ候補 | `checkout@v5` / `setup-node@v5` の Node24 互換評価（v1.24.0） |
+| schema | **1.2 維持** |
 
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
