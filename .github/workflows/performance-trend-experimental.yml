@@ -1,0 +1,55 @@
+name: Performance Trend Experimental
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Source workflow run ID to evaluate (optional, for experimental metadata)
+        required: false
+        type: string
+      source_conclusion:
+        description: Source workflow conclusion to record (optional, e.g. success)
+        required: false
+        type: string
+
+concurrency:
+  group: performance-trend-experimental-${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  experimental:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run performance trend analysis (experimental)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_WORKFLOW_RUN_ID: ${{ inputs.source_run_id }}
+          SOURCE_WORKFLOW_CONCLUSION: ${{ inputs.source_conclusion }}
+          PERFORMANCE_TREND_EXPERIMENTAL: "true"
+        run: node scripts/gha_analyze_performance_trend.js --github-actions
+
+      - name: Upload experimental performance trend reports
+        uses: actions/upload-artifact@v5
+        with:
+          name: performance-trend-experimental-${{ github.run_id }}
+          path: |
+            reports/performance-trend/latest/trend-report.md
+            reports/performance-trend/latest/trend-data.json
+          retention-days: 7
+          if-no-files-found: error

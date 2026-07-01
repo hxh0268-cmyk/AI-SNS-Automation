@@ -4,6 +4,45 @@
 
 ---
 
+## v1.22.0 — 保守更新（Performance Trend Experimental Workflow）
+
+`workflow_run` を本番導入せず、**手動 opt-in の experimental workflow** で Performance Trend を安全に評価できる基盤を追加しました。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| 新規 workflow | `.github/workflows/performance-trend-experimental.yml` |
+| 本番 workflow | `performance-trend.yml` **非変更** |
+| トリガー | `workflow_dispatch` のみ |
+| workflow_run | **未使用** |
+| inputs | `source_run_id` / `source_conclusion` |
+| env | `SOURCE_WORKFLOW_*` / `PERFORMANCE_TREND_EXPERIMENTAL=true` |
+| cache / secrets | **不使用** |
+| artifact | `performance-trend-experimental-<run_id>`（7 日 retention） |
+| schema | **1.2 維持**（`gha_analyze_performance_trend.js` 非変更） |
+| Test 80–88 | experimental workflow contract |
+
+### 設計判断
+
+- **workflow_run 本番未導入** — privilege escalation / cache poisoning リスク継続
+- **experimental は手動のみ** — disabled-by-default 相当（自動連鎖なし）
+- **cache 無効** — experimental workflow では setup-node cache を使わない
+
+### 影響範囲
+
+- 新規 experimental workflow + ドキュメント / テスト
+- 本番 trend workflow / 解析スクリプトは非変更
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **88 PASS**（Test 80–88 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.21.0 — 保守更新（workflow_run Opt-in Design Review）
 
 Performance Trend Analysis に **`workflow_run` opt-in 設計レビュー** を追加しました。本番 workflow への `workflow_run` 導入は行わず、セキュリティ方針と将来 experimental 導入条件を明文化します。

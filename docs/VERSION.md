@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.21.0**（workflow_run Opt-in Design Review）
+**v1.22.0**（Performance Trend Experimental Workflow）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.21.0** | **保守更新** | **✅ 完了** | **workflow_run opt-in design review** |
+| **v1.22.0** | **保守更新** | **✅ 完了** | **Performance Trend Experimental workflow** |
+| v1.21.0 | 保守更新 | ✅ 完了 | workflow_run opt-in design review |
 | v1.20.0 | 保守更新 | ✅ 完了 | Scheduled Performance Trend Collection |
 | v1.19.0 | 保守更新 | ✅ 完了 | GitHub Actions 自動 Performance Trend Collection |
 | v1.18.0 | 保守更新 | ✅ 完了 | Artifact metadata / retention awareness |
@@ -46,6 +47,46 @@
 
 ---
 
+
+### v1.22.0 で追加（Performance Trend Experimental Workflow）
+
+#### performance-trend-experimental.yml
+
+- **workflow_dispatch のみ** … workflow_run 未使用
+- **inputs** … `source_run_id` / `source_conclusion`
+- **env** … `SOURCE_WORKFLOW_RUN_ID` / `SOURCE_WORKFLOW_CONCLUSION` / `PERFORMANCE_TREND_EXPERIMENTAL=true`
+- **permissions** … `contents: read` / `actions: read`
+- **cache / secrets 不使用**
+- **artifact** … `performance-trend-experimental-<run_id>`（7 日 retention）
+- **本番 performance-trend.yml** … 非変更
+
+#### v1.23.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| workflow_run 本番可否の再評価 | experimental 実績 + schedule 実績を踏まえて判断 |
+| schema 1.3 検討 | `sourceWorkflowRunId` / `sourceWorkflowConclusion` を trend-data に反映 |
+| experimental → production promotion | 条件付き本番統合 |
+
+### 品質状況（v1.22.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **88 PASS** |
+| npm test | **PASS** |
+
+### v1.22.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| experimental workflow | ✅ |
+| performance-trend.yml 非変更 | ✅ |
+| workflow_run 未使用 | ✅ |
+| schema 1.2 維持 | ✅ |
+| Test 80–88 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
 
 ### v1.21.0 で追加（workflow_run Opt-in Design Review）
 
@@ -70,7 +111,7 @@
 | schema 拡張検討 | `sourceWorkflowRunId` / `sourceWorkflowConclusion` |
 | advanced scheduled trend policy | 複数 schedule / 条件付き実行 |
 
-### 品質状況（v1.21.0 最新）
+### 品質状況（v1.21.0）
 
 | 項目 | 結果 |
 |------|------|

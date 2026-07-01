@@ -750,7 +750,43 @@ v1.21.0 では **`workflow_run` を本番導入しません**。`performance-tre
 | API / gh CLI | **read-only** metadata / artifact retrieval に限定 |
 | 再検討条件 | **schedule 実績**（週次 run の安定性・artifact 品質）を確認してから workflow_run を再評価 |
 
-> **opt-in:** 本番 `performance-trend.yml` には `workflow_run` を追加せず、v1.22.0 以降で **experimental workflow**（`workflow_dispatch` 限定または disabled-by-default）として試験する方針です。
+> **opt-in:** 本番 `performance-trend.yml` には `workflow_run` を追加せず、v1.22.0 で **experimental workflow**（`workflow_dispatch` 限定）として試験する方針です。
+
+### Performance Trend Experimental（v1.22.0）
+
+`workflow_run` を**本番導入せず**、手動 opt-in で安全に評価する **experimental workflow** を追加しました。本番 `performance-trend.yml` は**変更しません**。
+
+| 項目 | 内容 |
+|------|------|
+| Workflow | `.github/workflows/performance-trend-experimental.yml`（**新規**） |
+| 本番 workflow | `performance-trend.yml` — **非変更**（schedule + workflow_dispatch 維持） |
+| トリガー | **`workflow_dispatch` のみ** — `workflow_run` は使わない |
+| inputs | `source_run_id` / `source_conclusion`（将来の source run 評価用メタデータ） |
+| env | `SOURCE_WORKFLOW_RUN_ID` / `SOURCE_WORKFLOW_CONCLUSION` / `PERFORMANCE_TREND_EXPERIMENTAL=true` |
+| permissions | `contents: read` / `actions: read` |
+| secrets | **不使用** |
+| cache | **不使用**（setup-node に npm cache なし — cache poisoning 回避） |
+| concurrency | `performance-trend-experimental-${{ github.workflow }}` |
+| artifact | `performance-trend-experimental-<run_id>`（**retention 7 日**） |
+| schema | **1.2 維持** — `gha_analyze_performance_trend.js` は今回非変更 |
+
+```bash
+# 手動実行（source run を記録したい場合）
+gh workflow run performance-trend-experimental.yml \
+  -f source_run_id=123456789 \
+  -f source_conclusion=success
+```
+
+#### workflow_run を本番未採用にした理由（継続方針）
+
+| リスク | 対策 |
+|--------|------|
+| **Privilege escalation** | 後続 workflow が upstream コンテキスト経由で secrets / write に触れる可能性 — 本番 `performance-trend.yml` には `workflow_run` を追加しない |
+| **Cache poisoning** | workflow 連鎖経由の cache を信頼しない — experimental は **cache 無効** |
+| **Artifact 信頼境界** | 他 workflow の artifact を workspace 直下で展開しない方針（v1.21.0 設計レビュー） |
+| **段階導入** | experimental は **手動 dispatch のみ** — schedule 実績と並行して評価 |
+
+> v1.23.0 以降で、experimental 実績を踏まえた `workflow_run` 本番可否を再検討します。
 
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 

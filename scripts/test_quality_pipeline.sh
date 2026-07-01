@@ -3647,5 +3647,182 @@ console.log("README security policy keywords ok");
 EOF
 pass "README security and schema policy keywords"
 
+WORKFLOW_EXP=".github/workflows/performance-trend-experimental.yml"
+
+echo "-- Test 80: performance-trend-experimental.yml exists --"
+test -f "$WORKFLOW_EXP"
+pass "performance-trend-experimental.yml exists"
+
+echo "-- Test 81: experimental workflow uses workflow_dispatch --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("workflow_dispatch:")) {
+  throw new Error("experimental workflow must use workflow_dispatch");
+}
+console.log("experimental workflow_dispatch ok");
+EOF
+pass "experimental workflow uses workflow_dispatch"
+
+echo "-- Test 82: experimental workflow does not use workflow_run --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (/^\s*workflow_run:/m.test(workflow)) {
+  throw new Error("experimental workflow must not use workflow_run");
+}
+console.log("experimental no workflow_run ok");
+EOF
+pass "experimental workflow does not use workflow_run"
+
+echo "-- Test 83: experimental permissions are contents read and actions read --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("contents: read") || !workflow.includes("actions: read")) {
+  throw new Error("experimental workflow must use contents: read and actions: read");
+}
+console.log("experimental permissions ok");
+EOF
+pass "experimental permissions are contents read and actions read"
+
+echo "-- Test 84: experimental concurrency is configured --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("concurrency:")) {
+  throw new Error("experimental workflow must define concurrency");
+}
+if (!workflow.includes("group: performance-trend-experimental-${{ github.workflow }}")) {
+  throw new Error("experimental workflow must use experimental concurrency group");
+}
+console.log("experimental concurrency ok");
+EOF
+pass "experimental concurrency is configured"
+
+echo "-- Test 85: experimental artifact name is isolated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("name: performance-trend-experimental-${{ github.run_id }}")) {
+  throw new Error("experimental artifact name must use performance-trend-experimental prefix");
+}
+console.log("experimental artifact name ok");
+EOF
+pass "experimental artifact name is isolated with experimental prefix"
+
+echo "-- Test 86: experimental retention-days is limited to 7 --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("retention-days: 7")) {
+  throw new Error("experimental workflow must set retention-days: 7");
+}
+console.log("experimental retention ok");
+EOF
+pass "experimental retention-days is limited to 7"
+
+echo "-- Test 87: source_run_id and source_conclusion inputs exist --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const workflow = fs.readFileSync(
+  path.join(PROJECT_ROOT, ".github/workflows/performance-trend-experimental.yml"),
+  "utf8",
+);
+if (!workflow.includes("source_run_id:")) {
+  throw new Error("experimental workflow must define source_run_id input");
+}
+if (!workflow.includes("source_conclusion:")) {
+  throw new Error("experimental workflow must define source_conclusion input");
+}
+if (!workflow.includes("SOURCE_WORKFLOW_RUN_ID:")) {
+  throw new Error("experimental workflow must pass SOURCE_WORKFLOW_RUN_ID env");
+}
+if (!workflow.includes("SOURCE_WORKFLOW_CONCLUSION:")) {
+  throw new Error("experimental workflow must pass SOURCE_WORKFLOW_CONCLUSION env");
+}
+if (!workflow.includes("PERFORMANCE_TREND_EXPERIMENTAL:")) {
+  throw new Error("experimental workflow must pass PERFORMANCE_TREND_EXPERIMENTAL env");
+}
+console.log("experimental inputs ok");
+EOF
+pass "source_run_id and source_conclusion inputs exist"
+
+echo "-- Test 88: schema remains 1.2 / no schema 1.3 change --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  SUPPORTED_TREND_DATA_SCHEMA_VERSIONS,
+  TREND_DATA_SCHEMA_VERSION,
+} from "./scripts/gha_analyze_performance_trend.js";
+
+if (TREND_DATA_SCHEMA_VERSION !== "1.2") {
+  throw new Error(`expected TREND_DATA_SCHEMA_VERSION 1.2, got ${TREND_DATA_SCHEMA_VERSION}`);
+}
+if (SUPPORTED_TREND_DATA_SCHEMA_VERSIONS.includes("1.3")) {
+  throw new Error("schema 1.3 must not be introduced in v1.22.0");
+}
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const script = fs.readFileSync(
+  path.join(PROJECT_ROOT, "scripts/gha_analyze_performance_trend.js"),
+  "utf8",
+);
+if (script.includes('"1.3"')) {
+  throw new Error("gha_analyze_performance_trend.js must not reference schema 1.3");
+}
+
+console.log("schema 1.2 maintained ok");
+EOF
+pass "schema remains 1.2 / no schema 1.3 change"
+
 echo ""
 echo "All quality pipeline tests passed."
