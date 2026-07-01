@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.24.0 --"
+echo "-- Test 98: VERSION updated to v1.26.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,15 +4040,15 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.24.0**（GitHub Actions Node24 Production Readiness）")) {
-  throw new Error("docs/VERSION.md current version must be v1.24.0");
+if (!versionDoc.includes("**v1.26.0**（Developer Automation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.26.0");
 }
-if (!versionDoc.includes("v1.25.0")) {
-  throw new Error("docs/VERSION.md must mention v1.25.0 Phase2 candidate");
+if (!versionDoc.includes("v1.27.0")) {
+  throw new Error("docs/VERSION.md must mention v1.27.0 Release Automation candidate");
 }
-console.log("VERSION v1.24.0 ok");
+console.log("VERSION v1.26.0 ok");
 EOF
-pass "VERSION updated to v1.24.0"
+pass "VERSION updated to v1.26.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4145,6 +4145,201 @@ if (report.ideasGenerated !== 3) {
 console.log("content generation lib contract ok");
 EOF
 pass "content generation lib unit contract"
+
+echo "-- Test 107: package.json dev:next script exists --"
+grep -q '"dev:next": "node scripts/run_dev_next.js"' package.json
+pass "package.json dev:next script exists"
+
+echo "-- Test 108: npm run dev:next --dry-run succeeds --"
+npm run dev:next -- --dry-run >/tmp/dev_next_dry_run.log
+grep -q "\[DevNext\] dry-run complete" /tmp/dev_next_dry_run.log
+pass "npm run dev:next --dry-run succeeds"
+
+echo "-- Test 109: dev-next.md generated --"
+test -f reports/developer-automation/latest/dev-next.md
+grep -q "# Developer Automation Next Plan" reports/developer-automation/latest/dev-next.md
+grep -q "developer-automation/dev-next/1.0" reports/developer-automation/latest/dev-next.md
+pass "dev-next.md generated"
+
+echo "-- Test 110: dev:next dry-run does not git commit tag or push --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const files = [
+  "scripts/run_dev_next.js",
+  "src/lib/developer_automation.js",
+];
+
+const forbidden = [
+  /git\s+commit\b/i,
+  /git\s+push\b/i,
+];
+
+for (const rel of files) {
+  const content = fs.readFileSync(path.join(PROJECT_ROOT, rel), "utf8");
+  for (const pattern of forbidden) {
+    if (pattern.test(content)) {
+      throw new Error(`${rel} must not invoke ${pattern}`);
+    }
+  }
+}
+console.log("dev:next dry-run git safety ok");
+EOF
+pass "dev:next dry-run does not git commit tag or push"
+
+echo "-- Test 111: developer automation output path is fixed --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { writeDevNextReport, buildDevNextPlan } from "./src/lib/developer_automation.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const libSource = fs.readFileSync(
+  path.join(PROJECT_ROOT, "src/lib/developer_automation.js"),
+  "utf8",
+);
+if (!libSource.includes('"reports", "developer-automation", "latest"')) {
+  throw new Error("developer automation output must use reports/developer-automation/latest");
+}
+
+const plan = buildDevNextPlan({ rootDir: PROJECT_ROOT, generatedAt: "2026-07-01T00:00:00.000Z" });
+const outputs = writeDevNextReport(plan, PROJECT_ROOT);
+if (outputs.markdown !== "reports/developer-automation/latest/dev-next.md") {
+  throw new Error(`unexpected markdown output path: ${outputs.markdown}`);
+}
+if (outputs.json !== "reports/developer-automation/latest/dev-next.json") {
+  throw new Error(`unexpected json output path: ${outputs.json}`);
+}
+
+console.log("developer automation output path ok");
+EOF
+pass "developer automation output path is fixed"
+
+echo "-- Test 112: VERSION.md version can be read --"
+node --input-type=module <<'EOF'
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { getVersionFromVersionMd } from "./src/lib/developer_automation.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const version = getVersionFromVersionMd(PROJECT_ROOT);
+if (!version || !/^v\d+\.\d+\.\d+$/.test(version)) {
+  throw new Error(`expected semver version from VERSION.md, got: ${version}`);
+}
+console.log(`VERSION.md version ok: ${version}`);
+EOF
+pass "VERSION.md version can be read"
+
+echo "-- Test 113: version-consistency.json is generated --"
+test -f reports/developer-automation/latest/version-consistency.json
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const report = JSON.parse(
+  fs.readFileSync("reports/developer-automation/latest/version-consistency.json", "utf8"),
+);
+if (report.schema !== "developer-automation/version-consistency/1.0") {
+  throw new Error("version-consistency schema mismatch");
+}
+if (!["ok", "warning"].includes(report.status)) {
+  throw new Error("version-consistency status must be ok or warning");
+}
+console.log("version-consistency.json ok");
+EOF
+pass "version-consistency.json is generated"
+
+echo "-- Test 114: version-consistency.md includes Version Consistency section --"
+test -f reports/developer-automation/latest/version-consistency.md
+grep -q "# Version Consistency Report" reports/developer-automation/latest/version-consistency.md
+grep -q "## Version Consistency" reports/developer-automation/latest/version-consistency.md
+grep -q "## Warnings" reports/developer-automation/latest/version-consistency.md
+pass "version-consistency.md includes Version Consistency section"
+
+echo "-- Test 115: version mismatch emits warning --"
+node --input-type=module <<'EOF'
+import {
+  buildVersionConsistencyMarkdown,
+  buildVersionConsistencyReport,
+} from "./src/lib/developer_automation.js";
+
+const report = buildVersionConsistencyReport({
+  gitTag: "v1.25.0",
+  versionMd: "v1.26.0",
+  changelogVersion: "v1.25.0",
+  generatedAt: "2026-07-01T00:00:00.000Z",
+});
+
+if (report.status !== "warning") {
+  throw new Error("expected warning status for version mismatch");
+}
+if (report.warnings.length === 0) {
+  throw new Error("expected warnings for version mismatch");
+}
+if (!report.warnings.some((w) => w.includes("Version mismatch detected"))) {
+  throw new Error("expected mismatch warning message");
+}
+
+const markdown = buildVersionConsistencyMarkdown(report);
+if (!markdown.includes("warning") || !markdown.includes("v1.26.0")) {
+  throw new Error("expected warning details in version-consistency markdown");
+}
+
+console.log("version mismatch warning ok");
+EOF
+pass "version mismatch emits warning"
+
+echo "-- Test 116: 3-way version consistency can be evaluated --"
+node --input-type=module <<'EOF'
+import {
+  buildVersionConsistencyReport,
+  getChangelogLatestVersion,
+  getLatestGitTag,
+  getVersionFromVersionMd,
+} from "./src/lib/developer_automation.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+
+const okReport = buildVersionConsistencyReport({
+  gitTag: "v9.9.9",
+  versionMd: "v9.9.9",
+  changelogVersion: "v9.9.9",
+});
+if (okReport.status !== "ok") {
+  throw new Error("expected ok when all three versions match");
+}
+if (okReport.warnings.length !== 0) {
+  throw new Error("expected no warnings when all three versions match");
+}
+
+const gitTag = getLatestGitTag(PROJECT_ROOT);
+const versionMd = getVersionFromVersionMd(PROJECT_ROOT);
+const changelog = getChangelogLatestVersion(PROJECT_ROOT);
+const liveReport = buildVersionConsistencyReport({
+  rootDir: PROJECT_ROOT,
+  gitTag,
+  versionMd,
+  changelogVersion: changelog,
+});
+
+if (!liveReport.gitTag && gitTag) {
+  throw new Error("live report must include git tag when available");
+}
+if (liveReport.versionMd !== versionMd) {
+  throw new Error("live report must reflect VERSION.md version");
+}
+if (liveReport.changelog !== changelog) {
+  throw new Error("live report must reflect CHANGELOG.md version");
+}
+
+console.log(`3-way consistency ok (live status: ${liveReport.status})`);
+EOF
+pass "3-way version consistency can be evaluated"
 
 echo ""
 echo "All quality pipeline tests passed."

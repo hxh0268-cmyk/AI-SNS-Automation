@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.24.0**（GitHub Actions Node24 Production Readiness）
+**v1.26.0**（Developer Automation Foundation）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.24.0** | **保守更新** | **✅ 完了** | **GitHub Actions Node24 Production Readiness** |
+| **v1.26.0** | **機能追加** | **✅ 完了** | **Developer Automation Foundation / 3-way Version Consistency** |
+| v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
 | v1.21.0 | 保守更新 | ✅ 完了 | workflow_run opt-in design review |
@@ -50,6 +51,46 @@
 ---
 
 
+### v1.26.0 で追加（Developer Automation Foundation）
+
+#### 3-way Version Consistency
+
+- **`getLatestGitTag()`** … 最新 Git Tag 取得
+- **`getVersionFromVersionMd()`** … VERSION.md current version 読み取り
+- **`getChangelogLatestVersion()`** … CHANGELOG 先頭 version セクション確認
+- **3-way 判定** … Git Tag / VERSION.md / CHANGELOG.md 一致で `ok`、不一致で `warning`
+- **`version-consistency.json`** … machine-readable report
+- **`version-consistency.md`** … human-readable report
+- **CLI** … `Version Check OK` / `Version Check WARNING`
+- **`npm run dev:next -- --dry-run`** … dev-next + version consistency 実行
+
+#### v1.27.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.26.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **116 PASS** |
+| npm test | **PASS** |
+
+### v1.26.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| dev:next npm script | ✅ |
+| 3-way Version Consistency | ✅ |
+| version-consistency reports | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 107–116 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.24.0 で追加（GitHub Actions Node24 Production Readiness）
 
 #### 本番 workflow Node24-ready
@@ -68,7 +109,7 @@
 | workflow_run 本番可否 | experimental + schedule 実績を踏まえて再評価 |
 | upload-artifact@v7 再評価 | Node24 安定後に v7 移行可否を判断 |
 
-### 品質状況（v1.24.0 最新）
+### 品質状況（v1.24.0）
 
 | 項目 | 結果 |
 |------|------|

@@ -4,6 +4,44 @@
 
 ---
 
+## v1.26.0 — 機能追加（Developer Automation Foundation）
+
+リリース前の状態確認基盤として **Developer Automation Foundation** を追加しました。Git Tag / VERSION.md / CHANGELOG.md の **3-way Version Consistency** を dry-run で検証できます。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Developer Automation | `src/lib/developer_automation.js` / `scripts/run_dev_next.js` |
+| npm script | `npm run dev:next -- --dry-run` |
+| Git Tag | `getLatestGitTag()` |
+| VERSION.md | `getVersionFromVersionMd()` |
+| CHANGELOG | `getChangelogLatestVersion()` |
+| 3-way Consistency | 一致 → `ok` / 不一致 → `warning` |
+| JSON report | `version-consistency.json` |
+| Markdown report | `version-consistency.md` |
+| CLI | `Version Check OK` / `Version Check WARNING` |
+| Test 107–116 | dev:next + version consistency |
+
+### 設計判断
+
+- **Dry-run First** — git commit / tag / push は v1.27.0 以降
+- **Human Approval Gate** — 自動 publish / release なし
+- **API キー不要** — git / docs 読み取りのみ
+
+### 影響範囲
+
+- Developer Automation ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **116 PASS**（Test 112–116 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.24.0 — 保守更新（GitHub Actions Node24 Production Readiness）
 
 本番 workflow を **Node24-ready**（`checkout@v5` / `setup-node@v5` / `upload-artifact@v6`）に更新し、GitHub Actions 基盤を安定版として一区切りしました。
