@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.29.0**（Developer Automation Workflow Foundation）
+**v1.30.0**（Developer Workflow Guard Foundation）
 
 ---
 
@@ -26,8 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.29.0** | **機能追加** | **✅ 完了** | **Developer Automation Workflow Foundation / Context ベース Workflow MVP** |
-| v1.28.0 | 機能追加 | ✅ 完了 | Release Plan Foundation / Release 作業計画 MVP |
+| **v1.30.0** | **機能追加** | **✅ 完了** | **Developer Workflow Guard Foundation / Workflow 安全制御 MVP** |
+| v1.29.0 | 機能追加 | ✅ 完了 | Developer Automation Workflow Foundation / Context ベース Workflow MVP |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
@@ -51,6 +51,49 @@
 
 ---
 
+### v1.30.0 で追加（Developer Workflow Guard Foundation）
+
+#### Workflow Guard MVP
+
+- **`DEFAULT_WORKFLOW_OPTIONS`** … dryRun / failFast / stopBeforeStep / skipSteps / guardHooks
+- **`shouldSkipStep()` / `shouldStopBeforeStep()` / `shouldExecuteStep()`** … 純粋 Guard 関数
+- **`GUARD_REASON`** … NONE / SKIP_STEP / STOP_BEFORE_STEP（Step guard reason 定数）
+- **`STEP_STATUS`** … PASS / FAIL / SKIPPED / STOPPED
+- **`WORKFLOW_STATUS`** … SUCCESS / FAILURE / STOPPED
+- **Guard Decision** … 各 Step Result に guard（shouldExecute / reason）を保持
+- **`WORKFLOW_STOP_REASON`** … NONE / FAIL_FAST / STOP_BEFORE_STEP（Workflow stopReason 定数）
+- **`buildGuardSummary()`** … Executed / Skipped / Stopped 集計
+- **schema** … `developer-automation/workflow/1.1`（Guard 対応版）
+- **Fail Fast / Stop Before / Skip Step** … Workflow 安全制御
+- **JSON → Markdown → CLI** … Single Source of Truth 維持
+
+#### v1.31.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.30.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **170 PASS** |
+| npm test | **PASS** |
+
+### v1.30.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Workflow Options / Guard | ✅ |
+| Guard Decision in JSON | ✅ |
+| developer-automation-report 更新 | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 136–170 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.29.0 で追加（Developer Automation Workflow Foundation）
 
 #### Workflow MVP
@@ -66,10 +109,11 @@
 - **CLI** … Step Results Summary
 - **`npm run developer:workflow -- --skip-npm-test`** … Developer Automation Workflow MVP
 
-#### v1.30.0 以降の候補
+#### v1.30.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Workflow Guard Foundation | ✅ v1.30.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

@@ -1,0 +1,5 @@
+export const WORKFLOW_STATUS = {
+  SUCCESS: "SUCCESS",
+  FAILURE: "FAILURE",
+  STOPPED: "STOPPED",
+};

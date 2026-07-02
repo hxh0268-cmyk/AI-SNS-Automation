@@ -4,6 +4,46 @@
 
 ---
 
+## v1.30.0 — 機能追加（Developer Workflow Guard Foundation）
+
+Workflow Engine に **安全制御（Guard）** を追加しました。Workflow Options / Guard 関数 / Guard Decision により、Fail Fast / Stop Before Step / Skip Step を Context ベースで制御します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Workflow Options | `workflow_options.js` — dryRun / failFast / stopBeforeStep / skipSteps |
+| Guard Functions | `workflow_guard.js` — shouldSkipStep / shouldStopBeforeStep / shouldExecuteStep |
+| Guard Reason | `workflow_guard_reason.js` — NONE / SKIP_STEP / STOP_BEFORE_STEP / FAIL_FAST |
+| Step Status | `workflow_step_status.js` — PASS / FAIL / SKIPPED / STOPPED |
+| Workflow Status | `workflow_status.js` — SUCCESS / FAILURE / STOPPED |
+| Guard Decision | 各 Step Result に guard（shouldExecute / reason） |
+| guardHooks | 将来拡張用に予約（空配列） |
+| JSON report | Workflow Options / Guard / Status 追加 |
+| CLI | Options + Workflow Status + Step Results 表示 |
+| Test 149–166 | Guard / Options / 後方互換 |
+
+### 設計判断
+
+- **Context 唯一** — Options は Context に保持、Engine は Context のみ参照
+- **Guard 純粋関数** — 副作用なし、boolean / guard decision を返す
+- **判定優先順位** — Stop Before > Skip > Execute
+- **Single Source of Truth** — JSON → Markdown → CLI
+- **MVP スコープ厳守** — Git 操作は未実装
+
+### 影響範囲
+
+- Developer Workflow Guard ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **166 PASS**（Test 149–166 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.29.0 — 機能追加（Developer Automation Workflow Foundation）
 
 Developer Automation を **Context ベース Workflow** として統合しました。Step Registry から順番に実行し、標準化された Step Result を `context.results[]` に蓄積して集約 report を生成します。
@@ -14,7 +54,7 @@ Developer Automation を **Context ベース Workflow** として統合しまし
 |------|------|
 | Developer Workflow | `src/lib/developer_workflow.js` / `scripts/run_developer_workflow.js` |
 | npm script | `npm run developer:workflow -- --skip-npm-test` |
-| schema | `developer-automation/workflow/1.0` |
+| schema | `developer-automation/workflow/1.1` |
 | Context | 唯一の状態管理（results / status / skipNpmTest） |
 | Step Registry | version-consistency → release-readiness → release-plan |
 | Step Result | id / name / status / detail（`STEP_STATUS` 定数使用） |

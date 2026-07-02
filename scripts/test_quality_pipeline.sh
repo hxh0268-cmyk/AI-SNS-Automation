@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.29.0 --"
+echo "-- Test 98: VERSION updated to v1.30.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.29.0**（Developer Automation Workflow Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.29.0");
+if (!versionDoc.includes("**v1.30.0**（Developer Workflow Guard Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.30.0");
 }
-console.log("VERSION v1.29.0 ok");
+console.log("VERSION v1.30.0 ok");
 EOF
-pass "VERSION updated to v1.29.0"
+pass "VERSION updated to v1.30.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4928,10 +4928,10 @@ import {
   WORKFLOW_STATUS,
 } from "./src/lib/developer_workflow.js";
 
-if (STEP_STATUS.PASS !== "pass" || STEP_STATUS.FAIL !== "fail" || STEP_STATUS.SKIP !== "skip") {
+if (STEP_STATUS.PASS !== "PASS" || STEP_STATUS.FAIL !== "FAIL" || STEP_STATUS.SKIPPED !== "SKIPPED" || STEP_STATUS.STOPPED !== "STOPPED") {
   throw new Error("STEP_STATUS constants mismatch");
 }
-if (WORKFLOW_STATUS.SUCCESS !== "success" || WORKFLOW_STATUS.FAILURE !== "failure") {
+if (WORKFLOW_STATUS.SUCCESS !== "SUCCESS" || WORKFLOW_STATUS.FAILURE !== "FAILURE" || WORKFLOW_STATUS.STOPPED !== "STOPPED") {
   throw new Error("WORKFLOW_STATUS constants mismatch");
 }
 
@@ -4953,10 +4953,13 @@ const result = buildStepResult({
   detail: { reportStatus: "ok" },
 });
 
-for (const key of ["id", "name", "status", "detail"]) {
+for (const key of ["id", "name", "status", "guard", "detail"]) {
   if (!(key in result)) {
     throw new Error(`step result must include ${key}`);
   }
+}
+if (result.guard.reason !== "NONE") {
+  throw new Error("default guard reason must be NONE");
 }
 if (result.id !== "version-consistency") {
   throw new Error("step result id mismatch");
@@ -4970,6 +4973,7 @@ echo "-- Test 138: workflow context creation --"
 node --input-type=module <<'EOF'
 import {
   DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA,
+  DEFAULT_WORKFLOW_OPTIONS,
   WORKFLOW_STATUS,
   createWorkflowContext,
 } from "./src/lib/developer_workflow.js";
@@ -4988,6 +4992,15 @@ if (context.rootDir !== "/tmp/project") {
 }
 if (context.skipNpmTest !== true) {
   throw new Error("workflow context skipNpmTest mismatch");
+}
+if (context.options.dryRun !== DEFAULT_WORKFLOW_OPTIONS.dryRun) {
+  throw new Error("workflow context must use default dryRun option");
+}
+if (context.options.failFast !== DEFAULT_WORKFLOW_OPTIONS.failFast) {
+  throw new Error("workflow context must use default failFast option");
+}
+if (!Array.isArray(context.options.guardHooks)) {
+  throw new Error("workflow context must include guardHooks");
 }
 if (!Array.isArray(context.results) || context.results.length !== 0) {
   throw new Error("workflow context must start with empty results");
@@ -5130,23 +5143,41 @@ node --input-type=module <<'EOF'
 import {
   STEP_STATUS,
   WORKFLOW_STATUS,
+  WORKFLOW_STOP_REASON,
   computeWorkflowStatus,
 } from "./src/lib/developer_workflow.js";
 
-const allPass = computeWorkflowStatus([
-  { status: STEP_STATUS.PASS },
-  { status: STEP_STATUS.PASS },
-]);
+const allPass = computeWorkflowStatus({
+  results: [
+    { status: STEP_STATUS.PASS },
+    { status: STEP_STATUS.PASS },
+  ],
+  stopReason: WORKFLOW_STOP_REASON.NONE,
+});
 if (allPass !== WORKFLOW_STATUS.SUCCESS) {
   throw new Error("all pass results must produce success workflow status");
 }
 
-const hasFail = computeWorkflowStatus([
-  { status: STEP_STATUS.PASS },
-  { status: STEP_STATUS.FAIL },
-]);
+const hasFail = computeWorkflowStatus({
+  results: [
+    { status: STEP_STATUS.PASS },
+    { status: STEP_STATUS.FAIL },
+  ],
+  stopReason: WORKFLOW_STOP_REASON.NONE,
+});
 if (hasFail !== WORKFLOW_STATUS.FAILURE) {
   throw new Error("any fail result must produce failure workflow status");
+}
+
+const stopped = computeWorkflowStatus({
+  results: [
+    { status: STEP_STATUS.PASS },
+    { status: STEP_STATUS.STOPPED },
+  ],
+  stopReason: WORKFLOW_STOP_REASON.STOP_BEFORE_STEP,
+});
+if (stopped !== WORKFLOW_STATUS.STOPPED) {
+  throw new Error("stopped step must produce stopped workflow status");
 }
 
 console.log("workflow status computation ok");
@@ -5176,6 +5207,7 @@ const context = runDeveloperWorkflow({
                 id: step.id,
                 name: step.name,
                 status: STEP_STATUS.PASS,
+                guard: { shouldExecute: true, reason: "NONE" },
                 detail: null,
               },
             ],
@@ -5188,6 +5220,7 @@ const context = runDeveloperWorkflow({
                 id: step.id,
                 name: step.name,
                 status: STEP_STATUS.FAIL,
+                guard: { shouldExecute: true, reason: "NONE" },
                 detail: null,
               },
             ],
@@ -5253,6 +5286,12 @@ if (payload.status !== WORKFLOW_STATUS.SUCCESS) {
 if (!Array.isArray(payload.results) || payload.results.length !== 1) {
   throw new Error("developer-automation-report.json results mismatch");
 }
+if (!payload.options || payload.options.dryRun !== true) {
+  throw new Error("developer-automation-report.json must include workflow options");
+}
+if (!payload.results[0].guard) {
+  throw new Error("developer-automation-report.json must include guard decision");
+}
 
 console.log("developer-automation-report.json ok");
 EOF
@@ -5284,7 +5323,7 @@ const context = finalizeWorkflowContext({
 });
 
 const markdown = buildDeveloperAutomationReportMarkdown(context);
-for (const section of ["Developer Automation Report", "Workflow", "Status", "Step Results"]) {
+for (const section of ["Developer Automation Report", "Workflow Options", "Workflow Status", "Guard Summary", "Step Results"]) {
   if (!markdown.includes(section)) {
     throw new Error(`developer-automation-report markdown must include section: ${section}`);
   }
@@ -5334,13 +5373,25 @@ const summary = buildDeveloperAutomationWorkflowCliSummary(context);
 if (!summary.includes("Developer Automation Workflow")) {
   throw new Error("CLI summary must include workflow heading");
 }
-if (!summary.includes("Status: FAILURE")) {
-  throw new Error("CLI summary must include workflow status");
+if (!summary.includes("Options")) {
+  throw new Error("CLI summary must include options section");
 }
-if (!summary.includes("✔ Version Consistency — pass")) {
+if (!summary.includes("Workflow Status")) {
+  throw new Error("CLI summary must include workflow status section");
+}
+if (!summary.includes("Guard Summary")) {
+  throw new Error("CLI summary must include guard summary section");
+}
+if (!summary.includes("Executed")) {
+  throw new Error("CLI summary must include executed count");
+}
+if (!summary.includes("FAILURE")) {
+  throw new Error("CLI summary must include workflow status value");
+}
+if (!summary.includes("Version Consistency\nPASS")) {
   throw new Error("CLI summary must include pass step");
 }
-if (!summary.includes("✘ Release Readiness — fail")) {
+if (!summary.includes("Release Readiness\nFAIL")) {
   throw new Error("CLI summary must include fail step");
 }
 
@@ -5383,10 +5434,13 @@ const summary = buildDeveloperAutomationWorkflowCliSummary(context);
 if (report.results.length !== context.results.length) {
   throw new Error("report must be built from the same context results");
 }
-if (!markdown.includes("Release Plan — pass")) {
+if (!markdown.includes("Release Plan")) {
   throw new Error("markdown must reflect context step results");
 }
-if (!summary.includes("Release Plan — pass")) {
+if (!markdown.includes("Status: PASS")) {
+  throw new Error("markdown must include step status");
+}
+if (!summary.includes("Release Plan\nPASS")) {
   throw new Error("CLI summary must reflect context step results");
 }
 
@@ -5398,12 +5452,905 @@ echo "-- Test 148: developer:workflow npm script --"
 grep -q '"developer:workflow": "node scripts/run_developer_workflow.js"' package.json
 npm run developer:workflow -- --skip-npm-test >/tmp/developer_workflow_cli.log || true
 grep -q "Developer Automation Workflow" /tmp/developer_workflow_cli.log
-grep -q "Status:" /tmp/developer_workflow_cli.log
+grep -q "Workflow Status" /tmp/developer_workflow_cli.log
+grep -q "Guard Summary" /tmp/developer_workflow_cli.log
 grep -q "Step Results" /tmp/developer_workflow_cli.log
+grep -q "Options" /tmp/developer_workflow_cli.log
 grep -q "Version Consistency" /tmp/developer_workflow_cli.log
 grep -q "Release Readiness" /tmp/developer_workflow_cli.log
 grep -q "Release Plan" /tmp/developer_workflow_cli.log
 pass "developer:workflow npm script"
+
+echo "-- Test 149: DEFAULT_WORKFLOW_OPTIONS --"
+node --input-type=module <<'EOF'
+import {
+  DEFAULT_WORKFLOW_OPTIONS,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+if (DEFAULT_WORKFLOW_OPTIONS.dryRun !== true) {
+  throw new Error("default dryRun must be true");
+}
+if (DEFAULT_WORKFLOW_OPTIONS.failFast !== false) {
+  throw new Error("default failFast must be false");
+}
+if (DEFAULT_WORKFLOW_OPTIONS.stopBeforeStep !== null) {
+  throw new Error("default stopBeforeStep must be null");
+}
+if (!Array.isArray(DEFAULT_WORKFLOW_OPTIONS.skipSteps) || DEFAULT_WORKFLOW_OPTIONS.skipSteps.length !== 0) {
+  throw new Error("default skipSteps must be empty array");
+}
+if (!Array.isArray(DEFAULT_WORKFLOW_OPTIONS.guardHooks)) {
+  throw new Error("default guardHooks must be array");
+}
+
+const context = createWorkflowContext();
+if (JSON.stringify(context.options) !== JSON.stringify(DEFAULT_WORKFLOW_OPTIONS)) {
+  throw new Error("unspecified options must use DEFAULT_WORKFLOW_OPTIONS");
+}
+
+console.log("DEFAULT_WORKFLOW_OPTIONS ok");
+EOF
+pass "DEFAULT_WORKFLOW_OPTIONS"
+
+echo "-- Test 150: workflow guard functions --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  createWorkflowContext,
+  evaluateGuard,
+  shouldExecuteStep,
+  shouldSkipStep,
+  shouldStopBeforeStep,
+} from "./src/lib/developer_workflow.js";
+
+const knownStepIds = ["version-consistency", "release-readiness", "release-plan"];
+const stopAndSkipContext = createWorkflowContext({
+  options: {
+    stopBeforeStep: "release-plan",
+    skipSteps: ["release-plan"],
+  },
+});
+
+if (!shouldStopBeforeStep(stopAndSkipContext, { id: "release-plan" }, knownStepIds)) {
+  throw new Error("shouldStopBeforeStep must return true for stop target");
+}
+if (!shouldSkipStep(stopAndSkipContext, { id: "release-plan" }, knownStepIds)) {
+  throw new Error("shouldSkipStep must return true when step is listed in skipSteps");
+}
+const priorityGuard = evaluateGuard(stopAndSkipContext, { id: "release-plan" }, knownStepIds);
+if (priorityGuard.reason !== GUARD_REASON.STOP_BEFORE_STEP) {
+  throw new Error("evaluateGuard must prioritize STOP_BEFORE_STEP over SKIP_STEP");
+}
+if (shouldExecuteStep(stopAndSkipContext, { id: "release-plan" }, knownStepIds)) {
+  throw new Error("shouldExecuteStep must return false when stopBeforeStep matches");
+}
+if (shouldExecuteStep(createWorkflowContext(), { id: "version-consistency" }, knownStepIds) !== true) {
+  throw new Error("shouldExecuteStep must return true when no guard applies");
+}
+
+const skipContext = createWorkflowContext({
+  options: { skipSteps: ["release-plan"] },
+});
+if (!shouldSkipStep(skipContext, { id: "release-plan" }, knownStepIds)) {
+  throw new Error("shouldSkipStep must return true for skipped step");
+}
+if (shouldExecuteStep(skipContext, { id: "release-plan" }, knownStepIds)) {
+  throw new Error("shouldExecuteStep must return false for skipped step");
+}
+
+console.log("workflow guard functions ok");
+EOF
+pass "workflow guard functions"
+
+echo "-- Test 151: fail fast true stops workflow --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STOP_REASON,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { failFast: true },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: step.id === "version-consistency" ? STEP_STATUS.FAIL : STEP_STATUS.PASS,
+          guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+if (context.results.length !== 1) {
+  throw new Error("failFast true must stop workflow after first failure");
+}
+if (context.status !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("failFast true must produce FAILURE workflow status");
+}
+if (context.stopReason !== WORKFLOW_STOP_REASON.FAIL_FAST) {
+  throw new Error("failFast true must set FAIL_FAST stop reason");
+}
+
+console.log("fail fast true stops workflow ok");
+EOF
+pass "fail fast true stops workflow"
+
+echo "-- Test 152: fail fast false continues workflow --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STOP_REASON,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { failFast: false },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: step.id === "version-consistency" ? STEP_STATUS.FAIL : STEP_STATUS.PASS,
+          guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+if (context.results.length !== WORKFLOW_STEP_REGISTRY.length) {
+  throw new Error("failFast false must continue after failure");
+}
+if (context.status !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("failFast false must still produce FAILURE when a step fails");
+}
+if (context.stopReason !== WORKFLOW_STOP_REASON.NONE) {
+  throw new Error("failFast false must not set stop reason");
+}
+
+console.log("fail fast false continues workflow ok");
+EOF
+pass "fail fast false continues workflow"
+
+echo "-- Test 153: stop before step --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { stopBeforeStep: "release-plan" },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: STEP_STATUS.PASS,
+          guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+if (context.results.length !== 3) {
+  throw new Error("stopBeforeStep must include stopped target step in results");
+}
+if (context.results[2].status !== STEP_STATUS.STOPPED) {
+  throw new Error("stopBeforeStep target must be STOPPED");
+}
+if (context.results[2].guard.reason !== GUARD_REASON.STOP_BEFORE_STEP) {
+  throw new Error("stopBeforeStep target must include STOP_BEFORE_STEP guard reason");
+}
+if (context.status !== WORKFLOW_STATUS.STOPPED) {
+  throw new Error("stopBeforeStep must produce STOPPED workflow status");
+}
+
+console.log("stop before step ok");
+EOF
+pass "stop before step"
+
+echo "-- Test 154: skip step --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { skipSteps: ["release-plan"] },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: STEP_STATUS.PASS,
+          guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+const releasePlan = context.results.find((result) => result.id === "release-plan");
+if (!releasePlan || releasePlan.status !== STEP_STATUS.SKIPPED) {
+  throw new Error("skipSteps must mark target step as SKIPPED");
+}
+if (releasePlan.guard.reason !== GUARD_REASON.SKIP_STEP) {
+  throw new Error("skipped step must include SKIP_STEP guard reason");
+}
+if (context.status !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("skip step workflow must remain SUCCESS when other steps pass");
+}
+
+console.log("skip step ok");
+EOF
+pass "skip step"
+
+echo "-- Test 155: stopBeforeStep priority over skipSteps --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: {
+    stopBeforeStep: "release-plan",
+    skipSteps: ["release-plan"],
+  },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ctx,
+  })),
+});
+
+const releasePlan = context.results.find((result) => result.id === "release-plan");
+if (releasePlan.status !== STEP_STATUS.STOPPED) {
+  throw new Error("stopBeforeStep must take priority over skipSteps");
+}
+if (releasePlan.guard.reason !== GUARD_REASON.STOP_BEFORE_STEP) {
+  throw new Error("priority guard reason must be STOP_BEFORE_STEP");
+}
+
+console.log("stopBeforeStep priority over skipSteps ok");
+EOF
+pass "stopBeforeStep priority over skipSteps"
+
+echo "-- Test 156: unknown stopBeforeStep ignored --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { stopBeforeStep: "unknown-step" },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: "PASS",
+          guard: { shouldExecute: true, reason: "NONE" },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+if (context.results.length !== WORKFLOW_STEP_REGISTRY.length) {
+  throw new Error("unknown stopBeforeStep must not stop workflow");
+}
+
+console.log("unknown stopBeforeStep ignored ok");
+EOF
+pass "unknown stopBeforeStep ignored"
+
+echo "-- Test 157: unknown skipSteps ignored --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { skipSteps: ["unknown-step", "release-plan"] },
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: "PASS",
+          guard: { shouldExecute: true, reason: "NONE" },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+const releasePlan = context.results.find((result) => result.id === "release-plan");
+if (releasePlan.status !== "SKIPPED") {
+  throw new Error("known skip step must still be skipped when unknown ids are present");
+}
+if (context.results.length !== WORKFLOW_STEP_REGISTRY.length) {
+  throw new Error("unknown skipSteps must not remove other steps");
+}
+
+console.log("unknown skipSteps ignored ok");
+EOF
+pass "unknown skipSteps ignored"
+
+echo "-- Test 158: json guard report --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STOP_REASON,
+  runDeveloperWorkflow,
+  writeDeveloperAutomationReport,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const context = runDeveloperWorkflow({
+  rootDir: PROJECT_ROOT,
+  options: { stopBeforeStep: "release-plan" },
+  registry: [
+    {
+      id: "version-consistency",
+      name: "Version Consistency",
+      run: (ctx) => ({
+        ...ctx,
+        results: [
+          ...ctx.results,
+          {
+            id: "version-consistency",
+            name: "Version Consistency",
+            status: STEP_STATUS.PASS,
+            guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+            detail: null,
+          },
+        ],
+      }),
+    },
+    {
+      id: "release-readiness",
+      name: "Release Readiness",
+      run: (ctx) => ({
+        ...ctx,
+        results: [
+          ...ctx.results,
+          {
+            id: "release-readiness",
+            name: "Release Readiness",
+            status: STEP_STATUS.PASS,
+            guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+            detail: null,
+          },
+        ],
+      }),
+    },
+    {
+      id: "release-plan",
+      name: "Release Plan",
+      run: (ctx) => ctx,
+    },
+  ],
+});
+
+writeDeveloperAutomationReport(context, PROJECT_ROOT);
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/developer-automation/latest/developer-automation-report.json"),
+    "utf8",
+  ),
+);
+
+if (payload.status !== WORKFLOW_STATUS.STOPPED) {
+  throw new Error("json guard report must include STOPPED workflow status");
+}
+if (payload.stopReason !== WORKFLOW_STOP_REASON.STOP_BEFORE_STEP) {
+  throw new Error("json guard report must include stop reason");
+}
+if (payload.results.at(-1).guard.reason !== GUARD_REASON.STOP_BEFORE_STEP) {
+  throw new Error("json guard report must include guard decision");
+}
+
+console.log("json guard report ok");
+EOF
+pass "json guard report"
+
+echo "-- Test 159: markdown guard report --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  buildDeveloperAutomationReport,
+  buildDeveloperAutomationReportMarkdown,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { skipSteps: ["release-plan"] },
+  registry: [
+    {
+      id: "version-consistency",
+      name: "Version Consistency",
+      run: (ctx) => ({
+        ...ctx,
+        results: [
+          ...ctx.results,
+          {
+            id: "version-consistency",
+            name: "Version Consistency",
+            status: STEP_STATUS.PASS,
+            guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+            detail: null,
+          },
+        ],
+      }),
+    },
+    {
+      id: "release-plan",
+      name: "Release Plan",
+      run: (ctx) => ctx,
+    },
+  ],
+});
+
+const report = buildDeveloperAutomationReport(context);
+const markdown = buildDeveloperAutomationReportMarkdown(context);
+
+if (!markdown.includes(`Dry Run: ${report.options.dryRun ? "YES" : "NO"}`)) {
+  throw new Error("markdown must reflect json workflow options");
+}
+if (!markdown.includes(`Workflow Status`) || !markdown.includes(report.status)) {
+  throw new Error("markdown must reflect json workflow status");
+}
+if (!markdown.includes("Guard Reason: SKIP_STEP")) {
+  throw new Error("markdown must reflect json guard decision");
+}
+
+console.log("markdown guard report ok");
+EOF
+pass "markdown guard report"
+
+echo "-- Test 160: cli options display --"
+node --input-type=module <<'EOF'
+import {
+  buildDeveloperAutomationWorkflowCliSummary,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const summary = buildDeveloperAutomationWorkflowCliSummary(
+  runDeveloperWorkflow({
+    options: {
+      dryRun: true,
+      failFast: false,
+      stopBeforeStep: "release-plan",
+      skipSteps: [],
+    },
+    registry: [],
+  }),
+);
+
+for (const expected of ["Dry Run", "YES", "Fail Fast", "NO", "Stop Before", "release-plan", "Skip Steps", "none"]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`CLI options must include: ${expected}`);
+  }
+}
+
+console.log("cli options display ok");
+EOF
+pass "cli options display"
+
+echo "-- Test 161: workflow status SUCCESS --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  registry: [
+    {
+      id: "version-consistency",
+      name: "Version Consistency",
+      run: (ctx) => ({
+        ...ctx,
+        results: [
+          ...ctx.results,
+          {
+            id: "version-consistency",
+            name: "Version Consistency",
+            status: STEP_STATUS.PASS,
+            guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+            detail: null,
+          },
+        ],
+      }),
+    },
+  ],
+});
+
+if (context.status !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("all pass steps must produce SUCCESS workflow status");
+}
+
+console.log("workflow status SUCCESS ok");
+EOF
+pass "workflow status SUCCESS"
+
+echo "-- Test 162: workflow status FAILURE --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  registry: [
+    {
+      id: "version-consistency",
+      name: "Version Consistency",
+      run: (ctx) => ({
+        ...ctx,
+        results: [
+          ...ctx.results,
+          {
+            id: "version-consistency",
+            name: "Version Consistency",
+            status: STEP_STATUS.FAIL,
+            guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+            detail: null,
+          },
+        ],
+      }),
+    },
+  ],
+});
+
+if (context.status !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("failed step must produce FAILURE workflow status");
+}
+
+console.log("workflow status FAILURE ok");
+EOF
+pass "workflow status FAILURE"
+
+echo "-- Test 163: workflow status STOPPED --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { stopBeforeStep: "release-plan" },
+  registry: [
+    {
+      id: "release-plan",
+      name: "Release Plan",
+      run: (ctx) => ctx,
+    },
+  ],
+});
+
+if (context.status !== WORKFLOW_STATUS.STOPPED) {
+  throw new Error("stop before step must produce STOPPED workflow status");
+}
+
+console.log("workflow status STOPPED ok");
+EOF
+pass "workflow status STOPPED"
+
+echo "-- Test 164: SKIPPED step status --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  options: { skipSteps: ["release-plan"] },
+  registry: [
+    {
+      id: "release-plan",
+      name: "Release Plan",
+      run: (ctx) => ctx,
+    },
+  ],
+});
+
+if (context.results[0].status !== STEP_STATUS.SKIPPED) {
+  throw new Error("skipped step must use SKIPPED status");
+}
+if (context.results[0].guard.reason !== GUARD_REASON.SKIP_STEP) {
+  throw new Error("skipped step must include SKIP_STEP guard reason");
+}
+
+console.log("SKIPPED step status ok");
+EOF
+pass "SKIPPED step status"
+
+echo "-- Test 165: developer workflow backward compatibility --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  skipNpmTest: true,
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) => ({
+      ...ctx,
+      results: [
+        ...ctx.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: "PASS",
+          guard: { shouldExecute: true, reason: "NONE" },
+          detail: null,
+        },
+      ],
+    }),
+  })),
+});
+
+if (context.results.length !== WORKFLOW_STEP_REGISTRY.length) {
+  throw new Error("default options must execute all workflow steps like v1.29.0");
+}
+if (context.options.failFast !== false || context.options.stopBeforeStep !== null || context.options.skipSteps.length !== 0) {
+  throw new Error("default options must match v1.29.0 behavior");
+}
+
+console.log("developer workflow backward compatibility ok");
+EOF
+pass "developer workflow backward compatibility"
+
+echo "-- Test 166: developer:workflow guard --"
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan >/tmp/developer_workflow_guard.log || true
+grep -q "Stop Before" /tmp/developer_workflow_guard.log
+grep -q "release-plan" /tmp/developer_workflow_guard.log
+grep -q "Release Plan" /tmp/developer_workflow_guard.log
+grep -q "STOPPED" /tmp/developer_workflow_guard.log
+pass "developer:workflow guard"
+
+echo "-- Test 167: workflow report schema 1.1 --"
+node --input-type=module <<'EOF'
+import {
+  DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+if (DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA !== "developer-automation/workflow/1.1") {
+  throw new Error("workflow report schema must be developer-automation/workflow/1.1");
+}
+
+const context = createWorkflowContext();
+if (context.schema !== "developer-automation/workflow/1.1") {
+  throw new Error("workflow context schema must be 1.1");
+}
+
+console.log("workflow report schema 1.1 ok");
+EOF
+pass "workflow report schema 1.1"
+
+echo "-- Test 168: WORKFLOW_STOP_REASON constants --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+if (WORKFLOW_STOP_REASON.NONE !== "NONE") {
+  throw new Error("WORKFLOW_STOP_REASON.NONE mismatch");
+}
+if (WORKFLOW_STOP_REASON.FAIL_FAST !== "FAIL_FAST") {
+  throw new Error("WORKFLOW_STOP_REASON.FAIL_FAST mismatch");
+}
+if (WORKFLOW_STOP_REASON.STOP_BEFORE_STEP !== "STOP_BEFORE_STEP") {
+  throw new Error("WORKFLOW_STOP_REASON.STOP_BEFORE_STEP mismatch");
+}
+
+const context = createWorkflowContext();
+if (context.stopReason !== WORKFLOW_STOP_REASON.NONE) {
+  throw new Error("initial stopReason must use WORKFLOW_STOP_REASON.NONE");
+}
+
+console.log("WORKFLOW_STOP_REASON constants ok");
+EOF
+pass "WORKFLOW_STOP_REASON constants"
+
+echo "-- Test 169: guard summary in json and cli --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  buildDeveloperAutomationWorkflowCliSummary,
+  buildGuardSummary,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+  writeDeveloperAutomationReport,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext({ rootDir: PROJECT_ROOT }),
+  results: [
+    {
+      id: "version-consistency",
+      name: "Version Consistency",
+      status: STEP_STATUS.PASS,
+      guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+      detail: null,
+    },
+    {
+      id: "release-readiness",
+      name: "Release Readiness",
+      status: STEP_STATUS.SKIPPED,
+      guard: { shouldExecute: false, reason: GUARD_REASON.SKIP_STEP },
+      detail: null,
+    },
+    {
+      id: "release-plan",
+      name: "Release Plan",
+      status: STEP_STATUS.STOPPED,
+      guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+      detail: null,
+    },
+  ],
+});
+
+const summary = buildGuardSummary(context.results);
+if (summary.executed !== 1 || summary.skipped !== 1 || summary.stopped !== 1) {
+  throw new Error("guard summary counts mismatch");
+}
+
+writeDeveloperAutomationReport(context, PROJECT_ROOT);
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/developer-automation/latest/developer-automation-report.json"),
+    "utf8",
+  ),
+);
+
+if (payload.guardSummary.executed !== 1 || payload.guardSummary.skipped !== 1 || payload.guardSummary.stopped !== 1) {
+  throw new Error("json guardSummary mismatch");
+}
+
+const cli = buildDeveloperAutomationWorkflowCliSummary(context);
+if (!cli.includes("Guard Summary") || !cli.includes("Executed\n1") || !cli.includes("Skipped\n1") || !cli.includes("Stopped\n1")) {
+  throw new Error("CLI guard summary mismatch");
+}
+
+console.log("guard summary in json and cli ok");
+EOF
+pass "guard summary in json and cli"
+
+echo "-- Test 170: guard summary aggregation from results only --"
+node --input-type=module <<'EOF'
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  buildDeveloperAutomationReport,
+  buildGuardSummary,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext(),
+  results: [
+    {
+      id: "a",
+      name: "A",
+      status: STEP_STATUS.PASS,
+      guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+      detail: null,
+    },
+    {
+      id: "b",
+      name: "B",
+      status: STEP_STATUS.FAIL,
+      guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+      detail: null,
+    },
+    {
+      id: "c",
+      name: "C",
+      status: STEP_STATUS.SKIPPED,
+      guard: { shouldExecute: false, reason: GUARD_REASON.SKIP_STEP },
+      detail: null,
+    },
+  ],
+});
+
+const report = buildDeveloperAutomationReport(context);
+const summary = buildGuardSummary(context.results);
+
+if (summary.executed !== 2) {
+  throw new Error("executed must count guard.shouldExecute true steps only");
+}
+if (summary.skipped !== 1) {
+  throw new Error("skipped must count SKIPPED status steps only");
+}
+if (summary.stopped !== 0) {
+  throw new Error("stopped must count STOPPED status steps only");
+}
+if (JSON.stringify(report.guardSummary) !== JSON.stringify(summary)) {
+  throw new Error("report guardSummary must match buildGuardSummary from results");
+}
+
+console.log("guard summary aggregation ok");
+EOF
+pass "guard summary aggregation from results only"
 
 echo ""
 echo "All quality pipeline tests passed."

@@ -10,32 +10,50 @@ import {
   writeReleaseReadinessReport,
 } from "./release_readiness.js";
 import { buildReleasePlan, writeReleasePlanReport } from "./release_plan.js";
+import {
+  DEFAULT_WORKFLOW_OPTIONS,
+  normalizeWorkflowOptions,
+} from "./workflow_options.js";
+import {
+  evaluateGuard,
+  guardDecisionToStepStatus,
+  shouldExecuteStep,
+  shouldSkipStep,
+  shouldStopBeforeStep,
+} from "./workflow_guard.js";
+import { GUARD_REASON } from "./workflow_guard_reason.js";
+import { STEP_STATUS } from "./workflow_step_status.js";
+import { WORKFLOW_STATUS } from "./workflow_status.js";
+import { WORKFLOW_STOP_REASON } from "./workflow_stop_reason.js";
 
 export const DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA =
-  "developer-automation/workflow/1.0";
+  "developer-automation/workflow/1.1";
 
-export const STEP_STATUS = {
-  PASS: "pass",
-  FAIL: "fail",
-  SKIP: "skip",
-};
-
-export const WORKFLOW_STATUS = {
-  SUCCESS: "success",
-  FAILURE: "failure",
-};
+export { DEFAULT_WORKFLOW_OPTIONS, normalizeWorkflowOptions } from "./workflow_options.js";
+export {
+  evaluateGuard,
+  shouldExecuteStep,
+  shouldSkipStep,
+  shouldStopBeforeStep,
+} from "./workflow_guard.js";
+export { GUARD_REASON } from "./workflow_guard_reason.js";
+export { WORKFLOW_STOP_REASON } from "./workflow_stop_reason.js";
+export { STEP_STATUS } from "./workflow_step_status.js";
+export { WORKFLOW_STATUS } from "./workflow_status.js";
 
 /**
  * @param {{
  *   id: string,
  *   name: string,
  *   status: string,
+ *   guard?: { shouldExecute: boolean, reason: string },
  *   detail?: unknown,
  * }} params
  * @returns {{
  *   id: string,
  *   name: string,
  *   status: string,
+ *   guard: { shouldExecute: boolean, reason: string },
  *   detail: unknown,
  * }}
  */
@@ -44,6 +62,10 @@ export function buildStepResult(params) {
     id: params.id,
     name: params.name,
     status: params.status,
+    guard: params.guard ?? {
+      shouldExecute: true,
+      reason: GUARD_REASON.NONE,
+    },
     detail: params.detail ?? null,
   };
 }
@@ -52,13 +74,16 @@ export function buildStepResult(params) {
  * @param {object} [params]
  * @param {string} [params.rootDir]
  * @param {boolean} [params.skipNpmTest]
+ * @param {Partial<typeof DEFAULT_WORKFLOW_OPTIONS>} [params.options]
  * @param {string} [params.generatedAt]
  * @returns {{
  *   schema: string,
  *   rootDir: string,
  *   skipNpmTest: boolean,
+ *   options: typeof DEFAULT_WORKFLOW_OPTIONS,
  *   results: ReturnType<typeof buildStepResult>[],
  *   status: string,
+ *   stopReason: string,
  *   generatedAt: string,
  * }}
  */
@@ -67,8 +92,10 @@ export function createWorkflowContext(params = {}) {
     schema: DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA,
     rootDir: params.rootDir ?? process.cwd(),
     skipNpmTest: params.skipNpmTest ?? false,
+    options: normalizeWorkflowOptions(params.options),
     results: [],
     status: WORKFLOW_STATUS.SUCCESS,
+    stopReason: WORKFLOW_STOP_REASON.NONE,
     generatedAt: params.generatedAt ?? new Date().toISOString(),
   };
 }
@@ -86,12 +113,27 @@ export function appendStepResult(context, stepResult) {
 }
 
 /**
- * @param {ReturnType<typeof buildStepResult>[]} results
+ * @param {ReturnType<typeof createWorkflowContext>} context
  * @returns {string}
  */
-export function computeWorkflowStatus(results) {
-  const hasFail = results.some((result) => result.status === STEP_STATUS.FAIL);
-  return hasFail ? WORKFLOW_STATUS.FAILURE : WORKFLOW_STATUS.SUCCESS;
+export function computeWorkflowStatus(context) {
+  const { results, stopReason } = context;
+
+  if (
+    stopReason === WORKFLOW_STOP_REASON.STOP_BEFORE_STEP ||
+    results.some((result) => result.status === STEP_STATUS.STOPPED)
+  ) {
+    return WORKFLOW_STATUS.STOPPED;
+  }
+
+  if (
+    stopReason === WORKFLOW_STOP_REASON.FAIL_FAST ||
+    results.some((result) => result.status === STEP_STATUS.FAIL)
+  ) {
+    return WORKFLOW_STATUS.FAILURE;
+  }
+
+  return WORKFLOW_STATUS.SUCCESS;
 }
 
 /**
@@ -101,7 +143,7 @@ export function computeWorkflowStatus(results) {
 export function finalizeWorkflowContext(context) {
   return {
     ...context,
-    status: computeWorkflowStatus(context.results),
+    status: computeWorkflowStatus(context),
   };
 }
 
@@ -119,6 +161,10 @@ export function stepVersionConsistency(context) {
       id: "version-consistency",
       name: "Version Consistency",
       status: report.status === "ok" ? STEP_STATUS.PASS : STEP_STATUS.FAIL,
+      guard: {
+        shouldExecute: true,
+        reason: GUARD_REASON.NONE,
+      },
       detail: {
         reportStatus: report.status,
         gitTag: report.gitTag,
@@ -146,6 +192,10 @@ export function stepReleaseReadiness(context) {
       id: "release-readiness",
       name: "Release Readiness",
       status: report.status === "ready" ? STEP_STATUS.PASS : STEP_STATUS.FAIL,
+      guard: {
+        shouldExecute: true,
+        reason: GUARD_REASON.NONE,
+      },
       detail: {
         readinessStatus: report.status,
         checks: report.checks,
@@ -168,6 +218,10 @@ export function stepReleasePlan(context) {
       id: "release-plan",
       name: "Release Plan",
       status: plan.status === "ready" ? STEP_STATUS.PASS : STEP_STATUS.FAIL,
+      guard: {
+        shouldExecute: true,
+        reason: GUARD_REASON.NONE,
+      },
       detail: {
         planStatus: plan.status,
         stepCount: plan.steps.length,
@@ -196,17 +250,64 @@ export const WORKFLOW_STEP_REGISTRY = [
 
 /**
  * @param {ReturnType<typeof createWorkflowContext>} context
- * @param {typeof WORKFLOW_STEP_REGISTRY} [registry]
+ * @param {typeof WORKFLOW_STEP_REGISTRY} registry
  * @returns {ReturnType<typeof createWorkflowContext>}
  */
 export function executeWorkflowSteps(context, registry = WORKFLOW_STEP_REGISTRY) {
-  return registry.reduce((currentContext, step) => step.run(currentContext), context);
+  const knownStepIds = registry.map((step) => step.id);
+  let currentContext = { ...context };
+
+  for (const step of registry) {
+    if (currentContext.stopReason !== WORKFLOW_STOP_REASON.NONE) {
+      break;
+    }
+
+    const guard = evaluateGuard(currentContext, step, knownStepIds);
+
+    if (!guard.shouldExecute) {
+      currentContext = appendStepResult(
+        currentContext,
+        buildStepResult({
+          id: step.id,
+          name: step.name,
+          status: guardDecisionToStepStatus(guard),
+          guard,
+        }),
+      );
+
+      if (guard.reason === GUARD_REASON.STOP_BEFORE_STEP) {
+        currentContext = {
+          ...currentContext,
+          stopReason: WORKFLOW_STOP_REASON.STOP_BEFORE_STEP,
+        };
+      }
+
+      continue;
+    }
+
+    currentContext = step.run(currentContext);
+    const lastResult = currentContext.results.at(-1);
+
+    if (
+      lastResult?.status === STEP_STATUS.FAIL &&
+      currentContext.options.failFast
+    ) {
+      currentContext = {
+        ...currentContext,
+        stopReason: WORKFLOW_STOP_REASON.FAIL_FAST,
+      };
+      break;
+    }
+  }
+
+  return currentContext;
 }
 
 /**
  * @param {object} [params]
  * @param {string} [params.rootDir]
  * @param {boolean} [params.skipNpmTest]
+ * @param {Partial<typeof DEFAULT_WORKFLOW_OPTIONS>} [params.options]
  * @param {string} [params.generatedAt]
  * @param {typeof WORKFLOW_STEP_REGISTRY} [params.registry]
  * @returns {ReturnType<typeof createWorkflowContext>}
@@ -218,10 +319,31 @@ export function runDeveloperWorkflow(params = {}) {
 }
 
 /**
+ * @param {ReturnType<typeof buildStepResult>[]} results
+ * @returns {{ executed: number, skipped: number, stopped: number }}
+ */
+export function buildGuardSummary(results) {
+  return {
+    executed: results.filter((result) => result.guard.shouldExecute === true).length,
+    skipped: results.filter((result) => result.status === STEP_STATUS.SKIPPED).length,
+    stopped: results.filter((result) => result.status === STEP_STATUS.STOPPED).length,
+  };
+}
+
+/**
  * @param {ReturnType<typeof runDeveloperWorkflow>} context
  * @returns {{
  *   schema: string,
  *   status: string,
+ *   options: {
+ *     dryRun: boolean,
+ *     failFast: boolean,
+ *     stopBeforeStep: string | null,
+ *     skipSteps: string[],
+ *   },
+ *   stopReason: string,
+ *   guardHooks: unknown[],
+ *   guardSummary: { executed: number, skipped: number, stopped: number },
  *   results: ReturnType<typeof buildStepResult>[],
  *   generatedAt: string,
  * }}
@@ -230,9 +352,42 @@ export function buildDeveloperAutomationReport(context) {
   return {
     schema: context.schema,
     status: context.status,
+    options: {
+      dryRun: context.options.dryRun,
+      failFast: context.options.failFast,
+      stopBeforeStep: context.options.stopBeforeStep,
+      skipSteps: context.options.skipSteps,
+    },
+    stopReason: context.stopReason,
+    guardHooks: context.options.guardHooks,
+    guardSummary: buildGuardSummary(context.results),
     results: context.results,
     generatedAt: context.generatedAt,
   };
+}
+
+/**
+ * @param {boolean} value
+ * @returns {string}
+ */
+function formatBooleanOption(value) {
+  return value ? "YES" : "NO";
+}
+
+/**
+ * @param {string[]} skipSteps
+ * @returns {string}
+ */
+function formatSkipStepsOption(skipSteps) {
+  return skipSteps.length > 0 ? skipSteps.join(", ") : "none";
+}
+
+/**
+ * @param {string | null} stopBeforeStep
+ * @returns {string}
+ */
+function formatStopBeforeOption(stopBeforeStep) {
+  return stopBeforeStep ?? "none";
 }
 
 /**
@@ -241,8 +396,6 @@ export function buildDeveloperAutomationReport(context) {
  */
 export function buildDeveloperAutomationReportMarkdown(context) {
   const report = buildDeveloperAutomationReport(context);
-  const displayStatus =
-    report.status === WORKFLOW_STATUS.SUCCESS ? "SUCCESS" : "FAILURE";
 
   const lines = [
     "# Developer Automation Report",
@@ -252,19 +405,36 @@ export function buildDeveloperAutomationReportMarkdown(context) {
     `- Schema: ${report.schema}`,
     `- Generated at: ${report.generatedAt}`,
     "",
-    "## Status",
+    "## Workflow Options",
     "",
-    displayStatus,
+    `- Dry Run: ${formatBooleanOption(report.options.dryRun)}`,
+    `- Fail Fast: ${formatBooleanOption(report.options.failFast)}`,
+    `- Stop Before: ${formatStopBeforeOption(report.options.stopBeforeStep)}`,
+    `- Skip Steps: ${formatSkipStepsOption(report.options.skipSteps)}`,
+    "",
+    "## Workflow Status",
+    "",
+    report.status,
+    "",
+    `- Stop Reason: ${report.stopReason}`,
+    "",
+    "## Guard Summary",
+    "",
+    `- Executed: ${report.guardSummary.executed}`,
+    `- Skipped: ${report.guardSummary.skipped}`,
+    `- Stopped: ${report.guardSummary.stopped}`,
     "",
     "## Step Results",
     "",
   ];
 
   for (const result of report.results) {
-    lines.push(`- ${result.name} — ${result.status}`);
+    lines.push(`### ${result.name}`, "");
+    lines.push(`- Status: ${result.status}`);
+    lines.push(`- Guard Should Execute: ${result.guard.shouldExecute ? "YES" : "NO"}`);
+    lines.push(`- Guard Reason: ${result.guard.reason}`);
+    lines.push("");
   }
-
-  lines.push("");
 
   return lines.join("\n");
 }
@@ -275,30 +445,49 @@ export function buildDeveloperAutomationReportMarkdown(context) {
  */
 export function buildDeveloperAutomationWorkflowCliSummary(context) {
   const report = buildDeveloperAutomationReport(context);
-  const icon = (status) => {
-    if (status === STEP_STATUS.PASS) {
-      return "✔";
-    }
-    if (status === STEP_STATUS.FAIL) {
-      return "✘";
-    }
-    return "○";
-  };
 
   const lines = [
     "Developer Automation Workflow",
     "",
-    `Status: ${report.status === WORKFLOW_STATUS.SUCCESS ? "SUCCESS" : "FAILURE"}`,
+    "Options",
+    "",
+    "Dry Run",
+    formatBooleanOption(report.options.dryRun),
+    "",
+    "Fail Fast",
+    formatBooleanOption(report.options.failFast),
+    "",
+    "Stop Before",
+    formatStopBeforeOption(report.options.stopBeforeStep),
+    "",
+    "Skip Steps",
+    formatSkipStepsOption(report.options.skipSteps),
+    "",
+    "Workflow Status",
+    report.status,
+    "",
+    "Guard Summary",
+    "",
+    "Executed",
+    String(report.guardSummary.executed),
+    "",
+    "Skipped",
+    String(report.guardSummary.skipped),
+    "",
+    "Stopped",
+    String(report.guardSummary.stopped),
     "",
     "Step Results",
     "",
   ];
 
   for (const result of report.results) {
-    lines.push(`${icon(result.status)} ${result.name} — ${result.status}`);
+    lines.push(result.name);
+    lines.push(result.status);
+    lines.push("");
   }
 
-  return lines.join("\n");
+  return lines.join("\n").trimEnd();
 }
 
 /**
@@ -317,6 +506,10 @@ export function writeDeveloperAutomationReport(context, rootDir = process.cwd())
   const jsonPayload = {
     schema: report.schema,
     status: report.status,
+    options: report.options,
+    stopReason: report.stopReason,
+    guardHooks: report.guardHooks,
+    guardSummary: report.guardSummary,
     results: report.results,
   };
 

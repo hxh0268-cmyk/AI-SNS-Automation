@@ -931,11 +931,11 @@ npm run developer:workflow
 |------|------|
 | ライブラリ | `src/lib/developer_workflow.js` |
 | CLI | `scripts/run_developer_workflow.js` |
-| schema | `developer-automation/workflow/1.0` |
+| schema | `developer-automation/workflow/1.1` |
 | Context | 唯一の状態管理（`context.results[]` に Step Result 蓄積） |
 | Step Registry | version-consistency → release-readiness → release-plan |
-| Step Status | `STEP_STATUS` — pass / fail / skip |
-| Workflow Status | `WORKFLOW_STATUS` — success / failure |
+| Step Status | `STEP_STATUS` — PASS / FAIL / SKIPPED / STOPPED |
+| Workflow Status | `WORKFLOW_STATUS` — SUCCESS / FAILURE / STOPPED |
 | JSON report | `reports/developer-automation/latest/developer-automation-report.json` |
 | Markdown report | `reports/developer-automation/latest/developer-automation-report.md` |
 | git commit/tag/push | **未実装** |
@@ -945,13 +945,104 @@ npm run developer:workflow
 ```text
 Developer Automation Workflow
 
-Status: SUCCESS
+Options
+
+Dry Run
+YES
+
+Fail Fast
+NO
+
+Stop Before
+none
+
+Skip Steps
+none
+
+Workflow Status
+SUCCESS
+
+Guard Summary
+
+Executed
+3
+
+Skipped
+0
+
+Stopped
+0
 
 Step Results
 
-✔ Version Consistency — pass
-✔ Release Readiness — pass
-✔ Release Plan — pass
+Version Consistency
+PASS
+
+Release Readiness
+PASS
+
+Release Plan
+PASS
+```
+
+### Developer Workflow Guard Foundation（v1.30.0）
+
+Workflow Engine に **安全制御（Guard）** を追加した MVP です。Workflow Options を Context に保持し、Guard 関数で Fail Fast / Stop Before Step / Skip Step を制御します。JSON / Markdown / CLI は同一 Context から生成されます。
+
+```bash
+# 基本実行
+npm run developer:workflow -- --skip-npm-test
+
+# Guard オプション例
+npm run developer:workflow -- --skip-npm-test --fail-fast
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan
+npm run developer:workflow -- --skip-npm-test --skip-step release-plan
+```
+
+| 項目 | 内容 |
+|------|------|
+| Options | dryRun（default: true）/ failFast / stopBeforeStep / skipSteps |
+| Guard 関数 | shouldSkipStep / shouldStopBeforeStep / shouldExecuteStep（純粋関数） |
+| Guard Reason | NONE / SKIP_STEP / STOP_BEFORE_STEP / FAIL_FAST |
+| Step Status | PASS / FAIL / SKIPPED / STOPPED |
+| Workflow Status | SUCCESS / FAILURE / STOPPED |
+| Guard Decision | 各 Step Result に guard（shouldExecute / reason） |
+| guardHooks | 将来拡張用（空配列） |
+| JSON report | `developer-automation-report.json`（Options / Guard / Status） |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例
+
+```text
+Developer Automation Workflow
+
+Options
+
+Dry Run
+YES
+
+Fail Fast
+NO
+
+Stop Before
+release-plan
+
+Skip Steps
+none
+
+Workflow Status
+STOPPED
+
+Step Results
+
+Version Consistency
+PASS
+
+Release Readiness
+PASS
+
+Release Plan
+STOPPED
 ```
 
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
