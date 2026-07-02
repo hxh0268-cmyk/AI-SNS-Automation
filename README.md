@@ -822,6 +822,63 @@ GitHub Actions **Node.js 24 runtime** への移行準備として、**experiment
 - **cache key** は `package-lock.json` 内容に依存 — lockfile 更新後の初回 run は miss 相当になりうる
 - **workflow_run 経由の cache は信頼しない** 方針は v1.21.0 以降も継続
 
+### Developer Automation Foundation（v1.26.0）
+
+Git Tag / VERSION.md / CHANGELOG.md の **3-way Version Consistency** を dry-run で検証する基盤です。
+
+```bash
+npm run dev:next -- --dry-run
+```
+
+| 項目 | 内容 |
+|------|------|
+| ライブラリ | `src/lib/developer_automation.js` |
+| CLI | `scripts/run_dev_next.js` |
+| JSON report | `reports/developer-automation/latest/version-consistency.json` |
+| Markdown report | `reports/developer-automation/latest/version-consistency.md` |
+| CLI 出力 | `Version Check OK` / `Version Check WARNING` |
+| git commit/tag/push | **未実装**（Human Approval Gate 維持） |
+
+### Release Readiness Foundation（v1.27.0）
+
+Release 自動実行ではなく、**Release 可能かどうかを自動判定する MVP** です。JSON / Markdown / CLI は同一の判定結果オブジェクトから生成されます。
+
+```bash
+# npm test 再帰を避けるため --skip-npm-test を推奨（テストスイート内実行時）
+npm run release:readiness -- --skip-npm-test
+
+# 本番判定（npm test 含む）
+npm run release:readiness
+```
+
+| 項目 | 内容 |
+|------|------|
+| ライブラリ | `src/lib/release_readiness.js` |
+| CLI | `scripts/run_release_readiness.js` |
+| schema | `developer-automation/release-readiness/1.0` |
+| 判定 | Working Tree clean / Version Consistency / 必須レポート / npm test |
+| 必須レポート | `version-consistency.json` / `version-consistency.md` |
+| JSON report | `reports/developer-automation/latest/release-readiness.json` |
+| Markdown report | `reports/developer-automation/latest/release-readiness.md` |
+| 全体 status | `ready` / `not-ready` |
+| 各 check | `pass` / `fail` |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例
+
+成功時:
+
+```text
+Release Readiness
+
+✔ Working Tree
+✔ Version Consistency
+✔ Required Reports
+✔ npm test
+
+Status: READY
+```
+
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
 GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。

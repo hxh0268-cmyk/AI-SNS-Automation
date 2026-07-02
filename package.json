@@ -32,6 +32,7 @@
     "quality-pipeline:export": "node scripts/run_quality_pipeline.js --from-phase export",
     "test:quality-pipeline": "bash scripts/test_quality_pipeline.sh",
     "test": "npm run test:quality-pipeline",
-    "dev:next": "node scripts/run_dev_next.js"
+    "dev:next": "node scripts/run_dev_next.js",
+    "release:readiness": "node scripts/run_release_readiness.js"
   }
 }

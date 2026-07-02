@@ -11,3 +11,5 @@ images/*.png
 !images/.gitkeep
 .cache/
 reports/
+# Generated content ideas
+output/content-ideas/

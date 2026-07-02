@@ -4,6 +4,46 @@
 
 ---
 
+## v1.27.0 — 機能追加（Release Readiness Foundation）
+
+Release 自動実行ではなく、**Release 可能かどうかを自動判定する MVP** を追加しました。Working Tree / Version Consistency / 必須レポート / npm test の 4 チェックで `ready` / `not-ready` を返します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Release Readiness | `src/lib/release_readiness.js` / `scripts/run_release_readiness.js` |
+| npm script | `npm run release:readiness -- --skip-npm-test` |
+| Working Tree | `checkWorkingTree()` — clean 判定 |
+| Version Consistency | `checkVersionConsistency()` — v1.26.0 ロジック再利用 |
+| Required Reports | `REQUIRED_REPORTS` 配列 — version-consistency.json / .md |
+| npm test | `checkNpmTest()` — 成功判定（CLI は `--skip-npm-test` で再帰回避） |
+| JSON report | `release-readiness.json` |
+| Markdown report | `release-readiness.md` |
+| CLI | Summary 表示（✔/✘ + `Status: READY` / `NOT READY`） |
+| .gitignore | `output/content-ideas/` 追加 |
+| Test 117–124 | Release Readiness 判定 / レポート / CLI |
+
+### 設計判断
+
+- **MVP スコープ厳守** — git commit / tag / push / GitHub Release は未実装
+- **Version Consistency 重複なし** — `buildVersionConsistencyReport()` を再利用
+- **同一判定オブジェクト** — JSON / Markdown / CLI は `evaluateReleaseReadiness()` から生成
+- **npm test 再帰回避** — CLI に `--skip-npm-test` フラグ
+
+### 影響範囲
+
+- Release Readiness ライブラリ / CLI / テスト / ドキュメント / .gitignore
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **124 PASS**（Test 117–124 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.26.0 — 機能追加（Developer Automation Foundation）
 
 リリース前の状態確認基盤として **Developer Automation Foundation** を追加しました。Git Tag / VERSION.md / CHANGELOG.md の **3-way Version Consistency** を dry-run で検証できます。

@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.26.0**（Developer Automation Foundation）
+**v1.27.0**（Release Readiness Foundation）
 
 ---
 
@@ -26,7 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.26.0** | **機能追加** | **✅ 完了** | **Developer Automation Foundation / 3-way Version Consistency** |
+| **v1.27.0** | **機能追加** | **✅ 完了** | **Release Readiness Foundation / Release 可能判定 MVP** |
+| v1.26.0 | 機能追加 | ✅ 完了 | Developer Automation Foundation / 3-way Version Consistency |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
@@ -50,6 +51,46 @@
 
 ---
 
+### v1.27.0 で追加（Release Readiness Foundation）
+
+#### Release Readiness MVP
+
+- **`checkWorkingTree()`** … Git working tree が clean か判定
+- **`checkVersionConsistency()`** … v1.26.0 の 3-way consistency を再利用（重複実装なし）
+- **`checkRequiredReports()`** … 必須レポート配列 `REQUIRED_REPORTS` の存在確認
+- **`checkNpmTest()`** … `npm test` 成功判定（CLI は `--skip-npm-test` で再帰回避）
+- **`evaluateReleaseReadiness()`** … 上記 4 チェックを統合、`ready` / `not-ready` を返す
+- **`release-readiness.json`** … machine-readable report（schema 定数化）
+- **`release-readiness.md`** … human-readable report
+- **CLI** … Summary 表示（✔/✘ + `Status: READY` / `NOT READY`）
+- **`npm run release:readiness -- --skip-npm-test`** … Release 可能判定 MVP
+
+#### v1.28.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.27.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **124 PASS** |
+| npm test | **PASS** |
+
+### v1.27.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| release:readiness npm script | ✅ |
+| 4-check Release Readiness MVP | ✅ |
+| release-readiness reports | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 117–124 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
 
 ### v1.26.0 で追加（Developer Automation Foundation）
 
@@ -64,10 +105,11 @@
 - **CLI** … `Version Check OK` / `Version Check WARNING`
 - **`npm run dev:next -- --dry-run`** … dev-next + version consistency 実行
 
-#### v1.27.0 以降の候補
+#### v1.27.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Release Readiness Foundation | ✅ v1.27.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

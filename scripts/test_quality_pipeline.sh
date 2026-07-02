@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.26.0 --"
+echo "-- Test 98: VERSION updated to v1.27.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,15 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.26.0**（Developer Automation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.26.0");
+if (!versionDoc.includes("**v1.27.0**（Release Readiness Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.27.0");
 }
-if (!versionDoc.includes("v1.27.0")) {
-  throw new Error("docs/VERSION.md must mention v1.27.0 Release Automation candidate");
-}
-console.log("VERSION v1.26.0 ok");
+console.log("VERSION v1.27.0 ok");
 EOF
-pass "VERSION updated to v1.26.0"
+pass "VERSION updated to v1.27.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4340,6 +4337,288 @@ if (liveReport.changelog !== changelog) {
 console.log(`3-way consistency ok (live status: ${liveReport.status})`);
 EOF
 pass "3-way version consistency can be evaluated"
+
+echo "-- Test 117: release readiness evaluation --"
+node --input-type=module <<'EOF'
+import {
+  RELEASE_READINESS_SCHEMA,
+  evaluateReleaseReadiness,
+} from "./src/lib/release_readiness.js";
+
+const readyReport = evaluateReleaseReadiness({
+  workingTree: { status: "pass", detail: "clean" },
+  versionConsistency: { status: "pass", detail: {} },
+  requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+  npmTest: { status: "pass", detail: "npm test passed" },
+  generatedAt: "2026-06-25T00:00:00.000Z",
+});
+
+if (readyReport.schema !== RELEASE_READINESS_SCHEMA) {
+  throw new Error("release readiness schema mismatch");
+}
+if (readyReport.status !== "ready") {
+  throw new Error("expected ready when all checks pass");
+}
+if (Object.values(readyReport.checks).some((check) => check.status !== "pass")) {
+  throw new Error("expected all checks to pass");
+}
+
+const notReadyReport = evaluateReleaseReadiness({
+  workingTree: { status: "fail", detail: "dirty" },
+  versionConsistency: { status: "pass", detail: {} },
+  requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+  npmTest: { status: "pass", detail: "npm test passed" },
+});
+
+if (notReadyReport.status !== "not-ready") {
+  throw new Error("expected not-ready when any check fails");
+}
+
+console.log("release readiness evaluation ok");
+EOF
+pass "release readiness evaluation"
+
+echo "-- Test 118: working tree check --"
+node --input-type=module <<'EOF'
+import { checkWorkingTree } from "./src/lib/release_readiness.js";
+
+const clean = checkWorkingTree("/tmp", () => "");
+if (clean.status !== "pass" || clean.detail !== "clean") {
+  throw new Error("expected pass for clean working tree");
+}
+
+const dirty = checkWorkingTree("/tmp", () => " M README.md");
+if (dirty.status !== "fail" || !dirty.detail.includes("README.md")) {
+  throw new Error("expected fail for dirty working tree");
+}
+
+console.log("working tree check ok");
+EOF
+pass "working tree check"
+
+echo "-- Test 119: release readiness version consistency check --"
+node --input-type=module <<'EOF'
+import { checkVersionConsistency } from "./src/lib/release_readiness.js";
+
+const passResult = checkVersionConsistency({
+  versionReport: {
+    status: "ok",
+    gitTag: "v1.27.0",
+    versionMd: "v1.27.0",
+    changelog: "v1.27.0",
+    warnings: [],
+  },
+});
+if (passResult.status !== "pass") {
+  throw new Error("expected pass when version consistency is ok");
+}
+
+const failResult = checkVersionConsistency({
+  versionReport: {
+    status: "warning",
+    gitTag: "v1.26.0",
+    versionMd: "v1.27.0",
+    changelog: "v1.27.0",
+    warnings: ["version mismatch"],
+  },
+});
+if (failResult.status !== "fail") {
+  throw new Error("expected fail when version consistency is warning");
+}
+
+console.log("release readiness version consistency check ok");
+EOF
+pass "release readiness version consistency check"
+
+echo "-- Test 120: required reports check --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { checkRequiredReports, REQUIRED_REPORTS } from "./src/lib/release_readiness.js";
+
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "release-readiness-"));
+const reportDir = path.join(tempRoot, "reports", "developer-automation", "latest");
+fs.mkdirSync(reportDir, { recursive: true });
+
+const missingResult = checkRequiredReports(tempRoot);
+if (missingResult.status !== "fail") {
+  throw new Error("expected fail when required reports are missing");
+}
+if (missingResult.detail.missing.length !== REQUIRED_REPORTS.length) {
+  throw new Error("expected all required reports to be listed as missing");
+}
+
+for (const filename of REQUIRED_REPORTS) {
+  fs.writeFileSync(path.join(reportDir, filename), "{}");
+}
+
+const passResult = checkRequiredReports(tempRoot);
+if (passResult.status !== "pass") {
+  throw new Error("expected pass when required reports exist");
+}
+
+console.log("required reports check ok");
+EOF
+pass "required reports check"
+
+echo "-- Test 121: npm test check --"
+node --input-type=module <<'EOF'
+import { checkNpmTest } from "./src/lib/release_readiness.js";
+
+const skipped = checkNpmTest({ skip: true });
+if (skipped.status !== "pass" || skipped.detail !== "skipped") {
+  throw new Error("expected pass when npm test check is skipped");
+}
+
+const passed = checkNpmTest({
+  execSyncImpl: () => "ok",
+});
+if (passed.status !== "pass") {
+  throw new Error("expected pass when npm test succeeds");
+}
+
+const failed = checkNpmTest({
+  execSyncImpl: () => {
+    throw new Error("npm test failed");
+  },
+});
+if (failed.status !== "fail") {
+  throw new Error("expected fail when npm test fails");
+}
+
+console.log("npm test check ok");
+EOF
+pass "npm test check"
+
+echo "-- Test 122: release-readiness.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  evaluateReleaseReadiness,
+  writeReleaseReadinessReport,
+} from "./src/lib/release_readiness.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const report = evaluateReleaseReadiness({
+  rootDir: PROJECT_ROOT,
+  workingTree: { status: "pass", detail: "clean" },
+  versionConsistency: { status: "pass", detail: {} },
+  requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+  npmTest: { status: "pass", detail: "skipped" },
+  generatedAt: "2026-06-25T00:00:00.000Z",
+});
+
+writeReleaseReadinessReport(report, PROJECT_ROOT);
+
+const jsonPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/release-readiness.json",
+);
+const payload = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+
+if (payload.schema !== "developer-automation/release-readiness/1.0") {
+  throw new Error("release-readiness.json schema mismatch");
+}
+if (payload.status !== "ready") {
+  throw new Error("release-readiness.json status mismatch");
+}
+for (const key of ["workingTree", "versionConsistency", "requiredReports", "npmTest"]) {
+  if (payload.checks[key]?.status !== "pass") {
+    throw new Error(`release-readiness.json check ${key} must be pass`);
+  }
+}
+
+console.log("release-readiness.json ok");
+EOF
+pass "release-readiness.json generated"
+
+echo "-- Test 123: release-readiness.md generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  buildReleaseReadinessMarkdown,
+  evaluateReleaseReadiness,
+} from "./src/lib/release_readiness.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const report = evaluateReleaseReadiness({
+  workingTree: { status: "pass", detail: "clean" },
+  versionConsistency: { status: "fail", detail: {} },
+  requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+  npmTest: { status: "pass", detail: "skipped" },
+  generatedAt: "2026-06-25T00:00:00.000Z",
+});
+
+const markdown = buildReleaseReadinessMarkdown(report);
+for (const section of [
+  "Release Readiness",
+  "Status",
+  "Working Tree",
+  "Version Consistency",
+  "Required Reports",
+  "npm test",
+]) {
+  if (!markdown.includes(section)) {
+    throw new Error(`release-readiness markdown must include section: ${section}`);
+  }
+}
+
+const markdownPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/release-readiness.md",
+);
+if (!fs.existsSync(markdownPath)) {
+  throw new Error("release-readiness.md must exist after json generation test");
+}
+
+console.log("release-readiness.md ok");
+EOF
+pass "release-readiness.md generated"
+
+echo "-- Test 124: release readiness CLI output --"
+grep -q '"release:readiness": "node scripts/run_release_readiness.js"' package.json
+npm run release:readiness -- --skip-npm-test >/tmp/release_readiness_cli.log || true
+grep -q "Release Readiness" /tmp/release_readiness_cli.log
+grep -q "Working Tree" /tmp/release_readiness_cli.log
+grep -q "Version Consistency" /tmp/release_readiness_cli.log
+grep -q "Required Reports" /tmp/release_readiness_cli.log
+grep -q "npm test" /tmp/release_readiness_cli.log
+grep -q "Status:" /tmp/release_readiness_cli.log
+node --input-type=module <<'EOF'
+import { buildReleaseReadinessCliSummary, evaluateReleaseReadiness } from "./src/lib/release_readiness.js";
+
+const readySummary = buildReleaseReadinessCliSummary(
+  evaluateReleaseReadiness({
+    workingTree: { status: "pass", detail: "clean" },
+    versionConsistency: { status: "pass", detail: {} },
+    requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+    npmTest: { status: "pass", detail: "skipped" },
+  }),
+);
+if (!readySummary.includes("✔ Working Tree") || !readySummary.includes("Status: READY")) {
+  throw new Error("ready CLI summary format mismatch");
+}
+
+const notReadySummary = buildReleaseReadinessCliSummary(
+  evaluateReleaseReadiness({
+    workingTree: { status: "fail", detail: "dirty" },
+    versionConsistency: { status: "pass", detail: {} },
+    requiredReports: { status: "pass", detail: { required: [], missing: [] } },
+    npmTest: { status: "pass", detail: "skipped" },
+  }),
+);
+if (!notReadySummary.includes("✘ Working Tree") || !notReadySummary.includes("Status: NOT READY")) {
+  throw new Error("not-ready CLI summary format mismatch");
+}
+
+console.log("release readiness CLI output ok");
+EOF
+pass "release readiness CLI output"
 
 echo ""
 echo "All quality pipeline tests passed."
