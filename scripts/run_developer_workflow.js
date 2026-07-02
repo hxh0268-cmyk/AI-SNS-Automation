@@ -14,6 +14,10 @@ import {
   WORKFLOW_STEP_REGISTRY,
 } from "../src/lib/developer_workflow.js";
 import {
+  buildWorkflowHistoryCliSummary,
+  recordWorkflowHistoryRun,
+} from "../src/lib/developer_workflow_history.js";
+import {
   buildWorkflowResumeReport,
   buildWorkflowResumeCliSummary,
   buildWorkflowState,
@@ -87,6 +91,23 @@ function writeCheckpointOutputs(state, rootDir) {
   return { checkpointValidation, checkpointReport, checkpointOutputs };
 }
 
+function writeHistoryOutputs(context, rootDir, options = {}) {
+  const { history, outputs } = recordWorkflowHistoryRun({
+    rootDir,
+    context,
+    state: options.state ?? null,
+    checkpointPath: options.checkpointPath ?? null,
+    statePath: options.statePath ?? null,
+  });
+
+  console.log(buildWorkflowHistoryCliSummary(history));
+  console.log(`[DeveloperWorkflow] history json: ${outputs.json}`);
+  console.log(`[DeveloperWorkflow] history markdown: ${outputs.markdown}`);
+  console.log("");
+
+  return { history, outputs };
+}
+
 function main() {
   const cliOptions = parseArgs(process.argv.slice(2));
   const rootDir = process.cwd();
@@ -158,6 +179,11 @@ function main() {
     console.log(`[DeveloperWorkflow] markdown: ${outputs.markdown}`);
     console.log(`[DeveloperWorkflow] resume json: ${resumeOutputs.json}`);
     console.log(`[DeveloperWorkflow] resume markdown: ${resumeOutputs.markdown}`);
+    console.log("");
+
+    writeHistoryOutputs(resumeResult.context, rootDir, {
+      state: resumeResult.state,
+    });
 
     process.exitCode =
       resumeResult.context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
@@ -176,13 +202,19 @@ function main() {
   });
   const outputs = writeDeveloperAutomationReport(context);
 
+  let workflowState = null;
+  let statePath = null;
+  let checkpointPath = null;
+
   if (context.status === WORKFLOW_STATUS.STOPPED) {
-    const state = buildWorkflowState(context);
-    const statePath = writeWorkflowState(state, rootDir);
+    workflowState = buildWorkflowState(context);
+    statePath = writeWorkflowState(workflowState, rootDir);
     const { checkpointReport, checkpointOutputs } = writeCheckpointOutputs(
-      state,
+      workflowState,
       rootDir,
     );
+
+    checkpointPath = checkpointOutputs.json;
 
     console.log(buildWorkflowCheckpointCliSummary(checkpointReport));
     console.log(`[DeveloperWorkflow] state: ${statePath}`);
@@ -196,6 +228,13 @@ function main() {
   console.log(buildDeveloperAutomationWorkflowCliSummary(context));
   console.log(`[DeveloperWorkflow] json: ${outputs.json}`);
   console.log(`[DeveloperWorkflow] markdown: ${outputs.markdown}`);
+  console.log("");
+
+  writeHistoryOutputs(context, rootDir, {
+    state: workflowState,
+    checkpointPath,
+    statePath,
+  });
 
   process.exitCode = context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
 }

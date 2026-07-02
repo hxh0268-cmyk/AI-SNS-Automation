@@ -4,6 +4,38 @@
 
 ---
 
+## v1.34.0 — 機能追加（Developer Workflow History Foundation）
+
+Checkpoint Foundation の上に、**Developer Workflow History Foundation** を追加しました。過去の実行履歴・時系列管理を担い、将来の Timeline / Dashboard の共通基盤とします。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| History schema | `developer-automation/workflow-history/1.0` |
+| History Writer | `appendWorkflowHistoryRun()` / `recordWorkflowHistoryRun()` |
+| History Reader | `readWorkflowHistory()` |
+| History Validator | `validateWorkflowHistory()` / `normalizeWorkflowHistory()` |
+| History Report | `workflow-history.json` / `workflow-history.md` |
+| CLI Summary | `Workflow History` セクション追加 |
+| Test 209–218 | History 生成 / 検証 / CLI / context mapping |
+
+### 設計判断
+
+- **Checkpoint / History 責務分離** — Checkpoint は現在状態、History は過去実行記録
+- **JSON Source / Markdown View** — history.md は JSON からのみ生成
+- **append-only MVP** — ファイル全体書き換え方式
+- **Resume Foundation 維持** — 既存 resume / checkpoint 能力は破壊しない
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **218 PASS**（Test 209–218 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.33.0 — 機能追加（Workflow Checkpoint Foundation）
 
 Resume Foundation の実行能力を維持したまま、**Checkpoint Foundation** で workflow-state の現在位置・互換性・resume 安全性を検証する基盤を追加しました。

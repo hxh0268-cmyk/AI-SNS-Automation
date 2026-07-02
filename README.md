@@ -1132,6 +1132,40 @@ Workflow Schema Version
 1.2
 ```
 
+Workflow Schema Version
+1.2
+```
+
+### Developer Workflow History Foundation（v1.34.0）
+
+Checkpoint Foundation の上に、**Developer Workflow History Foundation** を追加しました。過去の workflow 実行 run と step 結果を時系列で記録します。
+
+| 項目 | 内容 |
+|------|------|
+| history schema | `developer-automation/workflow-history/1.0` |
+| History JSON | `reports/developer-workflow/latest/workflow-history.json` |
+| History Markdown | `reports/developer-workflow/latest/workflow-history.md` |
+| 責務 | 過去実行履歴 / 時系列管理（Checkpoint とは分離） |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例（History）
+
+```text
+Workflow History
+
+Run Count
+1
+
+Latest Run Status
+stopped
+
+Latest Run Step Count
+3
+
+Latest Current Step
+release-plan
+```
+
 ### Developer Handoff Prompt Foundation（v1.31.0）
 
 ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を生成します。

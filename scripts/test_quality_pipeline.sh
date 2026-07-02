@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.33.0 --"
+echo "-- Test 98: VERSION updated to v1.34.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.33.0**（Workflow Checkpoint Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.33.0");
+if (!versionDoc.includes("**v1.34.0**（Developer Workflow History Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.34.0");
 }
-console.log("VERSION v1.33.0 ok");
+console.log("VERSION v1.34.0 ok");
 EOF
-pass "VERSION updated to v1.33.0"
+pass "VERSION updated to v1.34.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.34.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.34.0");
+if (payload.nextVersion !== "v1.35.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.35.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.34.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.34.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.35.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.35.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6504,14 +6504,14 @@ node --input-type=module <<'EOF'
 import { buildDeveloperHandoff, buildDeveloperHandoffCliSummary } from "./src/lib/developer_handoff.js";
 
 const summary = buildDeveloperHandoffCliSummary(
-  buildDeveloperHandoff({ currentVersion: "v1.33.0" }),
+  buildDeveloperHandoff({ currentVersion: "v1.34.0" }),
 );
 
 for (const expected of [
   "Developer Handoff",
   "Project: AI-SNS-Automation",
-  "Current Version: v1.33.0",
-  "Next Version: v1.34.0",
+  "Current Version: v1.34.0",
+  "Next Version: v1.35.0",
   "Release: Developer Handoff Prompt Foundation",
   "reports/developer-automation/latest/developer-handoff.json",
   "reports/developer-automation/latest/developer-handoff.md",
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.34.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.35.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -6543,15 +6543,15 @@ import {
 } from "./src/lib/developer_handoff.js";
 
 const handoff = buildDeveloperHandoff({
-  currentVersion: "v1.33.0",
+  currentVersion: "v1.34.0",
   generatedAt: "2026-07-02T00:00:00.000Z",
 });
 const markdown = buildDeveloperHandoffMarkdown(handoff);
 
-if (handoff.nextVersion !== "v1.34.0") {
-  throw new Error("handoff nextVersion must auto increment to v1.34.0");
+if (handoff.nextVersion !== "v1.35.0") {
+  throw new Error("handoff nextVersion must auto increment to v1.35.0");
 }
-if (!markdown.includes("Next Version: v1.34.0")) {
+if (!markdown.includes("Next Version: v1.35.0")) {
   throw new Error("markdown must include auto nextVersion");
 }
 if (!markdown.includes(handoff.objective)) {
@@ -7590,6 +7590,334 @@ for (const expected of [
 console.log("checkpoint markdown report renders JSON-derived view ok");
 EOF
 pass "checkpoint markdown report renders JSON-derived view"
+
+echo "-- Test 209: workflow-history schema validation --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_HISTORY_SCHEMA,
+  WORKFLOW_HISTORY_VERSION,
+  createEmptyWorkflowHistory,
+  validateWorkflowHistory,
+} from "./src/lib/developer_workflow_history.js";
+
+const history = createEmptyWorkflowHistory("2026-07-02T00:00:00.000Z");
+if (history.schema !== WORKFLOW_HISTORY_SCHEMA) {
+  throw new Error("workflow-history schema mismatch");
+}
+if (history.historyVersion !== WORKFLOW_HISTORY_VERSION) {
+  throw new Error("workflow-history historyVersion mismatch");
+}
+
+const validation = validateWorkflowHistory(history);
+if (!validation.valid) {
+  throw new Error(`workflow-history validation failed: ${validation.errors.join("; ")}`);
+}
+
+console.log("workflow-history schema validation ok");
+EOF
+pass "workflow-history schema validation"
+
+echo "-- Test 210: appendWorkflowHistoryRun appends run --"
+node --input-type=module <<'EOF'
+import {
+  appendWorkflowHistoryRun,
+  createEmptyWorkflowHistory,
+  HISTORY_RUN_STATUS,
+} from "./src/lib/developer_workflow_history.js";
+
+const history = appendWorkflowHistoryRun(createEmptyWorkflowHistory(), {
+  runId: "run-001",
+  startedAt: "2026-07-02T00:00:00.000Z",
+  completedAt: "2026-07-02T00:00:01.000Z",
+  status: HISTORY_RUN_STATUS.STOPPED,
+  workflowSchemaVersion: "1.2",
+  stepRegistryHash: "sha256:test",
+  currentStepId: "release-plan",
+  resumeSupported: true,
+  resumeUnsupportedReason: null,
+  checkpointPath: "reports/developer-workflow/latest/workflow-checkpoint.json",
+  statePath: "reports/developer-workflow/latest/workflow-state.json",
+  steps: [
+    {
+      stepId: "version-consistency",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:00.500Z",
+    },
+  ],
+});
+
+if (history.runs.length !== 1) {
+  throw new Error("appendWorkflowHistoryRun must append one run");
+}
+if (history.runs[0].runId !== "run-001") {
+  throw new Error("appended runId mismatch");
+}
+
+console.log("appendWorkflowHistoryRun appends run ok");
+EOF
+pass "appendWorkflowHistoryRun appends run"
+
+echo "-- Test 211: readWorkflowHistory returns empty when missing --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_HISTORY_SCHEMA,
+  readWorkflowHistory,
+} from "./src/lib/developer_workflow_history.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const missingPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-workflow/latest/workflow-history-missing.json",
+);
+
+if (fs.existsSync(missingPath)) {
+  fs.unlinkSync(missingPath);
+}
+
+const history = readWorkflowHistory(missingPath, PROJECT_ROOT);
+if (history.schema !== WORKFLOW_HISTORY_SCHEMA) {
+  throw new Error("missing history must return empty schema");
+}
+if (!Array.isArray(history.runs) || history.runs.length !== 0) {
+  throw new Error("missing history must return empty runs");
+}
+
+console.log("readWorkflowHistory returns empty when missing ok");
+EOF
+pass "readWorkflowHistory returns empty when missing"
+
+echo "-- Test 212: normalizeWorkflowHistory handles legacy missing fields --"
+node --input-type=module <<'EOF'
+import {
+  normalizeWorkflowHistory,
+  WORKFLOW_HISTORY_SCHEMA,
+} from "./src/lib/developer_workflow_history.js";
+
+const normalized = normalizeWorkflowHistory({
+  runs: [
+    {
+      status: "stopped",
+      steps: [{ stepId: "release-plan", status: "stopped" }],
+    },
+  ],
+});
+
+if (normalized.schema !== WORKFLOW_HISTORY_SCHEMA) {
+  throw new Error("normalize must fill schema");
+}
+if (normalized.runs.length !== 1) {
+  throw new Error("normalize must preserve runs");
+}
+if (!normalized.runs[0].runId) {
+  throw new Error("normalize must fill runId");
+}
+if (normalized.runs[0].currentStepId !== null) {
+  throw new Error("normalize must default missing currentStepId to null");
+}
+
+console.log("normalizeWorkflowHistory handles legacy missing fields ok");
+EOF
+pass "normalizeWorkflowHistory handles legacy missing fields"
+
+echo "-- Test 213: validateWorkflowHistory passes valid history --"
+node --input-type=module <<'EOF'
+import {
+  appendWorkflowHistoryRun,
+  createEmptyWorkflowHistory,
+  validateWorkflowHistory,
+  HISTORY_RUN_STATUS,
+} from "./src/lib/developer_workflow_history.js";
+
+const history = appendWorkflowHistoryRun(createEmptyWorkflowHistory(), {
+  runId: "run-valid",
+  startedAt: "2026-07-02T00:00:00.000Z",
+  completedAt: "2026-07-02T00:00:01.000Z",
+  status: HISTORY_RUN_STATUS.COMPLETED,
+  workflowSchemaVersion: "1.2",
+  stepRegistryHash: "sha256:test",
+  currentStepId: null,
+  resumeSupported: false,
+  resumeUnsupportedReason: null,
+  checkpointPath: null,
+  statePath: null,
+  steps: [
+    {
+      stepId: "version-consistency",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+    },
+  ],
+});
+
+const validation = validateWorkflowHistory(history);
+if (!validation.valid) {
+  throw new Error(`valid history must pass: ${validation.errors.join("; ")}`);
+}
+
+console.log("validateWorkflowHistory passes valid history ok");
+EOF
+pass "validateWorkflowHistory passes valid history"
+
+echo "-- Test 214: validateWorkflowHistory fails invalid schema --"
+node --input-type=module <<'EOF'
+import { validateWorkflowHistory } from "./src/lib/developer_workflow_history.js";
+
+const validation = validateWorkflowHistory({
+  schema: "developer-automation/workflow-history/9.9",
+  historyVersion: "9.9",
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  runs: [],
+});
+
+if (validation.valid) {
+  throw new Error("invalid workflow-history schema must fail validation");
+}
+if (!validation.errors.some((error) => error.includes("schema must be"))) {
+  throw new Error("invalid schema error must be reported");
+}
+
+console.log("validateWorkflowHistory fails invalid schema ok");
+EOF
+pass "validateWorkflowHistory fails invalid schema"
+
+echo "-- Test 215: workflow-history.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_HISTORY_SCHEMA,
+  buildWorkflowHistoryRun,
+  recordWorkflowHistoryRun,
+} from "./src/lib/developer_workflow_history.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const context = createWorkflowContext({
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+context.status = WORKFLOW_STATUS.SUCCESS;
+context.results = [
+  {
+    id: "version-consistency",
+    name: "Version Consistency",
+    status: STEP_STATUS.PASS,
+    guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+    detail: null,
+  },
+];
+
+recordWorkflowHistoryRun({
+  rootDir: PROJECT_ROOT,
+  context,
+});
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/developer-workflow/latest/workflow-history.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_HISTORY_SCHEMA) {
+  throw new Error("workflow-history.json schema mismatch");
+}
+if (!Array.isArray(payload.runs) || payload.runs.length === 0) {
+  throw new Error("workflow-history.json must contain runs");
+}
+
+console.log("workflow-history.json generated ok");
+EOF
+pass "workflow-history.json generated"
+
+echo "-- Test 216: workflow-history.md generated --"
+test -f reports/developer-workflow/latest/workflow-history.md
+grep -q "# Developer Workflow History Report" reports/developer-workflow/latest/workflow-history.md
+grep -q "Run Count:" reports/developer-workflow/latest/workflow-history.md
+pass "workflow-history.md generated"
+
+echo "-- Test 217: CLI summary shows history info --"
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan >/tmp/developer_workflow_history_cli.log 2>&1 || true
+grep -q "Workflow History" /tmp/developer_workflow_history_cli.log
+grep -q "Run Count" /tmp/developer_workflow_history_cli.log
+grep -q "workflow-history.json" /tmp/developer_workflow_history_cli.log
+grep -q "workflow-history.md" /tmp/developer_workflow_history_cli.log
+pass "CLI summary shows history info"
+
+echo "-- Test 218: buildWorkflowHistoryRun maps workflow context --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryRun,
+  HISTORY_RUN_STATUS,
+  HISTORY_STEP_STATUS,
+} from "./src/lib/developer_workflow_history.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+import { buildWorkflowState } from "./src/lib/developer_workflow_resume.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.status = WORKFLOW_STATUS.STOPPED;
+context.results = [
+  {
+    id: "version-consistency",
+    name: "Version Consistency",
+    status: STEP_STATUS.PASS,
+    guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+    detail: null,
+  },
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+const run = buildWorkflowHistoryRun({
+  context,
+  state,
+  checkpointPath: "reports/developer-workflow/latest/workflow-checkpoint.json",
+  statePath: "reports/developer-workflow/latest/workflow-state.json",
+  runId: "run-map-test",
+});
+
+if (run.status !== HISTORY_RUN_STATUS.STOPPED) {
+  throw new Error("history run status must map STOPPED workflow");
+}
+if (run.currentStepId !== "release-plan") {
+  throw new Error("history run currentStepId mismatch");
+}
+if (run.steps[0].status !== HISTORY_STEP_STATUS.COMPLETED) {
+  throw new Error("history step status must map PASS to completed");
+}
+if (run.steps[1].status !== HISTORY_STEP_STATUS.STOPPED) {
+  throw new Error("history step status must map STOPPED to stopped");
+}
+
+console.log("buildWorkflowHistoryRun maps workflow context ok");
+EOF
+pass "buildWorkflowHistoryRun maps workflow context"
 
 echo ""
 echo "All quality pipeline tests passed."
