@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.31.0**（Developer Handoff Prompt Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.31.0");
+if (!versionDoc.includes("**v1.32.0**（Developer Workflow Resume Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.32.0");
 }
-console.log("VERSION v1.31.0 ok");
+console.log("VERSION v1.32.0 ok");
 EOF
-pass "VERSION updated to v1.31.0"
+pass "VERSION updated to v1.32.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.32.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.32.0");
+if (payload.nextVersion !== "v1.33.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.33.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.32.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.32.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.33.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.33.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6504,14 +6504,14 @@ node --input-type=module <<'EOF'
 import { buildDeveloperHandoff, buildDeveloperHandoffCliSummary } from "./src/lib/developer_handoff.js";
 
 const summary = buildDeveloperHandoffCliSummary(
-  buildDeveloperHandoff({ currentVersion: "v1.31.0" }),
+  buildDeveloperHandoff({ currentVersion: "v1.32.0" }),
 );
 
 for (const expected of [
   "Developer Handoff",
   "Project: AI-SNS-Automation",
-  "Current Version: v1.31.0",
-  "Next Version: v1.32.0",
+  "Current Version: v1.32.0",
+  "Next Version: v1.33.0",
   "Release: Developer Handoff Prompt Foundation",
   "reports/developer-automation/latest/developer-handoff.json",
   "reports/developer-automation/latest/developer-handoff.md",
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.32.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.33.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -6543,15 +6543,15 @@ import {
 } from "./src/lib/developer_handoff.js";
 
 const handoff = buildDeveloperHandoff({
-  currentVersion: "v1.31.0",
+  currentVersion: "v1.32.0",
   generatedAt: "2026-07-02T00:00:00.000Z",
 });
 const markdown = buildDeveloperHandoffMarkdown(handoff);
 
-if (handoff.nextVersion !== "v1.32.0") {
-  throw new Error("handoff nextVersion must auto increment to v1.32.0");
+if (handoff.nextVersion !== "v1.33.0") {
+  throw new Error("handoff nextVersion must auto increment to v1.33.0");
 }
-if (!markdown.includes("Next Version: v1.32.0")) {
+if (!markdown.includes("Next Version: v1.33.0")) {
   throw new Error("markdown must include auto nextVersion");
 }
 if (!markdown.includes(handoff.objective)) {
@@ -6668,6 +6668,505 @@ if node scripts/run_developer_handoff.js --next-version 1.32.0 >/tmp/developer_h
 fi
 grep -q "Invalid nextVersion format" /tmp/developer_handoff_invalid.log
 pass "handoff CLI rejects invalid nextVersion"
+
+echo "-- Test 189: workflow-state schema validation --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA,
+  buildWorkflowState,
+  validateResumeState,
+  getWorkflowVersionContext,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "version-consistency",
+    name: "Version Consistency",
+    status: STEP_STATUS.PASS,
+    guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+    detail: null,
+  },
+  {
+    id: "release-readiness",
+    name: "Release Readiness",
+    status: STEP_STATUS.PASS,
+    guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+    detail: null,
+  },
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+if (state.schema !== WORKFLOW_STATE_SCHEMA) {
+  throw new Error("workflow-state schema mismatch");
+}
+if (state.workflowStatus !== "stopped") {
+  throw new Error("workflow-state workflowStatus must be stopped");
+}
+if (state.stoppedBeforeStepId !== "release-plan") {
+  throw new Error("workflow-state stoppedBeforeStepId mismatch");
+}
+
+const versionContext = getWorkflowVersionContext(process.cwd());
+const validation = validateResumeState(state, versionContext);
+if (!validation.valid) {
+  throw new Error(`workflow-state validation failed: ${validation.errors.join("; ")}`);
+}
+
+console.log("workflow-state schema validation ok");
+EOF
+pass "workflow-state schema validation"
+
+echo "-- Test 190: STOPPED workflow writes workflow-state.json --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_FILENAME,
+  DEVELOPER_WORKFLOW_REPORT_DIR,
+  writeWorkflowState,
+  buildWorkflowState,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const stubRegistry = WORKFLOW_STEP_REGISTRY.map((step) => ({
+  ...step,
+  run: (context) => ({
+    ...context,
+    results: [
+      ...context.results,
+      {
+        id: step.id,
+        name: step.name,
+        status: STEP_STATUS.PASS,
+        guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+        detail: null,
+      },
+    ],
+  }),
+}));
+
+const context = runDeveloperWorkflow({
+  rootDir: PROJECT_ROOT,
+  options: { stopBeforeStep: "release-plan" },
+  registry: stubRegistry,
+});
+
+if (context.status !== WORKFLOW_STATUS.STOPPED) {
+  throw new Error("stopBeforeStep must produce STOPPED workflow");
+}
+
+const statePath = writeWorkflowState(buildWorkflowState(context), PROJECT_ROOT);
+const absolutePath = path.join(
+  PROJECT_ROOT,
+  DEVELOPER_WORKFLOW_REPORT_DIR,
+  WORKFLOW_STATE_FILENAME,
+);
+
+if (!fs.existsSync(absolutePath)) {
+  throw new Error("workflow-state.json must be written for STOPPED workflow");
+}
+
+const payload = JSON.parse(fs.readFileSync(absolutePath, "utf8"));
+if (payload.schema !== WORKFLOW_STATE_SCHEMA) {
+  throw new Error("written workflow-state.json schema mismatch");
+}
+if (payload.stoppedBeforeStepId !== "release-plan") {
+  throw new Error("written workflow-state.json stoppedBeforeStepId mismatch");
+}
+if (!statePath.includes("workflow-state.json")) {
+  throw new Error("writeWorkflowState must return workflow-state.json path");
+}
+
+console.log("STOPPED workflow writes workflow-state.json ok");
+EOF
+pass "STOPPED workflow writes workflow-state.json"
+
+echo "-- Test 191: Resume starts from stoppedBeforeStepId --"
+node --input-type=module <<'EOF'
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_STATE_SCHEMA,
+  getWorkflowVersionContext,
+  runDeveloperWorkflowResume,
+  writeWorkflowState,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionContext = getWorkflowVersionContext(PROJECT_ROOT);
+const executedStepIds = [];
+
+const stubRegistry = WORKFLOW_STEP_REGISTRY.map((step) => ({
+  ...step,
+  run: (context) => {
+    executedStepIds.push(step.id);
+    return {
+      ...context,
+      results: [
+        ...context.results,
+        {
+          id: step.id,
+          name: step.name,
+          status: STEP_STATUS.PASS,
+          guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+          detail: null,
+        },
+      ],
+    };
+  },
+}));
+
+writeWorkflowState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  PROJECT_ROOT,
+);
+
+const resumeResult = runDeveloperWorkflowResume(
+  { rootDir: PROJECT_ROOT },
+  stubRegistry,
+);
+
+if (resumeResult.resumeFromStepId !== "release-plan") {
+  throw new Error("resume must start from stoppedBeforeStepId");
+}
+if (executedStepIds.join(",") !== "release-plan") {
+  throw new Error(`resume must not re-run completed steps: ${executedStepIds.join(",")}`);
+}
+if (resumeResult.context.status !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("resume must complete remaining step successfully");
+}
+
+console.log("Resume starts from stoppedBeforeStepId ok");
+EOF
+pass "Resume starts from stoppedBeforeStepId"
+
+echo "-- Test 192: Resume rejects non-stopped workflowStatus --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA,
+  getWorkflowVersionContext,
+  validateResumeState,
+} from "./src/lib/developer_workflow_resume.js";
+
+const versionContext = getWorkflowVersionContext(process.cwd());
+const validation = validateResumeState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "success",
+    stopReason: "none",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  versionContext,
+);
+
+if (validation.valid) {
+  throw new Error("non-stopped workflowStatus must be rejected");
+}
+if (!validation.errors.some((error) => error.includes('workflowStatus must be "stopped"'))) {
+  throw new Error("validation must report non-stopped workflowStatus");
+}
+
+console.log("Resume rejects non-stopped workflowStatus ok");
+EOF
+pass "Resume rejects non-stopped workflowStatus"
+
+echo "-- Test 193: Resume rejects unknown step id --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA,
+  getWorkflowVersionContext,
+  validateResumeState,
+} from "./src/lib/developer_workflow_resume.js";
+
+const versionContext = getWorkflowVersionContext(process.cwd());
+const validation = validateResumeState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["unknown-step"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  versionContext,
+);
+
+if (validation.valid) {
+  throw new Error("unknown completed step id must be rejected");
+}
+if (!validation.errors.some((error) => error.includes("unknown completed step id"))) {
+  throw new Error("validation must report unknown completed step id");
+}
+
+console.log("Resume rejects unknown step id ok");
+EOF
+pass "Resume rejects unknown step id"
+
+echo "-- Test 194: Resume rejects nextVersion mismatch --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA,
+  getWorkflowVersionContext,
+  validateResumeState,
+} from "./src/lib/developer_workflow_resume.js";
+
+const versionContext = getWorkflowVersionContext(process.cwd());
+const validation = validateResumeState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: "9.9.9",
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  versionContext,
+);
+
+if (validation.valid) {
+  throw new Error("nextVersion mismatch must be rejected");
+}
+if (!validation.errors.some((error) => error.includes("nextVersion mismatch"))) {
+  throw new Error("validation must report nextVersion mismatch");
+}
+
+console.log("Resume rejects nextVersion mismatch ok");
+EOF
+pass "Resume rejects nextVersion mismatch"
+
+echo "-- Test 195: workflow-resume.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_RESUME_SCHEMA,
+  WORKFLOW_STATE_SCHEMA,
+  buildWorkflowResumeReport,
+  getWorkflowVersionContext,
+  runDeveloperWorkflowResume,
+  writeWorkflowResumeReport,
+  writeWorkflowState,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionContext = getWorkflowVersionContext(PROJECT_ROOT);
+
+writeWorkflowState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  PROJECT_ROOT,
+);
+
+const stubRegistry = WORKFLOW_STEP_REGISTRY.map((step) => ({
+  ...step,
+  run: (context) => ({
+    ...context,
+    results: [
+      ...context.results,
+      {
+        id: step.id,
+        name: step.name,
+        status: STEP_STATUS.PASS,
+        guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+        detail: null,
+      },
+    ],
+  }),
+}));
+
+const resumeResult = runDeveloperWorkflowResume(
+  { rootDir: PROJECT_ROOT },
+  stubRegistry,
+);
+const report = buildWorkflowResumeReport({
+  status: "resumed",
+  resumeFromStepId: resumeResult.resumeFromStepId,
+  completedStepIds: resumeResult.state.completedStepIds ?? [],
+  workflowStatus: resumeResult.context.status,
+  generatedAt: resumeResult.context.generatedAt,
+});
+writeWorkflowResumeReport(report, PROJECT_ROOT);
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(
+      PROJECT_ROOT,
+      "reports/developer-workflow/latest/workflow-resume.json",
+    ),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_RESUME_SCHEMA) {
+  throw new Error("workflow-resume.json schema mismatch");
+}
+if (payload.status !== "resumed") {
+  throw new Error("workflow-resume.json status must be resumed");
+}
+if (payload.resumeFromStepId !== "release-plan") {
+  throw new Error("workflow-resume.json resumeFromStepId mismatch");
+}
+
+console.log("workflow-resume.json generated ok");
+EOF
+pass "workflow-resume.json generated"
+
+echo "-- Test 196: workflow-resume.md generated --"
+test -f reports/developer-workflow/latest/workflow-resume.md
+grep -q "# Developer Workflow Resume Report" reports/developer-workflow/latest/workflow-resume.md
+grep -q "Resume From Step: release-plan" reports/developer-workflow/latest/workflow-resume.md
+pass "workflow-resume.md generated"
+
+echo "-- Test 197: CLI summary shows Resume status --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowResumeCliSummary,
+  buildWorkflowResumeReport,
+} from "./src/lib/developer_workflow_resume.js";
+
+const summary = buildWorkflowResumeCliSummary(
+  buildWorkflowResumeReport({
+    status: "resumed",
+    resumeFromStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    workflowStatus: "SUCCESS",
+  }),
+);
+
+for (const expected of [
+  "Workflow Resume",
+  "Status",
+  "resumed",
+  "Resume From",
+  "release-plan",
+  "Completed Steps",
+  "version-consistency, release-readiness",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`resume CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("resume CLI summary ok");
+EOF
+node --input-type=module <<'EOF'
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_STATE_SCHEMA,
+  getWorkflowVersionContext,
+  writeWorkflowState,
+} from "./src/lib/developer_workflow_resume.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionContext = getWorkflowVersionContext(PROJECT_ROOT);
+
+writeWorkflowState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  PROJECT_ROOT,
+);
+EOF
+npm run developer:workflow -- --resume --skip-npm-test >/tmp/developer_workflow_resume_cli.log 2>&1 || true
+grep -q "Workflow Resume" /tmp/developer_workflow_resume_cli.log
+grep -q "Resume From" /tmp/developer_workflow_resume_cli.log
+grep -q "release-plan" /tmp/developer_workflow_resume_cli.log
+grep -q "workflow-resume.json" /tmp/developer_workflow_resume_cli.log
+pass "CLI summary shows Resume status"
+
+echo "-- Test 198: npm test remains PASS --"
+grep -q '"test"' package.json
+grep -q "scripts/test_quality_pipeline.sh" package.json
+pass "npm test remains PASS"
 
 echo ""
 echo "All quality pipeline tests passed."

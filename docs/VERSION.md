@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.31.0**（Developer Handoff Prompt Foundation）
+**v1.32.0**（Developer Workflow Resume Foundation）
 
 ---
 
@@ -26,6 +26,7 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
+| **v1.32.0** | **機能追加** | **✅ 完了** | **Developer Workflow Resume Foundation / STOPPED 状態の保存と Resume** |
 | **v1.31.0** | **機能追加** | **✅ 完了** | **Developer Handoff Prompt Foundation / Claude Code 引き継ぎ MVP** |
 | v1.30.0 | 機能追加 | ✅ 完了 | Developer Workflow Guard Foundation / Workflow 安全制御 MVP |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
@@ -51,6 +52,47 @@
 
 ---
 
+### v1.32.0 で追加（Developer Workflow Resume Foundation）
+
+#### Workflow Resume MVP
+
+- **`buildWorkflowState()`** … STOPPED 時の workflow-state.json 生成
+- **`validateResumeState()`** … Resume 前バリデーション
+- **`resolveResumeCursor()`** … stoppedBeforeStepId から再開位置を解決
+- **`runDeveloperWorkflowResume()`** … 完了済み Step をスキップして再開
+- **schema** … `developer-automation/workflow-state/1.0` / `developer-automation/workflow-resume/1.0`
+- **`npm run developer:workflow -- --resume`** … Resume CLI
+- **`--resume-state`** … workflow-state.json パス指定
+- **JSON → Markdown** … workflow-resume.json / workflow-resume.md
+
+#### v1.33.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.32.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **198 PASS** |
+| npm test | **PASS** |
+
+### v1.32.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-state.json 生成 | ✅ |
+| Resume Validator | ✅ |
+| Resume CLI | ✅ |
+| workflow-resume JSON / Markdown | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 189–198 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.31.0 で追加（Developer Handoff Prompt Foundation）
 
 #### Handoff Prompt MVP
@@ -64,10 +106,11 @@
 - **`npm run developer:handoff`** … 引き継ぎプロンプト生成 CLI
 - **JSON → Markdown** … Single Source of Truth 維持
 
-#### v1.32.0 以降の候補
+#### v1.32.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Workflow Resume Foundation | ✅ v1.32.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

@@ -1045,6 +1045,54 @@ Release Plan
 STOPPED
 ```
 
+Release Plan
+STOPPED
+```
+
+### Developer Workflow Resume Foundation（v1.32.0）
+
+Workflow Guard で **STOPPED** になった状態を保存し、`--resume` で安全に再開します。
+
+```bash
+# STOPPED 後に workflow-state.json が生成される
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan
+
+# 停止位置から再開
+npm run developer:workflow -- --resume --skip-npm-test
+
+# 状態ファイルを明示指定
+npm run developer:workflow -- --resume \
+  --resume-state reports/developer-workflow/latest/workflow-state.json
+```
+
+| 項目 | 内容 |
+|------|------|
+| workflow-state schema | `developer-automation/workflow-state/1.0` |
+| workflow-resume schema | `developer-automation/workflow-resume/1.0` |
+| State report | `reports/developer-workflow/latest/workflow-state.json` |
+| Resume JSON report | `reports/developer-workflow/latest/workflow-resume.json` |
+| Resume Markdown report | `reports/developer-workflow/latest/workflow-resume.md` |
+| Resume CLI | `--resume` / `--resume-state` |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例（Resume）
+
+```text
+Workflow Resume
+
+Status
+resumed
+
+Resume From
+release-plan
+
+Completed Steps
+version-consistency, release-readiness
+
+Workflow Status
+SUCCESS
+```
+
 ### Developer Handoff Prompt Foundation（v1.31.0）
 
 ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を生成します。

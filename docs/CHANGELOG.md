@@ -4,6 +4,40 @@
 
 ---
 
+## v1.32.0 — 機能追加（Developer Workflow Resume Foundation）
+
+Workflow Guard で **STOPPED** になった状態を `workflow-state.json` に保存し、`--resume` で安全に再開できる Resume Foundation を追加しました。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| State Persistence | `workflow-state.json`（schema: `developer-automation/workflow-state/1.0`） |
+| Resume Validator | schema / workflowStatus / nextVersion / step registry 検証 |
+| Resume Execution | 完了済み Step をスキップして `stoppedBeforeStepId` から再開 |
+| Resume CLI | `npm run developer:workflow -- --resume` / `--resume-state` |
+| Resume Report | `workflow-resume.json` / `workflow-resume.md` |
+| Test 189–198 | Resume 生成 / 検証 / CLI / Git 非自動化 |
+
+### 設計判断
+
+- **JSON Source / Markdown View** — workflow-resume.md は JSON からのみ生成
+- **Pure Functions** — Resume ロジックは `developer_workflow_resume.js` に分離
+- **MVP スコープ厳守** — Git 操作は未実装
+
+### 影響範囲
+
+- Developer Workflow Resume ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **198 PASS**（Test 189–198 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.31.0 — 機能追加（Developer Handoff Prompt Foundation）
 
 ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を自動生成する MVP を追加しました。

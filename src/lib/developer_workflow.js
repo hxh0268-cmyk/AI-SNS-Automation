@@ -253,11 +253,21 @@ export const WORKFLOW_STEP_REGISTRY = [
  * @param {typeof WORKFLOW_STEP_REGISTRY} registry
  * @returns {ReturnType<typeof createWorkflowContext>}
  */
-export function executeWorkflowSteps(context, registry = WORKFLOW_STEP_REGISTRY) {
+export function executeWorkflowSteps(
+  context,
+  registry = WORKFLOW_STEP_REGISTRY,
+  executionOptions = {},
+) {
   const knownStepIds = registry.map((step) => step.id);
+  const completedStepIds = new Set(executionOptions.completedStepIds ?? []);
+  const skippedStepIds = new Set(executionOptions.skippedStepIds ?? []);
   let currentContext = { ...context };
 
   for (const step of registry) {
+    if (completedStepIds.has(step.id) || skippedStepIds.has(step.id)) {
+      continue;
+    }
+
     if (currentContext.stopReason !== WORKFLOW_STOP_REASON.NONE) {
       break;
     }
