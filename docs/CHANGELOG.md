@@ -4,6 +4,39 @@
 
 ---
 
+## v1.36.0 — 機能追加（Developer Dashboard Foundation）
+
+workflow-timeline.json を唯一の入力として、Developer Automation の **Dashboard 集計基盤（Dashboard Foundation）** を追加しました。Timeline を Single Source of Truth とする Aggregation Layer です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Dashboard schema | `developer-automation/workflow-dashboard/1.0` |
+| Dashboard Builder | `buildWorkflowDashboard()`（Pure Function） |
+| Dashboard Reader | `readWorkflowDashboard()` |
+| Dashboard Validator | `validateWorkflowDashboard()` |
+| Dashboard Report | `workflow-dashboard.json` / `workflow-dashboard.md` |
+| CLI Summary | `Developer Workflow Dashboard` |
+| Test 246–262 | schema / builder / reader / validator / markdown / CLI / timeline-only / compatibility |
+
+### 設計判断
+
+- **Timeline Single Source of Truth** — Dashboard は workflow-timeline.json のみを入力とする
+- **History / Checkpoint / State 非参照** — Dashboard は Timeline の集計レイヤーのみ
+- **Timeline Schema 1.0 不変** — Timeline 構造・イベントは補正・再構築しない
+- **JSON Source / Markdown View** — dashboard.md は JSON からのみ生成
+- **Backward Compatibility** — unknown field 無視 / missing durationMs → 0 / missing status → unknown
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **262 PASS**（Test 246–262 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.35.0 — 機能追加（Developer Workflow Timeline Foundation）
 
 workflow-history.json を入力として、Developer Workflow の **時系列表示基盤（Timeline Foundation）** を追加しました。Dashboard の共通基盤となる MVP です。

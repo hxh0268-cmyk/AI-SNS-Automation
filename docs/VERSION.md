@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.35.0**（Developer Workflow Timeline Foundation）
+**v1.36.0**（Developer Dashboard Foundation）
 
 ---
 
@@ -10,6 +10,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.36.0** | **機能追加** | **✅ 完了** | **Developer Dashboard Foundation / Timeline を唯一入力とする集計 MVP** |
 | v1.0 | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
 | v1.1 | Genspark連携 | ✅ 完了 | Genspark の調査結果を投稿生成に反映（半自動運用） |
 | v1.1.1 | 運用品質向上 | ✅ 完了 | Health Check / Doctor / Smart Auto Fix で日常運用を支援 |
@@ -55,6 +56,50 @@
 
 ---
 
+### v1.36.0 で追加（Developer Dashboard Foundation）
+
+#### Workflow Dashboard MVP
+
+- **`buildWorkflowDashboard()`** … Timeline を唯一入力とする Pure 集計
+- **`readWorkflowDashboard()`** … workflow-dashboard.json Reader
+- **`validateWorkflowDashboard()`** … Dashboard schema / 必須項目検証
+- **`writeWorkflowDashboardReport()`** … workflow-dashboard.json / .md 出力
+- **`renderWorkflowDashboardMarkdown()`** … JSON Source から Markdown View 生成
+- **schema** … `developer-automation/workflow-dashboard/1.0`
+- **Timeline Single Source of Truth** … History / Checkpoint / State は非参照
+- **Timeline Schema 1.0 不変** … Timeline イベント構造は補正しない
+
+#### v1.37.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Analytics Foundation | Dashboard / Timeline 上の分析層 |
+| Web Dashboard Foundation | Dashboard JSON を入力とする Web UI |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.36.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **262 PASS** |
+| npm test | **PASS** |
+
+### v1.36.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-dashboard schema 1.0 | ✅ |
+| Dashboard Builder / Reader / Validator | ✅ |
+| workflow-dashboard JSON / Markdown | ✅ |
+| Timeline のみ入力 / History 非参照 | ✅ |
+| Timeline Schema 1.0 不変 | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 246–262 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.35.0 で追加（Developer Workflow Timeline Foundation）
 
 #### Workflow Timeline MVP
@@ -67,12 +112,13 @@
 - **JSON → Markdown** … Timeline View は JSON Source のみから生成
 - **History / Checkpoint 責務分離** … Timeline は表示基盤のみ
 
-#### v1.36.0 以降の候補
+#### v1.36.0 以降の候補（Timeline）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Dashboard Foundation | ✅ v1.36.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
-| Dashboard Foundation | Timeline Foundation 上の集計・表示層 |
+| Analytics Foundation | Dashboard / Timeline 上の分析層 |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 
 ### 品質状況（v1.35.0 最新）

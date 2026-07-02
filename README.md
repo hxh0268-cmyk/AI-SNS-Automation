@@ -1166,6 +1166,35 @@ Latest Current Step
 release-plan
 ```
 
+### Developer Dashboard Foundation（v1.36.0）
+
+Timeline Foundation の上に、**Developer Dashboard Foundation** を追加しました。workflow-timeline.json を唯一の入力として集計・表示用データを生成します。
+
+Developer Dashboard は Timeline を唯一の入力とする集計基盤です。History / Checkpoint / Workflow State は直接参照しません。Timeline Schema 1.0 の構造は変更しません。JSON Source / Markdown View / CLI Summary の原則を維持します。
+
+| 項目 | 内容 |
+|------|------|
+| dashboard schema | `developer-automation/workflow-dashboard/1.0` |
+| 入力 | `reports/developer-workflow/latest/workflow-timeline.json`（**Timeline のみ**） |
+| Dashboard JSON | `reports/developer-workflow/latest/workflow-dashboard.json` |
+| Dashboard Markdown | `reports/developer-workflow/latest/workflow-dashboard.md` |
+| 責務 | Timeline の集計レイヤー（Aggregation Layer） |
+| 非参照 | History / Checkpoint / Workflow State |
+
+#### CLI 出力例（Dashboard）
+
+```text
+Developer Workflow Dashboard
+Runs: 3
+Steps: 18
+Success: 17
+Failed: 1
+Resume: 1
+Total Duration: 12345ms
+Average Duration: 686ms
+Status: mixed
+```
+
 ### Developer Workflow Timeline Foundation（v1.35.0）
 
 History Foundation の上に、**Developer Workflow Timeline Foundation** を追加しました。workflow-history.json から時系列表示 Source を生成します。

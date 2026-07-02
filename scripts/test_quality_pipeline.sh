@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.35.0 --"
+echo "-- Test 98: VERSION updated to v1.36.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.35.0**（Developer Workflow Timeline Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.35.0");
+if (!versionDoc.includes("**v1.36.0**（Developer Dashboard Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.36.0");
 }
-console.log("VERSION v1.35.0 ok");
+console.log("VERSION v1.36.0 ok");
 EOF
-pass "VERSION updated to v1.35.0"
+pass "VERSION updated to v1.36.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.36.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.36.0");
+if (payload.nextVersion !== "v1.37.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.37.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.36.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.36.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.37.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.37.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.36.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.37.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -8845,6 +8845,544 @@ if (!markdown.includes("No steps recorded.")) {
 console.log("timeline markdown no steps message ok");
 EOF
 pass "timeline markdown no steps message"
+
+echo "-- Test 246: workflow-dashboard schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  buildWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 0, stepCount: 0, firstRunAt: null, lastRunAt: null },
+  runs: [],
+});
+
+if (dashboard.schema !== WORKFLOW_DASHBOARD_SCHEMA) {
+  throw new Error("workflow-dashboard schema constant mismatch");
+}
+if (WORKFLOW_DASHBOARD_SCHEMA !== "developer-automation/workflow-dashboard/1.0") {
+  throw new Error("WORKFLOW_DASHBOARD_SCHEMA must be developer-automation/workflow-dashboard/1.0");
+}
+
+console.log("workflow-dashboard schema constant ok");
+EOF
+pass "workflow-dashboard schema constant"
+
+echo "-- Test 247: dashboard builder aggregates timeline --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  buildWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 1, stepCount: 2, firstRunAt: null, lastRunAt: null },
+  runs: [
+    {
+      runId: "run-builder",
+      status: "completed",
+      durationMs: 1000,
+      resume: { isResume: true, resumedFromRunId: "run-prev" },
+      steps: [
+        {
+          stepId: "version-consistency",
+          status: "completed",
+          durationMs: 500,
+        },
+        {
+          stepId: "release-plan",
+          status: "failed",
+          durationMs: 300,
+        },
+      ],
+    },
+  ],
+});
+
+if (dashboard.summary.runCount !== 1) {
+  throw new Error("dashboard builder runCount mismatch");
+}
+if (dashboard.summary.stepCount !== 2) {
+  throw new Error("dashboard builder stepCount mismatch");
+}
+if (dashboard.summary.successCount !== 1 || dashboard.summary.failedCount !== 1) {
+  throw new Error("dashboard builder success/failed counts mismatch");
+}
+if (dashboard.summary.resumeCount !== 1) {
+  throw new Error("dashboard builder resumeCount mismatch");
+}
+if (dashboard.summary.totalDurationMs !== 800) {
+  throw new Error("dashboard builder totalDurationMs mismatch");
+}
+if (dashboard.status !== DASHBOARD_STATUS.MIXED) {
+  throw new Error("dashboard builder status must be mixed");
+}
+if (dashboard.source.schema !== WORKFLOW_TIMELINE_SCHEMA) {
+  throw new Error("dashboard source schema must reference timeline");
+}
+
+console.log("dashboard builder aggregates timeline ok");
+EOF
+pass "dashboard builder aggregates timeline"
+
+echo "-- Test 248: dashboard reader reads JSON --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  buildWorkflowDashboardFromTimeline,
+  readWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import {
+  WORKFLOW_TIMELINE_SCHEMA,
+  buildWorkflowTimeline,
+  writeWorkflowTimelineReport,
+} from "./src/lib/developer_workflow_timeline.js";
+import { createEmptyWorkflowHistory } from "./src/lib/developer_workflow_history.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const timeline = buildWorkflowTimeline(createEmptyWorkflowHistory(), {
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+writeWorkflowTimelineReport(timeline, PROJECT_ROOT);
+buildWorkflowDashboardFromTimeline({ rootDir: PROJECT_ROOT });
+
+const dashboard = readWorkflowDashboard(null, PROJECT_ROOT);
+if (dashboard.schema !== WORKFLOW_DASHBOARD_SCHEMA) {
+  throw new Error("dashboard reader schema mismatch");
+}
+if (dashboard.source.schema !== WORKFLOW_TIMELINE_SCHEMA) {
+  throw new Error("dashboard reader source schema mismatch");
+}
+
+console.log("dashboard reader reads JSON ok");
+EOF
+pass "dashboard reader reads JSON"
+
+echo "-- Test 249: dashboard validator --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowDashboard,
+  validateWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 0, stepCount: 0, firstRunAt: null, lastRunAt: null },
+  runs: [],
+});
+
+const validation = validateWorkflowDashboard(dashboard);
+if (!validation.valid) {
+  throw new Error(`dashboard validator must pass: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateWorkflowDashboard({});
+if (invalid.valid) {
+  throw new Error("dashboard validator must fail for invalid dashboard");
+}
+
+console.log("dashboard validator ok");
+EOF
+pass "dashboard validator"
+
+echo "-- Test 250: dashboard markdown render --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowDashboard,
+  renderWorkflowDashboardMarkdown,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const markdown = renderWorkflowDashboardMarkdown(
+  buildWorkflowDashboard({
+    schema: WORKFLOW_TIMELINE_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    summary: { runCount: 1, stepCount: 2, firstRunAt: null, lastRunAt: null },
+    runs: [
+      {
+        runId: "run-md",
+        status: "completed",
+        resume: { isResume: true },
+        steps: [
+          { stepId: "a", status: "completed", durationMs: 1000 },
+          { stepId: "b", status: "failed", durationMs: 500 },
+        ],
+      },
+    ],
+  }),
+);
+
+for (const expected of [
+  "# Developer Workflow Dashboard",
+  "| Status | mixed |",
+  "| Runs | 1 |",
+  "| Steps | 2 |",
+  "| Success | 1 |",
+  "| Failed | 1 |",
+  "| Resume | 1 |",
+  "| Total Duration | 1500ms |",
+  "| Average Duration | 750ms |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`dashboard markdown must include: ${expected}`);
+  }
+}
+
+console.log("dashboard markdown render ok");
+EOF
+pass "dashboard markdown render"
+
+echo "-- Test 251: dashboard CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowDashboard,
+  buildWorkflowDashboardCliSummary,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const summary = buildWorkflowDashboardCliSummary(
+  buildWorkflowDashboard({
+    schema: WORKFLOW_TIMELINE_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    summary: { runCount: 3, stepCount: 18, firstRunAt: null, lastRunAt: null },
+    runs: [
+      {
+        runId: "run-cli",
+        status: "completed",
+        resume: { isResume: true },
+        steps: [
+          { stepId: "a", status: "completed", durationMs: 10000 },
+          { stepId: "b", status: "failed", durationMs: 2345 },
+        ],
+      },
+    ],
+  }),
+);
+
+for (const expected of [
+  "Developer Workflow Dashboard",
+  "Runs: 3",
+  "Steps: 18",
+  "Success: 1",
+  "Failed: 1",
+  "Resume: 1",
+  "Total Duration: 12345ms",
+  "Average Duration: 686ms",
+  "Status: mixed",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`dashboard CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("dashboard CLI summary ok");
+EOF
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan >/tmp/developer_workflow_dashboard_cli.log 2>&1 || true
+grep -q "Developer Workflow Dashboard" /tmp/developer_workflow_dashboard_cli.log
+grep -q "workflow-dashboard.json" /tmp/developer_workflow_dashboard_cli.log
+grep -q "workflow-dashboard.md" /tmp/developer_workflow_dashboard_cli.log
+pass "dashboard CLI summary"
+
+echo "-- Test 252: dashboard uses timeline only input --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildWorkflowDashboardFromTimeline,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "dashboard-timeline-only-"));
+const reportDir = path.join(tempDir, "reports/developer-workflow/latest");
+fs.mkdirSync(reportDir, { recursive: true });
+
+const timelinePath = path.join(reportDir, "workflow-timeline.json");
+fs.writeFileSync(
+  timelinePath,
+  `${JSON.stringify(
+    {
+      schema: WORKFLOW_TIMELINE_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      summary: { runCount: 1, stepCount: 1, firstRunAt: null, lastRunAt: null },
+      runs: [
+        {
+          runId: "timeline-only",
+          status: "completed",
+          steps: [{ stepId: "version-consistency", status: "completed", durationMs: 100 }],
+        },
+      ],
+    },
+    null,
+    2,
+  )}\n`,
+);
+
+const historyPath = path.join(reportDir, "workflow-history.json");
+if (fs.existsSync(historyPath)) {
+  throw new Error("history file must not exist for timeline-only test");
+}
+
+const { dashboard } = buildWorkflowDashboardFromTimeline({
+  rootDir: tempDir,
+  timelinePath: "reports/developer-workflow/latest/workflow-timeline.json",
+});
+
+if (dashboard.summary.runCount !== 1 || dashboard.summary.successCount !== 1) {
+  throw new Error("dashboard must build from timeline file only");
+}
+
+console.log("dashboard uses timeline only input ok");
+EOF
+pass "dashboard uses timeline only input"
+
+echo "-- Test 253: timeline schema unchanged by dashboard --"
+node --input-type=module <<'EOF'
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+if (WORKFLOW_TIMELINE_SCHEMA !== "developer-automation/workflow-timeline/1.0") {
+  throw new Error("timeline schema must remain developer-automation/workflow-timeline/1.0");
+}
+
+console.log("timeline schema unchanged by dashboard ok");
+EOF
+pass "timeline schema unchanged by dashboard"
+
+echo "-- Test 254: dashboard does not mutate timeline --"
+node --input-type=module <<'EOF'
+import { buildWorkflowDashboard } from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const timeline = {
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 1, stepCount: 1, firstRunAt: null, lastRunAt: null },
+  customField: "keep-me",
+  runs: [
+    {
+      runId: "run-immutable",
+      status: "completed",
+      extra: true,
+      steps: [{ stepId: "release-plan", status: "completed", durationMs: 100, note: "x" }],
+    },
+  ],
+};
+
+const snapshot = JSON.stringify(timeline);
+buildWorkflowDashboard(timeline);
+
+if (JSON.stringify(timeline) !== snapshot) {
+  throw new Error("dashboard builder must not mutate timeline input");
+}
+
+console.log("dashboard does not mutate timeline ok");
+EOF
+pass "dashboard does not mutate timeline"
+
+echo "-- Test 255: dashboard ignores unknown timeline fields --"
+node --input-type=module <<'EOF'
+import { buildWorkflowDashboard } from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  unknownTopLevel: true,
+  summary: { runCount: 1, stepCount: 1, firstRunAt: null, lastRunAt: null, extra: true },
+  runs: [
+    {
+      runId: "run-unknown",
+      status: "completed",
+      unknownRunField: "ignored",
+      steps: [
+        {
+          stepId: "version-consistency",
+          status: "completed",
+          durationMs: 250,
+          unknownStepField: "ignored",
+        },
+      ],
+    },
+  ],
+});
+
+if (dashboard.summary.successCount !== 1 || dashboard.summary.totalDurationMs !== 250) {
+  throw new Error("dashboard must ignore unknown timeline fields and aggregate known data");
+}
+
+console.log("dashboard ignores unknown timeline fields ok");
+EOF
+pass "dashboard ignores unknown timeline fields"
+
+echo "-- Test 256: dashboard missing durationMs compatibility --"
+node --input-type=module <<'EOF'
+import { buildWorkflowDashboard } from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 1, stepCount: 1, firstRunAt: null, lastRunAt: null },
+  runs: [
+    {
+      runId: "run-no-duration",
+      status: "completed",
+      steps: [{ stepId: "release-plan", status: "completed" }],
+    },
+  ],
+});
+
+if (dashboard.summary.totalDurationMs !== 0) {
+  throw new Error("dashboard must treat missing durationMs as 0");
+}
+
+console.log("dashboard missing durationMs compatibility ok");
+EOF
+pass "dashboard missing durationMs compatibility"
+
+echo "-- Test 257: dashboard missing status compatibility --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  buildWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 1, stepCount: 1, firstRunAt: null, lastRunAt: null },
+  runs: [
+    {
+      runId: "run-no-status",
+      steps: [{ stepId: "release-plan", durationMs: 100 }],
+    },
+  ],
+});
+
+if (dashboard.runs[0].status !== "unknown") {
+  throw new Error("dashboard must treat missing run status as unknown");
+}
+if (dashboard.status !== DASHBOARD_STATUS.UNKNOWN) {
+  throw new Error("dashboard must remain unknown when step status is missing");
+}
+
+console.log("dashboard missing status compatibility ok");
+EOF
+pass "dashboard missing status compatibility"
+
+echo "-- Test 258: dashboard empty timeline --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  buildWorkflowDashboard,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 0, stepCount: 0, firstRunAt: null, lastRunAt: null },
+  runs: [],
+});
+
+if (dashboard.status !== DASHBOARD_STATUS.UNKNOWN) {
+  throw new Error("empty timeline dashboard status must be unknown");
+}
+if (dashboard.summary.runCount !== 0 || dashboard.summary.stepCount !== 0) {
+  throw new Error("empty timeline dashboard counts must be zero");
+}
+
+console.log("dashboard empty timeline ok");
+EOF
+pass "dashboard empty timeline"
+
+echo "-- Test 259: dashboard mixed status --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  resolveDashboardStatus,
+} from "./src/lib/developer_workflow_dashboard.js";
+
+if (resolveDashboardStatus(3, 2, 1) !== DASHBOARD_STATUS.MIXED) {
+  throw new Error("dashboard mixed status resolution failed");
+}
+
+console.log("dashboard mixed status ok");
+EOF
+pass "dashboard mixed status"
+
+echo "-- Test 260: dashboard failed status --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  resolveDashboardStatus,
+} from "./src/lib/developer_workflow_dashboard.js";
+
+if (resolveDashboardStatus(2, 0, 2) !== DASHBOARD_STATUS.FAILED) {
+  throw new Error("dashboard failed status resolution failed");
+}
+
+console.log("dashboard failed status ok");
+EOF
+pass "dashboard failed status"
+
+echo "-- Test 261: dashboard success status --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_STATUS,
+  resolveDashboardStatus,
+} from "./src/lib/developer_workflow_dashboard.js";
+
+if (resolveDashboardStatus(5, 5, 0) !== DASHBOARD_STATUS.SUCCESS) {
+  throw new Error("dashboard success status resolution failed");
+}
+
+console.log("dashboard success status ok");
+EOF
+pass "dashboard success status"
+
+echo "-- Test 262: dashboard does not reference history checkpoint or state --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const dashboardSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_dashboard.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "developer_workflow_history.js",
+  "developer_workflow_resume.js",
+  "readWorkflowHistory",
+  "readWorkflowCheckpoint",
+  "readWorkflowState",
+  "workflow-history.json",
+  "workflow-checkpoint.json",
+  "workflow-state.json",
+]) {
+  if (dashboardSource.includes(forbidden)) {
+    throw new Error(`dashboard must not reference ${forbidden}`);
+  }
+}
+
+console.log("dashboard does not reference history checkpoint or state ok");
+EOF
+pass "dashboard does not reference history checkpoint or state"
 
 echo ""
 echo "All quality pipeline tests passed."
