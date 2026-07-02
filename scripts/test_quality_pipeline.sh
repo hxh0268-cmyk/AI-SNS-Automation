@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.30.0 --"
+echo "-- Test 98: VERSION updated to v1.31.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.30.0**（Developer Workflow Guard Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.30.0");
+if (!versionDoc.includes("**v1.31.0**（Developer Handoff Prompt Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.31.0");
 }
-console.log("VERSION v1.30.0 ok");
+console.log("VERSION v1.31.0 ok");
 EOF
-pass "VERSION updated to v1.30.0"
+pass "VERSION updated to v1.31.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6351,6 +6351,323 @@ if (JSON.stringify(report.guardSummary) !== JSON.stringify(summary)) {
 console.log("guard summary aggregation ok");
 EOF
 pass "guard summary aggregation from results only"
+
+echo "-- Test 171: developer handoff generator exists --"
+test -f src/lib/developer_handoff.js
+grep -q "buildDeveloperHandoff" src/lib/developer_handoff.js
+grep -q "writeDeveloperHandoffReport" src/lib/developer_handoff.js
+pass "developer handoff generator exists"
+
+echo "-- Test 172: developer-handoff schema --"
+node --input-type=module <<'EOF'
+import {
+  DEVELOPER_HANDOFF_SCHEMA,
+  buildDeveloperHandoff,
+} from "./src/lib/developer_handoff.js";
+
+if (DEVELOPER_HANDOFF_SCHEMA !== "developer-automation/handoff/1.0") {
+  throw new Error("developer-handoff schema constant mismatch");
+}
+
+const handoff = buildDeveloperHandoff({ currentVersion: "v1.31.0" });
+if (handoff.schema !== DEVELOPER_HANDOFF_SCHEMA) {
+  throw new Error("developer-handoff schema mismatch");
+}
+
+console.log("developer-handoff schema ok");
+EOF
+pass "developer-handoff schema"
+
+echo "-- Test 173: handoff currentVersion read from VERSION.md --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  buildDeveloperHandoff,
+} from "./src/lib/developer_handoff.js";
+import { getVersionFromVersionMd as readVersion } from "./src/lib/developer_automation.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
+const match = versionDoc.match(/\*\*(v\d+\.\d+\.\d+)\*\*/);
+if (!match) {
+  throw new Error("VERSION.md must contain current version");
+}
+
+const handoff = buildDeveloperHandoff({ rootDir: PROJECT_ROOT });
+if (handoff.currentVersion !== match[1]) {
+  throw new Error("handoff currentVersion must match docs/VERSION.md");
+}
+if (handoff.currentVersion !== readVersion(PROJECT_ROOT)) {
+  throw new Error("handoff currentVersion must use getVersionFromVersionMd");
+}
+
+console.log(`handoff currentVersion ok: ${handoff.currentVersion}`);
+EOF
+pass "handoff currentVersion read from VERSION.md"
+
+echo "-- Test 174: handoff nextVersion auto increments minor version --"
+node --input-type=module <<'EOF'
+import {
+  buildDeveloperHandoff,
+  computeNextMinorVersion,
+} from "./src/lib/developer_handoff.js";
+
+if (computeNextMinorVersion("v1.31.0") !== "v1.32.0") {
+  throw new Error("computeNextMinorVersion v1.31.0 must be v1.32.0");
+}
+if (computeNextMinorVersion("v1.32.0") !== "v1.33.0") {
+  throw new Error("computeNextMinorVersion v1.32.0 must be v1.33.0");
+}
+
+const handoff = buildDeveloperHandoff({ currentVersion: "v1.30.0" });
+if (handoff.nextVersion !== "v1.31.0") {
+  throw new Error("handoff nextVersion must auto increment minor version");
+}
+
+console.log("handoff nextVersion auto increment ok");
+EOF
+pass "handoff nextVersion auto increments minor version"
+
+echo "-- Test 175: developer-handoff.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  DEVELOPER_HANDOFF_SCHEMA,
+  buildDeveloperHandoff,
+  writeDeveloperHandoffReport,
+} from "./src/lib/developer_handoff.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const handoff = buildDeveloperHandoff({
+  rootDir: PROJECT_ROOT,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+writeDeveloperHandoffReport(handoff, PROJECT_ROOT);
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/developer-automation/latest/developer-handoff.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== DEVELOPER_HANDOFF_SCHEMA) {
+  throw new Error("developer-handoff.json schema mismatch");
+}
+if (payload.project !== "AI-SNS-Automation") {
+  throw new Error("developer-handoff.json project mismatch");
+}
+if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
+  throw new Error("developer-handoff.json scope must be non-empty array");
+}
+if (payload.nextVersion !== "v1.32.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.32.0");
+}
+
+console.log("developer-handoff.json ok");
+EOF
+pass "developer-handoff.json generated"
+
+echo "-- Test 176: developer-handoff.md generated --"
+test -f reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.32.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.32.0" reports/developer-automation/latest/developer-handoff.md
+pass "developer-handoff.md generated"
+
+echo "-- Test 177: handoff markdown includes Project Context --"
+grep -q "## Project Context" reports/developer-automation/latest/developer-handoff.md
+grep -q "Phase2 Developer Automation" reports/developer-automation/latest/developer-handoff.md
+pass "handoff markdown includes Project Context"
+
+echo "-- Test 178: handoff markdown includes Implementation Scope --"
+grep -q "## Implementation Scope" reports/developer-automation/latest/developer-handoff.md
+grep -q "Add developer handoff generator" reports/developer-automation/latest/developer-handoff.md
+pass "handoff markdown includes Implementation Scope"
+
+echo "-- Test 179: handoff markdown includes Prohibited Actions --"
+grep -q "## Prohibited Actions" reports/developer-automation/latest/developer-handoff.md
+grep -q "git commit" reports/developer-automation/latest/developer-handoff.md
+grep -q "Git operation automation" reports/developer-automation/latest/developer-handoff.md
+pass "handoff markdown includes Prohibited Actions"
+
+echo "-- Test 180: handoff markdown includes Completion Report Checklist --"
+grep -q "## Completion Report Checklist" reports/developer-automation/latest/developer-handoff.md
+grep -q "commit / tag / push は未実施であること" reports/developer-automation/latest/developer-handoff.md
+pass "handoff markdown includes Completion Report Checklist"
+
+echo "-- Test 181: handoff CLI summary includes output paths --"
+node --input-type=module <<'EOF'
+import { buildDeveloperHandoff, buildDeveloperHandoffCliSummary } from "./src/lib/developer_handoff.js";
+
+const summary = buildDeveloperHandoffCliSummary(
+  buildDeveloperHandoff({ currentVersion: "v1.31.0" }),
+);
+
+for (const expected of [
+  "Developer Handoff",
+  "Project: AI-SNS-Automation",
+  "Current Version: v1.31.0",
+  "Next Version: v1.32.0",
+  "Release: Developer Handoff Prompt Foundation",
+  "reports/developer-automation/latest/developer-handoff.json",
+  "reports/developer-automation/latest/developer-handoff.md",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("handoff CLI summary ok");
+EOF
+pass "handoff CLI summary includes output paths"
+
+echo "-- Test 182: developer:handoff npm script exists --"
+grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.json
+test -f scripts/run_developer_handoff.js
+npm run developer:handoff >/tmp/developer_handoff_cli.log
+grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.32.0" /tmp/developer_handoff_cli.log
+grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
+grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
+pass "developer:handoff npm script exists"
+
+echo "-- Test 183: handoff json source markdown view consistency --"
+node --input-type=module <<'EOF'
+import {
+  buildDeveloperHandoff,
+  buildDeveloperHandoffMarkdown,
+} from "./src/lib/developer_handoff.js";
+
+const handoff = buildDeveloperHandoff({
+  currentVersion: "v1.31.0",
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+const markdown = buildDeveloperHandoffMarkdown(handoff);
+
+if (handoff.nextVersion !== "v1.32.0") {
+  throw new Error("handoff nextVersion must auto increment to v1.32.0");
+}
+if (!markdown.includes("Next Version: v1.32.0")) {
+  throw new Error("markdown must include auto nextVersion");
+}
+if (!markdown.includes(handoff.objective)) {
+  throw new Error("markdown must include objective from handoff json source");
+}
+if (!markdown.includes(handoff.releaseName)) {
+  throw new Error("markdown must include releaseName from handoff json source");
+}
+for (const item of handoff.scope) {
+  if (!markdown.includes(item)) {
+    throw new Error(`markdown must include scope item: ${item}`);
+  }
+}
+for (const item of handoff.prohibitedActions) {
+  if (!markdown.includes(item)) {
+    throw new Error(`markdown must include prohibited action: ${item}`);
+  }
+}
+
+console.log("handoff json source markdown view consistency ok");
+EOF
+pass "handoff json source markdown view consistency"
+
+echo "-- Test 184: no git operation automation in handoff --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { HANDOFF_PROHIBITED_ACTIONS } from "./src/lib/developer_handoff.js";
+
+const handoffSource = fs.readFileSync("src/lib/developer_handoff.js", "utf8");
+const cliSource = fs.readFileSync("scripts/run_developer_handoff.js", "utf8");
+
+if (handoffSource.includes("git commit") && !HANDOFF_PROHIBITED_ACTIONS.includes("git commit")) {
+  throw new Error("prohibited actions must include git commit");
+}
+if (/execSync\(\s*["'`]git/.test(handoffSource) || /execSync\(\s*["'`]git/.test(cliSource)) {
+  throw new Error("handoff generator must not execute git commands");
+}
+if (cliSource.includes("git add") || cliSource.includes("git push")) {
+  throw new Error("handoff CLI must not automate git operations");
+}
+
+console.log("no git operation automation in handoff ok");
+EOF
+pass "no git operation automation in handoff"
+
+echo "-- Test 185: handoff nextVersion can be overridden by CLI argument --"
+node --input-type=module <<'EOF'
+import {
+  buildDeveloperHandoff,
+  parseDeveloperHandoffArgs,
+} from "./src/lib/developer_handoff.js";
+
+const options = parseDeveloperHandoffArgs(["--next-version", "v1.40.0"]);
+const handoff = buildDeveloperHandoff({
+  currentVersion: "v1.31.0",
+  nextVersion: options.nextVersion,
+});
+
+if (handoff.nextVersion !== "v1.40.0") {
+  throw new Error("handoff nextVersion must honor CLI override");
+}
+
+console.log("handoff nextVersion CLI override ok");
+EOF
+pass "handoff nextVersion can be overridden by CLI argument"
+
+echo "-- Test 186: invalid handoff nextVersion is rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildDeveloperHandoff,
+  resolveHandoffNextVersion,
+} from "./src/lib/developer_handoff.js";
+
+const invalidValues = ["1.32.0", "v1.32", "v1", "next"];
+
+for (const value of invalidValues) {
+  let rejected = false;
+  try {
+    resolveHandoffNextVersion("v1.31.0", value);
+  } catch (error) {
+    rejected = true;
+    if (!String(error.message).includes("Invalid nextVersion format")) {
+      throw error;
+    }
+  }
+  if (!rejected) {
+    throw new Error(`invalid nextVersion must be rejected: ${value}`);
+  }
+}
+
+let buildRejected = false;
+try {
+  buildDeveloperHandoff({ currentVersion: "v1.31.0", nextVersion: "1.32.0" });
+} catch (error) {
+  buildRejected = true;
+}
+if (!buildRejected) {
+  throw new Error("buildDeveloperHandoff must reject invalid nextVersion");
+}
+
+console.log("invalid handoff nextVersion rejection ok");
+EOF
+pass "invalid handoff nextVersion is rejected"
+
+echo "-- Test 187: handoff CLI override via npm script --"
+npm run developer:handoff -- --next-version v1.40.0 >/tmp/developer_handoff_override_cli.log
+grep -q "Next Version: v1.40.0" /tmp/developer_handoff_override_cli.log
+pass "handoff CLI override via npm script"
+
+echo "-- Test 188: handoff CLI rejects invalid nextVersion --"
+if node scripts/run_developer_handoff.js --next-version 1.32.0 >/tmp/developer_handoff_invalid.log 2>&1; then
+  echo "invalid nextVersion must exit non-zero" >&2
+  exit 1
+fi
+grep -q "Invalid nextVersion format" /tmp/developer_handoff_invalid.log
+pass "handoff CLI rejects invalid nextVersion"
 
 echo ""
 echo "All quality pipeline tests passed."

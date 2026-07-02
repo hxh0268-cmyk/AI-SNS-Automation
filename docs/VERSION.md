@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.30.0**（Developer Workflow Guard Foundation）
+**v1.31.0**（Developer Handoff Prompt Foundation）
 
 ---
 
@@ -26,8 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.30.0** | **機能追加** | **✅ 完了** | **Developer Workflow Guard Foundation / Workflow 安全制御 MVP** |
-| v1.29.0 | 機能追加 | ✅ 完了 | Developer Automation Workflow Foundation / Context ベース Workflow MVP |
+| **v1.31.0** | **機能追加** | **✅ 完了** | **Developer Handoff Prompt Foundation / Claude Code 引き継ぎ MVP** |
+| v1.30.0 | 機能追加 | ✅ 完了 | Developer Workflow Guard Foundation / Workflow 安全制御 MVP |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
@@ -51,6 +51,45 @@
 
 ---
 
+### v1.31.0 で追加（Developer Handoff Prompt Foundation）
+
+#### Handoff Prompt MVP
+
+- **`buildDeveloperHandoff()`** … 引き継ぎ JSON Source 生成
+- **`buildDeveloperHandoffMarkdown()`** … Claude Code 用 Markdown View
+- **`writeDeveloperHandoffReport()`** … 固定出力パスへ書き込み
+- **schema** … `developer-automation/handoff/1.0`
+- **`computeNextMinorVersion()`** … currentVersion から nextVersion を minor +1 で自動算出
+- **`--next-version`** … CLI で nextVersion を明示指定（`vX.Y.Z` のみ）
+- **`npm run developer:handoff`** … 引き継ぎプロンプト生成 CLI
+- **JSON → Markdown** … Single Source of Truth 維持
+
+#### v1.32.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.31.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **188 PASS** |
+| npm test | **PASS** |
+
+### v1.31.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| developer:handoff npm script | ✅ |
+| developer-handoff JSON / Markdown | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 171–188 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.30.0 で追加（Developer Workflow Guard Foundation）
 
 #### Workflow Guard MVP
@@ -67,10 +106,11 @@
 - **Fail Fast / Stop Before / Skip Step** … Workflow 安全制御
 - **JSON → Markdown → CLI** … Single Source of Truth 維持
 
-#### v1.31.0 以降の候補
+#### v1.31.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Handoff Prompt Foundation | ✅ v1.31.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

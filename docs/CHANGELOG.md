@@ -4,6 +4,45 @@
 
 ---
 
+## v1.31.0 — 機能追加（Developer Handoff Prompt Foundation）
+
+ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を自動生成する MVP を追加しました。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Handoff Generator | `src/lib/developer_handoff.js` / `scripts/run_developer_handoff.js` |
+| npm script | `npm run developer:handoff` |
+| schema | `developer-automation/handoff/1.0` |
+| JSON report | `developer-handoff.json` |
+| Markdown report | `developer-handoff.md`（Claude Code 貼り付け用） |
+| currentVersion | `docs/VERSION.md` から読み取り |
+| nextVersion | currentVersion の minor +1 を自動算出（例: v1.31.0 → v1.32.0） |
+| nextVersion override | `--next-version vX.Y.Z`（CLI 引数優先） |
+| Test 171–188 | Handoff 生成 / レポート / CLI / Git 非自動化 / nextVersion 自動算出 |
+
+### 設計判断
+
+- **nextVersion 自動算出** — currentVersion の minor を +1（patch は 0 にリセット）
+- **nextVersion 引数指定** — `--next-version vX.Y.Z` で上書き可能
+- **JSON Source / Markdown View** — Markdown は JSON からのみ生成
+- **固定出力パス** — `reports/developer-automation/latest/`
+- **MVP スコープ厳守** — Git 操作は未実装
+
+### 影響範囲
+
+- Developer Handoff ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **188 PASS**（Test 171–188 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.30.0 — 機能追加（Developer Workflow Guard Foundation）
 
 Workflow Engine に **安全制御（Guard）** を追加しました。Workflow Options / Guard 関数 / Guard Decision により、Fail Fast / Stop Before Step / Skip Step を Context ベースで制御します。

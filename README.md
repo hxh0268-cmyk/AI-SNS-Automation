@@ -1045,6 +1045,41 @@ Release Plan
 STOPPED
 ```
 
+### Developer Handoff Prompt Foundation（v1.31.0）
+
+ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を生成します。
+
+```bash
+npm run developer:handoff
+```
+
+| 項目 | 内容 |
+|------|------|
+| schema | `developer-automation/handoff/1.0` |
+| JSON report | `reports/developer-automation/latest/developer-handoff.json` |
+| Markdown report | `reports/developer-automation/latest/developer-handoff.md` |
+| currentVersion | `docs/VERSION.md` から読み取り |
+| nextVersion | currentVersion の minor を +1 して自動算出（例: v1.31.0 → v1.32.0） |
+| nextVersion override | `npm run developer:handoff -- --next-version v1.40.0` |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例
+
+```text
+Developer Handoff
+
+Project: AI-SNS-Automation
+Current Version: v1.31.0
+Next Version: v1.32.0
+Release: Developer Handoff Prompt Foundation
+
+Outputs:
+- reports/developer-automation/latest/developer-handoff.json
+- reports/developer-automation/latest/developer-handoff.md
+```
+
+`--next-version` 指定時は自動算出より引数を優先します（`vX.Y.Z` 形式のみ許可）。
+
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
 GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。
