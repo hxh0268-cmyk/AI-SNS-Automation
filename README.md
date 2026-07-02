@@ -1093,6 +1093,45 @@ Workflow Status
 SUCCESS
 ```
 
+Workflow Status
+SUCCESS
+```
+
+### Workflow Checkpoint Foundation（v1.33.0）
+
+Resume Foundation の実行能力を維持したまま、**Checkpoint Foundation** で workflow-state の現在位置・互換性・resume 安全性を検証します。
+
+| 項目 | 内容 |
+|------|------|
+| workflow-state schema | `developer-automation/workflow-state/1.2` |
+| checkpoint schema | `developer-automation/workflow-checkpoint/1.0` |
+| Checkpoint JSON | `reports/developer-workflow/latest/workflow-checkpoint.json` |
+| Checkpoint Markdown | `reports/developer-workflow/latest/workflow-checkpoint.md` |
+| 新フィールド | currentStepId / resumeSupported / stepRegistryHash / workflowSchemaVersion |
+| legacy 1.0 互換 | warning 付きで resume 可能 |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例（Checkpoint）
+
+```text
+Workflow Checkpoint
+
+Valid
+true
+
+Resume Supported
+true
+
+Current Step
+release-plan
+
+Step Registry Hash Matched
+true
+
+Workflow Schema Version
+1.2
+```
+
 ### Developer Handoff Prompt Foundation（v1.31.0）
 
 ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を生成します。

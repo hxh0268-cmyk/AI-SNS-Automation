@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.31.0 --"
+echo "-- Test 98: VERSION updated to v1.33.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.32.0**（Developer Workflow Resume Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.32.0");
+if (!versionDoc.includes("**v1.33.0**（Workflow Checkpoint Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.33.0");
 }
-console.log("VERSION v1.32.0 ok");
+console.log("VERSION v1.33.0 ok");
 EOF
-pass "VERSION updated to v1.32.0"
+pass "VERSION updated to v1.33.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.33.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.33.0");
+if (payload.nextVersion !== "v1.34.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.34.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.33.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.33.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.34.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.34.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6504,14 +6504,14 @@ node --input-type=module <<'EOF'
 import { buildDeveloperHandoff, buildDeveloperHandoffCliSummary } from "./src/lib/developer_handoff.js";
 
 const summary = buildDeveloperHandoffCliSummary(
-  buildDeveloperHandoff({ currentVersion: "v1.32.0" }),
+  buildDeveloperHandoff({ currentVersion: "v1.33.0" }),
 );
 
 for (const expected of [
   "Developer Handoff",
   "Project: AI-SNS-Automation",
-  "Current Version: v1.32.0",
-  "Next Version: v1.33.0",
+  "Current Version: v1.33.0",
+  "Next Version: v1.34.0",
   "Release: Developer Handoff Prompt Foundation",
   "reports/developer-automation/latest/developer-handoff.json",
   "reports/developer-automation/latest/developer-handoff.md",
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.33.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.34.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -6543,15 +6543,15 @@ import {
 } from "./src/lib/developer_handoff.js";
 
 const handoff = buildDeveloperHandoff({
-  currentVersion: "v1.32.0",
+  currentVersion: "v1.33.0",
   generatedAt: "2026-07-02T00:00:00.000Z",
 });
 const markdown = buildDeveloperHandoffMarkdown(handoff);
 
-if (handoff.nextVersion !== "v1.33.0") {
-  throw new Error("handoff nextVersion must auto increment to v1.33.0");
+if (handoff.nextVersion !== "v1.34.0") {
+  throw new Error("handoff nextVersion must auto increment to v1.34.0");
 }
-if (!markdown.includes("Next Version: v1.33.0")) {
+if (!markdown.includes("Next Version: v1.34.0")) {
   throw new Error("markdown must include auto nextVersion");
 }
 if (!markdown.includes(handoff.objective)) {
@@ -6673,6 +6673,8 @@ echo "-- Test 189: workflow-state schema validation --"
 node --input-type=module <<'EOF'
 import {
   WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+  computeStepRegistryHash,
   buildWorkflowState,
   validateResumeState,
   getWorkflowVersionContext,
@@ -6716,8 +6718,20 @@ const state = buildWorkflowState(context);
 if (state.schema !== WORKFLOW_STATE_SCHEMA) {
   throw new Error("workflow-state schema mismatch");
 }
-if (state.workflowStatus !== "stopped") {
-  throw new Error("workflow-state workflowStatus must be stopped");
+if (state.status !== "stopped") {
+  throw new Error("workflow-state status must be stopped");
+}
+if (state.currentStepId !== "release-plan") {
+  throw new Error("workflow-state currentStepId mismatch");
+}
+if (state.resumeSupported !== true) {
+  throw new Error("workflow-state resumeSupported must be true");
+}
+if (state.workflowSchemaVersion !== "1.2") {
+  throw new Error("workflow-state workflowSchemaVersion must be 1.2");
+}
+if (!state.stepRegistryHash?.startsWith("sha256:")) {
+  throw new Error("workflow-state stepRegistryHash must be sha256 hash");
 }
 if (state.stoppedBeforeStepId !== "release-plan") {
   throw new Error("workflow-state stoppedBeforeStepId mismatch");
@@ -6740,6 +6754,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
   WORKFLOW_STATE_FILENAME,
   DEVELOPER_WORKFLOW_REPORT_DIR,
   writeWorkflowState,
@@ -6781,7 +6796,7 @@ if (context.status !== WORKFLOW_STATUS.STOPPED) {
   throw new Error("stopBeforeStep must produce STOPPED workflow");
 }
 
-const statePath = writeWorkflowState(buildWorkflowState(context), PROJECT_ROOT);
+const statePath = writeWorkflowState(buildWorkflowState(context, {}, stubRegistry), PROJECT_ROOT);
 const absolutePath = path.join(
   PROJECT_ROOT,
   DEVELOPER_WORKFLOW_REPORT_DIR,
@@ -6795,6 +6810,18 @@ if (!fs.existsSync(absolutePath)) {
 const payload = JSON.parse(fs.readFileSync(absolutePath, "utf8"));
 if (payload.schema !== WORKFLOW_STATE_SCHEMA) {
   throw new Error("written workflow-state.json schema mismatch");
+}
+if (payload.currentStepId !== "release-plan") {
+  throw new Error("written workflow-state.json currentStepId mismatch");
+}
+if (payload.resumeSupported !== true) {
+  throw new Error("written workflow-state.json resumeSupported mismatch");
+}
+if (payload.workflowSchemaVersion !== "1.2") {
+  throw new Error("written workflow-state.json workflowSchemaVersion mismatch");
+}
+if (!payload.stepRegistryHash?.startsWith("sha256:")) {
+  throw new Error("written workflow-state.json stepRegistryHash mismatch");
 }
 if (payload.stoppedBeforeStepId !== "release-plan") {
   throw new Error("written workflow-state.json stoppedBeforeStepId mismatch");
@@ -6813,6 +6840,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+  computeStepRegistryHash,
   getWorkflowVersionContext,
   runDeveloperWorkflowResume,
   writeWorkflowState,
@@ -6887,7 +6916,7 @@ pass "Resume starts from stoppedBeforeStepId"
 echo "-- Test 192: Resume rejects non-stopped workflowStatus --"
 node --input-type=module <<'EOF'
 import {
-  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
   getWorkflowVersionContext,
   validateResumeState,
 } from "./src/lib/developer_workflow_resume.js";
@@ -6895,7 +6924,7 @@ import {
 const versionContext = getWorkflowVersionContext(process.cwd());
 const validation = validateResumeState(
   {
-    schema: WORKFLOW_STATE_SCHEMA,
+    schema: WORKFLOW_STATE_SCHEMA_LEGACY,
     workflowStatus: "success",
     stopReason: "none",
     currentVersion: versionContext.currentVersion,
@@ -6913,7 +6942,7 @@ const validation = validateResumeState(
 if (validation.valid) {
   throw new Error("non-stopped workflowStatus must be rejected");
 }
-if (!validation.errors.some((error) => error.includes('workflowStatus must be "stopped"'))) {
+if (!validation.errors.some((error) => error.includes('status must be "stopped"'))) {
   throw new Error("validation must report non-stopped workflowStatus");
 }
 
@@ -6924,7 +6953,7 @@ pass "Resume rejects non-stopped workflowStatus"
 echo "-- Test 193: Resume rejects unknown step id --"
 node --input-type=module <<'EOF'
 import {
-  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
   getWorkflowVersionContext,
   validateResumeState,
 } from "./src/lib/developer_workflow_resume.js";
@@ -6932,7 +6961,7 @@ import {
 const versionContext = getWorkflowVersionContext(process.cwd());
 const validation = validateResumeState(
   {
-    schema: WORKFLOW_STATE_SCHEMA,
+    schema: WORKFLOW_STATE_SCHEMA_LEGACY,
     workflowStatus: "stopped",
     stopReason: "stop-before-step",
     currentVersion: versionContext.currentVersion,
@@ -6961,7 +6990,7 @@ pass "Resume rejects unknown step id"
 echo "-- Test 194: Resume rejects nextVersion mismatch --"
 node --input-type=module <<'EOF'
 import {
-  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
   getWorkflowVersionContext,
   validateResumeState,
 } from "./src/lib/developer_workflow_resume.js";
@@ -6969,7 +6998,7 @@ import {
 const versionContext = getWorkflowVersionContext(process.cwd());
 const validation = validateResumeState(
   {
-    schema: WORKFLOW_STATE_SCHEMA,
+    schema: WORKFLOW_STATE_SCHEMA_LEGACY,
     workflowStatus: "stopped",
     stopReason: "stop-before-step",
     currentVersion: versionContext.currentVersion,
@@ -7167,6 +7196,400 @@ echo "-- Test 198: npm test remains PASS --"
 grep -q '"test"' package.json
 grep -q "scripts/test_quality_pipeline.sh" package.json
 pass "npm test remains PASS"
+
+echo "-- Test 199: checkpoint state includes currentStepId --"
+node --input-type=module <<'EOF'
+import { buildWorkflowState } from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+if (state.currentStepId !== "release-plan") {
+  throw new Error("checkpoint state must include currentStepId");
+}
+
+console.log("checkpoint state includes currentStepId ok");
+EOF
+pass "checkpoint state includes currentStepId"
+
+echo "-- Test 200: checkpoint state includes resumeSupported --"
+node --input-type=module <<'EOF'
+import { buildWorkflowState } from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+if (state.resumeSupported !== true) {
+  throw new Error("checkpoint state must include resumeSupported=true");
+}
+if (state.resumeUnsupportedReason !== null) {
+  throw new Error("checkpoint state resumeUnsupportedReason must be null");
+}
+
+console.log("checkpoint state includes resumeSupported ok");
+EOF
+pass "checkpoint state includes resumeSupported"
+
+echo "-- Test 201: checkpoint state includes workflowSchemaVersion --"
+node --input-type=module <<'EOF'
+import { buildWorkflowState } from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+if (state.workflowSchemaVersion !== "1.2") {
+  throw new Error("checkpoint state must include workflowSchemaVersion 1.2");
+}
+
+console.log("checkpoint state includes workflowSchemaVersion ok");
+EOF
+pass "checkpoint state includes workflowSchemaVersion"
+
+echo "-- Test 202: checkpoint state includes stepRegistryHash --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowState,
+  computeStepRegistryHash,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  WORKFLOW_STEP_REGISTRY,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context, {}, WORKFLOW_STEP_REGISTRY);
+const expectedHash = computeStepRegistryHash(WORKFLOW_STEP_REGISTRY);
+if (state.stepRegistryHash !== expectedHash) {
+  throw new Error("checkpoint state stepRegistryHash mismatch");
+}
+
+console.log("checkpoint state includes stepRegistryHash ok");
+EOF
+pass "checkpoint state includes stepRegistryHash"
+
+echo "-- Test 203: checkpoint validator passes compatible state --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowState,
+  validateWorkflowCheckpoint,
+} from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "version-consistency",
+    name: "Version Consistency",
+    status: STEP_STATUS.PASS,
+    guard: { shouldExecute: true, reason: GUARD_REASON.NONE },
+    detail: null,
+  },
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+const validation = validateWorkflowCheckpoint({ state });
+if (!validation.valid) {
+  throw new Error(`compatible checkpoint must pass: ${validation.errors.join("; ")}`);
+}
+if (!validation.resumeSupported) {
+  throw new Error("compatible checkpoint must be resume supported");
+}
+if (validation.currentStepId !== "release-plan") {
+  throw new Error("compatible checkpoint currentStepId mismatch");
+}
+
+console.log("checkpoint validator passes compatible state ok");
+EOF
+pass "checkpoint validator passes compatible state"
+
+echo "-- Test 204: checkpoint validator warns on legacy state --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+  getWorkflowVersionContext,
+  validateWorkflowCheckpoint,
+} from "./src/lib/developer_workflow_resume.js";
+
+const versionContext = getWorkflowVersionContext(process.cwd());
+const validation = validateWorkflowCheckpoint({
+  state: {
+    schema: WORKFLOW_STATE_SCHEMA_LEGACY,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+});
+
+if (!validation.valid) {
+  throw new Error("legacy checkpoint should remain resume valid with warnings");
+}
+if (!validation.warnings.some((warning) => warning.includes("stepRegistryHash"))) {
+  throw new Error("legacy checkpoint must warn about missing stepRegistryHash");
+}
+
+console.log("checkpoint validator warns on legacy state ok");
+EOF
+pass "checkpoint validator warns on legacy state"
+
+echo "-- Test 205: checkpoint validator fails unsupported schema --"
+node --input-type=module <<'EOF'
+import { validateWorkflowCheckpoint } from "./src/lib/developer_workflow_checkpoint.js";
+
+const validation = validateWorkflowCheckpoint({
+  state: {
+    schema: "developer-automation/workflow-state/9.9",
+    workflowSchemaVersion: "9.9",
+    status: "stopped",
+    currentStepId: "release-plan",
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: [],
+    skippedStepIds: [],
+    resumeSupported: true,
+    resumeUnsupportedReason: null,
+    stepRegistryHash: "sha256:deadbeef",
+    createdAt: "2026-07-02T00:00:00.000Z",
+    updatedAt: "2026-07-02T00:00:00.000Z",
+  },
+});
+
+if (validation.valid) {
+  throw new Error("unsupported schema must fail checkpoint validation");
+}
+if (!validation.errors.some((error) => error.includes("unsupported workflow-state schema"))) {
+  throw new Error("unsupported schema error must be reported");
+}
+
+console.log("checkpoint validator fails unsupported schema ok");
+EOF
+pass "checkpoint validator fails unsupported schema"
+
+echo "-- Test 206: checkpoint validator fails registry mismatch --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_STATE_SCHEMA,
+  validateWorkflowCheckpoint,
+} from "./src/lib/developer_workflow_checkpoint.js";
+
+const validation = validateWorkflowCheckpoint({
+  state: {
+    schema: WORKFLOW_STATE_SCHEMA,
+    workflowSchemaVersion: "1.2",
+    status: "stopped",
+    currentStepId: "release-plan",
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: [],
+    skippedStepIds: [],
+    resumeSupported: true,
+    resumeUnsupportedReason: null,
+    stepRegistryHash: "sha256:deadbeef",
+    createdAt: "2026-07-02T00:00:00.000Z",
+    updatedAt: "2026-07-02T00:00:00.000Z",
+  },
+});
+
+if (validation.valid) {
+  throw new Error("registry mismatch must fail checkpoint validation");
+}
+if (!validation.errors.some((error) => error.includes("stepRegistryHash"))) {
+  throw new Error("registry mismatch error must be reported");
+}
+
+console.log("checkpoint validator fails registry mismatch ok");
+EOF
+pass "checkpoint validator fails registry mismatch"
+
+echo "-- Test 207: resume uses checkpoint validation --"
+node --input-type=module <<'EOF'
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+  getWorkflowVersionContext,
+  prepareResumeWorkflow,
+  writeWorkflowState,
+} from "./src/lib/developer_workflow_resume.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const versionContext = getWorkflowVersionContext(PROJECT_ROOT);
+
+writeWorkflowState(
+  {
+    schema: WORKFLOW_STATE_SCHEMA_LEGACY,
+    workflowStatus: "stopped",
+    stopReason: "stop-before-step",
+    currentVersion: versionContext.currentVersion,
+    nextVersion: versionContext.nextVersion,
+    stoppedBeforeStepId: "release-plan",
+    completedStepIds: ["version-consistency", "release-readiness"],
+    skippedStepIds: [],
+    failedStepIds: [],
+    createdAt: "2026-07-02T00:00:00.000Z",
+    source: { command: "developer:workflow", mode: "dry-run" },
+  },
+  PROJECT_ROOT,
+);
+
+const prepared = prepareResumeWorkflow({ rootDir: PROJECT_ROOT });
+if (!prepared.validation.valid) {
+  throw new Error(`resume must use checkpoint validation: ${prepared.validation.errors.join("; ")}`);
+}
+if (!prepared.validation.checkpoint) {
+  throw new Error("resume validation must include checkpoint result");
+}
+if (!prepared.validation.resume) {
+  throw new Error("resume validation must include resume result");
+}
+
+console.log("resume uses checkpoint validation ok");
+EOF
+pass "resume uses checkpoint validation"
+
+echo "-- Test 208: checkpoint markdown report renders JSON-derived view --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowCheckpointMarkdown,
+  buildWorkflowCheckpointReport,
+  validateWorkflowCheckpoint,
+} from "./src/lib/developer_workflow_checkpoint.js";
+import { buildWorkflowState } from "./src/lib/developer_workflow_resume.js";
+import {
+  GUARD_REASON,
+  STEP_STATUS,
+  WORKFLOW_STOP_REASON,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  options: { stopBeforeStep: "release-plan", dryRun: true },
+});
+context.stopReason = WORKFLOW_STOP_REASON.STOP_BEFORE_STEP;
+context.results = [
+  {
+    id: "release-plan",
+    name: "Release Plan",
+    status: STEP_STATUS.STOPPED,
+    guard: { shouldExecute: false, reason: GUARD_REASON.STOP_BEFORE_STEP },
+    detail: null,
+  },
+];
+
+const state = buildWorkflowState(context);
+const checkpointValidation = validateWorkflowCheckpoint({ state });
+const report = buildWorkflowCheckpointReport(
+  checkpointValidation,
+  state,
+  "2026-07-02T00:00:00.000Z",
+);
+const markdown = buildWorkflowCheckpointMarkdown(report);
+
+for (const expected of [
+  "# Developer Workflow Checkpoint Report",
+  "Current Step: release-plan",
+  "Workflow Schema Version: 1.2",
+  "Step Registry Hash Matched: true",
+  "Resume Supported: true",
+  `Step Registry Hash: ${state.stepRegistryHash}`,
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`checkpoint markdown must include: ${expected}`);
+  }
+}
+
+console.log("checkpoint markdown report renders JSON-derived view ok");
+EOF
+pass "checkpoint markdown report renders JSON-derived view"
 
 echo ""
 echo "All quality pipeline tests passed."

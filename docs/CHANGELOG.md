@@ -4,6 +4,36 @@
 
 ---
 
+## v1.33.0 — 機能追加（Workflow Checkpoint Foundation）
+
+Resume Foundation の実行能力を維持したまま、**Checkpoint Foundation** で workflow-state の現在位置・互換性・resume 安全性を検証する基盤を追加しました。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| workflow-state schema | `developer-automation/workflow-state/1.2` |
+| Checkpoint Validator | `validateWorkflowCheckpoint()`（Pure Function） |
+| Legacy Compatibility | v1.32.0 state（1.0）を warning 付きで resume 可能 |
+| Checkpoint Report | `workflow-checkpoint.json` / `workflow-checkpoint.md` |
+| 新フィールド | currentStepId / resumeSupported / stepRegistryHash / workflowSchemaVersion |
+| Test 199–208 | Checkpoint 検証 / legacy / resume 接続 |
+
+### 設計判断
+
+- **Resume Foundation 破壊禁止** — 既存 resume 実行能力を維持
+- **JSON Source / Markdown View** — checkpoint.md は JSON からのみ生成
+- **legacy warning** — 欠落フィールドは即 fail せず warning
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **208 PASS**（Test 199–208 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.32.0 — 機能追加（Developer Workflow Resume Foundation）
 
 Workflow Guard で **STOPPED** になった状態を `workflow-state.json` に保存し、`--resume` で安全に再開できる Resume Foundation を追加しました。

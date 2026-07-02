@@ -2,6 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { detectCurrentVersion } from "./developer_automation.js";
 import {
+  computeStepRegistryHash,
+  normalizeWorkflowState,
+  validateWorkflowCheckpoint,
+  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+} from "./developer_workflow_checkpoint.js";
+import {
   createWorkflowContext,
   executeWorkflowSteps,
   finalizeWorkflowContext,
@@ -11,12 +18,22 @@ import { GUARD_REASON } from "./workflow_guard_reason.js";
 import { STEP_STATUS } from "./workflow_step_status.js";
 import { WORKFLOW_STOP_REASON } from "./workflow_stop_reason.js";
 
-export const WORKFLOW_STATE_SCHEMA = "developer-automation/workflow-state/1.0";
+export {
+  computeStepRegistryHash,
+  normalizeWorkflowState,
+  validateWorkflowCheckpoint,
+  WORKFLOW_STATE_SCHEMA,
+  WORKFLOW_STATE_SCHEMA_LEGACY,
+} from "./developer_workflow_checkpoint.js";
+
 export const WORKFLOW_RESUME_SCHEMA = "developer-automation/workflow-resume/1.0";
 export const DEVELOPER_WORKFLOW_REPORT_DIR = "reports/developer-workflow/latest";
 export const WORKFLOW_STATE_FILENAME = "workflow-state.json";
 export const WORKFLOW_RESUME_JSON_FILENAME = "workflow-resume.json";
 export const WORKFLOW_RESUME_MD_FILENAME = "workflow-resume.md";
+
+/** @deprecated Use WORKFLOW_STATE_SCHEMA from developer_workflow_checkpoint.js */
+export const WORKFLOW_STATE_SCHEMA_V1_0 = WORKFLOW_STATE_SCHEMA_LEGACY;
 
 /**
  * @param {string | null | undefined} version
@@ -63,9 +80,10 @@ export function mapStopReasonToState(stopReason) {
  * @param {object} [params]
  * @param {string} [params.createdAt]
  * @param {string} [params.command]
+ * @param {typeof WORKFLOW_STEP_REGISTRY} [params.registry]
  * @returns {object}
  */
-export function buildWorkflowState(context, params = {}) {
+export function buildWorkflowState(context, params = {}, registry = WORKFLOW_STEP_REGISTRY) {
   const versionContext = getWorkflowVersionContext(context.rootDir);
   const completedStepIds = context.results
     .filter((result) => result.status === STEP_STATUS.PASS)
@@ -79,18 +97,27 @@ export function buildWorkflowState(context, params = {}) {
   const stoppedStep = context.results.find(
     (result) => result.status === STEP_STATUS.STOPPED,
   );
+  const stoppedBeforeStepId = stoppedStep?.id ?? null;
+  const createdAt = params.createdAt ?? context.generatedAt;
 
   return {
     schema: WORKFLOW_STATE_SCHEMA,
+    workflowSchemaVersion: "1.2",
+    status: "stopped",
+    currentStepId: stoppedBeforeStepId,
+    completedStepIds,
+    skippedStepIds,
+    stoppedBeforeStepId,
+    resumeSupported: failedStepIds.length === 0 && stoppedBeforeStepId !== null,
+    resumeUnsupportedReason: null,
+    stepRegistryHash: computeStepRegistryHash(registry),
+    createdAt,
+    updatedAt: createdAt,
     workflowStatus: "stopped",
     stopReason: mapStopReasonToState(context.stopReason),
     currentVersion: versionContext.currentVersion,
     nextVersion: versionContext.nextVersion,
-    stoppedBeforeStepId: stoppedStep?.id ?? null,
-    completedStepIds,
-    skippedStepIds,
     failedStepIds,
-    createdAt: params.createdAt ?? context.generatedAt,
     source: {
       command: params.command ?? "developer:workflow",
       mode: context.options.dryRun ? "dry-run" : "execute",
@@ -148,31 +175,38 @@ export function writeWorkflowState(state, rootDir = process.cwd()) {
 export function validateResumeState(state, versionContext, registry = WORKFLOW_STEP_REGISTRY) {
   /** @type {string[]} */
   const errors = [];
+  const normalized = normalizeWorkflowState(state);
   const registryIds = new Set(registry.map((step) => step.id));
 
   if (!state || typeof state !== "object") {
     return { valid: false, errors: ["workflow state must be an object"] };
   }
 
-  if (state.schema !== WORKFLOW_STATE_SCHEMA) {
-    errors.push(`schema must be ${WORKFLOW_STATE_SCHEMA}`);
-  }
-
-  if (state.workflowStatus !== "stopped") {
-    errors.push('workflowStatus must be "stopped"');
-  }
-
-  if (state.nextVersion !== versionContext.nextVersion) {
+  if (
+    normalized.schema !== WORKFLOW_STATE_SCHEMA &&
+    normalized.schema !== WORKFLOW_STATE_SCHEMA_LEGACY
+  ) {
     errors.push(
-      `nextVersion mismatch: state=${state.nextVersion}, expected=${versionContext.nextVersion}`,
+      `schema must be ${WORKFLOW_STATE_SCHEMA_LEGACY} or ${WORKFLOW_STATE_SCHEMA}`,
     );
   }
 
-  if (!state.stoppedBeforeStepId || !registryIds.has(state.stoppedBeforeStepId)) {
+  if (normalized.status !== "stopped") {
+    errors.push('status must be "stopped"');
+  }
+
+  if (normalized.nextVersion !== versionContext.nextVersion) {
+    errors.push(
+      `nextVersion mismatch: state=${normalized.nextVersion}, expected=${versionContext.nextVersion}`,
+    );
+  }
+
+  const stoppedBeforeStepId = normalized.stoppedBeforeStepId;
+  if (!stoppedBeforeStepId || !registryIds.has(stoppedBeforeStepId)) {
     errors.push("stoppedBeforeStepId must exist in step registry");
   }
 
-  const completedStepIds = state.completedStepIds ?? [];
+  const completedStepIds = normalized.completedStepIds;
   if (!Array.isArray(completedStepIds)) {
     errors.push("completedStepIds must be an array");
   } else {
@@ -182,13 +216,13 @@ export function validateResumeState(state, versionContext, registry = WORKFLOW_S
       }
     }
 
-    if (state.stoppedBeforeStepId) {
+    if (stoppedBeforeStepId) {
       const stoppedIndex = registry.findIndex(
-        (step) => step.id === state.stoppedBeforeStepId,
+        (step) => step.id === stoppedBeforeStepId,
       );
 
       for (const stepId of completedStepIds) {
-        if (stepId === state.stoppedBeforeStepId) {
+        if (stepId === stoppedBeforeStepId) {
           errors.push("completedStepIds must not include stoppedBeforeStepId");
         }
 
@@ -200,12 +234,41 @@ export function validateResumeState(state, versionContext, registry = WORKFLOW_S
     }
   }
 
-  const failedStepIds = state.failedStepIds ?? [];
+  const failedStepIds = normalized.failedStepIds;
   if (!Array.isArray(failedStepIds) || failedStepIds.length > 0) {
     errors.push("failedStepIds must be empty");
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+/**
+ * @param {object} state
+ * @param {{ currentVersion: string, nextVersion: string }} versionContext
+ * @param {typeof WORKFLOW_STEP_REGISTRY} [registry]
+ * @returns {{
+ *   valid: boolean,
+ *   errors: string[],
+ *   warnings: string[],
+ *   checkpoint: ReturnType<typeof validateWorkflowCheckpoint>,
+ *   resume: { valid: boolean, errors: string[] },
+ * }}
+ */
+export function validateWorkflowResumeState(state, versionContext, registry = WORKFLOW_STEP_REGISTRY) {
+  const normalized = normalizeWorkflowState(state);
+  const checkpoint = validateWorkflowCheckpoint({
+    state: normalized,
+    stepRegistry: registry,
+  });
+  const resume = validateResumeState(normalized, versionContext, registry);
+
+  return {
+    valid: checkpoint.valid && resume.valid,
+    errors: [...checkpoint.errors, ...resume.errors],
+    warnings: checkpoint.warnings,
+    checkpoint,
+    resume,
+  };
 }
 
 /**
@@ -219,14 +282,16 @@ export function validateResumeState(state, versionContext, registry = WORKFLOW_S
  * }}
  */
 export function resolveResumeCursor(state, registry = WORKFLOW_STEP_REGISTRY) {
-  const resumeFromStepId = state.stoppedBeforeStepId;
+  const normalized = normalizeWorkflowState(state);
+  const resumeFromStepId =
+    normalized.currentStepId ?? normalized.stoppedBeforeStepId;
   const startIndex = registry.findIndex((step) => step.id === resumeFromStepId);
 
   return {
     resumeFromStepId,
     startIndex,
-    completedStepIds: [...(state.completedStepIds ?? [])],
-    skippedStepIds: [...(state.skippedStepIds ?? [])],
+    completedStepIds: [...normalized.completedStepIds],
+    skippedStepIds: [...normalized.skippedStepIds],
   };
 }
 
@@ -236,10 +301,11 @@ export function resolveResumeCursor(state, registry = WORKFLOW_STEP_REGISTRY) {
  * @returns {ReturnType<typeof createWorkflowContext>["results"]}
  */
 export function buildPriorResultsFromState(state, registry) {
+  const normalized = normalizeWorkflowState(state);
   /** @type {ReturnType<typeof createWorkflowContext>["results"]} */
   const results = [];
 
-  for (const stepId of state.completedStepIds ?? []) {
+  for (const stepId of normalized.completedStepIds) {
     const step = registry.find((entry) => entry.id === stepId);
     if (!step) {
       continue;
@@ -254,7 +320,7 @@ export function buildPriorResultsFromState(state, registry) {
     });
   }
 
-  for (const stepId of state.skippedStepIds ?? []) {
+  for (const stepId of normalized.skippedStepIds) {
     const step = registry.find((entry) => entry.id === stepId);
     if (!step) {
       continue;
@@ -281,7 +347,7 @@ export function buildPriorResultsFromState(state, registry) {
  * @param {string} [params.generatedAt]
  * @param {typeof WORKFLOW_STEP_REGISTRY} [params.registry]
  * @returns {{
- *   validation: { valid: boolean, errors: string[] },
+ *   validation: ReturnType<typeof validateWorkflowResumeState>,
  *   state: object | null,
  *   versionContext: { currentVersion: string, nextVersion: string },
  *   context: ReturnType<typeof createWorkflowContext> | null,
@@ -292,7 +358,7 @@ export function prepareResumeWorkflow(params = {}, registry = WORKFLOW_STEP_REGI
   const rootDir = params.rootDir ?? process.cwd();
   const state = readWorkflowState(params.resumeStatePath, rootDir);
   const versionContext = getWorkflowVersionContext(rootDir);
-  const validation = validateResumeState(state, versionContext, registry);
+  const validation = validateWorkflowResumeState(state, versionContext, registry);
 
   if (!validation.valid) {
     return {
@@ -304,7 +370,8 @@ export function prepareResumeWorkflow(params = {}, registry = WORKFLOW_STEP_REGI
     };
   }
 
-  const cursor = resolveResumeCursor(state, registry);
+  const normalized = normalizeWorkflowState(state);
+  const cursor = resolveResumeCursor(normalized, registry);
   const context = createWorkflowContext({
     rootDir,
     skipNpmTest: params.skipNpmTest,
@@ -317,11 +384,11 @@ export function prepareResumeWorkflow(params = {}, registry = WORKFLOW_STEP_REGI
 
   return {
     validation,
-    state,
+    state: normalized,
     versionContext,
     context: {
       ...context,
-      results: buildPriorResultsFromState(state, registry),
+      results: buildPriorResultsFromState(normalized, registry),
     },
     cursor,
   };
@@ -333,7 +400,7 @@ export function prepareResumeWorkflow(params = {}, registry = WORKFLOW_STEP_REGI
  * @returns {{
  *   context: ReturnType<typeof finalizeWorkflowContext>,
  *   resumeFromStepId: string,
- *   validation: { valid: boolean, errors: string[] },
+ *   validation: ReturnType<typeof validateWorkflowResumeState>,
  *   state: object,
  * }}
  */
@@ -363,6 +430,7 @@ export function runDeveloperWorkflowResume(params = {}, registry = WORKFLOW_STEP
  * @param {string | null} [params.resumeFromStepId]
  * @param {string[]} [params.completedStepIds]
  * @param {string[]} [params.validationErrors]
+ * @param {string[]} [params.validationWarnings]
  * @param {string | null} [params.workflowStatus]
  * @param {string} [params.generatedAt]
  * @returns {object}
@@ -374,6 +442,7 @@ export function buildWorkflowResumeReport(params) {
     resumeFromStepId: params.resumeFromStepId ?? null,
     completedStepIds: params.completedStepIds ?? [],
     validationErrors: params.validationErrors ?? [],
+    validationWarnings: params.validationWarnings ?? [],
     workflowStatus: params.workflowStatus ?? null,
     generatedAt: params.generatedAt ?? new Date().toISOString(),
   };
@@ -404,6 +473,14 @@ export function buildWorkflowResumeMarkdown(report) {
     `- Workflow Status: ${report.workflowStatus ?? "unknown"}`,
     "",
   ];
+
+  if (report.validationWarnings.length > 0) {
+    lines.push("## Validation Warnings", "");
+    for (const warning of report.validationWarnings) {
+      lines.push(`- ${warning}`);
+    }
+    lines.push("");
+  }
 
   if (report.validationErrors.length > 0) {
     lines.push("## Validation Errors", "");
@@ -458,6 +535,7 @@ export function writeWorkflowResumeReport(report, rootDir = process.cwd()) {
     resumeFromStepId: report.resumeFromStepId,
     completedStepIds: report.completedStepIds,
     validationErrors: report.validationErrors,
+    validationWarnings: report.validationWarnings,
     workflowStatus: report.workflowStatus,
     generatedAt: report.generatedAt,
   };

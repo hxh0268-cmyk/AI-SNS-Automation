@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 
 import {
+  buildWorkflowCheckpointReport,
+  buildWorkflowCheckpointCliSummary,
+  validateWorkflowCheckpoint,
+  writeWorkflowCheckpointReport,
+} from "../src/lib/developer_workflow_checkpoint.js";
+import {
   buildDeveloperAutomationWorkflowCliSummary,
   runDeveloperWorkflow,
   writeDeveloperAutomationReport,
   WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
 } from "../src/lib/developer_workflow.js";
 import {
   buildWorkflowResumeReport,
@@ -66,6 +73,20 @@ export function parseArgs(argv) {
   return options;
 }
 
+function writeCheckpointOutputs(state, rootDir) {
+  const checkpointValidation = validateWorkflowCheckpoint({
+    state,
+    stepRegistry: WORKFLOW_STEP_REGISTRY,
+  });
+  const checkpointReport = buildWorkflowCheckpointReport(
+    checkpointValidation,
+    state,
+  );
+  const checkpointOutputs = writeWorkflowCheckpointReport(checkpointReport, rootDir);
+
+  return { checkpointValidation, checkpointReport, checkpointOutputs };
+}
+
 function main() {
   const cliOptions = parseArgs(process.argv.slice(2));
   const rootDir = process.cwd();
@@ -82,10 +103,22 @@ function main() {
       },
     });
 
+    if (prepared.state) {
+      const { checkpointReport, checkpointOutputs } = writeCheckpointOutputs(
+        prepared.state,
+        rootDir,
+      );
+      console.log(buildWorkflowCheckpointCliSummary(checkpointReport));
+      console.log(`[DeveloperWorkflow] checkpoint json: ${checkpointOutputs.json}`);
+      console.log(`[DeveloperWorkflow] checkpoint markdown: ${checkpointOutputs.markdown}`);
+      console.log("");
+    }
+
     if (!prepared.validation.valid) {
       const failedReport = buildWorkflowResumeReport({
         status: "validation-failed",
         validationErrors: prepared.validation.errors,
+        validationWarnings: prepared.validation.warnings,
         generatedAt: new Date().toISOString(),
       });
       const resumeOutputs = writeWorkflowResumeReport(failedReport, rootDir);
@@ -111,6 +144,7 @@ function main() {
       status: "resumed",
       resumeFromStepId: resumeResult.resumeFromStepId,
       completedStepIds: resumeResult.state.completedStepIds ?? [],
+      validationWarnings: resumeResult.validation.warnings,
       workflowStatus: resumeResult.context.status,
       generatedAt: resumeResult.context.generatedAt,
     });
@@ -143,8 +177,20 @@ function main() {
   const outputs = writeDeveloperAutomationReport(context);
 
   if (context.status === WORKFLOW_STATUS.STOPPED) {
-    const statePath = writeWorkflowState(buildWorkflowState(context), rootDir);
+    const state = buildWorkflowState(context);
+    const statePath = writeWorkflowState(state, rootDir);
+    const { checkpointReport, checkpointOutputs } = writeCheckpointOutputs(
+      state,
+      rootDir,
+    );
+
+    console.log(buildWorkflowCheckpointCliSummary(checkpointReport));
     console.log(`[DeveloperWorkflow] state: ${statePath}`);
+    console.log(`[DeveloperWorkflow] checkpoint json: ${checkpointOutputs.json}`);
+    console.log(
+      `[DeveloperWorkflow] checkpoint markdown: ${checkpointOutputs.markdown}`,
+    );
+    console.log("");
   }
 
   console.log(buildDeveloperAutomationWorkflowCliSummary(context));

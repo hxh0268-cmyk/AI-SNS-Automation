@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.32.0**（Developer Workflow Resume Foundation）
+**v1.33.0**（Workflow Checkpoint Foundation）
 
 ---
 
@@ -26,6 +26,7 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
+| **v1.33.0** | **機能追加** | **✅ 完了** | **Workflow Checkpoint Foundation / state 位置・互換性・resume 安全性検証** |
 | **v1.32.0** | **機能追加** | **✅ 完了** | **Developer Workflow Resume Foundation / STOPPED 状態の保存と Resume** |
 | **v1.31.0** | **機能追加** | **✅ 完了** | **Developer Handoff Prompt Foundation / Claude Code 引き継ぎ MVP** |
 | v1.30.0 | 機能追加 | ✅ 完了 | Developer Workflow Guard Foundation / Workflow 安全制御 MVP |
@@ -52,6 +53,46 @@
 
 ---
 
+### v1.33.0 で追加（Workflow Checkpoint Foundation）
+
+#### Workflow Checkpoint MVP
+
+- **`validateWorkflowCheckpoint()`** … state 位置・互換性・resume 安全性の Pure Validator
+- **`normalizeWorkflowState()`** … legacy state の欠落フィールド補完
+- **`computeStepRegistryHash()`** … Step Registry 整合性ハッシュ
+- **workflow-state schema 1.2** … currentStepId / resumeSupported / stepRegistryHash 等
+- **workflow-checkpoint.json / .md** … Checkpoint JSON Source / Markdown View
+- **legacy 1.0 互換** … warning 付きで resume 可能
+
+#### v1.34.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.33.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **208 PASS** |
+| npm test | **PASS** |
+
+### v1.33.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-state schema 1.2 | ✅ |
+| checkpoint validator | ✅ |
+| legacy state compatibility | ✅ |
+| workflow-checkpoint JSON / Markdown | ✅ |
+| Resume Foundation 維持 | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 199–208 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.32.0 で追加（Developer Workflow Resume Foundation）
 
 #### Workflow Resume MVP
@@ -65,10 +106,11 @@
 - **`--resume-state`** … workflow-state.json パス指定
 - **JSON → Markdown** … workflow-resume.json / workflow-resume.md
 
-#### v1.33.0 以降の候補
+#### v1.33.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Workflow Checkpoint Foundation | ✅ v1.33.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 
