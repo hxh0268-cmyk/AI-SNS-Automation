@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.27.0 --"
+echo "-- Test 98: VERSION updated to v1.28.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.27.0**（Release Readiness Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.27.0");
+if (!versionDoc.includes("**v1.28.0**（Release Plan Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.28.0");
 }
-console.log("VERSION v1.27.0 ok");
+console.log("VERSION v1.28.0 ok");
 EOF
-pass "VERSION updated to v1.27.0"
+pass "VERSION updated to v1.28.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4619,6 +4619,307 @@ if (!notReadySummary.includes("✘ Working Tree") || !notReadySummary.includes("
 console.log("release readiness CLI output ok");
 EOF
 pass "release readiness CLI output"
+
+echo "-- Test 125: release plan generation --"
+node --input-type=module <<'EOF'
+import {
+  RELEASE_PLAN_STEPS,
+  buildReleasePlan,
+} from "./src/lib/release_plan.js";
+
+const plan = buildReleasePlan({
+  readiness: { status: "ready" },
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+
+if (plan.steps.length !== RELEASE_PLAN_STEPS.length) {
+  throw new Error("release plan must include all defined steps");
+}
+if (plan.steps.some((step) => step.completed !== false)) {
+  throw new Error("MVP release plan steps must remain incomplete");
+}
+
+console.log("release plan generation ok");
+EOF
+pass "release plan generation"
+
+echo "-- Test 126: release plan schema --"
+node --input-type=module <<'EOF'
+import {
+  RELEASE_PLAN_SCHEMA,
+  buildReleasePlan,
+} from "./src/lib/release_plan.js";
+
+if (RELEASE_PLAN_SCHEMA !== "developer-automation/release-plan/1.0") {
+  throw new Error("release plan schema constant mismatch");
+}
+
+const plan = buildReleasePlan({ readiness: { status: "ready" } });
+if (plan.schema !== RELEASE_PLAN_SCHEMA) {
+  throw new Error("release plan schema mismatch");
+}
+
+console.log("release plan schema ok");
+EOF
+pass "release plan schema"
+
+echo "-- Test 127: release plan status --"
+node --input-type=module <<'EOF'
+import { buildReleasePlan } from "./src/lib/release_plan.js";
+
+const readyPlan = buildReleasePlan({ readiness: { status: "ready" } });
+if (readyPlan.status !== "ready") {
+  throw new Error("expected ready status when readiness is ready");
+}
+
+const notReadyPlan = buildReleasePlan({ readiness: { status: "not-ready" } });
+if (notReadyPlan.status !== "not-ready") {
+  throw new Error("expected not-ready status when readiness is not-ready");
+}
+
+console.log("release plan status ok");
+EOF
+pass "release plan status"
+
+echo "-- Test 128: release plan steps --"
+node --input-type=module <<'EOF'
+import { buildReleasePlan } from "./src/lib/release_plan.js";
+
+const plan = buildReleasePlan({ readiness: { status: "ready" } });
+const requiredSteps = plan.steps.filter((step) => step.required);
+const optionalSteps = plan.steps.filter((step) => !step.required);
+
+if (requiredSteps.length !== 3) {
+  throw new Error("expected 3 required release plan steps");
+}
+if (optionalSteps.length !== 2) {
+  throw new Error("expected 2 optional release plan steps");
+}
+for (const step of plan.steps) {
+  if (!step.id || !step.name || typeof step.required !== "boolean") {
+    throw new Error("each release plan step must include id, name, and required");
+  }
+}
+
+console.log("release plan steps ok");
+EOF
+pass "release plan steps"
+
+echo "-- Test 129: release plan step ids are fixed strings --"
+node --input-type=module <<'EOF'
+import {
+  RELEASE_PLAN_STEPS,
+  buildReleasePlan,
+} from "./src/lib/release_plan.js";
+
+const expectedIds = [
+  "git-commit",
+  "git-tag",
+  "git-push",
+  "github-release",
+  "publish",
+];
+
+if (RELEASE_PLAN_STEPS.map((step) => step.id).join(",") !== expectedIds.join(",")) {
+  throw new Error("release plan step ids must be fixed strings");
+}
+
+const plan = buildReleasePlan({ readiness: { status: "ready" } });
+if (plan.steps.map((step) => step.id).join(",") !== expectedIds.join(",")) {
+  throw new Error("generated release plan step ids must match fixed ids");
+}
+
+console.log("release plan step ids ok");
+EOF
+pass "release plan step ids are fixed strings"
+
+echo "-- Test 130: release plan step reasons exist --"
+node --input-type=module <<'EOF'
+import { buildReleasePlan } from "./src/lib/release_plan.js";
+
+const readyPlan = buildReleasePlan({ readiness: { status: "ready" } });
+for (const step of readyPlan.steps) {
+  if (!step.reason || step.reason.trim().length === 0) {
+    throw new Error(`step ${step.id} must include reason`);
+  }
+}
+
+const notReadyPlan = buildReleasePlan({ readiness: { status: "not-ready" } });
+for (const step of notReadyPlan.steps) {
+  if (!step.reason || step.reason.trim().length === 0) {
+    throw new Error(`step ${step.id} must include reason when not-ready`);
+  }
+}
+
+console.log("release plan step reasons ok");
+EOF
+pass "release plan step reasons exist"
+
+echo "-- Test 131: release-plan.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  buildReleasePlan,
+  writeReleasePlanReport,
+} from "./src/lib/release_plan.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const plan = buildReleasePlan({
+  rootDir: PROJECT_ROOT,
+  readiness: { status: "ready" },
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+
+writeReleasePlanReport(plan, PROJECT_ROOT);
+
+const jsonPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/release-plan.json",
+);
+const payload = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+
+if (payload.schema !== "developer-automation/release-plan/1.0") {
+  throw new Error("release-plan.json schema mismatch");
+}
+if (payload.status !== "ready") {
+  throw new Error("release-plan.json status mismatch");
+}
+if (!Array.isArray(payload.steps) || payload.steps.length !== 5) {
+  throw new Error("release-plan.json steps mismatch");
+}
+
+console.log("release-plan.json ok");
+EOF
+pass "release-plan.json generated"
+
+echo "-- Test 132: release-plan.md generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  buildReleasePlan,
+  buildReleasePlanMarkdown,
+} from "./src/lib/release_plan.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const plan = buildReleasePlan({ readiness: { status: "ready" } });
+const markdown = buildReleasePlanMarkdown(plan);
+
+for (const section of ["Release Plan", "Status", "Planned Steps"]) {
+  if (!markdown.includes(section)) {
+    throw new Error(`release-plan markdown must include section: ${section}`);
+  }
+}
+
+const markdownPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/release-plan.md",
+);
+if (!fs.existsSync(markdownPath)) {
+  throw new Error("release-plan.md must exist after json generation test");
+}
+
+console.log("release-plan.md ok");
+EOF
+pass "release-plan.md generated"
+
+echo "-- Test 133: release plan CLI summary --"
+node --input-type=module <<'EOF'
+import { buildReleasePlan, buildReleasePlanCliSummary } from "./src/lib/release_plan.js";
+
+const readySummary = buildReleasePlanCliSummary(
+  buildReleasePlan({ readiness: { status: "ready" } }),
+);
+if (!readySummary.includes("Release Plan")) {
+  throw new Error("CLI summary must include Release Plan heading");
+}
+if (!readySummary.includes("Status: READY")) {
+  throw new Error("CLI summary must include READY status");
+}
+if (!readySummary.includes("Planned Steps")) {
+  throw new Error("CLI summary must include Planned Steps section");
+}
+if (!readySummary.includes("○ git commit — Pending human approval")) {
+  throw new Error("CLI summary must include pending git commit step");
+}
+if (!readySummary.includes("○ GitHub Release — Out of MVP scope")) {
+  throw new Error("CLI summary must include out-of-scope GitHub Release step");
+}
+
+const notReadySummary = buildReleasePlanCliSummary(
+  buildReleasePlan({ readiness: { status: "not-ready" } }),
+);
+if (!notReadySummary.includes("Status: NOT READY")) {
+  throw new Error("CLI summary must include NOT READY status");
+}
+if (!notReadySummary.includes("Release readiness is not ready")) {
+  throw new Error("CLI summary must reflect readiness not-ready reason");
+}
+
+console.log("release plan CLI summary ok");
+EOF
+pass "release plan CLI summary"
+
+echo "-- Test 134: release:plan npm script --"
+grep -q '"release:plan": "node scripts/run_release_plan.js"' package.json
+npm run release:plan >/tmp/release_plan_cli.log || true
+grep -q "Release Plan" /tmp/release_plan_cli.log
+grep -q "Status:" /tmp/release_plan_cli.log
+grep -q "Planned Steps" /tmp/release_plan_cli.log
+grep -q "git commit" /tmp/release_plan_cli.log
+pass "release:plan npm script"
+
+echo "-- Test 135: release plan release readiness integration --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildReleasePlan,
+} from "./src/lib/release_plan.js";
+
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "release-plan-"));
+const reportDir = path.join(tempRoot, "reports", "developer-automation", "latest");
+fs.mkdirSync(reportDir, { recursive: true });
+
+fs.writeFileSync(
+  path.join(reportDir, "release-readiness.json"),
+  `${JSON.stringify({ schema: "developer-automation/release-readiness/1.0", status: "ready", checks: {} }, null, 2)}\n`,
+);
+
+const readyPlan = buildReleasePlan({ rootDir: tempRoot });
+if (readyPlan.status !== "ready") {
+  throw new Error("release plan must be ready when release-readiness.json is ready");
+}
+if (readyPlan.steps[0].reason !== "Pending human approval") {
+  throw new Error("required step reason must be Pending human approval when ready");
+}
+
+fs.writeFileSync(
+  path.join(reportDir, "release-readiness.json"),
+  `${JSON.stringify({ schema: "developer-automation/release-readiness/1.0", status: "not-ready", checks: {} }, null, 2)}\n`,
+);
+
+const notReadyPlan = buildReleasePlan({ rootDir: tempRoot });
+if (notReadyPlan.status !== "not-ready") {
+  throw new Error("release plan must be not-ready when release-readiness.json is not-ready");
+}
+if (notReadyPlan.steps[0].reason !== "Release readiness is not ready") {
+  throw new Error("required step reason must reflect readiness not-ready");
+}
+
+const missingRoot = fs.mkdtempSync(path.join(os.tmpdir(), "release-plan-missing-"));
+const fallbackPlan = buildReleasePlan({ rootDir: missingRoot });
+if (fallbackPlan.status !== "not-ready") {
+  throw new Error("release plan must be not-ready when release-readiness.json is missing");
+}
+
+console.log("release plan release readiness integration ok");
+EOF
+pass "release plan release readiness integration"
 
 echo ""
 echo "All quality pipeline tests passed."

@@ -879,6 +879,42 @@ Release Readiness
 Status: READY
 ```
 
+### Release Plan Foundation（v1.28.0）
+
+Release 実行ではなく、**Release に必要な作業を機械的に計画・可視化する MVP** です。`release-readiness.json` を前提条件として読み取り、JSON / Markdown / CLI は同一の Plan オブジェクトから生成されます。
+
+```bash
+npm run release:plan
+```
+
+| 項目 | 内容 |
+|------|------|
+| ライブラリ | `src/lib/release_plan.js` |
+| CLI | `scripts/run_release_plan.js` |
+| schema | `developer-automation/release-plan/1.0` |
+| 前提 | `reports/developer-automation/latest/release-readiness.json` |
+| steps | git-commit / git-tag / git-push / github-release / publish |
+| JSON report | `reports/developer-automation/latest/release-plan.json` |
+| Markdown report | `reports/developer-automation/latest/release-plan.md` |
+| 全体 status | `ready` / `not-ready`（Release Readiness に連動） |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例
+
+```text
+Release Plan
+
+Status: READY
+
+Planned Steps
+
+○ git commit — Pending human approval
+○ git tag — Pending human approval
+○ git push — Pending human approval
+○ GitHub Release — Out of MVP scope
+○ Publish — Out of MVP scope
+```
+
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
 GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。

@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.27.0**（Release Readiness Foundation）
+**v1.28.0**（Release Plan Foundation）
 
 ---
 
@@ -26,8 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.27.0** | **機能追加** | **✅ 完了** | **Release Readiness Foundation / Release 可能判定 MVP** |
-| v1.26.0 | 機能追加 | ✅ 完了 | Developer Automation Foundation / 3-way Version Consistency |
+| **v1.28.0** | **機能追加** | **✅ 完了** | **Release Plan Foundation / Release 作業計画 MVP** |
+| v1.27.0 | 機能追加 | ✅ 完了 | Release Readiness Foundation / Release 可能判定 MVP |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
@@ -51,6 +51,46 @@
 
 ---
 
+### v1.28.0 で追加（Release Plan Foundation）
+
+#### Release Plan MVP
+
+- **`buildReleasePlan()`** … Release 作業計画を生成（データ生成のみ）
+- **`readReleaseReadinessReport()`** … `release-readiness.json` を読み取り前提条件とする
+- **`getStepReason()`** … step ごとの reason を決定
+- **`RELEASE_PLAN_STEPS`** … 固定 step id（git-commit / git-tag / git-push / github-release / publish）
+- **`release-plan.json`** … machine-readable report（schema 定数化）
+- **`release-plan.md`** … human-readable report
+- **CLI** … Summary 表示（Planned Steps + reason）
+- **`npm run release:plan`** … Release Plan 生成 MVP
+
+#### v1.29.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.28.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **135 PASS** |
+| npm test | **PASS** |
+
+### v1.28.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| release:plan npm script | ✅ |
+| Release Plan MVP | ✅ |
+| release-plan reports | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 125–135 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.27.0 で追加（Release Readiness Foundation）
 
 #### Release Readiness MVP
@@ -65,10 +105,11 @@
 - **CLI** … Summary 表示（✔/✘ + `Status: READY` / `NOT READY`）
 - **`npm run release:readiness -- --skip-npm-test`** … Release 可能判定 MVP
 
-#### v1.28.0 以降の候補
+#### v1.28.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Release Plan Foundation | ✅ v1.28.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

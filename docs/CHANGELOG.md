@@ -4,6 +4,45 @@
 
 ---
 
+## v1.28.0 — 機能追加（Release Plan Foundation）
+
+Release 実行ではなく、**Release に必要な作業を機械的に計画・可視化する MVP** を追加しました。`release-readiness.json` を前提条件として読み取り、固定 step id と reason 付きの Release Plan を生成します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Release Plan | `src/lib/release_plan.js` / `scripts/run_release_plan.js` |
+| npm script | `npm run release:plan` |
+| schema | `developer-automation/release-plan/1.0` |
+| steps | git-commit / git-tag / git-push / github-release / publish |
+| reason | Pending human approval / Out of MVP scope / Release readiness is not ready |
+| JSON report | `release-plan.json` |
+| Markdown report | `release-plan.md` |
+| CLI | Summary 表示（Planned Steps + reason） |
+| Release Readiness 連携 | `release-readiness.json` の status を Plan status に反映 |
+| Test 125–135 | Release Plan 生成 / レポート / CLI / Readiness 連携 |
+
+### 設計判断
+
+- **MVP スコープ厳守** — git commit / tag / push / GitHub Release / Publish は未実装
+- **Plan 生成と表示を分離** — `buildReleasePlan()` / `writeReleasePlanReport()` / `buildReleasePlanCliSummary()`
+- **同一 Plan オブジェクト** — JSON / Markdown / CLI は `buildReleasePlan()` から生成
+- **Release Readiness 前提** — readiness `not-ready` 時は required step の reason に反映
+
+### 影響範囲
+
+- Release Plan ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **135 PASS**（Test 125–135 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.27.0 — 機能追加（Release Readiness Foundation）
 
 Release 自動実行ではなく、**Release 可能かどうかを自動判定する MVP** を追加しました。Working Tree / Version Consistency / 必須レポート / npm test の 4 チェックで `ready` / `not-ready` を返します。
