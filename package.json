@@ -34,6 +34,7 @@
     "test": "npm run test:quality-pipeline",
     "dev:next": "node scripts/run_dev_next.js",
     "release:readiness": "node scripts/run_release_readiness.js",
-    "release:plan": "node scripts/run_release_plan.js"
+    "release:plan": "node scripts/run_release_plan.js",
+    "developer:workflow": "node scripts/run_developer_workflow.js"
   }
 }

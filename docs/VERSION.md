@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.28.0**（Release Plan Foundation）
+**v1.29.0**（Developer Automation Workflow Foundation）
 
 ---
 
@@ -26,8 +26,8 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
-| **v1.28.0** | **機能追加** | **✅ 完了** | **Release Plan Foundation / Release 作業計画 MVP** |
-| v1.27.0 | 機能追加 | ✅ 完了 | Release Readiness Foundation / Release 可能判定 MVP |
+| **v1.29.0** | **機能追加** | **✅ 完了** | **Developer Automation Workflow Foundation / Context ベース Workflow MVP** |
+| v1.28.0 | 機能追加 | ✅ 完了 | Release Plan Foundation / Release 作業計画 MVP |
 | v1.24.0 | 保守更新 | ✅ 完了 | GitHub Actions Node24 Production Readiness |
 | v1.23.0 | 保守更新 | ✅ 完了 | Node24 Migration Readiness（experimental） |
 | v1.22.0 | 保守更新 | ✅ 完了 | Performance Trend Experimental workflow |
@@ -51,6 +51,48 @@
 
 ---
 
+### v1.29.0 で追加（Developer Automation Workflow Foundation）
+
+#### Workflow MVP
+
+- **`createWorkflowContext()`** … Context を唯一の状態管理として初期化
+- **`WORKFLOW_STEP_REGISTRY`** … version-consistency / release-readiness / release-plan を順次実行
+- **`buildStepResult()`** … 標準化された Step Result（id / name / status / detail）
+- **`STEP_STATUS`** … pass / fail / skip 定数
+- **`WORKFLOW_STATUS`** … success / failure 定数
+- **`context.results[]`** … 各 Step Result を蓄積
+- **`developer-automation-report.json`** … machine-readable 集約 report
+- **`developer-automation-report.md`** … human-readable 集約 report
+- **CLI** … Step Results Summary
+- **`npm run developer:workflow -- --skip-npm-test`** … Developer Automation Workflow MVP
+
+#### v1.30.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.29.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **148 PASS** |
+| npm test | **PASS** |
+
+### v1.29.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| developer:workflow npm script | ✅ |
+| Context ベース Workflow MVP | ✅ |
+| developer-automation-report | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 136–148 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.28.0 で追加（Release Plan Foundation）
 
 #### Release Plan MVP
@@ -64,10 +106,11 @@
 - **CLI** … Summary 表示（Planned Steps + reason）
 - **`npm run release:plan`** … Release Plan 生成 MVP
 
-#### v1.29.0 以降の候補
+#### v1.29.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Automation Workflow Foundation | ✅ v1.29.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 

@@ -4,6 +4,46 @@
 
 ---
 
+## v1.29.0 — 機能追加（Developer Automation Workflow Foundation）
+
+Developer Automation を **Context ベース Workflow** として統合しました。Step Registry から順番に実行し、標準化された Step Result を `context.results[]` に蓄積して集約 report を生成します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Developer Workflow | `src/lib/developer_workflow.js` / `scripts/run_developer_workflow.js` |
+| npm script | `npm run developer:workflow -- --skip-npm-test` |
+| schema | `developer-automation/workflow/1.0` |
+| Context | 唯一の状態管理（results / status / skipNpmTest） |
+| Step Registry | version-consistency → release-readiness → release-plan |
+| Step Result | id / name / status / detail（`STEP_STATUS` 定数使用） |
+| Workflow Status | success / failure（`WORKFLOW_STATUS` 定数使用） |
+| JSON report | `developer-automation-report.json` |
+| Markdown report | `developer-automation-report.md` |
+| CLI | Step Results Summary |
+| Test 136–148 | Workflow / Context / Step Result / レポート / CLI |
+
+### 設計判断
+
+- **Context 唯一** — Step は Context を受け取り Context を返す
+- **Step 間非連携** — Registry から順次実行、Step 同士は直接呼ばない
+- **同一 Context** — JSON / Markdown / CLI は同一 Context から生成
+- **MVP スコープ厳守** — git commit / tag / push / GitHub Release は未実装
+
+### 影響範囲
+
+- Developer Workflow ライブラリ / CLI / テスト / ドキュメント
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **148 PASS**（Test 136–148 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.28.0 — 機能追加（Release Plan Foundation）
 
 Release 実行ではなく、**Release に必要な作業を機械的に計画・可視化する MVP** を追加しました。`release-readiness.json` を前提条件として読み取り、固定 step id と reason 付きの Release Plan を生成します。

@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.28.0 --"
+echo "-- Test 98: VERSION updated to v1.29.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.28.0**（Release Plan Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.28.0");
+if (!versionDoc.includes("**v1.29.0**（Developer Automation Workflow Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.29.0");
 }
-console.log("VERSION v1.28.0 ok");
+console.log("VERSION v1.29.0 ok");
 EOF
-pass "VERSION updated to v1.28.0"
+pass "VERSION updated to v1.29.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4920,6 +4920,490 @@ if (fallbackPlan.status !== "not-ready") {
 console.log("release plan release readiness integration ok");
 EOF
 pass "release plan release readiness integration"
+
+echo "-- Test 136: workflow step status constants --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+} from "./src/lib/developer_workflow.js";
+
+if (STEP_STATUS.PASS !== "pass" || STEP_STATUS.FAIL !== "fail" || STEP_STATUS.SKIP !== "skip") {
+  throw new Error("STEP_STATUS constants mismatch");
+}
+if (WORKFLOW_STATUS.SUCCESS !== "success" || WORKFLOW_STATUS.FAILURE !== "failure") {
+  throw new Error("WORKFLOW_STATUS constants mismatch");
+}
+
+console.log("workflow step status constants ok");
+EOF
+pass "workflow step status constants"
+
+echo "-- Test 137: workflow step result standardization --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  buildStepResult,
+} from "./src/lib/developer_workflow.js";
+
+const result = buildStepResult({
+  id: "version-consistency",
+  name: "Version Consistency",
+  status: STEP_STATUS.PASS,
+  detail: { reportStatus: "ok" },
+});
+
+for (const key of ["id", "name", "status", "detail"]) {
+  if (!(key in result)) {
+    throw new Error(`step result must include ${key}`);
+  }
+}
+if (result.id !== "version-consistency") {
+  throw new Error("step result id mismatch");
+}
+
+console.log("workflow step result standardization ok");
+EOF
+pass "workflow step result standardization"
+
+echo "-- Test 138: workflow context creation --"
+node --input-type=module <<'EOF'
+import {
+  DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA,
+  WORKFLOW_STATUS,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext({
+  rootDir: "/tmp/project",
+  skipNpmTest: true,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+});
+
+if (context.schema !== DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA) {
+  throw new Error("workflow context schema mismatch");
+}
+if (context.rootDir !== "/tmp/project") {
+  throw new Error("workflow context rootDir mismatch");
+}
+if (context.skipNpmTest !== true) {
+  throw new Error("workflow context skipNpmTest mismatch");
+}
+if (!Array.isArray(context.results) || context.results.length !== 0) {
+  throw new Error("workflow context must start with empty results");
+}
+if (context.status !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("workflow context initial status must be success");
+}
+
+console.log("workflow context creation ok");
+EOF
+pass "workflow context creation"
+
+echo "-- Test 139: workflow context accumulates step results --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  appendStepResult,
+  buildStepResult,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = createWorkflowContext();
+const first = appendStepResult(
+  context,
+  buildStepResult({
+    id: "version-consistency",
+    name: "Version Consistency",
+    status: STEP_STATUS.PASS,
+  }),
+);
+const second = appendStepResult(
+  first,
+  buildStepResult({
+    id: "release-readiness",
+    name: "Release Readiness",
+    status: STEP_STATUS.FAIL,
+  }),
+);
+
+if (context.results.length !== 0) {
+  throw new Error("appendStepResult must not mutate original context");
+}
+if (second.results.length !== 2) {
+  throw new Error("workflow context must accumulate step results");
+}
+if (second.results[1].status !== STEP_STATUS.FAIL) {
+  throw new Error("accumulated step result status mismatch");
+}
+
+console.log("workflow context accumulates step results ok");
+EOF
+pass "workflow context accumulates step results"
+
+echo "-- Test 140: workflow step registry execution order --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  appendStepResult,
+  buildStepResult,
+  createWorkflowContext,
+  executeWorkflowSteps,
+} from "./src/lib/developer_workflow.js";
+
+const calls = [];
+const mockRegistry = WORKFLOW_STEP_REGISTRY.map((step) => ({
+  ...step,
+  run: (context) => {
+    calls.push(step.id);
+    return appendStepResult(
+      context,
+      buildStepResult({
+        id: step.id,
+        name: step.name,
+        status: STEP_STATUS.PASS,
+      }),
+    );
+  },
+}));
+
+const context = executeWorkflowSteps(createWorkflowContext(), mockRegistry);
+const expectedIds = WORKFLOW_STEP_REGISTRY.map((step) => step.id);
+
+if (calls.join(",") !== expectedIds.join(",")) {
+  throw new Error("workflow steps must execute in registry order");
+}
+if (context.results.map((result) => result.id).join(",") !== expectedIds.join(",")) {
+  throw new Error("workflow results must follow registry order");
+}
+
+console.log("workflow step registry execution order ok");
+EOF
+pass "workflow step registry execution order"
+
+echo "-- Test 141: workflow steps receive and return context --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  appendStepResult,
+  buildStepResult,
+  createWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const stepA = (context) =>
+  appendStepResult(
+    context,
+    buildStepResult({
+      id: "step-a",
+      name: "Step A",
+      status: STEP_STATUS.PASS,
+      detail: { marker: "a" },
+    }),
+  );
+
+const stepB = (context) =>
+  appendStepResult(
+    context,
+    buildStepResult({
+      id: "step-b",
+      name: "Step B",
+      status: STEP_STATUS.PASS,
+      detail: { marker: "b", previousCount: context.results.length },
+    }),
+  );
+
+const finalContext = stepB(stepA(createWorkflowContext()));
+if (finalContext.results.length !== 2) {
+  throw new Error("chained steps must return updated context");
+}
+if (finalContext.results[1].detail.previousCount !== 1) {
+  throw new Error("step must receive prior context state");
+}
+
+console.log("workflow steps receive and return context ok");
+EOF
+pass "workflow steps receive and return context"
+
+echo "-- Test 142: workflow status computation --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  computeWorkflowStatus,
+} from "./src/lib/developer_workflow.js";
+
+const allPass = computeWorkflowStatus([
+  { status: STEP_STATUS.PASS },
+  { status: STEP_STATUS.PASS },
+]);
+if (allPass !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("all pass results must produce success workflow status");
+}
+
+const hasFail = computeWorkflowStatus([
+  { status: STEP_STATUS.PASS },
+  { status: STEP_STATUS.FAIL },
+]);
+if (hasFail !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("any fail result must produce failure workflow status");
+}
+
+console.log("workflow status computation ok");
+EOF
+pass "workflow status computation"
+
+echo "-- Test 143: runDeveloperWorkflow integration --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  WORKFLOW_STEP_REGISTRY,
+  runDeveloperWorkflow,
+} from "./src/lib/developer_workflow.js";
+
+const context = runDeveloperWorkflow({
+  skipNpmTest: true,
+  registry: WORKFLOW_STEP_REGISTRY.map((step) => ({
+    ...step,
+    run: (ctx) =>
+      step.id === "release-readiness"
+        ? {
+            ...ctx,
+            results: [
+              ...ctx.results,
+              {
+                id: step.id,
+                name: step.name,
+                status: STEP_STATUS.PASS,
+                detail: null,
+              },
+            ],
+          }
+        : {
+            ...ctx,
+            results: [
+              ...ctx.results,
+              {
+                id: step.id,
+                name: step.name,
+                status: STEP_STATUS.FAIL,
+                detail: null,
+              },
+            ],
+          },
+  })),
+});
+
+if (context.results.length !== WORKFLOW_STEP_REGISTRY.length) {
+  throw new Error("runDeveloperWorkflow must execute all registry steps");
+}
+if (context.status !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("runDeveloperWorkflow must finalize workflow status from results");
+}
+
+console.log("runDeveloperWorkflow integration ok");
+EOF
+pass "runDeveloperWorkflow integration"
+
+echo "-- Test 144: developer-automation-report.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA,
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  buildStepResult,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+  writeDeveloperAutomationReport,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext({
+    rootDir: PROJECT_ROOT,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+  }),
+  results: [
+    buildStepResult({
+      id: "version-consistency",
+      name: "Version Consistency",
+      status: STEP_STATUS.PASS,
+    }),
+  ],
+});
+
+writeDeveloperAutomationReport(context, PROJECT_ROOT);
+
+const jsonPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/developer-automation-report.json",
+);
+const payload = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+
+if (payload.schema !== DEVELOPER_AUTOMATION_WORKFLOW_SCHEMA) {
+  throw new Error("developer-automation-report.json schema mismatch");
+}
+if (payload.status !== WORKFLOW_STATUS.SUCCESS) {
+  throw new Error("developer-automation-report.json status mismatch");
+}
+if (!Array.isArray(payload.results) || payload.results.length !== 1) {
+  throw new Error("developer-automation-report.json results mismatch");
+}
+
+console.log("developer-automation-report.json ok");
+EOF
+pass "developer-automation-report.json generated"
+
+echo "-- Test 145: developer-automation-report.md generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  STEP_STATUS,
+  buildDeveloperAutomationReportMarkdown,
+  buildStepResult,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext({ generatedAt: "2026-07-02T00:00:00.000Z" }),
+  results: [
+    buildStepResult({
+      id: "release-plan",
+      name: "Release Plan",
+      status: STEP_STATUS.FAIL,
+    }),
+  ],
+});
+
+const markdown = buildDeveloperAutomationReportMarkdown(context);
+for (const section of ["Developer Automation Report", "Workflow", "Status", "Step Results"]) {
+  if (!markdown.includes(section)) {
+    throw new Error(`developer-automation-report markdown must include section: ${section}`);
+  }
+}
+
+const markdownPath = path.join(
+  PROJECT_ROOT,
+  "reports/developer-automation/latest/developer-automation-report.md",
+);
+if (!fs.existsSync(markdownPath)) {
+  throw new Error("developer-automation-report.md must exist after json generation test");
+}
+
+console.log("developer-automation-report.md ok");
+EOF
+pass "developer-automation-report.md generated"
+
+echo "-- Test 146: developer workflow CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  WORKFLOW_STATUS,
+  buildDeveloperAutomationReport,
+  buildDeveloperAutomationWorkflowCliSummary,
+  buildStepResult,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext(),
+  results: [
+    buildStepResult({
+      id: "version-consistency",
+      name: "Version Consistency",
+      status: STEP_STATUS.PASS,
+    }),
+    buildStepResult({
+      id: "release-readiness",
+      name: "Release Readiness",
+      status: STEP_STATUS.FAIL,
+    }),
+  ],
+});
+
+const summary = buildDeveloperAutomationWorkflowCliSummary(context);
+if (!summary.includes("Developer Automation Workflow")) {
+  throw new Error("CLI summary must include workflow heading");
+}
+if (!summary.includes("Status: FAILURE")) {
+  throw new Error("CLI summary must include workflow status");
+}
+if (!summary.includes("✔ Version Consistency — pass")) {
+  throw new Error("CLI summary must include pass step");
+}
+if (!summary.includes("✘ Release Readiness — fail")) {
+  throw new Error("CLI summary must include fail step");
+}
+
+const report = buildDeveloperAutomationReport(context);
+if (report.status !== WORKFLOW_STATUS.FAILURE) {
+  throw new Error("report and CLI must share the same context status");
+}
+
+console.log("developer workflow CLI summary ok");
+EOF
+pass "developer workflow CLI summary"
+
+echo "-- Test 147: json markdown cli share same context --"
+node --input-type=module <<'EOF'
+import {
+  STEP_STATUS,
+  buildDeveloperAutomationReport,
+  buildDeveloperAutomationReportMarkdown,
+  buildDeveloperAutomationWorkflowCliSummary,
+  buildStepResult,
+  createWorkflowContext,
+  finalizeWorkflowContext,
+} from "./src/lib/developer_workflow.js";
+
+const context = finalizeWorkflowContext({
+  ...createWorkflowContext({ generatedAt: "2026-07-02T00:00:00.000Z" }),
+  results: [
+    buildStepResult({
+      id: "release-plan",
+      name: "Release Plan",
+      status: STEP_STATUS.PASS,
+    }),
+  ],
+});
+
+const report = buildDeveloperAutomationReport(context);
+const markdown = buildDeveloperAutomationReportMarkdown(context);
+const summary = buildDeveloperAutomationWorkflowCliSummary(context);
+
+if (report.results.length !== context.results.length) {
+  throw new Error("report must be built from the same context results");
+}
+if (!markdown.includes("Release Plan — pass")) {
+  throw new Error("markdown must reflect context step results");
+}
+if (!summary.includes("Release Plan — pass")) {
+  throw new Error("CLI summary must reflect context step results");
+}
+
+console.log("json markdown cli share same context ok");
+EOF
+pass "json markdown cli share same context"
+
+echo "-- Test 148: developer:workflow npm script --"
+grep -q '"developer:workflow": "node scripts/run_developer_workflow.js"' package.json
+npm run developer:workflow -- --skip-npm-test >/tmp/developer_workflow_cli.log || true
+grep -q "Developer Automation Workflow" /tmp/developer_workflow_cli.log
+grep -q "Status:" /tmp/developer_workflow_cli.log
+grep -q "Step Results" /tmp/developer_workflow_cli.log
+grep -q "Version Consistency" /tmp/developer_workflow_cli.log
+grep -q "Release Readiness" /tmp/developer_workflow_cli.log
+grep -q "Release Plan" /tmp/developer_workflow_cli.log
+pass "developer:workflow npm script"
 
 echo ""
 echo "All quality pipeline tests passed."

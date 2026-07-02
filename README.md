@@ -915,6 +915,45 @@ Planned Steps
 ○ Publish — Out of MVP scope
 ```
 
+### Developer Automation Workflow Foundation（v1.29.0）
+
+Developer Automation を **Context ベース Workflow** として統合する MVP です。Step Registry から version-consistency / release-readiness / release-plan を順次実行し、JSON / Markdown / CLI は同一 Context から生成されます。
+
+```bash
+# npm test 再帰を避けるため --skip-npm-test を推奨（テストスイート内実行時）
+npm run developer:workflow -- --skip-npm-test
+
+# 本番実行（npm test 含む）
+npm run developer:workflow
+```
+
+| 項目 | 内容 |
+|------|------|
+| ライブラリ | `src/lib/developer_workflow.js` |
+| CLI | `scripts/run_developer_workflow.js` |
+| schema | `developer-automation/workflow/1.0` |
+| Context | 唯一の状態管理（`context.results[]` に Step Result 蓄積） |
+| Step Registry | version-consistency → release-readiness → release-plan |
+| Step Status | `STEP_STATUS` — pass / fail / skip |
+| Workflow Status | `WORKFLOW_STATUS` — success / failure |
+| JSON report | `reports/developer-automation/latest/developer-automation-report.json` |
+| Markdown report | `reports/developer-automation/latest/developer-automation-report.md` |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例
+
+```text
+Developer Automation Workflow
+
+Status: SUCCESS
+
+Step Results
+
+✔ Version Consistency — pass
+✔ Release Readiness — pass
+✔ Release Plan — pass
+```
+
 ### GitHub Actions Automated Performance Trend Collection（v1.19.0）
 
 GitHub Actions 上で Performance Trend Analysis を **手動トリガー**（`workflow_dispatch`）実行できる最小基盤を追加しました。ローカル解析（gh CLI / fixture）とは共存します。
