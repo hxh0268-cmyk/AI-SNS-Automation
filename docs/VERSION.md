@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.34.0**（Developer Workflow History Foundation）
+**v1.35.0**（Developer Workflow Timeline Foundation）
 
 ---
 
@@ -26,6 +26,7 @@
 | v1.8.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply に `NANO_BANANA_API_KEY` 対応 |
 | v1.8.2 | 運用品質パッチ | ✅ 完了 | Secrets Check を GEMINI / NANO OR 条件に修正 |
 | v1.9.0 | Health Check エラー可視化 | ✅ 完了 | HEALTH_CHECK 個別エラーをログ・metrics・failure summary で確認可能 |
+| **v1.35.0** | **機能追加** | **✅ 完了** | **Developer Workflow Timeline Foundation / History から時系列表示 MVP** |
 | **v1.34.0** | **機能追加** | **✅ 完了** | **Developer Workflow History Foundation / 実行履歴・時系列管理 MVP** |
 | **v1.33.0** | **機能追加** | **✅ 完了** | **Workflow Checkpoint Foundation / state 位置・互換性・resume 安全性検証** |
 | **v1.32.0** | **機能追加** | **✅ 完了** | **Developer Workflow Resume Foundation / STOPPED 状態の保存と Resume** |
@@ -54,6 +55,48 @@
 
 ---
 
+### v1.35.0 で追加（Developer Workflow Timeline Foundation）
+
+#### Workflow Timeline MVP
+
+- **`buildWorkflowTimeline()`** … History を Timeline Source へ Pure 変換
+- **`readWorkflowTimelineSource()`** … workflow-history.json Reader
+- **`validateWorkflowTimeline()`** … Timeline schema / 必須項目検証
+- **`writeWorkflowTimelineReport()`** … workflow-timeline.json / .md 出力
+- **schema** … `developer-automation/workflow-timeline/1.0`
+- **JSON → Markdown** … Timeline View は JSON Source のみから生成
+- **History / Checkpoint 責務分離** … Timeline は表示基盤のみ
+
+#### v1.36.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
+| Dashboard Foundation | Timeline Foundation 上の集計・表示層 |
+| Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
+
+### 品質状況（v1.35.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **245 PASS** |
+| npm test | **PASS** |
+
+### v1.35.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-timeline schema 1.0 | ✅ |
+| Timeline Builder / Reader / Validator | ✅ |
+| workflow-timeline JSON / Markdown | ✅ |
+| History 空でも生成可能 | ✅ |
+| Checkpoint / History 責務分離維持 | ✅ |
+| git commit/tag/push 非実装 | ✅ |
+| Test 219–245 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+
+---
+
 ### v1.34.0 で追加（Developer Workflow History Foundation）
 
 #### Workflow History MVP
@@ -66,12 +109,13 @@
 - **JSON → Markdown** … workflow-history.json / workflow-history.md
 - **Checkpoint 責務分離** … History は過去実行記録のみ
 
-#### v1.35.0 以降の候補
+#### v1.35.0 以降の候補（履歴）
 
 | 候補 | 方針 |
 |------|------|
+| Developer Workflow Timeline Foundation | ✅ v1.35.0 で実装済み |
 | Release Automation Foundation | git commit / tag / push の段階導入（Human Approval Gate 維持） |
-| Timeline / Dashboard | History Foundation 上の表示層 |
+| Dashboard Foundation | Timeline Foundation 上の集計・表示層 |
 | Phase2 AIコンテンツ生成フェーズ | カルーセル / 品質パイプライン本機能の次期拡張 |
 
 ### 品質状況（v1.34.0 最新）

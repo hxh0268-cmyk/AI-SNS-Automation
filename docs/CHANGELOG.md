@@ -4,6 +4,47 @@
 
 ---
 
+## v1.35.0 — 機能追加（Developer Workflow Timeline Foundation）
+
+workflow-history.json を入力として、Developer Workflow の **時系列表示基盤（Timeline Foundation）** を追加しました。Dashboard の共通基盤となる MVP です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Timeline schema | `developer-automation/workflow-timeline/1.0` |
+| Timeline Builder | `buildWorkflowTimeline()`（Pure Function） |
+| Timeline Reader | `readWorkflowTimelineSource()` |
+| Timeline Validator | `validateWorkflowTimeline()` |
+| Timeline Report | `workflow-timeline.json` / `workflow-timeline.md` |
+| CLI Summary | `Workflow timeline: generated` |
+| Test 219–245 | Timeline 生成 / 空 history / resume 検出 / durationMs / sort / markdown table |
+
+### Release 前改善
+
+| 項目 | 内容 |
+|------|------|
+| computeDurationMs | string 型チェック強化 / invalid date は null |
+| Timeline Sort | 有効 startedAt 昇順 / 無効・欠落は最後尾 / Stable Sort |
+| workflow-timeline.md | Summary / Run / Step を table 形式へ（JSON Source は不変） |
+| Test 230–245 | durationMs 優先 / sort / markdown table |
+
+### 設計判断
+
+- **History / Timeline 責務分離** — History は記録、Timeline は時系列表示 Source
+- **JSON Source / Markdown View** — timeline.md は JSON からのみ生成
+- **Backward Compatibility** — 空 history / unknown status / null duration 対応
+- **Workflow 非破壊** — Timeline 生成失敗時は skip して既存 Workflow を継続
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **245 PASS**（Test 219–245 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.34.0 — 機能追加（Developer Workflow History Foundation）
 
 Checkpoint Foundation の上に、**Developer Workflow History Foundation** を追加しました。過去の実行履歴・時系列管理を担い、将来の Timeline / Dashboard の共通基盤とします。

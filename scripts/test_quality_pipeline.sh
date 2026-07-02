@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.34.0 --"
+echo "-- Test 98: VERSION updated to v1.35.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.34.0**（Developer Workflow History Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.34.0");
+if (!versionDoc.includes("**v1.35.0**（Developer Workflow Timeline Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.35.0");
 }
-console.log("VERSION v1.34.0 ok");
+console.log("VERSION v1.35.0 ok");
 EOF
-pass "VERSION updated to v1.34.0"
+pass "VERSION updated to v1.35.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.35.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.35.0");
+if (payload.nextVersion !== "v1.36.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.36.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.35.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.35.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.36.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.36.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6504,14 +6504,14 @@ node --input-type=module <<'EOF'
 import { buildDeveloperHandoff, buildDeveloperHandoffCliSummary } from "./src/lib/developer_handoff.js";
 
 const summary = buildDeveloperHandoffCliSummary(
-  buildDeveloperHandoff({ currentVersion: "v1.34.0" }),
+  buildDeveloperHandoff({ currentVersion: "v1.35.0" }),
 );
 
 for (const expected of [
   "Developer Handoff",
   "Project: AI-SNS-Automation",
-  "Current Version: v1.34.0",
-  "Next Version: v1.35.0",
+  "Current Version: v1.35.0",
+  "Next Version: v1.36.0",
   "Release: Developer Handoff Prompt Foundation",
   "reports/developer-automation/latest/developer-handoff.json",
   "reports/developer-automation/latest/developer-handoff.md",
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.35.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.36.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -6543,15 +6543,15 @@ import {
 } from "./src/lib/developer_handoff.js";
 
 const handoff = buildDeveloperHandoff({
-  currentVersion: "v1.34.0",
+  currentVersion: "v1.35.0",
   generatedAt: "2026-07-02T00:00:00.000Z",
 });
 const markdown = buildDeveloperHandoffMarkdown(handoff);
 
-if (handoff.nextVersion !== "v1.35.0") {
-  throw new Error("handoff nextVersion must auto increment to v1.35.0");
+if (handoff.nextVersion !== "v1.36.0") {
+  throw new Error("handoff nextVersion must auto increment to v1.36.0");
 }
-if (!markdown.includes("Next Version: v1.35.0")) {
+if (!markdown.includes("Next Version: v1.36.0")) {
   throw new Error("markdown must include auto nextVersion");
 }
 if (!markdown.includes(handoff.objective)) {
@@ -7918,6 +7918,933 @@ if (run.steps[1].status !== HISTORY_STEP_STATUS.STOPPED) {
 console.log("buildWorkflowHistoryRun maps workflow context ok");
 EOF
 pass "buildWorkflowHistoryRun maps workflow context"
+
+echo "-- Test 219: workflow-timeline schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_TIMELINE_SCHEMA,
+  buildWorkflowTimeline,
+} from "./src/lib/developer_workflow_timeline.js";
+import { createEmptyWorkflowHistory } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline(createEmptyWorkflowHistory());
+if (timeline.schema !== WORKFLOW_TIMELINE_SCHEMA) {
+  throw new Error("workflow-timeline schema constant mismatch");
+}
+if (WORKFLOW_TIMELINE_SCHEMA !== "developer-automation/workflow-timeline/1.0") {
+  throw new Error("WORKFLOW_TIMELINE_SCHEMA must be developer-automation/workflow-timeline/1.0");
+}
+
+console.log("workflow-timeline schema constant ok");
+EOF
+pass "workflow-timeline schema constant"
+
+echo "-- Test 220: workflow-timeline.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_TIMELINE_SCHEMA,
+  buildWorkflowTimelineFromHistory,
+} from "./src/lib/developer_workflow_timeline.js";
+import {
+  HISTORY_RUN_STATUS,
+  appendWorkflowHistoryRun,
+  createEmptyWorkflowHistory,
+  writeWorkflowHistoryReport,
+} from "./src/lib/developer_workflow_history.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const history = appendWorkflowHistoryRun(createEmptyWorkflowHistory(), {
+  runId: "timeline-run-001",
+  startedAt: "2026-07-02T00:00:00.000Z",
+  completedAt: "2026-07-02T00:00:01.000Z",
+  status: HISTORY_RUN_STATUS.COMPLETED,
+  workflowSchemaVersion: "1.2",
+  stepRegistryHash: "sha256:test",
+  currentStepId: null,
+  resumeSupported: false,
+  resumeUnsupportedReason: null,
+  checkpointPath: null,
+  statePath: null,
+  steps: [
+    {
+      stepId: "version-consistency",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+    },
+  ],
+});
+writeWorkflowHistoryReport(history, PROJECT_ROOT);
+buildWorkflowTimelineFromHistory({ rootDir: PROJECT_ROOT });
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/developer-workflow/latest/workflow-timeline.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_TIMELINE_SCHEMA) {
+  throw new Error("workflow-timeline.json schema mismatch");
+}
+if (payload.summary.runCount !== 1) {
+  throw new Error("workflow-timeline.json must include runs");
+}
+
+console.log("workflow-timeline.json generated ok");
+EOF
+pass "workflow-timeline.json generated"
+
+echo "-- Test 221: workflow-timeline.md generated --"
+test -f reports/developer-workflow/latest/workflow-timeline.md
+grep -q "# Developer Workflow Timeline" reports/developer-workflow/latest/workflow-timeline.md
+grep -q "## Summary" reports/developer-workflow/latest/workflow-timeline.md
+grep -q "## Timeline" reports/developer-workflow/latest/workflow-timeline.md
+pass "workflow-timeline.md generated"
+
+echo "-- Test 222: timeline succeeds with empty history --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  validateWorkflowTimeline,
+} from "./src/lib/developer_workflow_timeline.js";
+import { createEmptyWorkflowHistory } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline(createEmptyWorkflowHistory());
+const validation = validateWorkflowTimeline(timeline);
+
+if (!validation.valid) {
+  throw new Error(`empty history timeline must succeed: ${validation.errors.join("; ")}`);
+}
+if (timeline.summary.runCount !== 0) {
+  throw new Error("empty history timeline runCount must be 0");
+}
+if (timeline.summary.stepCount !== 0) {
+  throw new Error("empty history timeline stepCount must be 0");
+}
+
+console.log("timeline succeeds with empty history ok");
+EOF
+pass "timeline succeeds with empty history"
+
+echo "-- Test 223: timeline duration null when timestamps missing --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-no-time",
+      status: "unknown",
+      startedAt: null,
+      completedAt: null,
+      steps: [
+        {
+          stepId: "version-consistency",
+          status: "unknown",
+          startedAt: null,
+          completedAt: null,
+        },
+      ],
+    },
+  ],
+});
+
+if (timeline.runs[0].durationMs !== null) {
+  throw new Error("timeline run durationMs must be null without timestamps");
+}
+if (timeline.runs[0].steps[0].durationMs !== null) {
+  throw new Error("timeline step durationMs must be null without timestamps");
+}
+
+console.log("timeline duration null when timestamps missing ok");
+EOF
+pass "timeline duration null when timestamps missing"
+
+echo "-- Test 224: timeline unknown status normalized --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  TIMELINE_RUN_STATUS,
+  TIMELINE_STEP_STATUS,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-unknown",
+      status: "weird-status",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [
+        {
+          stepId: "release-plan",
+          status: "weird-step",
+          startedAt: "2026-07-02T00:00:00.000Z",
+          completedAt: "2026-07-02T00:00:01.000Z",
+        },
+      ],
+    },
+  ],
+});
+
+if (timeline.runs[0].status !== TIMELINE_RUN_STATUS.UNKNOWN) {
+  throw new Error("unknown run status must normalize to unknown");
+}
+if (timeline.runs[0].steps[0].status !== TIMELINE_STEP_STATUS.UNKNOWN) {
+  throw new Error("unknown step status must normalize to unknown");
+}
+
+console.log("timeline unknown status normalized ok");
+EOF
+pass "timeline unknown status normalized"
+
+echo "-- Test 225: timeline summary runCount --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-a",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+    {
+      runId: "run-b",
+      status: "stopped",
+      startedAt: "2026-07-02T00:00:02.000Z",
+      completedAt: "2026-07-02T00:00:03.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.summary.runCount !== 2) {
+  throw new Error("timeline summary.runCount must match run count");
+}
+
+console.log("timeline summary runCount ok");
+EOF
+pass "timeline summary runCount"
+
+echo "-- Test 226: timeline summary stepCount --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-steps",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [
+        {
+          stepId: "version-consistency",
+          status: "completed",
+          startedAt: "2026-07-02T00:00:00.000Z",
+          completedAt: "2026-07-02T00:00:01.000Z",
+        },
+        {
+          stepId: "release-readiness",
+          status: "completed",
+          startedAt: "2026-07-02T00:00:00.000Z",
+          completedAt: "2026-07-02T00:00:01.000Z",
+        },
+      ],
+    },
+  ],
+});
+
+if (timeline.summary.stepCount !== 2) {
+  throw new Error("timeline summary.stepCount must count all steps");
+}
+if (timeline.runs[0].steps[0].order !== 1) {
+  throw new Error("timeline step order must start at 1");
+}
+if (timeline.runs[0].steps[1].order !== 2) {
+  throw new Error("timeline step order must increment");
+}
+
+console.log("timeline summary stepCount ok");
+EOF
+pass "timeline summary stepCount"
+
+echo "-- Test 227: timeline markdown renders JSON-derived view --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineMarkdown,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-md",
+      status: "stopped",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [
+        {
+          stepId: "release-plan",
+          status: "stopped",
+          startedAt: "2026-07-02T00:00:00.000Z",
+          completedAt: "2026-07-02T00:00:01.000Z",
+        },
+      ],
+    },
+  ],
+});
+
+const markdown = buildWorkflowTimelineMarkdown(timeline);
+
+for (const expected of [
+  "# Developer Workflow Timeline",
+  "| Field | Value |",
+  "| Runs | 1 |",
+  "| Steps | 1 |",
+  "### Run: run-md",
+  "| Order | Step | Status | Duration |",
+  "| 1 | release-plan | stopped | 1000ms |",
+  "stopped",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`timeline markdown must include: ${expected}`);
+  }
+}
+
+console.log("timeline markdown renders JSON-derived view ok");
+EOF
+pass "timeline markdown renders JSON-derived view"
+
+echo "-- Test 228: timeline CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineCliSummary,
+} from "./src/lib/developer_workflow_timeline.js";
+import { createEmptyWorkflowHistory } from "./src/lib/developer_workflow_history.js";
+
+const summary = buildWorkflowTimelineCliSummary(
+  buildWorkflowTimeline(createEmptyWorkflowHistory()),
+);
+
+for (const expected of [
+  "Workflow timeline: generated",
+  "Timeline runs: 0",
+  "Timeline steps: 0",
+  "Timeline report:",
+  "reports/developer-workflow/latest/workflow-timeline.md",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`timeline CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("timeline CLI summary ok");
+EOF
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan >/tmp/developer_workflow_timeline_cli.log 2>&1 || true
+grep -q "Workflow timeline: generated" /tmp/developer_workflow_timeline_cli.log
+grep -q "workflow-timeline.json" /tmp/developer_workflow_timeline_cli.log
+grep -q "workflow-timeline.md" /tmp/developer_workflow_timeline_cli.log
+pass "timeline CLI summary"
+
+echo "-- Test 229: timeline resume flow detection --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-stopped",
+      status: "stopped",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+    {
+      runId: "run-resumed",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:02.000Z",
+      completedAt: "2026-07-02T00:00:03.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (!timeline.runs[1].resume.isResume) {
+  throw new Error("timeline must detect resume after stopped run");
+}
+if (timeline.runs[1].resume.resumedFromRunId !== "run-stopped") {
+  throw new Error("timeline must link resumedFromRunId");
+}
+
+console.log("timeline resume flow detection ok");
+EOF
+pass "timeline resume flow detection"
+
+echo "-- Test 230: timeline run prefers history durationMs --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-duration",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      durationMs: 5000,
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.runs[0].durationMs !== 5000) {
+  throw new Error("timeline run must prefer history durationMs");
+}
+
+console.log("timeline run prefers history durationMs ok");
+EOF
+pass "timeline run prefers history durationMs"
+
+echo "-- Test 231: timeline step prefers history durationMs --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-step-duration",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:02.000Z",
+      steps: [
+        {
+          stepId: "version-consistency",
+          status: "completed",
+          startedAt: "2026-07-02T00:00:00.000Z",
+          completedAt: "2026-07-02T00:00:01.000Z",
+          durationMs: 7500,
+        },
+      ],
+    },
+  ],
+});
+
+if (timeline.runs[0].steps[0].durationMs !== 7500) {
+  throw new Error("timeline step must prefer history durationMs");
+}
+
+console.log("timeline step prefers history durationMs ok");
+EOF
+pass "timeline step prefers history durationMs"
+
+echo "-- Test 232: timeline computes durationMs from timestamps --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  computeDurationMs,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const startedAt = "2026-07-02T00:00:00.000Z";
+const completedAt = "2026-07-02T00:00:02.500Z";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-computed",
+      status: "completed",
+      startedAt,
+      completedAt,
+      steps: [
+        {
+          stepId: "release-readiness",
+          status: "completed",
+          startedAt,
+          completedAt,
+        },
+      ],
+    },
+  ],
+});
+
+const expected = computeDurationMs(startedAt, completedAt);
+if (timeline.runs[0].durationMs !== expected) {
+  throw new Error("timeline run must compute durationMs from timestamps");
+}
+if (timeline.runs[0].steps[0].durationMs !== expected) {
+  throw new Error("timeline step must compute durationMs from timestamps");
+}
+
+console.log("timeline computes durationMs from timestamps ok");
+EOF
+pass "timeline computes durationMs from timestamps"
+
+echo "-- Test 233: timeline durationMs null when uncomputable --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  resolveDurationMs,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+if (resolveDurationMs(undefined, null, null) !== null) {
+  throw new Error("resolveDurationMs must return null when uncomputable");
+}
+if (resolveDurationMs("invalid", null, null) !== null) {
+  throw new Error("resolveDurationMs must ignore non-number durationMs");
+}
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-null-duration",
+      status: "unknown",
+      startedAt: null,
+      completedAt: null,
+      durationMs: "invalid",
+      steps: [
+        {
+          stepId: "release-plan",
+          status: "unknown",
+          startedAt: null,
+          completedAt: null,
+        },
+      ],
+    },
+  ],
+});
+
+if (timeline.runs[0].durationMs !== null) {
+  throw new Error("timeline run durationMs must be null when uncomputable");
+}
+if (timeline.runs[0].steps[0].durationMs !== null) {
+  throw new Error("timeline step durationMs must be null when uncomputable");
+}
+
+console.log("timeline durationMs null when uncomputable ok");
+EOF
+pass "timeline durationMs null when uncomputable"
+
+echo "-- Test 234: computeDurationMs rejects non-string startedAt --"
+node --input-type=module <<'EOF'
+import { computeDurationMs } from "./src/lib/developer_workflow_timeline.js";
+
+if (computeDurationMs(null, "2026-07-02T00:00:01.000Z") !== null) {
+  throw new Error("computeDurationMs must return null for non-string startedAt");
+}
+if (computeDurationMs(123, "2026-07-02T00:00:01.000Z") !== null) {
+  throw new Error("computeDurationMs must return null for non-string startedAt");
+}
+
+console.log("computeDurationMs rejects non-string startedAt ok");
+EOF
+pass "computeDurationMs rejects non-string startedAt"
+
+echo "-- Test 235: computeDurationMs rejects non-string completedAt --"
+node --input-type=module <<'EOF'
+import { computeDurationMs } from "./src/lib/developer_workflow_timeline.js";
+
+if (computeDurationMs("2026-07-02T00:00:00.000Z", null) !== null) {
+  throw new Error("computeDurationMs must return null for non-string completedAt");
+}
+if (computeDurationMs("2026-07-02T00:00:00.000Z", 456) !== null) {
+  throw new Error("computeDurationMs must return null for non-string completedAt");
+}
+
+console.log("computeDurationMs rejects non-string completedAt ok");
+EOF
+pass "computeDurationMs rejects non-string completedAt"
+
+echo "-- Test 236: computeDurationMs rejects invalid dates --"
+node --input-type=module <<'EOF'
+import { computeDurationMs } from "./src/lib/developer_workflow_timeline.js";
+
+if (computeDurationMs("not-a-date", "2026-07-02T00:00:01.000Z") !== null) {
+  throw new Error("computeDurationMs must return null for invalid startedAt");
+}
+if (computeDurationMs("2026-07-02T00:00:00.000Z", "not-a-date") !== null) {
+  throw new Error("computeDurationMs must return null for invalid completedAt");
+}
+
+console.log("computeDurationMs rejects invalid dates ok");
+EOF
+pass "computeDurationMs rejects invalid dates"
+
+echo "-- Test 237: computeDurationMs clamps negative duration to zero --"
+node --input-type=module <<'EOF'
+import { computeDurationMs } from "./src/lib/developer_workflow_timeline.js";
+
+const duration = computeDurationMs(
+  "2026-07-02T00:00:02.000Z",
+  "2026-07-02T00:00:01.000Z",
+);
+
+if (duration !== 0) {
+  throw new Error("computeDurationMs must return 0 when end < start");
+}
+
+console.log("computeDurationMs clamps negative duration to zero ok");
+EOF
+pass "computeDurationMs clamps negative duration to zero"
+
+echo "-- Test 238: timeline sort orders valid startedAt ascending --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-late",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:02.000Z",
+      completedAt: "2026-07-02T00:00:03.000Z",
+      steps: [],
+    },
+    {
+      runId: "run-early",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.runs.map((run) => run.runId).join(",") !== "run-early,run-late") {
+  throw new Error("timeline must sort valid startedAt runs ascending");
+}
+
+console.log("timeline sort orders valid startedAt ascending ok");
+EOF
+pass "timeline sort orders valid startedAt ascending"
+
+echo "-- Test 239: timeline sort places missing startedAt at end --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-no-start",
+      status: "unknown",
+      startedAt: null,
+      completedAt: null,
+      steps: [],
+    },
+    {
+      runId: "run-valid",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.runs.map((run) => run.runId).join(",") !== "run-valid,run-no-start") {
+  throw new Error("timeline must place missing startedAt runs at end");
+}
+
+console.log("timeline sort places missing startedAt at end ok");
+EOF
+pass "timeline sort places missing startedAt at end"
+
+echo "-- Test 240: timeline sort places invalid startedAt at end --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-invalid",
+      status: "unknown",
+      startedAt: "not-a-date",
+      completedAt: null,
+      steps: [],
+    },
+    {
+      runId: "run-valid",
+      status: "completed",
+      startedAt: "2026-07-02T00:00:00.000Z",
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.runs.map((run) => run.runId).join(",") !== "run-valid,run-invalid") {
+  throw new Error("timeline must place invalid startedAt runs at end");
+}
+
+console.log("timeline sort places invalid startedAt at end ok");
+EOF
+pass "timeline sort places invalid startedAt at end"
+
+echo "-- Test 241: timeline sort preserves original order for same startedAt --"
+node --input-type=module <<'EOF'
+import { buildWorkflowTimeline } from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const sameStartedAt = "2026-07-02T00:00:00.000Z";
+const timeline = buildWorkflowTimeline({
+  schema: WORKFLOW_HISTORY_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  historyVersion: "1.0",
+  runs: [
+    {
+      runId: "run-first",
+      status: "completed",
+      startedAt: sameStartedAt,
+      completedAt: "2026-07-02T00:00:01.000Z",
+      steps: [],
+    },
+    {
+      runId: "run-second",
+      status: "completed",
+      startedAt: sameStartedAt,
+      completedAt: "2026-07-02T00:00:02.000Z",
+      steps: [],
+    },
+  ],
+});
+
+if (timeline.runs.map((run) => run.runId).join(",") !== "run-first,run-second") {
+  throw new Error("timeline must preserve original order for same startedAt");
+}
+
+console.log("timeline sort preserves original order for same startedAt ok");
+EOF
+pass "timeline sort preserves original order for same startedAt"
+
+echo "-- Test 242: timeline markdown summary table --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineMarkdown,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const markdown = buildWorkflowTimelineMarkdown(
+  buildWorkflowTimeline({
+    schema: WORKFLOW_HISTORY_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    historyVersion: "1.0",
+    runs: [
+      {
+        runId: "run-summary",
+        status: "completed",
+        startedAt: "2026-07-02T00:00:00.000Z",
+        completedAt: "2026-07-02T00:01:00.000Z",
+        steps: [],
+      },
+    ],
+  }),
+);
+
+for (const expected of [
+  "## Summary",
+  "| Field | Value |",
+  "| Runs | 1 |",
+  "| Steps | 0 |",
+  "| First Run | 2026-07-02T00:00:00.000Z |",
+  "| Last Run | 2026-07-02T00:01:00.000Z |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`timeline markdown summary table must include: ${expected}`);
+  }
+}
+
+console.log("timeline markdown summary table ok");
+EOF
+pass "timeline markdown summary table"
+
+echo "-- Test 243: timeline markdown run table --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineMarkdown,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const markdown = buildWorkflowTimelineMarkdown(
+  buildWorkflowTimeline({
+    schema: WORKFLOW_HISTORY_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    historyVersion: "1.0",
+    runs: [
+      {
+        runId: "run-table",
+        status: "completed",
+        startedAt: "2026-07-02T00:00:00.000Z",
+        completedAt: "2026-07-02T00:00:01.000Z",
+        steps: [],
+      },
+    ],
+  }),
+);
+
+for (const expected of [
+  "### Run: run-table",
+  "| Status | completed |",
+  "| Started At | 2026-07-02T00:00:00.000Z |",
+  "| Completed At | 2026-07-02T00:00:01.000Z |",
+  "| Duration | 1000ms |",
+  "| Resume | no |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`timeline markdown run table must include: ${expected}`);
+  }
+}
+
+console.log("timeline markdown run table ok");
+EOF
+pass "timeline markdown run table"
+
+echo "-- Test 244: timeline markdown step table --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineMarkdown,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const markdown = buildWorkflowTimelineMarkdown(
+  buildWorkflowTimeline({
+    schema: WORKFLOW_HISTORY_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    historyVersion: "1.0",
+    runs: [
+      {
+        runId: "run-steps",
+        status: "completed",
+        startedAt: "2026-07-02T00:00:00.000Z",
+        completedAt: "2026-07-02T00:00:02.000Z",
+        steps: [
+          {
+            stepId: "version-consistency",
+            status: "completed",
+            startedAt: "2026-07-02T00:00:00.000Z",
+            completedAt: "2026-07-02T00:00:00.500Z",
+            durationMs: 500,
+          },
+          {
+            stepId: "release-plan",
+            status: "completed",
+            startedAt: "2026-07-02T00:00:00.500Z",
+            completedAt: "2026-07-02T00:00:02.000Z",
+            durationMs: 200,
+          },
+        ],
+      },
+    ],
+  }),
+);
+
+for (const expected of [
+  "| Order | Step | Status | Duration |",
+  "| 1 | version-consistency | completed | 500ms |",
+  "| 2 | release-plan | completed | 200ms |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`timeline markdown step table must include: ${expected}`);
+  }
+}
+
+console.log("timeline markdown step table ok");
+EOF
+pass "timeline markdown step table"
+
+echo "-- Test 245: timeline markdown no steps message --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTimeline,
+  buildWorkflowTimelineMarkdown,
+} from "./src/lib/developer_workflow_timeline.js";
+import { WORKFLOW_HISTORY_SCHEMA } from "./src/lib/developer_workflow_history.js";
+
+const markdown = buildWorkflowTimelineMarkdown(
+  buildWorkflowTimeline({
+    schema: WORKFLOW_HISTORY_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    historyVersion: "1.0",
+    runs: [
+      {
+        runId: "run-no-steps",
+        status: "completed",
+        startedAt: "2026-07-02T00:00:00.000Z",
+        completedAt: "2026-07-02T00:00:01.000Z",
+        steps: [],
+      },
+    ],
+  }),
+);
+
+if (!markdown.includes("No steps recorded.")) {
+  throw new Error('timeline markdown must include "No steps recorded."');
+}
+
+console.log("timeline markdown no steps message ok");
+EOF
+pass "timeline markdown no steps message"
 
 echo ""
 echo "All quality pipeline tests passed."

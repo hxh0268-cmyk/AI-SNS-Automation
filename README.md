@@ -1166,6 +1166,29 @@ Latest Current Step
 release-plan
 ```
 
+### Developer Workflow Timeline Foundation（v1.35.0）
+
+History Foundation の上に、**Developer Workflow Timeline Foundation** を追加しました。workflow-history.json から時系列表示 Source を生成します。
+
+| 項目 | 内容 |
+|------|------|
+| timeline schema | `developer-automation/workflow-timeline/1.0` |
+| 入力 | `reports/developer-workflow/latest/workflow-history.json` |
+| Timeline JSON | `reports/developer-workflow/latest/workflow-timeline.json` |
+| Timeline Markdown | `reports/developer-workflow/latest/workflow-timeline.md`（Summary / Run / Step は table 形式） |
+| 責務 | History の時系列表示（Checkpoint / History 保存とは分離） |
+| git commit/tag/push | **未実装** |
+
+#### CLI 出力例（Timeline）
+
+```text
+Workflow timeline: generated
+Timeline runs: 3
+Timeline steps: 12
+Timeline report:
+reports/developer-workflow/latest/workflow-timeline.md
+```
+
 ### Developer Handoff Prompt Foundation（v1.31.0）
 
 ChatGPT 設計レビュー / 実装指示を Claude Code に渡すための **標準化引き継ぎプロンプト** を生成します。

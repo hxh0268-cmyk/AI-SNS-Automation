@@ -123,6 +123,7 @@ export function normalizeWorkflowHistoryRun(run) {
     startedAt: run.startedAt ?? null,
     completedAt: run.completedAt ?? null,
     status: run.status ?? HISTORY_RUN_STATUS.UNKNOWN,
+    ...(typeof run.durationMs === "number" ? { durationMs: run.durationMs } : {}),
     workflowSchemaVersion: run.workflowSchemaVersion ?? null,
     stepRegistryHash: run.stepRegistryHash ?? null,
     currentStepId: run.currentStepId ?? null,
@@ -155,6 +156,7 @@ export function normalizeWorkflowHistoryStep(step) {
     status: step.status ?? HISTORY_STEP_STATUS.UNKNOWN,
     startedAt: step.startedAt ?? null,
     completedAt: step.completedAt ?? null,
+    ...(typeof step.durationMs === "number" ? { durationMs: step.durationMs } : {}),
   };
 }
 

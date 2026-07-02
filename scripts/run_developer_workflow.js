@@ -18,6 +18,10 @@ import {
   recordWorkflowHistoryRun,
 } from "../src/lib/developer_workflow_history.js";
 import {
+  buildWorkflowTimelineCliSummary,
+  buildWorkflowTimelineFromHistory,
+} from "../src/lib/developer_workflow_timeline.js";
+import {
   buildWorkflowResumeReport,
   buildWorkflowResumeCliSummary,
   buildWorkflowState,
@@ -108,6 +112,23 @@ function writeHistoryOutputs(context, rootDir, options = {}) {
   return { history, outputs };
 }
 
+function writeTimelineOutputs(rootDir) {
+  try {
+    const { timeline, outputs } = buildWorkflowTimelineFromHistory({ rootDir });
+
+    console.log(buildWorkflowTimelineCliSummary(timeline));
+    console.log(`[DeveloperWorkflow] timeline json: ${outputs.json}`);
+    console.log(`[DeveloperWorkflow] timeline markdown: ${outputs.markdown}`);
+    console.log("");
+
+    return { timeline, outputs };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[DeveloperWorkflow] timeline skipped: ${message}`);
+    return null;
+  }
+}
+
 function main() {
   const cliOptions = parseArgs(process.argv.slice(2));
   const rootDir = process.cwd();
@@ -184,6 +205,7 @@ function main() {
     writeHistoryOutputs(resumeResult.context, rootDir, {
       state: resumeResult.state,
     });
+    writeTimelineOutputs(rootDir);
 
     process.exitCode =
       resumeResult.context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
@@ -235,6 +257,7 @@ function main() {
     checkpointPath,
     statePath,
   });
+  writeTimelineOutputs(rootDir);
 
   process.exitCode = context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
 }
