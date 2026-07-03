@@ -18,6 +18,10 @@ import {
   recordWorkflowHistoryRun,
 } from "../src/lib/developer_workflow_history.js";
 import {
+  buildWorkflowAnalyticsCliSummary,
+  buildWorkflowAnalyticsFromDashboard,
+} from "../src/lib/developer_workflow_analytics.js";
+import {
   buildWorkflowDashboardCliSummary,
   buildWorkflowDashboardFromTimeline,
 } from "../src/lib/developer_workflow_dashboard.js";
@@ -114,6 +118,23 @@ function writeHistoryOutputs(context, rootDir, options = {}) {
   console.log("");
 
   return { history, outputs };
+}
+
+function writeAnalyticsOutputs(rootDir) {
+  try {
+    const { analytics, outputs } = buildWorkflowAnalyticsFromDashboard({ rootDir });
+
+    console.log(buildWorkflowAnalyticsCliSummary(analytics));
+    console.log(`[DeveloperWorkflow] analytics json: ${outputs.json}`);
+    console.log(`[DeveloperWorkflow] analytics markdown: ${outputs.markdown}`);
+    console.log("");
+
+    return { analytics, outputs };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[DeveloperWorkflow] analytics skipped: ${message}`);
+    return null;
+  }
 }
 
 function writeDashboardOutputs(rootDir) {
@@ -228,6 +249,7 @@ function main() {
     });
     writeTimelineOutputs(rootDir);
     writeDashboardOutputs(rootDir);
+    writeAnalyticsOutputs(rootDir);
 
     process.exitCode =
       resumeResult.context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
@@ -281,6 +303,7 @@ function main() {
   });
   writeTimelineOutputs(rootDir);
   writeDashboardOutputs(rootDir);
+  writeAnalyticsOutputs(rootDir);
 
   process.exitCode = context.status === WORKFLOW_STATUS.SUCCESS ? 0 : 1;
 }

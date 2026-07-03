@@ -1166,6 +1166,34 @@ Latest Current Step
 release-plan
 ```
 
+### Developer Analytics Foundation（v1.37.0）
+
+Dashboard Foundation の上に、**Developer Analytics Foundation** を追加しました。workflow-dashboard.json の **Dashboard Public Contract** のみを入力として KPI・Health を生成します。
+
+Analytics は Dashboard のみを入力とする集計基盤です。Timeline / History / Checkpoint / Workflow State は直接参照しません。Dashboard Internal（runs / warnings / source 等）は参照しません。JSON Source / Markdown View / CLI Summary の原則を維持します。
+
+| 項目 | 内容 |
+|------|------|
+| analytics schema | `developer-automation/workflow-analytics/1.0` |
+| 入力 | `reports/developer-workflow/latest/workflow-dashboard.json`（**Public Contract のみ**） |
+| Analytics JSON | `reports/workflow-analytics/workflow-analytics.json` |
+| Analytics Markdown | `reports/workflow-analytics/workflow-analytics.md` |
+| ADR | `docs/adr/ADR-0007-*` / `docs/adr/ADR-0008-*` |
+| 非参照 | Timeline / History / Checkpoint / Workflow State / Dashboard Internal |
+
+#### CLI 出力例（Analytics）
+
+```text
+Developer Analytics Summary
+Runs: 4
+Steps: 10
+Success Rate: 75.0%
+Failure Rate: 25.0%
+Resume Rate: 25.0%
+Average Duration: 1000ms
+Health: warning
+```
+
 ### Developer Dashboard Foundation（v1.36.0）
 
 Timeline Foundation の上に、**Developer Dashboard Foundation** を追加しました。workflow-timeline.json を唯一の入力として集計・表示用データを生成します。

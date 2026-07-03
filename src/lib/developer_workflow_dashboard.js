@@ -18,6 +18,12 @@ export const DASHBOARD_STATUS = {
   UNKNOWN: "unknown",
 };
 
+export const DASHBOARD_WORKFLOW_HEALTH = {
+  HEALTHY: "healthy",
+  WARNING: "warning",
+  CRITICAL: "critical",
+};
+
 const RUN_STATUS_KEYS = ["completed", "failed", "stopped", "unknown"];
 const STEP_STATUS_KEYS = ["completed", "failed", "skipped", "stopped", "unknown"];
 
@@ -116,6 +122,102 @@ export function resolveDashboardStatus(stepCount, successCount, failedCount) {
   }
 
   return DASHBOARD_STATUS.UNKNOWN;
+}
+
+/**
+ * @param {string | undefined} dashboardStatus
+ * @param {number} runCount
+ * @returns {string}
+ */
+export function resolveDashboardWorkflowHealth(dashboardStatus, runCount) {
+  if (runCount === 0) {
+    return DASHBOARD_WORKFLOW_HEALTH.WARNING;
+  }
+
+  if (dashboardStatus === DASHBOARD_STATUS.SUCCESS) {
+    return DASHBOARD_WORKFLOW_HEALTH.HEALTHY;
+  }
+
+  if (dashboardStatus === DASHBOARD_STATUS.FAILED) {
+    return DASHBOARD_WORKFLOW_HEALTH.CRITICAL;
+  }
+
+  return DASHBOARD_WORKFLOW_HEALTH.WARNING;
+}
+
+/**
+ * @param {object | null | undefined} dashboard
+ * @returns {object}
+ */
+export function extractDashboardPublicContract(dashboard) {
+  if (!dashboard || typeof dashboard !== "object") {
+    return {
+      metadata: {
+        schema: WORKFLOW_DASHBOARD_SCHEMA,
+        generatedAt: null,
+      },
+      summary: {
+        runCount: 0,
+        stepCount: 0,
+        totalDurationMs: 0,
+      },
+      metrics: {
+        successfulRuns: 0,
+        failedRuns: 0,
+        resumedRuns: 0,
+      },
+      status: {
+        workflowHealth: DASHBOARD_WORKFLOW_HEALTH.WARNING,
+      },
+    };
+  }
+
+  const runCount =
+    typeof dashboard.summary?.runCount === "number" ? dashboard.summary.runCount : 0;
+  const stepCount =
+    typeof dashboard.summary?.stepCount === "number" ? dashboard.summary.stepCount : 0;
+  const totalDurationMs =
+    typeof dashboard.summary?.totalDurationMs === "number"
+      ? dashboard.summary.totalDurationMs
+      : 0;
+  const successfulRuns =
+    typeof dashboard.metrics?.runs?.completed === "number"
+      ? dashboard.metrics.runs.completed
+      : 0;
+  const failedRuns =
+    typeof dashboard.metrics?.runs?.failed === "number"
+      ? dashboard.metrics.runs.failed
+      : 0;
+  const resumedRuns =
+    typeof dashboard.summary?.resumeCount === "number"
+      ? dashboard.summary.resumeCount
+      : typeof dashboard.metrics?.resume?.count === "number"
+        ? dashboard.metrics.resume.count
+        : 0;
+
+  return {
+    metadata: {
+      schema:
+        typeof dashboard.schema === "string"
+          ? dashboard.schema
+          : WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt:
+        typeof dashboard.generatedAt === "string" ? dashboard.generatedAt : null,
+    },
+    summary: {
+      runCount,
+      stepCount,
+      totalDurationMs,
+    },
+    metrics: {
+      successfulRuns,
+      failedRuns,
+      resumedRuns,
+    },
+    status: {
+      workflowHealth: resolveDashboardWorkflowHealth(dashboard.status, runCount),
+    },
+  };
 }
 
 /**

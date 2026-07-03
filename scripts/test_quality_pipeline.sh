@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.36.0 --"
+echo "-- Test 98: VERSION updated to v1.37.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.36.0**（Developer Dashboard Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.36.0");
+if (!versionDoc.includes("**v1.37.0**（Developer Analytics Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.37.0");
 }
-console.log("VERSION v1.36.0 ok");
+console.log("VERSION v1.37.0 ok");
 EOF
-pass "VERSION updated to v1.36.0"
+pass "VERSION updated to v1.37.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.37.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.37.0");
+if (payload.nextVersion !== "v1.38.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.38.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.37.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.37.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.38.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.38.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.37.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.38.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -9383,6 +9383,522 @@ for (const forbidden of [
 console.log("dashboard does not reference history checkpoint or state ok");
 EOF
 pass "dashboard does not reference history checkpoint or state"
+
+echo "-- Test 263: workflow-analytics schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_ANALYTICS_SCHEMA,
+  buildWorkflowAnalytics,
+} from "./src/lib/developer_workflow_analytics.js";
+
+const analytics = buildWorkflowAnalytics(null);
+if (analytics.schema !== WORKFLOW_ANALYTICS_SCHEMA) {
+  throw new Error("workflow-analytics schema constant mismatch");
+}
+if (WORKFLOW_ANALYTICS_SCHEMA !== "developer-automation/workflow-analytics/1.0") {
+  throw new Error("WORKFLOW_ANALYTICS_SCHEMA must be developer-automation/workflow-analytics/1.0");
+}
+
+console.log("workflow-analytics schema constant ok");
+EOF
+pass "workflow-analytics schema constant"
+
+echo "-- Test 264: analytics builder computes KPIs from dashboard public contract --"
+node --input-type=module <<'EOF'
+import {
+  ANALYTICS_HEALTH_STATUS,
+  buildWorkflowAnalytics,
+} from "./src/lib/developer_workflow_analytics.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const analytics = buildWorkflowAnalytics({
+  schema: WORKFLOW_DASHBOARD_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  status: "mixed",
+  summary: {
+    runCount: 4,
+    stepCount: 10,
+    resumeCount: 1,
+    totalDurationMs: 4000,
+  },
+  metrics: {
+    runs: { completed: 3, failed: 1, stopped: 0, unknown: 0 },
+    resume: { count: 1, rate: 0.25 },
+  },
+});
+
+if (analytics.summary.runCount !== 4 || analytics.summary.stepCount !== 10) {
+  throw new Error("analytics summary must mirror dashboard public contract");
+}
+if (analytics.metrics.successRate !== 0.75) {
+  throw new Error("analytics successRate must be successfulRuns / runCount");
+}
+if (analytics.metrics.failureRate !== 0.25) {
+  throw new Error("analytics failureRate must be failedRuns / runCount");
+}
+if (analytics.metrics.resumeRate !== 0.25) {
+  throw new Error("analytics resumeRate must be resumedRuns / runCount");
+}
+if (analytics.metrics.averageDurationMs !== 1000) {
+  throw new Error("analytics averageDurationMs must be totalDurationMs / runCount");
+}
+if (analytics.health.healthStatus !== ANALYTICS_HEALTH_STATUS.WARNING) {
+  throw new Error("mixed dashboard must produce warning health status");
+}
+
+console.log("analytics builder computes KPIs ok");
+EOF
+pass "analytics builder computes KPIs from dashboard public contract"
+
+echo "-- Test 265: analytics reader reads JSON --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_ANALYTICS_SCHEMA,
+  buildWorkflowAnalyticsFromDashboard,
+  readWorkflowAnalytics,
+} from "./src/lib/developer_workflow_analytics.js";
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  buildWorkflowDashboard,
+  writeWorkflowDashboardReport,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const dashboard = buildWorkflowDashboard({
+  schema: WORKFLOW_TIMELINE_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  summary: { runCount: 0, stepCount: 0, firstRunAt: null, lastRunAt: null },
+  runs: [],
+});
+writeWorkflowDashboardReport(dashboard, PROJECT_ROOT);
+buildWorkflowAnalyticsFromDashboard({ rootDir: PROJECT_ROOT });
+
+const analytics = readWorkflowAnalytics(null, PROJECT_ROOT);
+if (analytics.schema !== WORKFLOW_ANALYTICS_SCHEMA) {
+  throw new Error("analytics reader schema mismatch");
+}
+
+console.log("analytics reader reads JSON ok");
+EOF
+pass "analytics reader reads JSON"
+
+echo "-- Test 266: analytics validator --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowAnalytics,
+  validateWorkflowAnalytics,
+} from "./src/lib/developer_workflow_analytics.js";
+
+const analytics = buildWorkflowAnalytics(null);
+const validation = validateWorkflowAnalytics(analytics);
+if (!validation.valid) {
+  throw new Error(`analytics validator must pass: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateWorkflowAnalytics({});
+if (invalid.valid) {
+  throw new Error("analytics validator must fail for invalid analytics");
+}
+
+console.log("analytics validator ok");
+EOF
+pass "analytics validator"
+
+echo "-- Test 267: analytics markdown renders JSON view only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  buildWorkflowAnalytics,
+  renderWorkflowAnalyticsMarkdown,
+} from "./src/lib/developer_workflow_analytics.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const analytics = buildWorkflowAnalytics({
+  schema: WORKFLOW_DASHBOARD_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  status: "success",
+  summary: {
+    runCount: 2,
+    stepCount: 6,
+    resumeCount: 0,
+    totalDurationMs: 2000,
+  },
+  metrics: {
+    runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 },
+    resume: { count: 0, rate: 0 },
+  },
+});
+
+const markdown = renderWorkflowAnalyticsMarkdown(analytics);
+for (const expected of [
+  "# Developer Workflow Analytics",
+  "| Runs | 2 |",
+  "| Steps | 6 |",
+  "| Success Rate | 100.0% |",
+  "| Failure Rate | 0.0% |",
+  "| Health Status | healthy |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`analytics markdown must include: ${expected}`);
+  }
+}
+
+const analyticsSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_analytics.js"),
+  "utf8",
+);
+const markdownStart = analyticsSource.indexOf("export function renderWorkflowAnalyticsMarkdown");
+const builderEnd = analyticsSource.indexOf("export function readWorkflowAnalytics");
+const builderSource = analyticsSource.slice(0, builderEnd);
+if (builderSource.includes("renderWorkflowAnalyticsMarkdown")) {
+  throw new Error("analytics builder must not generate markdown");
+}
+
+console.log("analytics markdown renders JSON view only ok");
+EOF
+pass "analytics markdown renders JSON view only"
+
+echo "-- Test 268: workflow-analytics.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_ANALYTICS_SCHEMA,
+  buildWorkflowAnalyticsFromDashboard,
+} from "./src/lib/developer_workflow_analytics.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+buildWorkflowAnalyticsFromDashboard({ rootDir: PROJECT_ROOT });
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/workflow-analytics/workflow-analytics.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_ANALYTICS_SCHEMA) {
+  throw new Error("workflow-analytics.json schema mismatch");
+}
+if (!payload.metadata || !payload.metrics || !payload.health) {
+  throw new Error("workflow-analytics.json must include metadata, metrics, and health");
+}
+
+console.log("workflow-analytics.json generated ok");
+EOF
+test -f reports/workflow-analytics/workflow-analytics.md
+pass "workflow-analytics.json generated"
+
+echo "-- Test 269: analytics CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowAnalytics,
+  buildWorkflowAnalyticsCliSummary,
+} from "./src/lib/developer_workflow_analytics.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const summary = buildWorkflowAnalyticsCliSummary(
+  buildWorkflowAnalytics({
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    status: "failed",
+    summary: {
+      runCount: 4,
+      stepCount: 8,
+      resumeCount: 2,
+      totalDurationMs: 8000,
+    },
+    metrics: {
+      runs: { completed: 1, failed: 3, stopped: 0, unknown: 0 },
+      resume: { count: 2, rate: 0.5 },
+    },
+  }),
+);
+
+for (const expected of [
+  "Developer Analytics Summary",
+  "Runs: 4",
+  "Steps: 8",
+  "Success Rate: 25.0%",
+  "Failure Rate: 75.0%",
+  "Resume Rate: 50.0%",
+  "Average Duration: 2000ms",
+  "Health: critical",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`analytics CLI summary must include: ${expected}`);
+  }
+}
+if (summary.includes("REVIEW_FAILURES") || summary.includes("MONITOR_RESUMES")) {
+  throw new Error("analytics CLI summary must not include recommendation text");
+}
+
+console.log("analytics CLI summary ok");
+EOF
+npm run developer:workflow -- --skip-npm-test --stop-before-step release-plan >/tmp/developer_workflow_analytics_cli.log 2>&1 || true
+grep -q "Developer Analytics Summary" /tmp/developer_workflow_analytics_cli.log
+grep -q "workflow-analytics.json" /tmp/developer_workflow_analytics_cli.log
+grep -q "workflow-analytics.md" /tmp/developer_workflow_analytics_cli.log
+pass "analytics CLI summary"
+
+echo "-- Test 270: analytics uses dashboard only input --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  buildWorkflowAnalyticsFromDashboard,
+} from "./src/lib/developer_workflow_analytics.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "analytics-dashboard-only-"));
+const dashboardDir = path.join(tempDir, "reports/developer-workflow/latest");
+fs.mkdirSync(dashboardDir, { recursive: true });
+
+fs.writeFileSync(
+  path.join(dashboardDir, "workflow-dashboard.json"),
+  `${JSON.stringify(
+    {
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: {
+        runCount: 1,
+        stepCount: 2,
+        resumeCount: 0,
+        totalDurationMs: 500,
+      },
+      metrics: {
+        runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 },
+        resume: { count: 0, rate: 0 },
+      },
+    },
+    null,
+    2,
+  )}\n`,
+);
+
+const timelinePath = path.join(dashboardDir, "workflow-timeline.json");
+if (fs.existsSync(timelinePath)) {
+  throw new Error("timeline file must not exist for dashboard-only analytics test");
+}
+
+const { analytics } = buildWorkflowAnalyticsFromDashboard({ rootDir: tempDir });
+if (analytics.summary.runCount !== 1 || analytics.metrics.successRate !== 1) {
+  throw new Error("analytics must build from dashboard file only");
+}
+
+console.log("analytics uses dashboard only input ok");
+EOF
+pass "analytics uses dashboard only input"
+
+echo "-- Test 271: analytics does not reference timeline --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const analyticsSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_analytics.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "developer_workflow_timeline.js",
+  "workflow-timeline.json",
+  "readWorkflowTimeline",
+  "buildWorkflowTimeline",
+]) {
+  if (analyticsSource.includes(forbidden)) {
+    throw new Error(`analytics must not reference ${forbidden}`);
+  }
+}
+
+console.log("analytics does not reference timeline ok");
+EOF
+pass "analytics does not reference timeline"
+
+echo "-- Test 272: analytics does not reference history checkpoint or workflow state --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const analyticsSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_analytics.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "developer_workflow_history.js",
+  "developer_workflow_resume.js",
+  "developer_workflow_checkpoint.js",
+  "readWorkflowHistory",
+  "readWorkflowCheckpoint",
+  "readWorkflowState",
+  "workflow-history.json",
+  "workflow-checkpoint.json",
+  "workflow-state.json",
+]) {
+  if (analyticsSource.includes(forbidden)) {
+    throw new Error(`analytics must not reference ${forbidden}`);
+  }
+}
+
+console.log("analytics does not reference history checkpoint or workflow state ok");
+EOF
+pass "analytics does not reference history checkpoint or workflow state"
+
+echo "-- Test 273: analytics does not reference dashboard internal fields --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const analyticsSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_analytics.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "dashboard.runs",
+  "dashboard.warnings",
+  "dashboard.source",
+  "metrics.runs.completed",
+  "metrics.steps",
+]) {
+  if (analyticsSource.includes(forbidden)) {
+    throw new Error(`analytics must not reference dashboard internal field ${forbidden}`);
+  }
+}
+
+console.log("analytics does not reference dashboard internal fields ok");
+EOF
+pass "analytics does not reference dashboard internal fields"
+
+echo "-- Test 274: dashboard public contract extraction --"
+node --input-type=module <<'EOF'
+import {
+  DASHBOARD_WORKFLOW_HEALTH,
+  WORKFLOW_DASHBOARD_SCHEMA,
+  extractDashboardPublicContract,
+} from "./src/lib/developer_workflow_dashboard.js";
+
+const contract = extractDashboardPublicContract({
+  schema: WORKFLOW_DASHBOARD_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  status: "success",
+  summary: {
+    runCount: 2,
+    stepCount: 4,
+    totalDurationMs: 1200,
+    resumeCount: 1,
+  },
+  metrics: {
+    runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 },
+    resume: { count: 1, rate: 0.5 },
+  },
+  runs: [{ runId: "internal", status: "completed" }],
+  warnings: ["internal warning"],
+  source: { schema: "hidden", path: "hidden" },
+});
+
+if (contract.summary.runCount !== 2 || contract.metrics.successfulRuns !== 2) {
+  throw new Error("dashboard public contract summary/metrics mismatch");
+}
+if (contract.metrics.resumedRuns !== 1) {
+  throw new Error("dashboard public contract resumedRuns mismatch");
+}
+if (contract.status.workflowHealth !== DASHBOARD_WORKFLOW_HEALTH.HEALTHY) {
+  throw new Error("dashboard public contract workflowHealth mismatch");
+}
+if ("runs" in contract || "warnings" in contract || "source" in contract) {
+  throw new Error("dashboard public contract must not expose internal fields");
+}
+
+console.log("dashboard public contract extraction ok");
+EOF
+pass "dashboard public contract extraction"
+
+echo "-- Test 275: analytics backward compatibility for missing dashboard fields --"
+node --input-type=module <<'EOF'
+import {
+  ANALYTICS_HEALTH_STATUS,
+  buildWorkflowAnalytics,
+} from "./src/lib/developer_workflow_analytics.js";
+
+const analytics = buildWorkflowAnalytics({
+  schema: "developer-automation/workflow-dashboard/1.0",
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  unknownField: true,
+});
+
+if (analytics.summary.runCount !== 0) {
+  throw new Error("analytics must tolerate missing dashboard summary fields");
+}
+if (analytics.metrics.successRate !== 0 || analytics.metrics.averageDurationMs !== 0) {
+  throw new Error("analytics must default missing dashboard metrics to zero rates");
+}
+if (analytics.health.healthStatus !== ANALYTICS_HEALTH_STATUS.WARNING) {
+  throw new Error("empty dashboard must produce warning health status");
+}
+if (!analytics.health.warningCodes.includes("RUN_COUNT_ZERO")) {
+  throw new Error("analytics must emit RUN_COUNT_ZERO warning for empty dashboard");
+}
+
+console.log("analytics backward compatibility ok");
+EOF
+pass "analytics backward compatibility for missing dashboard fields"
+
+echo "-- Test 276: analytics health status resolution --"
+node --input-type=module <<'EOF'
+import {
+  ANALYTICS_HEALTH_STATUS,
+  resolveAnalyticsHealthStatus,
+} from "./src/lib/developer_workflow_analytics.js";
+import { DASHBOARD_WORKFLOW_HEALTH } from "./src/lib/developer_workflow_dashboard.js";
+
+const healthy = resolveAnalyticsHealthStatus(
+  {
+    summary: { runCount: 2 },
+    status: { workflowHealth: DASHBOARD_WORKFLOW_HEALTH.HEALTHY },
+    metrics: { successfulRuns: 2, failedRuns: 0, resumedRuns: 0 },
+  },
+  { successRate: 1, failureRate: 0, resumeRate: 0, averageDurationMs: 100 },
+);
+const critical = resolveAnalyticsHealthStatus(
+  {
+    summary: { runCount: 2 },
+    status: { workflowHealth: DASHBOARD_WORKFLOW_HEALTH.CRITICAL },
+    metrics: { successfulRuns: 0, failedRuns: 2, resumedRuns: 0 },
+  },
+  { successRate: 0, failureRate: 1, resumeRate: 0, averageDurationMs: 100 },
+);
+
+if (healthy !== ANALYTICS_HEALTH_STATUS.HEALTHY) {
+  throw new Error("analytics healthy status resolution failed");
+}
+if (critical !== ANALYTICS_HEALTH_STATUS.CRITICAL) {
+  throw new Error("analytics critical status resolution failed");
+}
+
+console.log("analytics health status resolution ok");
+EOF
+pass "analytics health status resolution"
+
+echo "-- Test 277: analytics ADR documents exist --"
+test -f docs/adr/ADR-0007-developer-analytics-layer-architecture.md
+test -f docs/adr/ADR-0008-dashboard-public-contract.md
+grep -q "Dashboard Public Contract" docs/adr/ADR-0008-dashboard-public-contract.md
+grep -q "Analytics Layer" docs/adr/ADR-0007-developer-analytics-layer-architecture.md
+pass "analytics ADR documents exist"
 
 echo ""
 echo "All quality pipeline tests passed."

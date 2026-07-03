@@ -4,6 +4,40 @@
 
 ---
 
+## v1.37.0 — 機能追加（Developer Analytics Foundation）
+
+workflow-dashboard.json を唯一の入力として、Developer Automation の **Analytics 基盤（Analytics Foundation）** を追加しました。Dashboard Public Contract のみを参照する KPI / Health レイヤーです。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Analytics schema | `developer-automation/workflow-analytics/1.0` |
+| Analytics Builder | `buildWorkflowAnalytics()`（Pure Function / JSON のみ） |
+| Analytics Reader | `readWorkflowAnalytics()` |
+| Analytics Validator | `validateWorkflowAnalytics()` |
+| Analytics Report | `reports/workflow-analytics/workflow-analytics.json` / `.md` |
+| Dashboard Public Contract | `extractDashboardPublicContract()` |
+| ADR | ADR-0007 / ADR-0008 |
+| Test 263–277 | builder / reader / validator / markdown / CLI / dashboard-only / contract |
+
+### 設計判断
+
+- **Dashboard Single Input** — Analytics は workflow-dashboard.json の Public Contract のみ参照
+- **Timeline / History / Checkpoint / State 非参照** — Analytics は Dashboard 集計レイヤーの上に位置
+- **Dashboard Internal 非参照** — runs / warnings / source 等は参照禁止
+- **JSON Source / Markdown View** — analytics.md は JSON からのみ生成（分析計算なし）
+- **Schema Evolution Rule** — 公開 Contract 削除禁止 / Optional Field 追加のみ
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **277 PASS**（Test 263–277 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.36.0 — 機能追加（Developer Dashboard Foundation）
 
 workflow-timeline.json を唯一の入力として、Developer Automation の **Dashboard 集計基盤（Dashboard Foundation）** を追加しました。Timeline を Single Source of Truth とする Aggregation Layer です。
