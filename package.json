@@ -46,6 +46,7 @@
     "image:generation": "node scripts/run_image_generation.js",
     "publishing": "node scripts/run_publishing.js",
     "analytics": "node scripts/run_analytics.js",
-    "continuous:improvement": "node scripts/run_continuous_improvement.js"
+    "continuous:improvement": "node scripts/run_continuous_improvement.js",
+    "public-contract:catalog": "node scripts/run_public_contract_catalog.js"
   }
 }

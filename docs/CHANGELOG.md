@@ -4,6 +4,35 @@
 
 ---
 
+## v1.48.0 — 機能追加（Public Contract Catalog & Compatibility Foundation）
+
+Application Layer Foundation 群（v1.41.0〜v1.47.0）の **Public Contract Catalog** と **Compatibility Matrix** を追加しました。Provider / Runtime / 外部 API 接続は実装しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Catalog schema | `public-contract-catalog/1.0` |
+| Catalog Builder | `buildPublicContractCatalog()` — foundations / rules / matrix |
+| 出力 | `reports/public-contract-catalog/latest/public-contract-catalog.json` / `.md` |
+| CLI | `npm run public-contract:catalog` |
+| Test 407–422 | schema / foundations / rules / matrix / JSON / MD / CLI / 後方互換 |
+
+### 設計判断
+
+- **Public Contract First** — Application Layer 7 Foundation の extract 関数を一覧化
+- **Dependency Rule / Layer Rule / Version Rule / Deprecation Rule** — 将来の Provider / Adapter 追加に備えて明文化
+- **No Runtime Execution** — カタログ生成のみ、外部 API / 実行基盤は非実装
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **422 PASS**（Test 407–422 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.47.0 — 機能追加（Continuous Improvement Foundation）
 
 Analytics Public Contract から **pre-publish Continuous Improvement Report** を生成する **Continuous Improvement Foundation** を追加しました。LLM 自動改善 / 自動再投稿 / 外部 Metrics API は実装しません。

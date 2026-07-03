@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.47.0 --"
+echo "-- Test 98: VERSION updated to v1.48.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.47.0**（Continuous Improvement Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.47.0");
+if (!versionDoc.includes("**v1.48.0**（Public Contract Catalog & Compatibility Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.48.0");
 }
-console.log("VERSION v1.47.0 ok");
+console.log("VERSION v1.48.0 ok");
 EOF
-pass "VERSION updated to v1.47.0"
+pass "VERSION updated to v1.48.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.48.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.48.0");
+if (payload.nextVersion !== "v1.49.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.49.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.48.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.48.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.49.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.49.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.48.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.49.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13539,6 +13539,365 @@ console.log("v1.46.0 analytics backward compatibility preserved ok");
 EOF
 grep -q "Analytics Summary" /tmp/analytics_backward_compat_v146.log
 pass "v1.46.0 analytics backward compatibility preserved"
+
+echo "-- Test 407: public_contract_catalog.js exists --"
+test -f src/lib/public_contract_catalog.js
+node --input-type=module <<'EOF'
+import * as catalog from "./src/lib/public_contract_catalog.js";
+
+for (const name of [
+  "parsePublicContractCatalogArgs",
+  "buildPublicContractCatalog",
+  "normalizePublicContractCatalog",
+  "validatePublicContractCatalog",
+  "renderPublicContractCatalogMarkdown",
+  "printPublicContractCatalogSummary",
+]) {
+  if (typeof catalog[name] !== "function") {
+    throw new Error(`public contract catalog must export ${name}`);
+  }
+}
+
+console.log("public_contract_catalog.js exists ok");
+EOF
+pass "public_contract_catalog.js exists"
+
+echo "-- Test 408: public contract catalog schema --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_CATALOG_SCHEMA,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog({
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+
+if (catalog.schema !== PUBLIC_CONTRACT_CATALOG_SCHEMA) {
+  throw new Error("public contract catalog schema mismatch");
+}
+if (PUBLIC_CONTRACT_CATALOG_SCHEMA !== "public-contract-catalog/1.0") {
+  throw new Error("PUBLIC_CONTRACT_CATALOG_SCHEMA must be public-contract-catalog/1.0");
+}
+if (catalog.catalogVersion !== "1.0") {
+  throw new Error("catalogVersion must be 1.0");
+}
+
+console.log("public contract catalog schema ok");
+EOF
+pass "public contract catalog schema"
+
+echo "-- Test 409: public contract catalog foundations count --"
+node --input-type=module <<'EOF'
+import {
+  APPLICATION_LAYER_FOUNDATIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const applicationFoundations = catalog.foundations.filter(
+  (foundation) => foundation.layer === "application",
+);
+
+if (applicationFoundations.length !== APPLICATION_LAYER_FOUNDATIONS.length) {
+  throw new Error("application foundations count mismatch");
+}
+if (applicationFoundations.length !== 7) {
+  throw new Error("application layer must include 7 foundations");
+}
+
+console.log("public contract catalog foundations count ok");
+EOF
+pass "public contract catalog foundations count"
+
+echo "-- Test 410: public contract catalog public contract count --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+
+if (catalog.publicContracts.length !== PUBLIC_CONTRACT_DEFINITIONS.length) {
+  throw new Error("public contract count mismatch");
+}
+if (catalog.publicContracts.length !== 7) {
+  throw new Error("application layer must include 7 public contracts");
+}
+
+console.log("public contract catalog public contract count ok");
+EOF
+pass "public contract catalog public contract count"
+
+echo "-- Test 411: public contract catalog dependency rules --"
+node --input-type=module <<'EOF'
+import {
+  DEPENDENCY_RULES,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+
+if (catalog.dependencyRules.length !== DEPENDENCY_RULES.length) {
+  throw new Error("dependency rules count mismatch");
+}
+if (!catalog.dependencyRules.some((rule) => rule.id === "public-contract-only")) {
+  throw new Error("dependency rules must include public-contract-only");
+}
+if (!catalog.dependencyRules.some((rule) => rule.id === "no-circular-dependency")) {
+  throw new Error("dependency rules must include no-circular-dependency");
+}
+
+console.log("public contract catalog dependency rules ok");
+EOF
+pass "public contract catalog dependency rules"
+
+echo "-- Test 412: public contract catalog compatibility matrix --"
+node --input-type=module <<'EOF'
+import {
+  buildCompatibilityMatrix,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const expected = buildCompatibilityMatrix();
+
+if (catalog.compatibilityMatrix.length !== expected.length) {
+  throw new Error("compatibility matrix entry count mismatch");
+}
+if (!catalog.compatibilityMatrix.every((edge) => edge.dependencyType === "public-contract")) {
+  throw new Error("compatibility matrix must use public-contract dependency type");
+}
+if (!catalog.compatibilityMatrix.some((edge) => edge.downstreamFoundationId === "analytics")) {
+  throw new Error("compatibility matrix must include analytics dependency");
+}
+
+console.log("public contract catalog compatibility matrix ok");
+EOF
+pass "public contract catalog compatibility matrix"
+
+echo "-- Test 413: public contract catalog layer rules --"
+node --input-type=module <<'EOF'
+import { LAYER_RULES, buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+
+if (catalog.layerRules.length !== LAYER_RULES.length) {
+  throw new Error("layer rules count mismatch");
+}
+if (!catalog.layerRules.some((rule) => rule.id === "platform-independent-from-application")) {
+  throw new Error("layer rules must include platform-independent-from-application");
+}
+if (!catalog.layerRules.some((rule) => rule.id === "no-circular-reference")) {
+  throw new Error("layer rules must include no-circular-reference");
+}
+
+console.log("public contract catalog layer rules ok");
+EOF
+pass "public contract catalog layer rules"
+
+echo "-- Test 414: public contract catalog version rules --"
+node --input-type=module <<'EOF'
+import { VERSION_RULES, buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const types = catalog.versionRules.map((rule) => rule.type);
+
+if (catalog.versionRules.length !== VERSION_RULES.length) {
+  throw new Error("version rules count mismatch");
+}
+for (const expected of ["patch", "minor", "major"]) {
+  if (!types.includes(expected)) {
+    throw new Error(`version rules must include ${expected}`);
+  }
+}
+
+console.log("public contract catalog version rules ok");
+EOF
+pass "public contract catalog version rules"
+
+echo "-- Test 415: public contract catalog deprecation rules --"
+node --input-type=module <<'EOF'
+import { DEPRECATION_RULES, buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const stages = catalog.deprecationRules.map((rule) => rule.stage);
+
+if (catalog.deprecationRules.length !== DEPRECATION_RULES.length) {
+  throw new Error("deprecation rules count mismatch");
+}
+for (const expected of ["deprecated", "warning", "removal-candidate", "removed"]) {
+  if (!stages.includes(expected)) {
+    throw new Error(`deprecation rules must include ${expected}`);
+  }
+}
+
+console.log("public contract catalog deprecation rules ok");
+EOF
+pass "public contract catalog deprecation rules"
+
+echo "-- Test 416: public contract catalog validator --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog({
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+const validation = validatePublicContractCatalog(catalog);
+
+if (!validation.valid) {
+  throw new Error(`public contract catalog must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validatePublicContractCatalog(null);
+if (invalid.valid) {
+  throw new Error("null public contract catalog must be invalid");
+}
+
+console.log("public contract catalog validator ok");
+EOF
+pass "public contract catalog validator"
+
+echo "-- Test 417: public-contract-catalog.json generated --"
+npm run public-contract:catalog >/tmp/public_contract_catalog_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync(
+    "reports/public-contract-catalog/latest/public-contract-catalog.json",
+    "utf8",
+  ),
+);
+if (data.schema !== "public-contract-catalog/1.0") {
+  throw new Error("public-contract-catalog.json schema mismatch");
+}
+if (!Array.isArray(data.foundations) || data.foundations.length === 0) {
+  throw new Error("public-contract-catalog.json must include foundations");
+}
+if (!Array.isArray(data.compatibilityMatrix) || data.compatibilityMatrix.length === 0) {
+  throw new Error("public-contract-catalog.json must include compatibilityMatrix");
+}
+if (!Array.isArray(data.compatibilityNotes) || data.compatibilityNotes.length === 0) {
+  throw new Error("public-contract-catalog.json must include compatibilityNotes");
+}
+
+console.log("public-contract-catalog.json generated ok");
+EOF
+pass "public-contract-catalog.json generated"
+
+echo "-- Test 418: public-contract-catalog.md generated --"
+test -f reports/public-contract-catalog/latest/public-contract-catalog.md
+grep -q "# Public Contract Catalog" reports/public-contract-catalog/latest/public-contract-catalog.md
+grep -q "## Compatibility Matrix" reports/public-contract-catalog/latest/public-contract-catalog.md
+grep -q "## Deprecation Rules" reports/public-contract-catalog/latest/public-contract-catalog.md
+pass "public-contract-catalog.md generated"
+
+echo "-- Test 419: public contract catalog CLI summary --"
+grep -q "Public Contract Catalog Summary" /tmp/public_contract_catalog_cli.log
+grep -q "public-contract-catalog.json" /tmp/public_contract_catalog_cli.log
+grep -q "public-contract-catalog.md" /tmp/public_contract_catalog_cli.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { printPublicContractCatalogSummary } from "./src/lib/public_contract_catalog.js";
+
+const data = JSON.parse(
+  fs.readFileSync(
+    "reports/public-contract-catalog/latest/public-contract-catalog.json",
+    "utf8",
+  ),
+);
+const summary = printPublicContractCatalogSummary(data);
+
+for (const expected of [
+  "Public Contract Catalog Summary",
+  "Catalog Version:",
+  "Application Foundations:",
+  "Public Contracts:",
+  "Dependency Rules:",
+  "Compatibility Matrix Entries:",
+  "Layer Rules:",
+  "Version Rules:",
+  "Deprecation Rules:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`public contract catalog CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("public contract catalog CLI summary ok");
+EOF
+pass "public contract catalog CLI summary"
+
+echo "-- Test 420: public-contract:catalog npm script exists --"
+grep -q '"public-contract:catalog": "node scripts/run_public_contract_catalog.js"' package.json
+test -f scripts/run_public_contract_catalog.js
+pass "public-contract:catalog npm script exists"
+
+echo "-- Test 421: public contract catalog excludes external integrations and runtime execution --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/public_contract_catalog.js",
+  "scripts/run_public_contract_catalog.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "Instagram API",
+  "X API",
+  "Facebook API",
+  "Threads API",
+  "OAuth",
+  "access_token",
+  "accessToken",
+  "scheduler",
+  "Retry",
+  "Queue",
+  "database",
+  "Metrics API",
+  "graph.instagram",
+  "from \"openai\"",
+  "@google/genai",
+  "buildPublishingPipeline(",
+  "buildAnalyticsPipeline(",
+  "buildContinuousImprovementPipeline(",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`public contract catalog must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("public contract catalog excludes external integrations and runtime execution ok");
+EOF
+pass "public contract catalog excludes external integrations and runtime execution"
+
+echo "-- Test 422: v1.47.0 continuous improvement backward compatibility preserved --"
+npm run continuous:improvement >/tmp/continuous_improvement_backward_compat_v147.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/continuous-improvement/improvement.json", "utf8"));
+if (data.schema !== "continuous-improvement/1.0") {
+  throw new Error("v1.47.0 continuous improvement schema must remain continuous-improvement/1.0");
+}
+if (!Array.isArray(data.improvements) || data.improvements.length === 0) {
+  throw new Error("v1.47.0 continuous improvement output must remain valid");
+}
+
+console.log("v1.47.0 continuous improvement backward compatibility preserved ok");
+EOF
+grep -q "Continuous Improvement Summary" /tmp/continuous_improvement_backward_compat_v147.log
+pass "v1.47.0 continuous improvement backward compatibility preserved"
 
 
 echo ""

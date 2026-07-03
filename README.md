@@ -1170,6 +1170,45 @@ Latest Current Step
 release-plan
 ```
 
+### Public Contract Catalog & Compatibility Foundation（v1.48.0）
+
+**Public Contract Catalog & Compatibility Foundation** を追加しました。v1.41.0〜v1.47.0 で完成した Application Layer Foundation 群の **Public Contract** を一覧化し、Dependency Rule / Layer Rule / Version Rule / Deprecation Rule / Compatibility Matrix を固定します。
+
+Provider / Adapter / Runtime / 外部 SNS API / 実投稿 / 永続化ストア / 実行基盤は実装しません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `public-contract-catalog/1.0` |
+| JSON | `reports/public-contract-catalog/latest/public-contract-catalog.json` |
+| Markdown | `reports/public-contract-catalog/latest/public-contract-catalog.md` |
+| CLI | `npm run public-contract:catalog` |
+
+#### Catalog Scope
+
+Application Layer 7 Foundations / 7 Public Contracts / Compatibility Matrix / Dependency Rules / Layer Rules / Version Rules / Deprecation Rules / Extension Warnings
+
+#### 非対象
+
+外部 API 接続 / 認証トークン交換 / 実投稿 / 自動投稿 / 永続化ストア / 実行基盤 / Provider 実装 / Runtime 実行 / Platform Layer 新 Foundation / Public Contract 破壊的変更
+
+#### CLI 出力例
+
+```text
+Public Contract Catalog Summary
+Catalog Version: 1.0
+Application Foundations: 7
+Public Contracts: 7
+Dependency Rules: 6
+Compatibility Matrix Entries: 5
+Layer Rules: 6
+Version Rules: 3
+Deprecation Rules: 4
+```
+
+#### gitignore
+
+`reports/` は `.gitignore` 対象です（カタログ出力含む）。
+
 ### Continuous Improvement Foundation（v1.47.0）
 
 **Continuous Improvement Foundation** を Application Layer に追加しました。v1.46.0 の **Analytics Public Contract**（`extractAnalyticsPublicContract()`）のみを入力とし、**pre-publish Continuous Improvement Report** を生成します。

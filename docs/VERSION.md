@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.47.0**（Continuous Improvement Foundation）
+**v1.48.0**（Public Contract Catalog & Compatibility Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.48.0
+**Next Candidate:** v1.49.0
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.48.0** | **機能追加** | **✅ 完了** | **Public Contract Catalog & Compatibility Foundation / Application Layer Public Contract 一覧・互換性ルール固定** |
 | **v1.47.0** | **機能追加** | **✅ 完了** | **Continuous Improvement Foundation / Analytics Public Contract から pre-publish 改善 MVP** |
 | **v1.46.0** | **機能追加** | **✅ 完了** | **Analytics Foundation / Publishing Public Contract から pre-publish Analytics MVP** |
 | **v1.45.0** | **機能追加** | **✅ 完了** | **Publishing Foundation / Image Public Contract から Publishing Package MVP** |
@@ -69,6 +70,42 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.48.0 で追加（Public Contract Catalog & Compatibility Foundation）
+
+#### Public Contract Catalog MVP
+
+- **`buildPublicContractCatalog()`** … Application Layer 7 Foundation の Public Contract / Dependency / Compatibility 一覧
+- **Dependency Rule / Layer Rule / Version Rule / Deprecation Rule** … 公開境界・互換性ルールの明文化
+- **出力** … `reports/public-contract-catalog/latest/public-contract-catalog.json` / `.md`
+- **CLI** … `npm run public-contract:catalog`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.49.0** | Application Layer 次フェーズ候補 |
+
+### 品質状況（v1.48.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **422 PASS** |
+| npm test | **PASS** |
+
+### v1.48.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| public-contract-catalog/1.0 schema | ✅ |
+| Catalog Builder / Validator / CLI | ✅ |
+| Compatibility Matrix | ✅ |
+| Dependency / Layer / Version / Deprecation Rules | ✅ |
+| 外部 API / Runtime / Provider 非実装 | ✅ |
+| v1.47.0 後方互換 | ✅ |
+| Test 407–422 | ✅ |
 
 ---
 
