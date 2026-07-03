@@ -158,6 +158,45 @@ export function buildWorkflowHistoryAnalytics(inputs, options = {}) {
  * @param {object | null | undefined} analytics
  * @returns {object}
  */
+export function extractHistoricalPublicContract(analytics) {
+  const normalized = normalizeWorkflowHistoryAnalytics(analytics);
+
+  return {
+    metadata: {
+      schema: normalized.schema,
+      generatedAt: normalized.generatedAt,
+    },
+    period: {
+      start: normalized.period.start,
+      end: normalized.period.end,
+    },
+    coverage: {
+      periodStart: normalized.coverage.periodStart,
+      periodEnd: normalized.coverage.periodEnd,
+      sampleCount: normalized.coverage.sampleCount,
+      missingSnapshots: normalized.coverage.missingSnapshots,
+    },
+    summary: {
+      totalRuns: normalized.summary.totalRuns,
+      successCount: normalized.summary.successCount,
+      failureCount: normalized.summary.failureCount,
+      averageDurationMs: normalized.summary.averageDurationMs,
+      resumeCount: normalized.summary.resumeCount,
+      resumeRate: normalized.summary.resumeRate,
+      successRate: normalized.summary.successRate,
+    },
+    workflowHealth: {
+      healthy: normalized.workflowHealth.healthy,
+      warning: normalized.workflowHealth.warning,
+      critical: normalized.workflowHealth.critical,
+    },
+  };
+}
+
+/**
+ * @param {object | null | undefined} analytics
+ * @returns {object}
+ */
 export function normalizeWorkflowHistoryAnalytics(analytics) {
   if (!analytics || typeof analytics !== "object") {
     return buildWorkflowHistoryAnalytics({

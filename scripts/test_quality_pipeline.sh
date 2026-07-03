@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.39.0 --"
+echo "-- Test 98: VERSION updated to v1.40.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.39.0**（Historical Analytics Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.39.0");
+if (!versionDoc.includes("**v1.40.0**（Visualization Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.40.0");
 }
-console.log("VERSION v1.39.0 ok");
+console.log("VERSION v1.40.0 ok");
 EOF
-pass "VERSION updated to v1.39.0"
+pass "VERSION updated to v1.40.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.40.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.40.0");
+if (payload.nextVersion !== "v1.41.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.41.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.40.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.40.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.41.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.41.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.40.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.41.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -10664,6 +10664,430 @@ for (const forbiddenWord of ["forecast", "prediction", "anomaly", "correlation",
 console.log("historical analytics excludes forecast prediction anomaly ok");
 EOF
 pass "historical analytics excludes forecast prediction anomaly"
+
+echo "-- Test 301: extractHistoricalPublicContract exposes public historical contract --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryAnalytics,
+  extractHistoricalPublicContract,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import { extractDashboardPublicContract } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract } from "./src/lib/developer_workflow_trend.js";
+
+const analytics = buildWorkflowHistoryAnalytics({
+  dashboardContract: extractDashboardPublicContract(null),
+  trendContract: extractTrendPublicContract(null),
+  snapshotContracts: [],
+});
+const contract = extractHistoricalPublicContract(analytics);
+
+if (contract.summary.totalRuns !== 0) {
+  throw new Error("historical public contract totalRuns mismatch");
+}
+if ("coverage" in contract && contract.coverage.sampleCount !== 0) {
+  throw new Error("historical public contract coverage mismatch");
+}
+if ("period" in contract === false || "workflowHealth" in contract === false) {
+  throw new Error("historical public contract must expose period and workflowHealth");
+}
+
+console.log("extractHistoricalPublicContract exposes public historical contract ok");
+EOF
+pass "extractHistoricalPublicContract exposes public historical contract"
+
+echo "-- Test 302: workflow-visualization schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_VISUALIZATION_SCHEMA,
+  buildWorkflowVisualization,
+} from "./src/lib/developer_workflow_visualization.js";
+import { extractDashboardPublicContract } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract } from "./src/lib/developer_workflow_trend.js";
+import { extractHistoricalPublicContract } from "./src/lib/developer_workflow_history_analytics.js";
+
+const visualization = buildWorkflowVisualization({
+  dashboardContract: extractDashboardPublicContract(null),
+  trendContract: extractTrendPublicContract(null),
+  historicalContract: extractHistoricalPublicContract(null),
+});
+
+if (visualization.schema !== WORKFLOW_VISUALIZATION_SCHEMA) {
+  throw new Error("workflow-visualization schema constant mismatch");
+}
+if (WORKFLOW_VISUALIZATION_SCHEMA !== "developer-automation/workflow-visualization/1.0") {
+  throw new Error("WORKFLOW_VISUALIZATION_SCHEMA mismatch");
+}
+
+console.log("workflow-visualization schema constant ok");
+EOF
+pass "workflow-visualization schema constant"
+
+echo "-- Test 303: workflow visualization handles empty input --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowVisualization,
+  validateWorkflowVisualization,
+} from "./src/lib/developer_workflow_visualization.js";
+
+const visualization = buildWorkflowVisualization({});
+const validation = validateWorkflowVisualization(visualization);
+
+if (!validation.valid) {
+  throw new Error(`empty visualization must validate: ${validation.errors.join("; ")}`);
+}
+if (visualization.dashboardSummary.runCount !== 0) {
+  throw new Error("empty visualization must use zero dashboard counts");
+}
+if (visualization.trendSummary.sampleCount !== 0) {
+  throw new Error("empty visualization must use zero trend counts");
+}
+
+console.log("workflow visualization handles empty input ok");
+EOF
+pass "workflow visualization handles empty input"
+
+echo "-- Test 304: workflow visualization handles partial input --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowVisualization,
+  parseVisualizationInputs,
+} from "./src/lib/developer_workflow_visualization.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const visualization = buildWorkflowVisualization(
+  parseVisualizationInputs(
+    {
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: { runCount: 3, stepCount: 6, totalDurationMs: 9000, resumeCount: 1 },
+      metrics: { runs: { completed: 3, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 1 } },
+    },
+    null,
+    null,
+  ),
+);
+
+if (visualization.dashboardSummary.runCount !== 3) {
+  throw new Error("partial visualization must preserve dashboard public contract");
+}
+if (visualization.trendSummary.sampleCount !== 0 || visualization.historicalSummary.summary.totalRuns !== 0) {
+  throw new Error("partial visualization must degrade missing trend and historical safely");
+}
+
+console.log("workflow visualization handles partial input ok");
+EOF
+pass "workflow visualization handles partial input"
+
+echo "-- Test 305: workflow visualization handles invalid input --"
+node --input-type=module <<'EOF'
+import {
+  validateWorkflowVisualization,
+} from "./src/lib/developer_workflow_visualization.js";
+
+const validation = validateWorkflowVisualization(null);
+if (validation.valid) {
+  throw new Error("null visualization must be invalid");
+}
+
+const legacyValidation = validateWorkflowVisualization({
+  schema: "legacy",
+  generatedAt: null,
+});
+if (legacyValidation.valid) {
+  throw new Error("visualization without generatedAt must be invalid");
+}
+if (legacyValidation.warnings.length === 0) {
+  throw new Error("legacy visualization schema must emit warning");
+}
+if (!legacyValidation.errors.some((error) => error.includes("generatedAt"))) {
+  throw new Error("invalid visualization must report generatedAt error");
+}
+
+console.log("workflow visualization handles invalid input ok");
+EOF
+pass "workflow visualization handles invalid input"
+
+echo "-- Test 306: workflow-visualization.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_VISUALIZATION_SCHEMA,
+  generateWorkflowVisualizationReport,
+} from "./src/lib/developer_workflow_visualization.js";
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  writeWorkflowDashboardReport,
+} from "./src/lib/developer_workflow_dashboard.js";
+import {
+  buildWorkflowTrend,
+  writeWorkflowTrendReport,
+} from "./src/lib/developer_workflow_trend.js";
+import { buildWorkflowHistoryAnalyticsFromReports } from "./src/lib/developer_workflow_history_analytics.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+writeWorkflowDashboardReport(
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    source: { schema: WORKFLOW_TIMELINE_SCHEMA, path: "reports/developer-workflow/latest/workflow-timeline.json" },
+    status: "success",
+    summary: {
+      runCount: 2,
+      stepCount: 4,
+      successCount: 2,
+      failedCount: 0,
+      resumeCount: 1,
+      totalDurationMs: 4000,
+      averageDurationMs: 2000,
+    },
+    metrics: {
+      runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 },
+      steps: { completed: 4, failed: 0, skipped: 0, stopped: 0, unknown: 0 },
+      duration: { totalMs: 4000, averageMs: 2000, minMs: 1000, maxMs: 3000 },
+      resume: { count: 1, rate: 0.5 },
+    },
+    runs: [],
+    warnings: [],
+  },
+  PROJECT_ROOT,
+);
+writeWorkflowTrendReport(buildWorkflowTrend([]), PROJECT_ROOT);
+buildWorkflowHistoryAnalyticsFromReports({ rootDir: PROJECT_ROOT });
+generateWorkflowVisualizationReport({ rootDir: PROJECT_ROOT });
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/workflow-visualization/latest/workflow-visualization.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_VISUALIZATION_SCHEMA) {
+  throw new Error("workflow-visualization.json schema mismatch");
+}
+for (const section of [
+  "dashboardSummary",
+  "trendSummary",
+  "historicalSummary",
+  "workflowHealthSummary",
+  "metadata",
+]) {
+  if (!payload[section]) {
+    throw new Error(`workflow-visualization.json must include ${section}`);
+  }
+}
+
+console.log("workflow-visualization.json generated ok");
+EOF
+pass "workflow-visualization.json generated"
+
+echo "-- Test 307: visualization-report.md generated --"
+test -f reports/workflow-visualization/latest/visualization-report.md
+grep -q "# Workflow Visualization Report" reports/workflow-visualization/latest/visualization-report.md
+grep -q "## Dashboard Summary" reports/workflow-visualization/latest/visualization-report.md
+grep -q "## Workflow Health Summary" reports/workflow-visualization/latest/visualization-report.md
+pass "visualization-report.md generated"
+
+echo "-- Test 308: workflow visualization CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowVisualization,
+  renderVisualizationSummary,
+} from "./src/lib/developer_workflow_visualization.js";
+import { extractDashboardPublicContract, WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract, buildWorkflowTrend } from "./src/lib/developer_workflow_trend.js";
+import { extractHistoricalPublicContract } from "./src/lib/developer_workflow_history_analytics.js";
+
+const summary = renderVisualizationSummary(
+  buildWorkflowVisualization({
+    dashboardContract: extractDashboardPublicContract({
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: { runCount: 2, stepCount: 4, totalDurationMs: 4000, resumeCount: 0 },
+      metrics: { runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+    }),
+    trendContract: extractTrendPublicContract(buildWorkflowTrend([])),
+    historicalContract: extractHistoricalPublicContract(null),
+  }),
+);
+
+for (const expected of [
+  "Workflow Visualization Summary",
+  "Dashboard Runs: 2",
+  "Trend Samples: 0",
+  "Historical Runs: 0",
+  "Dashboard Health:",
+  "Workflow Health:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`visualization CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("workflow visualization CLI summary ok");
+EOF
+npm run developer:visualization >/tmp/developer_workflow_visualization_cli.log 2>&1
+grep -q "Workflow Visualization Summary" /tmp/developer_workflow_visualization_cli.log
+grep -q "workflow-visualization.json" /tmp/developer_workflow_visualization_cli.log
+grep -q "visualization-report.md" /tmp/developer_workflow_visualization_cli.log
+pass "workflow visualization CLI summary"
+
+echo "-- Test 309: workflow visualization does not reference dashboard internal --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_visualization.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "dashboard.runs",
+  "dashboard.warnings",
+  "dashboard.source",
+  "metrics.runs.completed",
+  "developer_workflow_timeline.js",
+  "developer_workflow_history.js",
+  "workflow-timeline.json",
+  "workflow-history.json",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`workflow visualization must not reference ${forbidden}`);
+  }
+}
+
+console.log("workflow visualization does not reference dashboard internal ok");
+EOF
+pass "workflow visualization does not reference dashboard internal"
+
+echo "-- Test 310: workflow visualization does not reference trend or historical internal --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_visualization.js"),
+  "utf8",
+);
+
+for (const required of [
+  "extractDashboardPublicContract",
+  "extractTrendPublicContract",
+  "extractHistoricalPublicContract",
+]) {
+  if (!source.includes(required)) {
+    throw new Error(`workflow visualization must use ${required}`);
+  }
+}
+
+for (const forbidden of [
+  "trend.trends",
+  "trends.successRate",
+  "normalizeWorkflowTrend(",
+  "buildWorkflowTrend(",
+  "parseHistoricalInputs",
+  "buildWorkflowHistoryAnalytics(",
+  "normalizeWorkflowHistoryAnalytics(",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`workflow visualization must not reference internal ${forbidden}`);
+  }
+}
+
+console.log("workflow visualization does not reference trend or historical internal ok");
+EOF
+pass "workflow visualization does not reference trend or historical internal"
+
+echo "-- Test 311: workflow visualization uses public contracts --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowVisualization,
+  parseVisualizationInputs,
+} from "./src/lib/developer_workflow_visualization.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+import { buildWorkflowTrend, parseTrendInputs } from "./src/lib/developer_workflow_trend.js";
+import { buildWorkflowHistoryAnalytics } from "./src/lib/developer_workflow_history_analytics.js";
+import { parseHistoricalInputs } from "./src/lib/developer_workflow_history_analytics.js";
+
+const dashboard = {
+  schema: WORKFLOW_DASHBOARD_SCHEMA,
+  generatedAt: "2026-07-02T00:00:00.000Z",
+  status: "mixed",
+  summary: { runCount: 5, stepCount: 10, totalDurationMs: 10000, resumeCount: 2 },
+  metrics: { runs: { completed: 4, failed: 1, stopped: 0, unknown: 0 }, resume: { count: 2 } },
+};
+const trend = buildWorkflowTrend(
+  parseTrendInputs([
+    {
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: { runCount: 1, stepCount: 1, totalDurationMs: 1000, resumeCount: 0 },
+      metrics: { runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+    },
+  ]),
+);
+const historical = buildWorkflowHistoryAnalytics(parseHistoricalInputs(dashboard, trend, []));
+const visualization = buildWorkflowVisualization(
+  parseVisualizationInputs(dashboard, trend, historical),
+);
+
+if (visualization.dashboardSummary.runCount !== 5) {
+  throw new Error("visualization must organize dashboard public contract");
+}
+if (visualization.trendSummary.sampleCount !== 1) {
+  throw new Error("visualization must organize trend public contract");
+}
+if (visualization.historicalSummary.summary.totalRuns !== 5) {
+  throw new Error("visualization must organize historical public contract");
+}
+
+console.log("workflow visualization uses public contracts ok");
+EOF
+pass "workflow visualization uses public contracts"
+
+echo "-- Test 312: workflow visualization excludes chart graph forecast --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/developer_workflow_visualization.js",
+  "scripts/run_developer_workflow_visualization.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbiddenWord of [
+  "forecast",
+  "prediction",
+  "anomaly",
+  "correlation",
+  "chart",
+  "graph",
+  "<svg",
+  "<html",
+  ".png",
+]) {
+  if (new RegExp(`\\b${forbiddenWord.replace(".", "\\.")}\\b`, "i").test(combined)) {
+    throw new Error(`workflow visualization must not include forbidden feature word: ${forbiddenWord}`);
+  }
+}
+
+console.log("workflow visualization excludes chart graph forecast ok");
+EOF
+pass "workflow visualization excludes chart graph forecast"
+
 
 echo ""
 echo "All quality pipeline tests passed."

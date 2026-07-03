@@ -2,9 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.39.0**（Historical Analytics Foundation）
+**v1.40.0**（Visualization Foundation）
 
-**Next Candidate:** v1.40.0 Visualization Foundation
+**Platform Status:** Developer Automation Platform **Completed**
+
+**Next Phase:** v1.41.0+ AI-SNS-Automation 本体開発（Idea → Content → Image → Publishing → Analytics → Improvement）
 
 ---
 
@@ -12,6 +14,8 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
+| **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
 | **v1.39.0** | **機能追加** | **✅ 完了** | **Historical Analytics Foundation / Dashboard + Trend Public Contract から履歴集計 MVP** |
 | **v1.38.0** | **機能追加** | **✅ 完了** | **Trend Analytics Foundation / Dashboard Public Contract から Workflow Trend MVP** |
 | **v1.37.1** | **ドキュメント** | **✅ 完了** | **Architecture Documentation MVP / docs/architecture 追加・コード変更なし** |
@@ -59,6 +63,50 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.40.0 で追加（Visualization Foundation / Platform Completed）
+
+#### Workflow Visualization MVP
+
+- **`extractHistoricalPublicContract()`** … Historical Public Contract 公開（Historical Internal 非公開）
+- **`buildWorkflowVisualization()`** … Dashboard + Trend + Historical Public Contract を整理（分析なし）
+- **`validateWorkflowVisualization()`** … schema / summary sections 検証
+- **出力** … `reports/workflow-visualization/latest/workflow-visualization.json` / `visualization-report.md`
+- **CLI** … `npm run developer:visualization`
+
+#### Developer Automation Platform Completed
+
+| レイヤー | 状態 |
+|----------|------|
+| Workflow → State → Checkpoint → History → Timeline → Dashboard → Analytics → Visualization | **✅ Completed** |
+
+#### Next Phase
+
+| 方針 | 内容 |
+|------|------|
+| **v1.41.0+** | AI-SNS-Automation 本体開発（Idea → Content → Image → Publishing → Analytics → Improvement） |
+| **Developer Automation** | 保守のみ — 新レイヤー追加なし |
+
+### 品質状況（v1.40.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **312 PASS** |
+| npm test | **PASS** |
+
+### v1.40.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-visualization schema 1.0 | ✅ |
+| extractHistoricalPublicContract | ✅ |
+| Visualization Builder / Validator / CLI | ✅ |
+| Public Contract Only（分析なし） | ✅ |
+| Chart / Graph / Forecast / HTML / SVG / PNG 非実装 | ✅ |
+| Developer Automation Platform Completed | ✅ |
+| Test 301–312 | ✅ |
 
 ---
 

@@ -4,6 +4,37 @@
 
 ---
 
+## v1.40.0 — 機能追加（Visualization Foundation / Developer Automation Platform Completed）
+
+Dashboard / Trend / Historical Public Contract を入力として、**Visualization Foundation** を追加しました。Developer Automation Platform の **最終レイヤー** として Public Contract 情報の整理のみを行います。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Visualization schema | `developer-automation/workflow-visualization/1.0` |
+| Historical Public Contract | `extractHistoricalPublicContract()` 追加 |
+| Visualization Builder | `buildWorkflowVisualization()`（Pure Function） |
+| Visualization Report | `workflow-visualization.json` / `visualization-report.md` |
+| CLI | `npm run developer:visualization` |
+| Test 301–312 | Public Contract / empty / partial / invalid / 非 Chart |
+
+### 設計判断
+
+- **Platform Completed** — Developer Automation Platform 全レイヤー完成
+- **分析なし** — Public Contract の整理のみ（Forecast / Chart / Graph / HTML / SVG / PNG 非実装）
+- **Public Contract Only** — Dashboard + Trend + Historical Public Contract のみ入力
+- **v1.41.0 以降** — AI-SNS-Automation 本体開発へ移行
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **312 PASS**（Test 301–312 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.39.0 — 機能追加（Historical Analytics Foundation）
 
 Dashboard Public Contract と Trend Public Contract を入力として、**Historical Analytics Foundation** を追加しました。Analytics Layer の兄弟レイヤーとして Period Summary / Data Coverage / Health Distribution を提供します。

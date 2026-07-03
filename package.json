@@ -38,6 +38,7 @@
     "developer:workflow": "node scripts/run_developer_workflow.js",
     "developer:handoff": "node scripts/run_developer_handoff.js",
     "developer:trend": "node scripts/run_developer_workflow_trend.js",
-    "developer:history-analytics": "node scripts/run_developer_workflow_history_analytics.js"
+    "developer:history-analytics": "node scripts/run_developer_workflow_history_analytics.js",
+    "developer:visualization": "node scripts/run_developer_workflow_visualization.js"
   }
 }
