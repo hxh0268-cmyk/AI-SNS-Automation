@@ -1170,6 +1170,47 @@ Latest Current Step
 release-plan
 ```
 
+### Historical Analytics Foundation（v1.39.0）
+
+Analytics Layer の兄弟として、**Historical Analytics Foundation** を追加しました。Dashboard Public Contract と Trend Public Contract（`extractTrendPublicContract()`）のみを入力とします。
+
+Timeline / History / Checkpoint / Workflow State / Dashboard Internal / Trend Internal は直接参照しません。Forecast / Prediction / AI Analysis / Visualization は実装していません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `developer-automation/workflow-history-analytics/1.0` |
+| 入力 | Dashboard Public Contract + Trend Public Contract |
+| JSON | `reports/workflow-history-analytics/workflow-history-analytics.json` |
+| Markdown | `reports/workflow-history-analytics/historical-report.md` |
+| CLI | `npm run developer:history-analytics` |
+
+#### Architecture（Analytics 兄弟レイヤー）
+
+```text
+Analytics
+├── Trend Analytics
+└── Historical Analytics
+```
+
+#### MVP Scope
+
+Total Runs / Success Count / Failure Count / Average Duration / Resume Count / Resume Rate / Workflow Health Distribution / Period Summary / Data Coverage
+
+#### 非対象
+
+Forecast / Prediction / AI Analysis / Root Cause / Correlation / Anomaly Detection / Automatic Recommendation / Visualization
+
+#### CLI 出力例
+
+```text
+Workflow Historical Analytics Summary
+Runs: 4
+Success Rate: 75%
+Resume Rate: 50%
+Average Duration: 2 sec
+Workflow Health: Warning
+```
+
 ### Trend Analytics Foundation（v1.38.0）
 
 Dashboard Public Contract を入力として、**Trend Analytics Foundation** を追加しました。Workflow の Success / Failure / Resume Rate / Duration / Health の時系列 Trend を生成します。

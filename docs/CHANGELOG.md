@@ -4,6 +4,37 @@
 
 ---
 
+## v1.39.0 — 機能追加（Historical Analytics Foundation）
+
+Dashboard Public Contract と Trend Public Contract を入力として、**Historical Analytics Foundation** を追加しました。Analytics Layer の兄弟レイヤーとして Period Summary / Data Coverage / Health Distribution を提供します。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Historical Analytics schema | `developer-automation/workflow-history-analytics/1.0` |
+| Trend Public Contract | `extractTrendPublicContract()` 追加 |
+| Historical Builder | `buildWorkflowHistoryAnalytics()`（Pure Function） |
+| Historical Report | `workflow-history-analytics.json` / `historical-report.md` |
+| CLI | `npm run developer:history-analytics` |
+| Test 289–300 | Public Contract / empty / missing / stable sort / 非 ML |
+
+### 設計判断
+
+- **Analytics 兄弟レイヤー** — Trend の上位ではなく Dashboard + Trend Public Contract を入力
+- **Trend Internal 非参照** — `extractTrendPublicContract()` のみ利用
+- **Data Coverage** — sampleCount / missingSnapshots 等の品質メタデータ
+- **非スコープ** — Forecast / Prediction / AI Analysis / Visualization
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **300 PASS**（Test 289–300 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.38.0 — 機能追加（Trend Analytics Foundation）
 
 Dashboard Public Contract を入力として、Developer Automation の **Trend Analytics Foundation** を追加しました。Workflow Trend の時系列 MVP です。

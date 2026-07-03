@@ -2,7 +2,9 @@
 
 ## 現在のバージョン
 
-**v1.38.0**（Trend Analytics Foundation）
+**v1.39.0**（Historical Analytics Foundation）
+
+**Next Candidate:** v1.40.0 Visualization Foundation
 
 ---
 
@@ -10,6 +12,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.39.0** | **機能追加** | **✅ 完了** | **Historical Analytics Foundation / Dashboard + Trend Public Contract から履歴集計 MVP** |
 | **v1.38.0** | **機能追加** | **✅ 完了** | **Trend Analytics Foundation / Dashboard Public Contract から Workflow Trend MVP** |
 | **v1.37.1** | **ドキュメント** | **✅ 完了** | **Architecture Documentation MVP / docs/architecture 追加・コード変更なし** |
 | **v1.37.0** | **機能追加** | **✅ 完了** | **Developer Analytics Foundation / Dashboard Public Contract から KPI・Health 生成 MVP** |
@@ -56,6 +59,42 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.39.0 で追加（Historical Analytics Foundation）
+
+#### Workflow Historical Analytics MVP
+
+- **`extractTrendPublicContract()`** … Trend Public Contract 公開（Trend Internal 非公開）
+- **`buildWorkflowHistoryAnalytics()`** … Dashboard + Trend Public Contract から Pure 集計
+- **`validateWorkflowHistoryAnalytics()`** … schema / coverage / summary / workflowHealth 検証
+- **出力** … `reports/workflow-history-analytics/workflow-history-analytics.json` / `historical-report.md`
+- **CLI** … `npm run developer:history-analytics`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.40.0 Visualization Foundation** | Developer Automation Platform 完成 — 集計結果の可視化 MVP |
+
+### 品質状況（v1.39.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **300 PASS** |
+| npm test | **PASS** |
+
+### v1.39.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-history-analytics schema 1.0 | ✅ |
+| extractTrendPublicContract | ✅ |
+| Historical Builder / Validator / CLI | ✅ |
+| Dashboard / Trend Public Contract のみ | ✅ |
+| Forecast / Prediction / Visualization 非実装 | ✅ |
+| Test 289–300 | ✅ |
 
 ---
 

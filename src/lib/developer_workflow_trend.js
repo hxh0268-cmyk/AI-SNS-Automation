@@ -185,6 +185,76 @@ export function buildWorkflowTrend(parsedInputs, options = {}) {
  * @param {object | null | undefined} trend
  * @returns {object}
  */
+export function extractTrendPublicContract(trend) {
+  const normalized = normalizeWorkflowTrend(trend);
+  const timestamps = normalized.trends.successRate
+    .map((point) => point.generatedAt)
+    .filter((value) => typeof value === "string");
+
+  /** @type {object[]} */
+  const snapshots = normalized.trends.successRate.map((point, index) => ({
+    generatedAt: point.generatedAt ?? null,
+    successRate: point.value ?? 0,
+    failureRate: normalized.trends.failureRate[index]?.value ?? 0,
+    resumeRate: normalized.trends.resumeRate[index]?.value ?? 0,
+    averageDurationMs: normalized.trends.duration[index]?.value ?? 0,
+    workflowHealth: normalized.trends.workflowHealth[index]?.value ?? "warning",
+  }));
+
+  return {
+    metadata: {
+      schema: normalized.schema,
+      generatedAt: normalized.generatedAt,
+    },
+    sampleCount: normalized.sampleCount,
+    periodStart: timestamps[0] ?? null,
+    periodEnd: timestamps.at(-1) ?? null,
+    latest: {
+      successRate: normalized.trends.successRate.at(-1)?.value ?? 0,
+      failureRate: normalized.trends.failureRate.at(-1)?.value ?? 0,
+      resumeRate: normalized.trends.resumeRate.at(-1)?.value ?? 0,
+      averageDurationMs: normalized.trends.duration.at(-1)?.value ?? 0,
+      workflowHealth: normalized.trends.workflowHealth.at(-1)?.value ?? "warning",
+    },
+    snapshots,
+  };
+}
+
+/**
+ * @param {string | null | undefined} trendPath
+ * @param {string} [rootDir]
+ * @returns {object}
+ */
+export function readWorkflowTrend(trendPath, rootDir = process.cwd()) {
+  const absolutePath = path.isAbsolute(trendPath ?? "")
+    ? trendPath
+    : path.join(
+        rootDir,
+        trendPath ?? `${WORKFLOW_TREND_REPORT_DIR}/${WORKFLOW_TREND_JSON_FILENAME}`,
+      );
+
+  if (!fs.existsSync(absolutePath)) {
+    return buildWorkflowTrend([]);
+  }
+
+  const raw = fs.readFileSync(absolutePath, "utf8");
+  return JSON.parse(raw);
+}
+
+/**
+ * @param {string} [rootDir]
+ * @returns {object[]}
+ */
+export function readTrendDashboardPublicContracts(rootDir = process.cwd()) {
+  return readWorkflowTrendSnapshots(rootDir).map((contract) =>
+    normalizeTrendPublicContract(contract),
+  );
+}
+
+/**
+ * @param {object | null | undefined} trend
+ * @returns {object}
+ */
 export function normalizeWorkflowTrend(trend) {
   if (!trend || typeof trend !== "object") {
     return buildWorkflowTrend([]);

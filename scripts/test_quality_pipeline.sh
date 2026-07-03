@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.38.0 --"
+echo "-- Test 98: VERSION updated to v1.39.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.38.0**（Trend Analytics Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.38.0");
+if (!versionDoc.includes("**v1.39.0**（Historical Analytics Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.39.0");
 }
-console.log("VERSION v1.38.0 ok");
+console.log("VERSION v1.39.0 ok");
 EOF
-pass "VERSION updated to v1.38.0"
+pass "VERSION updated to v1.39.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.39.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.39.0");
+if (payload.nextVersion !== "v1.40.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.40.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.39.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.39.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.40.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.40.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.39.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.40.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -10276,6 +10276,394 @@ for (const forbidden of [
 console.log("workflow trend excludes forecast prediction anomaly ok");
 EOF
 pass "workflow trend excludes forecast prediction anomaly"
+
+echo "-- Test 289: extractTrendPublicContract exposes public trend contract --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  extractTrendPublicContract,
+  parseTrendInputs,
+} from "./src/lib/developer_workflow_trend.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const trend = buildWorkflowTrend(
+  parseTrendInputs([
+    {
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: { runCount: 1, stepCount: 1, totalDurationMs: 5000, resumeCount: 0 },
+      metrics: { runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+    },
+  ]),
+);
+
+const contract = extractTrendPublicContract(trend);
+if (contract.sampleCount !== 1) {
+  throw new Error("trend public contract sampleCount mismatch");
+}
+if (contract.latest.successRate !== 1) {
+  throw new Error("trend public contract latest successRate mismatch");
+}
+if ("trends" in contract) {
+  throw new Error("trend public contract must not expose internal trends");
+}
+
+console.log("extractTrendPublicContract exposes public trend contract ok");
+EOF
+pass "extractTrendPublicContract exposes public trend contract"
+
+echo "-- Test 290: workflow-history-analytics schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_HISTORY_ANALYTICS_SCHEMA,
+  buildWorkflowHistoryAnalytics,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import { extractDashboardPublicContract } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract } from "./src/lib/developer_workflow_trend.js";
+
+const analytics = buildWorkflowHistoryAnalytics({
+  dashboardContract: extractDashboardPublicContract(null),
+  trendContract: extractTrendPublicContract(null),
+  snapshotContracts: [],
+});
+
+if (analytics.schema !== WORKFLOW_HISTORY_ANALYTICS_SCHEMA) {
+  throw new Error("workflow-history-analytics schema constant mismatch");
+}
+if (WORKFLOW_HISTORY_ANALYTICS_SCHEMA !== "developer-automation/workflow-history-analytics/1.0") {
+  throw new Error("WORKFLOW_HISTORY_ANALYTICS_SCHEMA mismatch");
+}
+
+console.log("workflow-history-analytics schema constant ok");
+EOF
+pass "workflow-history-analytics schema constant"
+
+echo "-- Test 291: historical analytics handles empty dataset --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryAnalytics,
+  validateWorkflowHistoryAnalytics,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import { extractDashboardPublicContract } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract } from "./src/lib/developer_workflow_trend.js";
+
+const analytics = buildWorkflowHistoryAnalytics({
+  dashboardContract: extractDashboardPublicContract(null),
+  trendContract: extractTrendPublicContract(null),
+  snapshotContracts: [],
+});
+const validation = validateWorkflowHistoryAnalytics(analytics);
+
+if (!validation.valid) {
+  throw new Error(`empty historical analytics must validate: ${validation.errors.join("; ")}`);
+}
+if (analytics.summary.totalRuns !== 0 || analytics.coverage.sampleCount !== 0) {
+  throw new Error("empty historical analytics must use zero counts");
+}
+
+console.log("historical analytics handles empty dataset ok");
+EOF
+pass "historical analytics handles empty dataset"
+
+echo "-- Test 292: historical analytics handles missing data safely --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryAnalytics,
+} from "./src/lib/developer_workflow_history_analytics.js";
+
+const analytics = buildWorkflowHistoryAnalytics({});
+if (analytics.summary.totalRuns !== 0 || analytics.coverage.missingSnapshots !== 0) {
+  throw new Error("missing historical inputs must degrade safely");
+}
+
+console.log("historical analytics handles missing data safely ok");
+EOF
+pass "historical analytics handles missing data safely"
+
+echo "-- Test 293: historical analytics stable ordering for snapshots --"
+node --input-type=module <<'EOF'
+import { parseHistoricalInputs } from "./src/lib/developer_workflow_history_analytics.js";
+
+const parsed = parseHistoricalInputs(null, null, [
+  {
+    metadata: { generatedAt: "2026-07-02T00:00:03.000Z" },
+    summary: { runCount: 3, stepCount: 3, totalDurationMs: 3000 },
+    metrics: { successfulRuns: 2, failedRuns: 1, resumedRuns: 1 },
+    status: { workflowHealth: "warning" },
+  },
+  {
+    metadata: { generatedAt: "2026-07-02T00:00:01.000Z" },
+    summary: { runCount: 1, stepCount: 1, totalDurationMs: 1000 },
+    metrics: { successfulRuns: 1, failedRuns: 0, resumedRuns: 0 },
+    status: { workflowHealth: "healthy" },
+  },
+]);
+
+if (
+  parsed.snapshotContracts.map((item) => item.metadata.generatedAt).join(",") !==
+  "2026-07-02T00:00:01.000Z,2026-07-02T00:00:03.000Z"
+) {
+  throw new Error("historical analytics must stable-sort snapshots chronologically");
+}
+
+console.log("historical analytics stable ordering for snapshots ok");
+EOF
+pass "historical analytics stable ordering for snapshots"
+
+echo "-- Test 294: workflow-history-analytics.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_HISTORY_ANALYTICS_SCHEMA,
+  buildWorkflowHistoryAnalyticsFromReports,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  writeWorkflowDashboardReport,
+} from "./src/lib/developer_workflow_dashboard.js";
+import {
+  buildWorkflowTrend,
+  writeWorkflowTrendReport,
+} from "./src/lib/developer_workflow_trend.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+writeWorkflowDashboardReport(
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    source: { schema: WORKFLOW_TIMELINE_SCHEMA, path: "reports/developer-workflow/latest/workflow-timeline.json" },
+    status: "success",
+    summary: {
+      runCount: 2,
+      stepCount: 4,
+      successCount: 2,
+      failedCount: 0,
+      resumeCount: 1,
+      totalDurationMs: 4000,
+      averageDurationMs: 2000,
+    },
+    metrics: {
+      runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 },
+      steps: { completed: 4, failed: 0, skipped: 0, stopped: 0, unknown: 0 },
+      duration: { totalMs: 4000, averageMs: 2000, minMs: 1000, maxMs: 3000 },
+      resume: { count: 1, rate: 0.5 },
+    },
+    runs: [],
+    warnings: [],
+  },
+  PROJECT_ROOT,
+);
+writeWorkflowTrendReport(buildWorkflowTrend([]), PROJECT_ROOT);
+buildWorkflowHistoryAnalyticsFromReports({ rootDir: PROJECT_ROOT });
+
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/workflow-history-analytics/workflow-history-analytics.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_HISTORY_ANALYTICS_SCHEMA) {
+  throw new Error("workflow-history-analytics.json schema mismatch");
+}
+if (!payload.coverage || !payload.summary || !payload.workflowHealth) {
+  throw new Error("workflow-history-analytics.json must include coverage summary workflowHealth");
+}
+
+console.log("workflow-history-analytics.json generated ok");
+EOF
+pass "workflow-history-analytics.json generated"
+
+echo "-- Test 295: historical-report.md generated --"
+test -f reports/workflow-history-analytics/historical-report.md
+grep -q "# Workflow Historical Analytics Report" reports/workflow-history-analytics/historical-report.md
+grep -q "## Data Coverage" reports/workflow-history-analytics/historical-report.md
+grep -q "## Workflow Health Distribution" reports/workflow-history-analytics/historical-report.md
+pass "historical-report.md generated"
+
+echo "-- Test 296: historical analytics CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryAnalytics,
+  buildWorkflowHistoryAnalyticsCliSummary,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import { extractDashboardPublicContract } from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+import { extractTrendPublicContract, buildWorkflowTrend } from "./src/lib/developer_workflow_trend.js";
+
+const summary = buildWorkflowHistoryAnalyticsCliSummary(
+  buildWorkflowHistoryAnalytics({
+    dashboardContract: extractDashboardPublicContract({
+      schema: WORKFLOW_DASHBOARD_SCHEMA,
+      generatedAt: "2026-07-02T00:00:00.000Z",
+      status: "success",
+      summary: { runCount: 2, stepCount: 4, totalDurationMs: 24000, resumeCount: 1 },
+      metrics: { runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 1 } },
+    }),
+    trendContract: extractTrendPublicContract(buildWorkflowTrend([])),
+    snapshotContracts: [],
+  }),
+);
+
+for (const expected of [
+  "Workflow Historical Analytics Summary",
+  "Runs: 2",
+  "Success Rate: 100%",
+  "Resume Rate: 50%",
+  "Average Duration: 12 sec",
+  "Workflow Health:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`historical analytics CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("historical analytics CLI summary ok");
+EOF
+npm run developer:history-analytics >/tmp/developer_workflow_history_analytics_cli.log 2>&1
+grep -q "Workflow Historical Analytics Summary" /tmp/developer_workflow_history_analytics_cli.log
+grep -q "workflow-history-analytics.json" /tmp/developer_workflow_history_analytics_cli.log
+grep -q "historical-report.md" /tmp/developer_workflow_history_analytics_cli.log
+pass "historical analytics CLI summary"
+
+echo "-- Test 297: historical analytics does not reference dashboard internal --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_history_analytics.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "dashboard.runs",
+  "dashboard.warnings",
+  "dashboard.source",
+  "metrics.runs.completed",
+  "developer_workflow_timeline.js",
+  "developer_workflow_history.js",
+  "workflow-timeline.json",
+  "workflow-history.json",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`historical analytics must not reference ${forbidden}`);
+  }
+}
+
+console.log("historical analytics does not reference dashboard internal ok");
+EOF
+pass "historical analytics does not reference dashboard internal"
+
+echo "-- Test 298: historical analytics does not reference trend internal --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_history_analytics.js"),
+  "utf8",
+);
+
+if (!source.includes("extractTrendPublicContract")) {
+  throw new Error("historical analytics must use extractTrendPublicContract");
+}
+
+for (const forbidden of [
+  "trend.trends",
+  "trends.successRate",
+  "trends.failureRate",
+  "normalizeWorkflowTrend(",
+  "buildWorkflowTrend(",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`historical analytics must not reference trend internal ${forbidden}`);
+  }
+}
+
+console.log("historical analytics does not reference trend internal ok");
+EOF
+pass "historical analytics does not reference trend internal"
+
+echo "-- Test 299: historical analytics uses public contracts --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowHistoryAnalytics,
+  parseHistoricalInputs,
+} from "./src/lib/developer_workflow_history_analytics.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+import { buildWorkflowTrend, parseTrendInputs } from "./src/lib/developer_workflow_trend.js";
+
+const inputs = parseHistoricalInputs(
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    status: "mixed",
+    summary: { runCount: 4, stepCount: 8, totalDurationMs: 8000, resumeCount: 2 },
+    metrics: { runs: { completed: 3, failed: 1, stopped: 0, unknown: 0 }, resume: { count: 2 } },
+  },
+  buildWorkflowTrend(
+    parseTrendInputs([
+      {
+        schema: WORKFLOW_DASHBOARD_SCHEMA,
+        generatedAt: "2026-07-02T00:00:00.000Z",
+        status: "success",
+        summary: { runCount: 1, stepCount: 1, totalDurationMs: 1000, resumeCount: 0 },
+        metrics: { runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+      },
+      {
+        schema: WORKFLOW_DASHBOARD_SCHEMA,
+        generatedAt: "2026-07-02T00:00:01.000Z",
+        status: "failed",
+        summary: { runCount: 1, stepCount: 1, totalDurationMs: 2000, resumeCount: 1 },
+        metrics: { runs: { completed: 0, failed: 1, stopped: 0, unknown: 0 }, resume: { count: 1 } },
+      },
+    ]),
+  ),
+  [],
+);
+
+const analytics = buildWorkflowHistoryAnalytics(inputs);
+if (analytics.summary.totalRuns !== 4 || analytics.summary.successCount !== 3) {
+  throw new Error("historical analytics must aggregate dashboard public contract summary");
+}
+if (analytics.workflowHealth.healthy + analytics.workflowHealth.warning + analytics.workflowHealth.critical !== 2) {
+  throw new Error("historical analytics must derive health distribution from trend public contract");
+}
+
+console.log("historical analytics uses public contracts ok");
+EOF
+pass "historical analytics uses public contracts"
+
+echo "-- Test 300: historical analytics excludes forecast prediction anomaly --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/developer_workflow_history_analytics.js",
+  "scripts/run_developer_workflow_history_analytics.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbiddenWord of ["forecast", "prediction", "anomaly", "correlation", "root cause"]) {
+  if (new RegExp(`\\b${forbiddenWord}\\b`, "i").test(combined)) {
+    throw new Error(`historical analytics must not include forbidden feature word: ${forbiddenWord}`);
+  }
+}
+
+console.log("historical analytics excludes forecast prediction anomaly ok");
+EOF
+pass "historical analytics excludes forecast prediction anomaly"
 
 echo ""
 echo "All quality pipeline tests passed."
