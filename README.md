@@ -1170,6 +1170,54 @@ Latest Current Step
 release-plan
 ```
 
+### Publishing Foundation（v1.45.0）
+
+**Publishing Foundation** を Application Layer に追加しました。v1.44.0 の **Image Generation Public Contract**（`extractImageGenerationPublicContract()`）のみを入力とし、Instagram 投稿用 **Publishing Package** を生成します。
+
+Instagram API / Scheduler / OAuth / Upload / Retry / Queue は実装しません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `publishing/1.0` |
+| JSON | `output/publishing/publishing.json` |
+| Markdown | `output/publishing/publishing.md` |
+| CLI | `npm run publishing` |
+| Public Contract | `extractPublishingPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Image Generation (v1.44.0)
+        ↓
+Publishing (v1.45.0) ← 今回
+        ↓
+Analytics → Continuous Improvement
+```
+
+#### MVP Scope
+
+Publishing Package Builder / Normalizer / Validator / JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+Instagram API / X API / Facebook API / Threads API / Scheduler / OAuth / Upload / Retry / Queue / Analytics
+
+#### CLI 出力例
+
+```text
+Publishing Summary
+
+Packages : 5
+Platform : instagram
+Ready    : 5
+Draft    : 5
+Output   : output/publishing/
+```
+
+#### gitignore
+
+`output/publishing/` は `.gitignore` 対象です。
+
 ### Image Generation Foundation（v1.44.0）
 
 **Image Generation Foundation** を Application Layer に追加しました。v1.43.0 の **Content Generation Public Contract**（`extractContentGenerationPublicContract()`）のみを入力とし、Instagram 投稿用の **画像生成 Prompt** を deterministic に生成します。

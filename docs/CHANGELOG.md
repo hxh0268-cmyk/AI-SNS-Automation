@@ -4,6 +4,36 @@
 
 ---
 
+## v1.45.0 — 機能追加（Publishing Foundation）
+
+Image Generation Public Contract から **Publishing Package** を生成する **Publishing Foundation** を追加しました。Instagram API / Scheduler / Upload は実装しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Publishing schema | `publishing/1.0` |
+| Package Builder | `buildPublishingPackages()` — deterministic package 生成 |
+| Public Contract | `extractPublishingPublicContract()` |
+| 出力 | `output/publishing/publishing.json` / `publishing.md` |
+| CLI | `npm run publishing` |
+| Test 366–378 | Parser / Builder / Validator / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **Image Public Contract Only** — `extractImageGenerationPublicContract()` のみ入力
+- **Package のみ** — API / OAuth / Scheduler / Upload / Retry / Queue / Analytics 非実装
+- **MVP 固定値** — platform `instagram`, format `feed`, status `draft`
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **378 PASS**（Test 366–378 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.44.0 — 機能追加（Image Generation Foundation）
 
 Content Generation Public Contract から Instagram 投稿用 **画像生成 Prompt** を生成する **Image Generation Foundation** を追加しました。画像そのものは生成しません。

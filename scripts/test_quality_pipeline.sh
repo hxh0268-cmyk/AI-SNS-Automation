@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.44.0 --"
+echo "-- Test 98: VERSION updated to v1.45.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.44.0**（Image Generation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.44.0");
+if (!versionDoc.includes("**v1.45.0**（Publishing Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.45.0");
 }
-console.log("VERSION v1.44.0 ok");
+console.log("VERSION v1.45.0 ok");
 EOF
-pass "VERSION updated to v1.44.0"
+pass "VERSION updated to v1.45.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.45.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.45.0");
+if (payload.nextVersion !== "v1.46.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.46.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.45.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.45.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.46.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.46.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.45.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.46.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -12330,6 +12330,348 @@ console.log("v1.43.0 content generation backward compatibility preserved ok");
 EOF
 grep -q "Content Generation Summary" /tmp/content_generate_backward_compat_v143.log
 pass "v1.43.0 content generation backward compatibility preserved"
+
+echo "-- Test 366: publishing.js exists --"
+test -f src/lib/publishing.js
+grep -q "PUBLISHING_SCHEMA" src/lib/publishing.js
+grep -q "buildPublishingPackages" src/lib/publishing.js
+grep -q "extractPublishingPublicContract" src/lib/publishing.js
+pass "publishing.js exists"
+
+echo "-- Test 367: publishing input parser --"
+node --input-type=module <<'EOF'
+import { parsePublishingArgs } from "./src/lib/publishing.js";
+import { extractImageGenerationPublicContract } from "./src/lib/image_generation.js";
+
+const contract = extractImageGenerationPublicContract({
+  schema: "image-generation/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  imagePrompts: [
+    {
+      id: "img-prompt-001",
+      sourceDraftId: "draft-001",
+      title: "Seasonal Menu",
+      prompt: "Instagram photo, seasonal menu",
+      style: "photorealistic",
+      aspectRatio: "1:1",
+      rank: 1,
+    },
+  ],
+});
+const parsed = parsePublishingArgs(null, contract);
+
+if (parsed.imageContract.summary.promptCount !== 1) {
+  throw new Error("publishing input parser must preserve image generation public contract");
+}
+
+console.log("publishing input parser ok");
+EOF
+pass "publishing input parser"
+
+echo "-- Test 368: publishing uses image generation public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/publishing.js"),
+  "utf8",
+);
+
+if (!source.includes("extractImageGenerationPublicContract")) {
+  throw new Error("publishing must use extractImageGenerationPublicContract");
+}
+
+for (const forbidden of [
+  "generateImagePrompts(",
+  "normalizeImageGeneration(",
+  "imagePrompt.mood",
+  "imagePrompt.subject",
+  "imagePrompt.composition",
+  "IMAGE_GENERATION_PROVIDER",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`publishing must not reference image generation internal ${forbidden}`);
+  }
+}
+
+console.log("publishing uses image generation public contract only ok");
+EOF
+pass "publishing uses image generation public contract only"
+
+echo "-- Test 369: publishing package builder --"
+node --input-type=module <<'EOF'
+import {
+  buildPublishingPackageFromPrompt,
+  buildPublishingPackages,
+} from "./src/lib/publishing.js";
+import { extractImageGenerationPublicContract } from "./src/lib/image_generation.js";
+
+const contract = extractImageGenerationPublicContract({
+  schema: "image-generation/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  imagePrompts: [
+    {
+      id: "img-prompt-001",
+      sourceDraftId: "draft-001",
+      title: "Menu Spotlight",
+      prompt: "Instagram photo, menu spotlight",
+      style: "photorealistic",
+      aspectRatio: "1:1",
+      rank: 1,
+    },
+  ],
+});
+const output = buildPublishingPackages(contract, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+
+if (output.packages.length !== 1) {
+  throw new Error("publishing package builder must create one package per image prompt");
+}
+
+const pkg = buildPublishingPackageFromPrompt(contract.imagePrompts[0], 0);
+if (pkg.platform !== "instagram" || pkg.format !== "feed" || pkg.status !== "draft") {
+  throw new Error("publishing package builder must use MVP fixed values");
+}
+if (pkg.asset.type !== "image-prompt" || pkg.asset.ready !== true) {
+  throw new Error("publishing package builder must set asset metadata");
+}
+
+console.log("publishing package builder ok");
+EOF
+pass "publishing package builder"
+
+echo "-- Test 370: publishing package normalizer --"
+node --input-type=module <<'EOF'
+import { buildPublishingPackages, normalizePublishingPackages } from "./src/lib/publishing.js";
+import { extractImageGenerationPublicContract } from "./src/lib/image_generation.js";
+
+const normalized = normalizePublishingPackages(
+  buildPublishingPackages(
+    extractImageGenerationPublicContract({
+      schema: "image-generation/1.0",
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      imagePrompts: [
+        {
+          id: "img-prompt-b",
+          sourceDraftId: "draft-b",
+          title: "B",
+          prompt: "prompt b",
+          style: "photorealistic",
+          aspectRatio: "1:1",
+          rank: 2,
+        },
+        {
+          id: "img-prompt-a",
+          sourceDraftId: "draft-a",
+          title: "A",
+          prompt: "prompt a",
+          style: "photorealistic",
+          aspectRatio: "1:1",
+          rank: 1,
+        },
+      ],
+    }),
+  ),
+);
+
+if (normalized.packages.map((pkg) => pkg.rank).join(",") !== "1,2") {
+  throw new Error("publishing package normalizer must stable-sort packages by rank");
+}
+
+console.log("publishing package normalizer ok");
+EOF
+pass "publishing package normalizer"
+
+echo "-- Test 371: publishing package validator --"
+node --input-type=module <<'EOF'
+import {
+  buildPublishingPipeline,
+  validatePublishingPackages,
+} from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/publishing-test-371";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildPublishingPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const validation = validatePublishingPackages(output);
+
+if (!validation.valid) {
+  throw new Error(`publishing packages must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validatePublishingPackages(null);
+if (invalid.valid) {
+  throw new Error("null publishing output must be invalid");
+}
+
+console.log("publishing package validator ok");
+EOF
+pass "publishing package validator"
+
+echo "-- Test 372: extractPublishingPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildPublishingPipeline,
+  extractPublishingPublicContract,
+} from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/publishing-test-372";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildPublishingPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const contract = extractPublishingPublicContract(output);
+
+if (contract.summary.packageCount !== output.packages.length) {
+  throw new Error("publishing public contract packageCount mismatch");
+}
+if ("source" in contract || "checklist" in contract.packages[0] || "asset" in contract.packages[0]) {
+  throw new Error("publishing public contract must not expose internal fields");
+}
+
+console.log("extractPublishingPublicContract exposes public contract ok");
+EOF
+pass "extractPublishingPublicContract exposes public contract"
+
+echo "-- Test 373: publishing.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_before_publishing.log 2>&1
+npm run content:generate >/tmp/content_generate_before_publishing.log 2>&1
+npm run image:generation >/tmp/image_generation_before_publishing.log 2>&1
+npm run publishing >/tmp/publishing_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/publishing/publishing.json", "utf8"));
+if (data.schema !== "publishing/1.0") {
+  throw new Error("publishing.json schema must be publishing/1.0");
+}
+if (!Array.isArray(data.packages) || data.packages.length === 0) {
+  throw new Error("publishing.json must include packages");
+}
+if (!data.packages.every((pkg) => pkg.caption && pkg.checklist && pkg.asset?.ready === true)) {
+  throw new Error("publishing.json package shape mismatch");
+}
+
+console.log("publishing.json generated ok");
+EOF
+pass "publishing.json generated"
+
+echo "-- Test 374: publishing.md generated --"
+test -f output/publishing/publishing.md
+grep -q "# Publishing Report" output/publishing/publishing.md
+grep -q "## Packages" output/publishing/publishing.md
+grep -q "#### Checklist" output/publishing/publishing.md
+pass "publishing.md generated"
+
+echo "-- Test 375: publishing CLI summary --"
+grep -q "Publishing Summary" /tmp/publishing_cli.log
+grep -q "Packages :" /tmp/publishing_cli.log
+grep -q "Platform : instagram" /tmp/publishing_cli.log
+grep -q "Output   : output/publishing/" /tmp/publishing_cli.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { buildPublishingCliSummary } from "./src/lib/publishing.js";
+
+const data = JSON.parse(fs.readFileSync("output/publishing/publishing.json", "utf8"));
+const summary = buildPublishingCliSummary(data);
+
+for (const expected of [
+  "Publishing Summary",
+  "Packages :",
+  "Platform : instagram",
+  "Ready    :",
+  "Draft    :",
+  "Output   : output/publishing/",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`publishing CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("publishing CLI summary ok");
+EOF
+pass "publishing CLI summary"
+
+echo "-- Test 376: publishing npm script exists --"
+grep -q '"publishing": "node scripts/run_publishing.js"' package.json
+test -f scripts/run_publishing.js
+pass "publishing npm script exists"
+
+echo "-- Test 377: publishing excludes api scheduler oauth upload retry queue analytics --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/publishing.js",
+  "scripts/run_publishing.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "Instagram API",
+  "X API",
+  "Facebook API",
+  "Threads API",
+  "Scheduler",
+  "OAuth",
+  "access_token",
+  "accessToken",
+  "Upload(",
+  "upload(",
+  "Retry",
+  "Queue",
+  "Analytics",
+  "Continuous Improvement",
+  "graph.instagram",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`publishing must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("publishing excludes api scheduler oauth upload retry queue analytics ok");
+EOF
+pass "publishing excludes api scheduler oauth upload retry queue analytics"
+
+echo "-- Test 378: v1.44.0 image generation backward compatibility preserved --"
+npm run image:generation >/tmp/image_generation_backward_compat_v144.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/image-generation/image-generation.json", "utf8"),
+);
+if (data.schema !== "image-generation/1.0") {
+  throw new Error("v1.44.0 image-generation schema must remain image-generation/1.0");
+}
+if (!Array.isArray(data.imagePrompts) || data.imagePrompts.length === 0) {
+  throw new Error("v1.44.0 image:generation output must remain valid");
+}
+
+console.log("v1.44.0 image generation backward compatibility preserved ok");
+EOF
+grep -q "Image Generation Summary" /tmp/image_generation_backward_compat_v144.log
+pass "v1.44.0 image generation backward compatibility preserved"
 
 
 echo ""
