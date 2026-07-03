@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.46.0 --"
+echo "-- Test 98: VERSION updated to v1.47.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.46.0**（Analytics Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.46.0");
+if (!versionDoc.includes("**v1.47.0**（Continuous Improvement Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.47.0");
 }
-console.log("VERSION v1.46.0 ok");
+console.log("VERSION v1.47.0 ok");
 EOF
-pass "VERSION updated to v1.46.0"
+pass "VERSION updated to v1.47.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.47.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.47.0");
+if (payload.nextVersion !== "v1.48.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.48.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.47.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.47.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.48.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.48.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.47.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.48.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13030,6 +13030,515 @@ console.log("v1.45.0 publishing backward compatibility preserved ok");
 EOF
 grep -q "Publishing Summary" /tmp/publishing_backward_compat_v145.log
 pass "v1.45.0 publishing backward compatibility preserved"
+
+echo "-- Test 392: continuous_improvement.js exists --"
+test -f src/lib/continuous_improvement.js
+node --input-type=module <<'EOF'
+import * as ci from "./src/lib/continuous_improvement.js";
+
+for (const name of [
+  "parseContinuousImprovementArgs",
+  "buildContinuousImprovement",
+  "normalizeContinuousImprovement",
+  "validateContinuousImprovement",
+  "renderContinuousImprovementMarkdown",
+  "printContinuousImprovementSummary",
+  "extractContinuousImprovementPublicContract",
+]) {
+  if (typeof ci[name] !== "function") {
+    throw new Error(`continuous improvement must export ${name}`);
+  }
+}
+
+console.log("continuous_improvement.js exists ok");
+EOF
+pass "continuous_improvement.js exists"
+
+echo "-- Test 393: continuous improvement input parser --"
+node --input-type=module <<'EOF'
+import { parseContinuousImprovementArgs } from "./src/lib/continuous_improvement.js";
+import { extractAnalyticsPublicContract } from "./src/lib/analytics.js";
+
+const contract = extractAnalyticsPublicContract({
+  schema: "analytics/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  source: "publishing-public-contract",
+  metricType: "pre-publish",
+  reports: [
+    {
+      id: "analytics-001",
+      sourcePackageId: "pkg-001",
+      title: "Menu Spotlight",
+      platform: "instagram",
+      format: "feed",
+      recommendation: "ready",
+      rank: 1,
+    },
+  ],
+  summary: {
+    reportCount: 1,
+    readyCount: 1,
+    reviewCount: 0,
+    needsWorkCount: 0,
+    averageReadinessScore: 1,
+  },
+});
+const parsed = parseContinuousImprovementArgs(null, contract);
+
+if (parsed.analyticsContract.summary.reportCount !== 1) {
+  throw new Error("continuous improvement input parser must preserve analytics public contract");
+}
+
+console.log("continuous improvement input parser ok");
+EOF
+pass "continuous improvement input parser"
+
+echo "-- Test 394: continuous improvement uses analytics public contract dependency --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/continuous_improvement.js"),
+  "utf8",
+);
+
+if (!source.includes("extractAnalyticsPublicContract")) {
+  throw new Error("continuous improvement must use extractAnalyticsPublicContract");
+}
+if (!source.includes("loadAnalyticsPublicContract")) {
+  throw new Error("continuous improvement must load analytics public contract");
+}
+
+console.log("continuous improvement uses analytics public contract dependency ok");
+EOF
+pass "continuous improvement uses analytics public contract dependency"
+
+echo "-- Test 395: continuous improvement uses analytics public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/continuous_improvement.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "buildAnalytics(",
+  "normalizeAnalytics(",
+  "buildAnalyticsReportFromPackage(",
+  "computeReadinessScore(",
+  "computeQualityScore(",
+  "computeChecklistScore(",
+  "report.readinessScore",
+  "report.qualityScore",
+  "report.checklistScore",
+  "report.flags",
+  "ANALYTICS_METRIC_TYPE",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`continuous improvement must not reference analytics internal ${forbidden}`);
+  }
+}
+
+console.log("continuous improvement uses analytics public contract only ok");
+EOF
+pass "continuous improvement uses analytics public contract only"
+
+echo "-- Test 396: continuous improvement builder --"
+node --input-type=module <<'EOF'
+import {
+  buildContinuousImprovement,
+  buildImprovementFromReport,
+} from "./src/lib/continuous_improvement.js";
+import { extractAnalyticsPublicContract } from "./src/lib/analytics.js";
+
+const contract = extractAnalyticsPublicContract({
+  schema: "analytics/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  source: "publishing-public-contract",
+  metricType: "pre-publish",
+  reports: [
+    {
+      id: "analytics-001",
+      sourcePackageId: "pkg-001",
+      title: "Menu Spotlight",
+      platform: "instagram",
+      format: "feed",
+      recommendation: "ready",
+      rank: 1,
+    },
+    {
+      id: "analytics-002",
+      sourcePackageId: "pkg-002",
+      title: "Needs Work Item",
+      platform: "instagram",
+      format: "feed",
+      recommendation: "needs-work",
+      rank: 2,
+    },
+  ],
+  summary: {
+    reportCount: 2,
+    readyCount: 1,
+    reviewCount: 0,
+    needsWorkCount: 1,
+    averageReadinessScore: 0.75,
+  },
+});
+const improvement = buildContinuousImprovement(contract, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+
+if (improvement.improvements.length !== 2) {
+  throw new Error("continuous improvement builder must create one item per report");
+}
+if (improvement.source !== "analytics-public-contract") {
+  throw new Error("continuous improvement builder must set analytics-public-contract source");
+}
+if (improvement.improvementType !== "pre-publish-improvement") {
+  throw new Error("continuous improvement builder must set pre-publish-improvement type");
+}
+if (improvement.status !== "draft-improvement") {
+  throw new Error("continuous improvement builder must set draft-improvement status");
+}
+
+const readyItem = buildImprovementFromReport(contract.reports[0], contract.summary, 0);
+const needsWorkItem = buildImprovementFromReport(contract.reports[1], contract.summary, 1);
+
+if (readyItem.suggestedAction !== "publish-ready") {
+  throw new Error("ready recommendation must map to publish-ready action");
+}
+if (needsWorkItem.suggestedAction !== "revise-package") {
+  throw new Error("needs-work recommendation must map to revise-package action");
+}
+if (!readyItem.reason.includes("recommendation:ready")) {
+  throw new Error("continuous improvement builder must include reason");
+}
+if (!Array.isArray(readyItem.nextCheck) || readyItem.nextCheck.length === 0) {
+  throw new Error("continuous improvement builder must include nextCheck");
+}
+
+console.log("continuous improvement builder ok");
+EOF
+pass "continuous improvement builder"
+
+echo "-- Test 397: continuous improvement normalizer --"
+node --input-type=module <<'EOF'
+import {
+  buildContinuousImprovement,
+  normalizeContinuousImprovement,
+} from "./src/lib/continuous_improvement.js";
+import { extractAnalyticsPublicContract } from "./src/lib/analytics.js";
+
+const normalized = normalizeContinuousImprovement(
+  buildContinuousImprovement(
+    extractAnalyticsPublicContract({
+      schema: "analytics/1.0",
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      source: "publishing-public-contract",
+      metricType: "pre-publish",
+      reports: [
+        {
+          id: "analytics-b",
+          sourcePackageId: "pkg-b",
+          title: "B Title",
+          platform: "instagram",
+          format: "feed",
+          recommendation: "needs-work",
+          rank: 2,
+        },
+        {
+          id: "analytics-a",
+          sourcePackageId: "pkg-a",
+          title: "A Title",
+          platform: "instagram",
+          format: "feed",
+          recommendation: "ready",
+          rank: 1,
+        },
+      ],
+      summary: {
+        reportCount: 2,
+        readyCount: 1,
+        reviewCount: 0,
+        needsWorkCount: 1,
+        averageReadinessScore: 0.75,
+      },
+    }),
+  ),
+);
+
+if (normalized.improvements[0].priorityScore >= normalized.improvements[1].priorityScore) {
+  throw new Error("continuous improvement normalizer must stable-sort by priority score");
+}
+
+console.log("continuous improvement normalizer ok");
+EOF
+pass "continuous improvement normalizer"
+
+echo "-- Test 398: continuous improvement validator --"
+node --input-type=module <<'EOF'
+import {
+  buildContinuousImprovementPipeline,
+  validateContinuousImprovement,
+} from "./src/lib/continuous_improvement.js";
+import { buildAnalyticsPipeline } from "./src/lib/analytics.js";
+import { buildPublishingPipeline } from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/continuous-improvement-test-398";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildPublishingPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildAnalyticsPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { improvement } = buildContinuousImprovementPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const validation = validateContinuousImprovement(improvement);
+
+if (!validation.valid) {
+  throw new Error(`continuous improvement must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateContinuousImprovement(null);
+if (invalid.valid) {
+  throw new Error("null continuous improvement must be invalid");
+}
+
+console.log("continuous improvement validator ok");
+EOF
+pass "continuous improvement validator"
+
+echo "-- Test 399: extractContinuousImprovementPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildContinuousImprovementPipeline,
+  extractContinuousImprovementPublicContract,
+} from "./src/lib/continuous_improvement.js";
+import { buildAnalyticsPipeline } from "./src/lib/analytics.js";
+import { buildPublishingPipeline } from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/continuous-improvement-test-399";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildPublishingPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildAnalyticsPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { improvement } = buildContinuousImprovementPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const contract = extractContinuousImprovementPublicContract(improvement);
+
+if (contract.summary.improvementCount !== improvement.improvements.length) {
+  throw new Error("continuous improvement public contract improvementCount mismatch");
+}
+if ("reason" in contract.improvements[0] || "nextCheck" in contract.improvements[0]) {
+  throw new Error("continuous improvement public contract must not expose internal reason details");
+}
+if ("flags" in contract.improvements[0] || "priorityScore" in contract.improvements[0]) {
+  throw new Error("continuous improvement public contract must not expose internal score details");
+}
+
+console.log("extractContinuousImprovementPublicContract exposes public contract ok");
+EOF
+pass "extractContinuousImprovementPublicContract exposes public contract"
+
+echo "-- Test 400: improvement.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_before_continuous_improvement.log 2>&1
+npm run content:generate >/tmp/content_generate_before_continuous_improvement.log 2>&1
+npm run image:generation >/tmp/image_generation_before_continuous_improvement.log 2>&1
+npm run publishing >/tmp/publishing_before_continuous_improvement.log 2>&1
+npm run analytics >/tmp/analytics_before_continuous_improvement.log 2>&1
+npm run continuous:improvement >/tmp/continuous_improvement_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/continuous-improvement/improvement.json", "utf8"));
+if (data.schema !== "continuous-improvement/1.0") {
+  throw new Error("improvement.json schema must be continuous-improvement/1.0");
+}
+if (data.source !== "analytics-public-contract") {
+  throw new Error("improvement.json source must be analytics-public-contract");
+}
+if (!Array.isArray(data.improvements) || data.improvements.length === 0) {
+  throw new Error("improvement.json must include improvements");
+}
+if (
+  !data.improvements.every(
+    (item) =>
+      item.suggestedAction &&
+      Array.isArray(item.nextCheck) &&
+      Array.isArray(item.flags),
+  )
+) {
+  throw new Error("improvement.json item shape mismatch");
+}
+
+console.log("improvement.json generated ok");
+EOF
+pass "improvement.json generated"
+
+echo "-- Test 401: improvement.md generated --"
+test -f output/continuous-improvement/improvement.md
+grep -q "# Continuous Improvement Report" output/continuous-improvement/improvement.md
+grep -q "## Improvements" output/continuous-improvement/improvement.md
+grep -q "| Suggested Action |" output/continuous-improvement/improvement.md
+pass "improvement.md generated"
+
+echo "-- Test 402: continuous improvement CLI summary --"
+grep -q "Continuous Improvement Summary" /tmp/continuous_improvement_cli.log
+grep -q "improvement.json" /tmp/continuous_improvement_cli.log
+grep -q "improvement.md" /tmp/continuous_improvement_cli.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { printContinuousImprovementSummary } from "./src/lib/continuous_improvement.js";
+
+const data = JSON.parse(fs.readFileSync("output/continuous-improvement/improvement.json", "utf8"));
+const summary = printContinuousImprovementSummary(data);
+
+for (const expected of [
+  "Continuous Improvement Summary",
+  "Improvements:",
+  "Publish Ready:",
+  "Review Content:",
+  "Revise Package:",
+  "High Priority:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`continuous improvement CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("continuous improvement CLI summary ok");
+EOF
+pass "continuous improvement CLI summary"
+
+echo "-- Test 403: continuous improvement npm script exists --"
+grep -q '"continuous:improvement": "node scripts/run_continuous_improvement.js"' package.json
+test -f scripts/run_continuous_improvement.js
+pass "continuous improvement npm script exists"
+
+echo "-- Test 404: recommendation to priority mapping --"
+node --input-type=module <<'EOF'
+import {
+  computePriorityScore,
+  resolvePriority,
+  resolveSuggestedAction,
+} from "./src/lib/continuous_improvement.js";
+
+const readyAction = resolveSuggestedAction("ready");
+const reviewAction = resolveSuggestedAction("review");
+const needsWorkAction = resolveSuggestedAction("needs-work");
+
+if (readyAction !== "publish-ready") {
+  throw new Error("ready must map to publish-ready");
+}
+if (reviewAction !== "review-content") {
+  throw new Error("review must map to review-content");
+}
+if (needsWorkAction !== "revise-package") {
+  throw new Error("needs-work must map to revise-package");
+}
+
+const needsWorkPriority = resolvePriority("needs-work", 1);
+const reviewPriority = resolvePriority("review", 1);
+const readyPriority = resolvePriority("ready", 3);
+
+if (needsWorkPriority !== "high" || reviewPriority !== "medium" || readyPriority !== "low") {
+  throw new Error("recommendation to priority mapping mismatch");
+}
+
+const needsWorkScore = computePriorityScore("needs-work", 1);
+const reviewScore = computePriorityScore("review", 1);
+const readyScore = computePriorityScore("ready", 1);
+
+if (!(needsWorkScore < reviewScore && reviewScore < readyScore)) {
+  throw new Error("priority score must order needs-work before review before ready");
+}
+
+const rankOne = computePriorityScore("needs-work", 1);
+const rankTwo = computePriorityScore("needs-work", 2);
+if (rankOne >= rankTwo) {
+  throw new Error("lower rank must produce lower priority score within same recommendation");
+}
+
+console.log("recommendation to priority mapping ok");
+EOF
+pass "recommendation to priority mapping"
+
+echo "-- Test 405: continuous improvement excludes external integrations and llm automation --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/continuous_improvement.js",
+  "scripts/run_continuous_improvement.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "Instagram API",
+  "X API",
+  "Facebook API",
+  "Threads API",
+  "OAuth",
+  "access_token",
+  "accessToken",
+  "scheduler",
+  "Retry",
+  "Queue",
+  "database",
+  "Metrics API",
+  "graph.instagram",
+  "insights",
+  "from \"openai\"",
+  "@google/genai",
+  "auto-repost",
+  "autoRepost",
+  "LLM",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`continuous improvement must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("continuous improvement excludes external integrations and llm automation ok");
+EOF
+pass "continuous improvement excludes external integrations and llm automation"
+
+echo "-- Test 406: v1.46.0 analytics backward compatibility preserved --"
+npm run analytics >/tmp/analytics_backward_compat_v146.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/analytics/analytics.json", "utf8"));
+if (data.schema !== "analytics/1.0") {
+  throw new Error("v1.46.0 analytics schema must remain analytics/1.0");
+}
+if (!Array.isArray(data.reports) || data.reports.length === 0) {
+  throw new Error("v1.46.0 analytics output must remain valid");
+}
+
+console.log("v1.46.0 analytics backward compatibility preserved ok");
+EOF
+grep -q "Analytics Summary" /tmp/analytics_backward_compat_v146.log
+pass "v1.46.0 analytics backward compatibility preserved"
 
 
 echo ""

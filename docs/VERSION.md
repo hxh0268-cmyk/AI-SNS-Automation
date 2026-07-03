@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.46.0**（Analytics Foundation）
+**v1.47.0**（Continuous Improvement Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.47.0 Continuous Improvement Foundation
+**Next Candidate:** v1.48.0
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.47.0** | **機能追加** | **✅ 完了** | **Continuous Improvement Foundation / Analytics Public Contract から pre-publish 改善 MVP** |
 | **v1.46.0** | **機能追加** | **✅ 完了** | **Analytics Foundation / Publishing Public Contract から pre-publish Analytics MVP** |
 | **v1.45.0** | **機能追加** | **✅ 完了** | **Publishing Foundation / Image Public Contract から Publishing Package MVP** |
 | **v1.44.0** | **機能追加** | **✅ 完了** | **Image Generation Foundation / Content Public Contract から画像 Prompt MVP** |
@@ -68,6 +69,43 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.47.0 で追加（Continuous Improvement Foundation）
+
+#### Pre-publish Continuous Improvement MVP
+
+- **`buildContinuousImprovement()`** … Analytics Public Contract から priority / suggestedAction / reason
+- **`extractContinuousImprovementPublicContract()`** … 後続レイヤー向け Public Contract
+- **入力** … `extractAnalyticsPublicContract()` のみ
+- **出力** … `output/continuous-improvement/improvement.json` / `improvement.md`
+- **CLI** … `npm run continuous:improvement`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.48.0** | Application Layer 次フェーズ候補 |
+
+### 品質状況（v1.47.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **406 PASS** |
+| npm test | **PASS** |
+
+### v1.47.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| continuous-improvement/1.0 schema | ✅ |
+| Continuous Improvement Builder / Validator / CLI | ✅ |
+| extractContinuousImprovementPublicContract | ✅ |
+| Analytics Public Contract Only | ✅ |
+| 外部 Metrics API / LLM / Database 非実装 | ✅ |
+| v1.46.0 後方互換 | ✅ |
+| Test 392–406 | ✅ |
 
 ---
 

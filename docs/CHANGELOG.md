@@ -4,6 +4,37 @@
 
 ---
 
+## v1.47.0 — 機能追加（Continuous Improvement Foundation）
+
+Analytics Public Contract から **pre-publish Continuous Improvement Report** を生成する **Continuous Improvement Foundation** を追加しました。LLM 自動改善 / 自動再投稿 / 外部 Metrics API は実装しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Continuous Improvement schema | `continuous-improvement/1.0` |
+| Improvement Builder | `buildContinuousImprovement()` — priority / suggestedAction / reason |
+| Public Contract | `extractContinuousImprovementPublicContract()` |
+| 出力 | `output/continuous-improvement/improvement.json` / `improvement.md` |
+| CLI | `npm run continuous:improvement` |
+| Test 392–406 | Parser / Builder / Validator / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **Analytics Public Contract Only** — `extractAnalyticsPublicContract()` のみ入力
+- **pre-publish 改善** — improvementType `pre-publish-improvement`、status `draft-improvement`
+- **ルールベース改善** — recommendation から suggestedAction / priority を固定ルールで生成
+- **外部 API 非接続** — Instagram API / Scheduler / Database / Metrics API / LLM 非実装
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **406 PASS**（Test 392–406 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.46.0 — 機能追加（Analytics Foundation）
 
 Publishing Public Contract から **pre-publish Analytics Report** を生成する **Analytics Foundation** を追加しました。外部 Metrics API / 実投稿データ収集は実装しません。

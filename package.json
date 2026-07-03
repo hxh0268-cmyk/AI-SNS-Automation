@@ -45,6 +45,7 @@
     "content:generate": "node scripts/run_content_generation.js",
     "image:generation": "node scripts/run_image_generation.js",
     "publishing": "node scripts/run_publishing.js",
-    "analytics": "node scripts/run_analytics.js"
+    "analytics": "node scripts/run_analytics.js",
+    "continuous:improvement": "node scripts/run_continuous_improvement.js"
   }
 }

@@ -1170,6 +1170,55 @@ Latest Current Step
 release-plan
 ```
 
+### Continuous Improvement Foundation（v1.47.0）
+
+**Continuous Improvement Foundation** を Application Layer に追加しました。v1.46.0 の **Analytics Public Contract**（`extractAnalyticsPublicContract()`）のみを入力とし、**pre-publish Continuous Improvement Report** を生成します。
+
+LLM 自動改善 / 自動再投稿 / 外部 Metrics API / Instagram API / Database / 実投稿データ収集は実装しません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `continuous-improvement/1.0` |
+| JSON | `output/continuous-improvement/improvement.json` |
+| Markdown | `output/continuous-improvement/improvement.md` |
+| CLI | `npm run continuous:improvement` |
+| Public Contract | `extractContinuousImprovementPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Publishing (v1.45.0)
+        ↓
+Analytics (v1.46.0)
+        ↓
+Continuous Improvement (v1.47.0) ← 今回（pre-publish 改善）
+        ↓
+Next Layer（未着手）
+```
+
+#### MVP Scope
+
+Priority / Suggested Action（publish-ready / review-content / revise-package）/ Reason / Next Check / JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+Instagram API / OAuth / Scheduler / Upload / Retry / Queue / Database / 外部 Metrics API / LLM 自動改善 / 自動再投稿 / 実投稿データ収集
+
+#### CLI 出力例
+
+```text
+Continuous Improvement Summary
+Improvements: 5
+Publish Ready: 5
+Review Content: 0
+Revise Package: 0
+High Priority: 0
+```
+
+#### gitignore
+
+`output/continuous-improvement/` は `.gitignore` 対象です。
+
 ### Analytics Foundation（v1.46.0）
 
 **Analytics Foundation** を Application Layer に追加しました。v1.45.0 の **Publishing Public Contract**（`extractPublishingPublicContract()`）のみを入力とし、**pre-publish Analytics Report** を生成します。
@@ -1189,9 +1238,9 @@ release-plan
 ```text
 Publishing (v1.45.0)
         ↓
-Analytics (v1.46.0) ← 今回（pre-publish 分析）
+Analytics (v1.46.0) ← pre-publish 分析
         ↓
-Continuous Improvement（未着手）
+Continuous Improvement (v1.47.0) ← pre-publish 改善
 ```
 
 #### MVP Scope
