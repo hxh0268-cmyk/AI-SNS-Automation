@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.43.0 --"
+echo "-- Test 98: VERSION updated to v1.44.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.43.0**（Content Generation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.43.0");
+if (!versionDoc.includes("**v1.44.0**（Image Generation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.44.0");
 }
-console.log("VERSION v1.43.0 ok");
+console.log("VERSION v1.44.0 ok");
 EOF
-pass "VERSION updated to v1.43.0"
+pass "VERSION updated to v1.44.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.44.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.44.0");
+if (payload.nextVersion !== "v1.45.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.45.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.44.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.44.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.45.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.45.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.44.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.45.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -12043,6 +12043,293 @@ console.log("v1.42.0 AI idea generation backward compatibility preserved ok");
 EOF
 grep -q "AI Idea Summary" /tmp/content_ai_ideas_backward_compat_v142.log
 pass "v1.42.0 AI idea generation backward compatibility preserved"
+
+echo "-- Test 353: image_generation.js exists --"
+test -f src/lib/image_generation.js
+grep -q "IMAGE_GENERATION_SCHEMA" src/lib/image_generation.js
+grep -q "buildImageGeneration" src/lib/image_generation.js
+grep -q "extractImageGenerationPublicContract" src/lib/image_generation.js
+pass "image_generation.js exists"
+
+echo "-- Test 354: run_image_generation.js exists --"
+test -f scripts/run_image_generation.js
+grep -q "buildImageGenerationPipeline" scripts/run_image_generation.js
+pass "run_image_generation.js exists"
+
+echo "-- Test 355: package.json image:generation script exists --"
+grep -q '"image:generation": "node scripts/run_image_generation.js"' package.json
+pass "package.json image:generation script exists"
+
+echo "-- Test 356: image generation uses content generation public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/image_generation.js"),
+  "utf8",
+);
+
+if (!source.includes("extractContentGenerationPublicContract")) {
+  throw new Error("image generation must use extractContentGenerationPublicContract");
+}
+
+for (const forbidden of [
+  "generateContentDrafts(",
+  "normalizeContentGenerationOutput(",
+  "draft.body",
+  "draft.callToAction",
+  "draft.qualityScore",
+  "CONTENT_GENERATION_PROVIDER",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`image generation must not reference content generation internal ${forbidden}`);
+  }
+}
+
+console.log("image generation uses content generation public contract only ok");
+EOF
+pass "image generation uses content generation public contract only"
+
+echo "-- Test 357: image prompt generator exists --"
+node --input-type=module <<'EOF'
+import {
+  buildImagePromptFromDraft,
+  generateImagePrompts,
+} from "./src/lib/image_generation.js";
+import { extractContentGenerationPublicContract } from "./src/lib/content_generation.js";
+
+const contract = extractContentGenerationPublicContract({
+  schema: "content-generation/2.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  drafts: [
+    {
+      id: "draft-001",
+      sourceIdeaId: "ai-idea-001",
+      title: "Seasonal Menu",
+      hook: "Try our new spring menu",
+      format: "single-post",
+      wordCount: 20,
+      rank: 1,
+    },
+  ],
+});
+const prompts = generateImagePrompts(contract);
+
+if (prompts.length !== 1) {
+  throw new Error("image prompt generator must create one prompt per draft");
+}
+
+const prompt = buildImagePromptFromDraft(contract.drafts[0], 0);
+if (!prompt.prompt.includes("Seasonal Menu") || prompt.style !== "photorealistic") {
+  throw new Error("image prompt generator must use public draft fields deterministically");
+}
+
+console.log("image prompt generator exists ok");
+EOF
+pass "image prompt generator exists"
+
+echo "-- Test 358: image generation normalizer exists --"
+node --input-type=module <<'EOF'
+import { buildImageGeneration, normalizeImageGeneration } from "./src/lib/image_generation.js";
+import { extractContentGenerationPublicContract } from "./src/lib/content_generation.js";
+
+const normalized = normalizeImageGeneration(
+  buildImageGeneration({
+    contentContract: extractContentGenerationPublicContract({
+      schema: "content-generation/2.0",
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      drafts: [
+        { id: "draft-b", title: "B", hook: "b", format: "single-post", wordCount: 1, rank: 2 },
+        { id: "draft-a", title: "A", hook: "a", format: "single-post", wordCount: 1, rank: 1 },
+      ],
+    }),
+  }),
+);
+
+if (normalized.imagePrompts.map((item) => item.rank).join(",") !== "1,2") {
+  throw new Error("image generation normalizer must stable-sort prompts by rank");
+}
+
+console.log("image generation normalizer exists ok");
+EOF
+pass "image generation normalizer exists"
+
+echo "-- Test 359: image generation validator exists --"
+node --input-type=module <<'EOF'
+import {
+  buildImageGenerationPipeline,
+  validateImageGeneration,
+} from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/image-generation-test-359";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildImageGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const validation = validateImageGeneration(output);
+
+if (!validation.valid) {
+  throw new Error(`image generation output must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateImageGeneration(null);
+if (invalid.valid) {
+  throw new Error("null image generation output must be invalid");
+}
+
+console.log("image generation validator exists ok");
+EOF
+pass "image generation validator exists"
+
+echo "-- Test 360: extractImageGenerationPublicContract exists --"
+node --input-type=module <<'EOF'
+import {
+  buildImageGenerationPipeline,
+  extractImageGenerationPublicContract,
+} from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/image-generation-test-360";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildImageGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const contract = extractImageGenerationPublicContract(output);
+
+if (contract.summary.promptCount !== output.imagePrompts.length) {
+  throw new Error("image generation public contract promptCount mismatch");
+}
+if ("source" in contract || "mood" in contract.imagePrompts[0]) {
+  throw new Error("image generation public contract must not expose internal-only fields");
+}
+
+console.log("extractImageGenerationPublicContract exists ok");
+EOF
+pass "extractImageGenerationPublicContract exists"
+
+echo "-- Test 361: image-generation.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_before_image_generation.log 2>&1
+npm run content:generate >/tmp/content_generate_before_image_generation.log 2>&1
+npm run image:generation >/tmp/image_generation_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/image-generation/image-generation.json", "utf8"),
+);
+if (data.schema !== "image-generation/1.0") {
+  throw new Error("image-generation.json schema must be image-generation/1.0");
+}
+if (!Array.isArray(data.imagePrompts) || data.imagePrompts.length === 0) {
+  throw new Error("image-generation.json must include image prompts");
+}
+if (!data.imagePrompts.every((prompt) => prompt.prompt && prompt.style === "photorealistic")) {
+  throw new Error("image-generation.json prompt shape mismatch");
+}
+
+console.log("image-generation.json generated ok");
+EOF
+pass "image-generation.json generated"
+
+echo "-- Test 362: image-generation.md generated --"
+test -f output/image-generation/image-generation.md
+grep -q "# Image Generation Report" output/image-generation/image-generation.md
+grep -q "## Image Prompts" output/image-generation/image-generation.md
+grep -q "| Composition |" output/image-generation/image-generation.md
+pass "image-generation.md generated"
+
+echo "-- Test 363: image generation CLI summary --"
+grep -q "Image Generation Summary" /tmp/image_generation_cli.log
+grep -q "image-generation.json" /tmp/image_generation_cli.log
+grep -q "image-generation.md" /tmp/image_generation_cli.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { buildImageGenerationSummary } from "./src/lib/image_generation.js";
+
+const data = JSON.parse(
+  fs.readFileSync("output/image-generation/image-generation.json", "utf8"),
+);
+const summary = buildImageGenerationSummary(data);
+
+for (const expected of [
+  "Image Generation Summary",
+  "Prompts:",
+  "Style: photorealistic",
+  "Aspect Ratio: 1:1",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`image generation CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("image generation CLI summary ok");
+EOF
+pass "image generation CLI summary"
+
+echo "-- Test 364: image generation excludes external image apis and publishing --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/image_generation.js",
+  "scripts/run_image_generation.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "from \"openai\"",
+  "from 'openai'",
+  "@google/genai",
+  "DALL",
+  "Stable Diffusion",
+  "Midjourney",
+  "images.generate",
+  "instagram",
+  "scheduler",
+  "publish",
+  "analytics",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`image generation must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("image generation excludes external image apis and publishing ok");
+EOF
+pass "image generation excludes external image apis and publishing"
+
+echo "-- Test 365: v1.43.0 content generation backward compatibility preserved --"
+npm run content:generate >/tmp/content_generate_backward_compat_v143.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/content-generation/content-generation.json", "utf8"),
+);
+if (data.schema !== "content-generation/2.0") {
+  throw new Error("v1.43.0 content-generation schema must remain content-generation/2.0");
+}
+if (!Array.isArray(data.drafts) || data.drafts.length === 0) {
+  throw new Error("v1.43.0 content:generate output must remain valid");
+}
+
+console.log("v1.43.0 content generation backward compatibility preserved ok");
+EOF
+grep -q "Content Generation Summary" /tmp/content_generate_backward_compat_v143.log
+pass "v1.43.0 content generation backward compatibility preserved"
 
 
 echo ""

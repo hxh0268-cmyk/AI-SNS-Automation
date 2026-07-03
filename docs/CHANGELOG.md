@@ -4,6 +4,36 @@
 
 ---
 
+## v1.44.0 — 機能追加（Image Generation Foundation）
+
+Content Generation Public Contract から Instagram 投稿用 **画像生成 Prompt** を生成する **Image Generation Foundation** を追加しました。画像そのものは生成しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Image Generation schema | `image-generation/1.0` |
+| Image Prompt Generator | `generateImagePrompts()` — deterministic mock |
+| Public Contract | `extractImageGenerationPublicContract()` |
+| 出力 | `output/image-generation/image-generation.json` / `image-generation.md` |
+| CLI | `npm run image:generation` |
+| Test 353–365 | Parser / Generator / Validator / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **Content Public Contract Only** — `extractContentGenerationPublicContract()` のみ入力
+- **Prompt のみ** — 画像生成 / 外部 API / Publishing / Scheduler / Analytics 非実装
+- **Provider 非依存** — 固定 style / aspectRatio / quality
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **365 PASS**（Test 353–365 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.43.0 — 機能追加（Content Generation Foundation）
 
 AI Idea Public Contract から投稿本文候補（Content Draft）を生成する **Content Generation Foundation** を追加しました。Mock / deterministic Generator MVP です。

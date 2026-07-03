@@ -1170,6 +1170,51 @@ Latest Current Step
 release-plan
 ```
 
+### Image Generation Foundation（v1.44.0）
+
+**Image Generation Foundation** を Application Layer に追加しました。v1.43.0 の **Content Generation Public Contract**（`extractContentGenerationPublicContract()`）のみを入力とし、Instagram 投稿用の **画像生成 Prompt** を deterministic に生成します。
+
+画像そのものは生成しません。外部画像生成 API も使用しません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `image-generation/1.0` |
+| JSON | `output/image-generation/image-generation.json` |
+| Markdown | `output/image-generation/image-generation.md` |
+| CLI | `npm run image:generation` |
+| Public Contract | `extractImageGenerationPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Content Generation (v1.43.0)
+        ↓
+Image Generation (v1.44.0) ← 今回（Prompt のみ）
+        ↓
+Publishing → Analytics → Improvement
+```
+
+#### MVP Scope
+
+Image Prompt Generator / Normalizer / Validator / JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+画像生成 / OpenAI Images / DALL·E / Stable Diffusion / Instagram API / Publishing / Scheduler / Analytics
+
+#### CLI 出力例
+
+```text
+Image Generation Summary
+Prompts: 5
+Style: photorealistic
+Aspect Ratio: 1:1
+```
+
+#### gitignore
+
+`output/image-generation/` は `.gitignore` 対象です。
+
 ### Content Generation Foundation（v1.43.0）
 
 **Content Generation Foundation** を Application Layer に追加しました。v1.42.0 の **AI Idea Public Contract**（`extractAIIdeaPublicContract()`）のみを入力とし、投稿本文候補（Content Draft）を生成します。

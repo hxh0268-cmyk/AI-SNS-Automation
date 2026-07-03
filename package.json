@@ -42,6 +42,7 @@
     "developer:visualization": "node scripts/run_developer_workflow_visualization.js",
     "content:ideas": "node scripts/run_content_ideas.js",
     "content:ai-ideas": "node scripts/run_content_ai_ideas.js",
-    "content:generate": "node scripts/run_content_generation.js"
+    "content:generate": "node scripts/run_content_generation.js",
+    "image:generation": "node scripts/run_image_generation.js"
   }
 }

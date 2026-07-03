@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.43.0**（Content Generation Foundation）
+**v1.44.0**（Image Generation Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.44.0 Image Generation Foundation
+**Next Candidate:** v1.45.0 Publishing Foundation
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.44.0** | **機能追加** | **✅ 完了** | **Image Generation Foundation / Content Public Contract から画像 Prompt MVP** |
 | **v1.43.0** | **機能追加** | **✅ 完了** | **Content Generation Foundation / AI Idea Public Contract から投稿本文候補 MVP** |
 | **v1.42.0** | **機能追加** | **✅ 完了** | **AI Idea Generation Foundation / Mock AI Generator・Dedup・Ranking・Public Contract MVP** |
 | **v1.41.0** | **機能追加** | **✅ 完了** | **Idea Generation Foundation / Content Idea Builder・Validator・Public Contract MVP（LLM 非依存）** |
@@ -65,6 +66,43 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.44.0 で追加（Image Generation Foundation）
+
+#### Image Prompt MVP
+
+- **`generateImagePrompts()`** … Content Public Contract から deterministic Prompt 生成
+- **`extractImageGenerationPublicContract()`** … 後続レイヤー向け Public Contract
+- **入力** … `extractContentGenerationPublicContract()` のみ
+- **出力** … `output/image-generation/image-generation.json` / `image-generation.md`
+- **CLI** … `npm run image:generation`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.45.0 Publishing Foundation** | Image Generation Public Contract から Publishing MVP |
+
+### 品質状況（v1.44.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **365 PASS** |
+| npm test | **PASS** |
+
+### v1.44.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| image-generation/1.0 schema | ✅ |
+| Image Prompt Generator / Validator / CLI | ✅ |
+| extractImageGenerationPublicContract | ✅ |
+| Content Public Contract Only | ✅ |
+| 画像生成 / 外部 API / Publishing 非実装 | ✅ |
+| v1.43.0 後方互換 | ✅ |
+| Test 353–365 | ✅ |
 
 ---
 
