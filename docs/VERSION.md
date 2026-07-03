@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.42.0**（AI Idea Generation Foundation）
+**v1.43.0**（Content Generation Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.43.0 Content Generation Foundation
+**Next Candidate:** v1.44.0 Image Generation Foundation
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.43.0** | **機能追加** | **✅ 完了** | **Content Generation Foundation / AI Idea Public Contract から投稿本文候補 MVP** |
 | **v1.42.0** | **機能追加** | **✅ 完了** | **AI Idea Generation Foundation / Mock AI Generator・Dedup・Ranking・Public Contract MVP** |
 | **v1.41.0** | **機能追加** | **✅ 完了** | **Idea Generation Foundation / Content Idea Builder・Validator・Public Contract MVP（LLM 非依存）** |
 | **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
@@ -64,6 +65,45 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.43.0 で追加（Content Generation Foundation）
+
+#### Content Draft MVP
+
+- **`generateContentDrafts()`** … Mock / deterministic Content Generator（外部 API 非接続）
+- **`normalizeContentDrafts()`** … qualityScore 降順 rank 付与
+- **`extractContentGenerationPublicContract()`** … 後続レイヤー向け Public Contract
+- **入力** … `extractAIIdeaPublicContract()` のみ
+- **出力** … `output/content-generation/content-generation.json` / `content-generation.md`
+- **CLI** … `npm run content:generate`
+- **Legacy** … v1.25 dry-run は `content_generation_legacy.js` に分離
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.44.0 Image Generation Foundation** | Content Generation Public Contract から画像生成 MVP |
+
+### 品質状況（v1.43.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **352 PASS** |
+| npm test | **PASS** |
+
+### v1.43.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| content-generation/2.0 schema | ✅ |
+| Content Generator / Validator / CLI | ✅ |
+| extractContentGenerationPublicContract | ✅ |
+| AI Idea Public Contract Only | ✅ |
+| 画像 / Publishing / Scheduler / Analytics 非実装 | ✅ |
+| v1.42.0 / v1.41.0 / legacy 後方互換 | ✅ |
+| Test 339–352 | ✅ |
 
 ---
 

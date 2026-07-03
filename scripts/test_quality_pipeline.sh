@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.42.0 --"
+echo "-- Test 98: VERSION updated to v1.43.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.42.0**（AI Idea Generation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.42.0");
+if (!versionDoc.includes("**v1.43.0**（Content Generation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.43.0");
 }
-console.log("VERSION v1.42.0 ok");
+console.log("VERSION v1.43.0 ok");
 EOF
-pass "VERSION updated to v1.42.0"
+pass "VERSION updated to v1.43.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -4064,7 +4064,7 @@ grep -q "Content Ideas Prompt" prompts/content_ideas.md
 pass "content ideas prompt exists"
 
 echo "-- Test 102: content generation dry-run exits 0 --"
-node scripts/run_content_generation.js --dry-run >/tmp/content_generation_dry_run.log
+node scripts/run_content_generation_legacy.js --dry-run >/tmp/content_generation_dry_run.log
 grep -q "\[ContentGeneration\] dry-run complete" /tmp/content_generation_dry_run.log
 pass "content generation dry-run exits 0"
 
@@ -4109,7 +4109,7 @@ import {
   buildContentGenerationReport,
   buildContentIdeasData,
   buildContentIdeasMarkdown
-} from "./src/lib/content_generation.js";
+} from "./src/lib/content_generation_legacy.js";
 
 const data = buildContentIdeasData({
   prompt: {
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.43.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.43.0");
+if (payload.nextVersion !== "v1.44.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.44.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.43.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.43.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.44.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.44.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.43.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.44.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -11356,7 +11356,7 @@ EOF
 pass "content idea foundation excludes llm ai generation"
 
 echo "-- Test 324: content generation backward compatibility preserved --"
-node scripts/run_content_generation.js --dry-run >/tmp/content_generation_backward_compat.log
+node scripts/run_content_generation_legacy.js --dry-run >/tmp/content_generation_backward_compat.log
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -11698,6 +11698,351 @@ console.log("v1.41.0 idea generation backward compatibility preserved ok");
 EOF
 grep -q "Content Idea Summary" /tmp/content_ideas_backward_compat_v141.log
 pass "v1.41.0 idea generation backward compatibility preserved"
+
+echo "-- Test 339: content-generation schema constant --"
+node --input-type=module <<'EOF'
+import {
+  CONTENT_GENERATION_SCHEMA,
+  buildContentGenerationPipeline,
+} from "./src/lib/content_generation.js";
+
+const { output } = buildContentGenerationPipeline(
+  { tone: "friendly", format: "single-post" },
+  {
+    generatedAt: "2026-07-03T00:00:00.000Z",
+    rootDir: "/tmp/content-generation-test-339",
+    aiIdeaPath: "/tmp/content-generation-test-339/missing-ai-ideas.json",
+  },
+);
+
+if (output.schema !== CONTENT_GENERATION_SCHEMA) {
+  throw new Error("content-generation schema constant mismatch");
+}
+if (CONTENT_GENERATION_SCHEMA !== "content-generation/2.0") {
+  throw new Error("CONTENT_GENERATION_SCHEMA mismatch");
+}
+
+console.log("content-generation schema constant ok");
+EOF
+pass "content-generation schema constant"
+
+echo "-- Test 340: content generation input parser --"
+node --input-type=module <<'EOF'
+import { parseContentGenerationInputs } from "./src/lib/content_generation.js";
+import { extractAIIdeaPublicContract } from "./src/lib/content_ai_idea.js";
+
+const contract = extractAIIdeaPublicContract({
+  schema: "content-ai-ideas/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  ideas: [{ id: "ai-idea-001", title: "Test Idea", category: "sns", finalScore: 0.8, rank: 1, tags: [] }],
+});
+const parsed = parseContentGenerationInputs(
+  { tone: "professional", format: "single-post" },
+  contract,
+);
+
+if (parsed.tone !== "professional" || parsed.format !== "single-post") {
+  throw new Error("content generation input parser must preserve tone and format");
+}
+if (parsed.aiIdeaContract.summary.ideaCount !== 1) {
+  throw new Error("content generation input parser must preserve AI idea public contract");
+}
+
+console.log("content generation input parser ok");
+EOF
+pass "content generation input parser"
+
+echo "-- Test 341: content generation uses AI idea public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/content_generation.js"),
+  "utf8",
+);
+
+if (!source.includes("extractAIIdeaPublicContract")) {
+  throw new Error("content generation must use extractAIIdeaPublicContract");
+}
+
+for (const forbidden of [
+  "generateAIIdeas(",
+  "deduplicateAIIdeas(",
+  "normalizeAIIdeaOutput(",
+  "idea.scores",
+  "idea.rationale",
+  "trend.trends",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`content generation must not reference AI idea internal ${forbidden}`);
+  }
+}
+
+console.log("content generation uses AI idea public contract only ok");
+EOF
+pass "content generation uses AI idea public contract only"
+
+echo "-- Test 342: mock content generator --"
+node --input-type=module <<'EOF'
+import {
+  generateContentDrafts,
+  parseContentGenerationInputs,
+} from "./src/lib/content_generation.js";
+import { extractAIIdeaPublicContract } from "./src/lib/content_ai_idea.js";
+
+const contract = extractAIIdeaPublicContract({
+  schema: "content-ai-ideas/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  ideas: [
+    { id: "ai-idea-001", title: "Menu Spotlight", category: "marketing", finalScore: 0.9, rank: 1, tags: [] },
+    { id: "ai-idea-002", title: "Staff Story", category: "culture", finalScore: 0.7, rank: 2, tags: [] },
+  ],
+});
+const inputs = parseContentGenerationInputs(null, contract);
+const drafts = generateContentDrafts(contract, inputs, { provider: "mock" });
+
+if (drafts.length !== 2) {
+  throw new Error("mock content generator must create one draft per AI idea");
+}
+if (!drafts.every((draft) => draft.sourceIdeaId && draft.body && draft.hook && draft.callToAction)) {
+  throw new Error("mock content generator must populate draft fields");
+}
+
+console.log("mock content generator ok");
+EOF
+pass "mock content generator"
+
+echo "-- Test 343: content draft normalizer --"
+node --input-type=module <<'EOF'
+import { normalizeContentDrafts } from "./src/lib/content_generation.js";
+
+const normalized = normalizeContentDrafts([
+  { id: "draft-b", title: "B", qualityScore: 0.7, hook: "h", body: "b", callToAction: "c" },
+  { id: "draft-a", title: "A", qualityScore: 0.9, hook: "h", body: "b", callToAction: "c" },
+]);
+
+if (normalized.map((draft) => draft.id).join(",") !== "draft-a,draft-b") {
+  throw new Error("content draft normalizer must rank by qualityScore desc then id asc");
+}
+if (normalized.map((draft) => draft.rank).join(",") !== "1,2") {
+  throw new Error("content draft normalizer must assign rank numbers");
+}
+
+console.log("content draft normalizer ok");
+EOF
+pass "content draft normalizer"
+
+echo "-- Test 344: content generation output validator --"
+node --input-type=module <<'EOF'
+import {
+  buildContentGenerationPipeline,
+  validateContentGenerationOutput,
+} from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/content-generation-test-344";
+buildAIIdeaPipeline({ count: 2 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildContentGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const validation = validateContentGenerationOutput(output);
+
+if (!validation.valid) {
+  throw new Error(`content generation output must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateContentGenerationOutput(null);
+if (invalid.valid) {
+  throw new Error("null content generation output must be invalid");
+}
+
+console.log("content generation output validator ok");
+EOF
+pass "content generation output validator"
+
+echo "-- Test 345: extractContentGenerationPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildContentGenerationPipeline,
+  extractContentGenerationPublicContract,
+} from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/content-generation-test-345";
+buildAIIdeaPipeline({ count: 2 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildContentGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const contract = extractContentGenerationPublicContract(output);
+
+if (contract.summary.draftCount !== output.drafts.length) {
+  throw new Error("content generation public contract draftCount mismatch");
+}
+if ("generator" in contract || "inputs" in contract || "qualityScore" in contract.drafts[0]) {
+  throw new Error("content generation public contract must not expose internal fields");
+}
+
+console.log("extractContentGenerationPublicContract exposes public contract ok");
+EOF
+pass "extractContentGenerationPublicContract exposes public contract"
+
+echo "-- Test 346: content generation markdown generated from json --"
+node --input-type=module <<'EOF'
+import {
+  buildContentGenerationMarkdown,
+  buildContentGenerationPipeline,
+} from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/content-generation-test-346";
+buildAIIdeaPipeline({ count: 2 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildContentGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const markdown = buildContentGenerationMarkdown(output);
+
+for (const expected of [
+  "# Content Generation",
+  "| Drafts |",
+  "| Average Word Count |",
+  "### Body",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`content generation markdown must include: ${expected}`);
+  }
+}
+
+console.log("content generation markdown generated from json ok");
+EOF
+pass "content generation markdown generated from json"
+
+echo "-- Test 347: content generation CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildContentGenerationPipeline,
+  buildContentGenerationSummary,
+} from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/content-generation-test-347";
+buildAIIdeaPipeline({ count: 2 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { output } = buildContentGenerationPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const summary = buildContentGenerationSummary(output);
+
+for (const expected of [
+  "Content Generation Summary",
+  "Drafts:",
+  "Average Word Count:",
+  "Top Quality Score:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`content generation CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("content generation CLI summary ok");
+EOF
+pass "content generation CLI summary"
+
+echo "-- Test 348: content-generation.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_before_generate.log 2>&1
+npm run content:generate >/tmp/content_generate_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/content-generation/content-generation.json", "utf8"),
+);
+if (data.schema !== "content-generation/2.0") {
+  throw new Error("content-generation.json schema must be content-generation/2.0");
+}
+if (!Array.isArray(data.drafts) || data.drafts.length === 0) {
+  throw new Error("content-generation.json must include ranked drafts");
+}
+if (!data.drafts.every((draft) => draft.body && typeof draft.rank === "number")) {
+  throw new Error("content-generation.json draft shape mismatch");
+}
+
+console.log("content-generation.json generated ok");
+EOF
+pass "content-generation.json generated"
+
+echo "-- Test 349: content-generation.md generated --"
+test -f output/content-generation/content-generation.md
+grep -q "# Content Generation" output/content-generation/content-generation.md
+grep -q "Content Generation Summary" /tmp/content_generate_cli.log
+grep -q "content-generation.json" /tmp/content_generate_cli.log
+grep -q "content-generation.md" /tmp/content_generate_cli.log
+pass "content-generation.md generated"
+
+echo "-- Test 350: content:generate npm script exists --"
+grep -q '"content:generate": "node scripts/run_content_generation.js"' package.json
+test -f scripts/run_content_generation.js
+test -f src/lib/content_generation.js
+pass "content:generate npm script exists"
+
+echo "-- Test 351: content generation excludes image publishing scheduler analytics --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/content_generation.js",
+  "scripts/run_content_generation.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "from \"openai\"",
+  "from 'openai'",
+  "@google/genai",
+  "instagram",
+  "publish",
+  "scheduler",
+  "analytics",
+  "hashtag",
+  "generateImage",
+  "create_carousel",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`content generation must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("content generation excludes image publishing scheduler analytics ok");
+EOF
+pass "content generation excludes image publishing scheduler analytics"
+
+echo "-- Test 352: v1.42.0 AI idea generation backward compatibility preserved --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_backward_compat_v142.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/content-ideas/content-ai-ideas.json", "utf8"),
+);
+if (data.schema !== "content-ai-ideas/1.0") {
+  throw new Error("v1.42.0 content-ai-ideas schema must remain content-ai-ideas/1.0");
+}
+if (!Array.isArray(data.ideas) || data.ideas.length === 0) {
+  throw new Error("v1.42.0 content:ai-ideas output must remain valid");
+}
+
+console.log("v1.42.0 AI idea generation backward compatibility preserved ok");
+EOF
+grep -q "AI Idea Summary" /tmp/content_ai_ideas_backward_compat_v142.log
+pass "v1.42.0 AI idea generation backward compatibility preserved"
 
 
 echo ""

@@ -1,32 +1,24 @@
 #!/usr/bin/env node
 
 import {
-  buildContentIdeasData,
-  readContentIdeasPrompt,
-  writeContentGenerationOutputs
+  buildContentGenerationPipeline,
+  buildContentGenerationSummary,
 } from "../src/lib/content_generation.js";
 
-const args = process.argv.slice(2);
-const isDryRun = args.includes("--dry-run");
-
 function main() {
-  if (!isDryRun) {
-    throw new Error("Only --dry-run mode is supported in v1.25.0.");
-  }
+  const { output, paths } = buildContentGenerationPipeline(null, {
+    rootDir: process.cwd(),
+  });
 
-  const prompt = readContentIdeasPrompt();
-  const data = buildContentIdeasData({ prompt });
-  const outputs = writeContentGenerationOutputs(data);
-
-  console.log("[ContentGeneration] dry-run complete");
-  console.log(`[ContentGeneration] ideas: ${data.ideas.length}`);
-  console.log(`[ContentGeneration] output: ${outputs.outputMarkdown}`);
-  console.log(`[ContentGeneration] report: ${outputs.reportMarkdown}`);
+  console.log(buildContentGenerationSummary(output));
+  console.log(`[ContentGeneration] json: ${paths.json}`);
+  console.log(`[ContentGeneration] markdown: ${paths.markdown}`);
 }
 
 try {
   main();
 } catch (error) {
-  console.error(`[ContentGeneration] failed: ${error.message}`);
-  process.exit(1);
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[ContentGeneration] failed: ${message}`);
+  process.exitCode = 1;
 }

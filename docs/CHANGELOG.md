@@ -4,6 +4,38 @@
 
 ---
 
+## v1.43.0 — 機能追加（Content Generation Foundation）
+
+AI Idea Public Contract から投稿本文候補（Content Draft）を生成する **Content Generation Foundation** を追加しました。Mock / deterministic Generator MVP です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Content Generation schema | `content-generation/2.0` |
+| Content Generator | `generateContentDrafts()` — mock provider（外部 API 非接続） |
+| Draft Normalizer | `normalizeContentDrafts()` — qualityScore 降順 rank |
+| Public Contract | `extractContentGenerationPublicContract()` |
+| 出力 | `output/content-generation/content-generation.json` / `content-generation.md` |
+| CLI | `npm run content:generate` |
+| Legacy 分離 | v1.25 dry-run → `content_generation_legacy.js` |
+| Test 339–352 | Parser / Generator / Validator / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **AI Idea Public Contract Only** — `extractAIIdeaPublicContract()` のみ入力
+- **投稿本文候補まで** — 画像 / ハッシュタグ / Publishing / Scheduler / Analytics 非実装
+- **Legacy 後方互換** — `content-generation/1.0` dry-run は legacy モジュールで維持
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **352 PASS**（Test 339–352 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.42.0 — 機能追加（AI Idea Generation Foundation）
 
 Mock / deterministic AI Generator による **AI Idea Generation Foundation** を追加しました。Deduplicator / Ranking / Public Contract MVP です。

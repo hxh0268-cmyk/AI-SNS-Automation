@@ -13,3 +13,4 @@ images/*.png
 reports/
 # Generated content ideas
 output/content-ideas/
+output/content-generation/

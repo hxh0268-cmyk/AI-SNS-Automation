@@ -1170,6 +1170,57 @@ Latest Current Step
 release-plan
 ```
 
+### Content Generation Foundation（v1.43.0）
+
+**Content Generation Foundation** を Application Layer に追加しました。v1.42.0 の **AI Idea Public Contract**（`extractAIIdeaPublicContract()`）のみを入力とし、投稿本文候補（Content Draft）を生成します。
+
+外部 API には接続しません。Provider は将来差し替え可能な Interface に閉じ込めています。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `content-generation/2.0` |
+| JSON | `output/content-generation/content-generation.json` |
+| Markdown | `output/content-generation/content-generation.md` |
+| CLI | `npm run content:generate` |
+| Public Contract | `extractContentGenerationPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Idea Generation (v1.41.0)
+        ↓
+AI Idea Generation (v1.42.0)
+        ↓
+Content Generation (v1.43.0) ← 今回
+        ↓
+Image → Publishing → Analytics → Improvement
+```
+
+#### MVP Scope
+
+Content Generator（mock）/ Draft Normalizer / Validator / JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+画像生成 / カルーセル生成 / ハッシュタグ / Instagram API / Publishing / Scheduler / Analytics
+
+#### CLI 出力例
+
+```text
+Content Generation Summary
+Drafts: 5
+Average Word Count: 42
+Top Quality Score: 0.875
+```
+
+#### Legacy 後方互換
+
+v1.25 の `content-generation/1.0` dry-run（`output/content-ideas/latest/`）は `content_generation_legacy.js` / `run_content_generation_legacy.js` で維持。
+
+#### gitignore
+
+`output/content-generation/` は `.gitignore` 対象です。
+
 ### AI Idea Generation Foundation（v1.42.0）
 
 **AI Idea Generation Foundation** を Application Layer に追加しました。Mock / deterministic AI Generator により投稿アイデア候補を生成し、Deduplicator / Ranking で整理します。
