@@ -1170,6 +1170,49 @@ Latest Current Step
 release-plan
 ```
 
+### Idea Generation Foundation（v1.41.0）
+
+AI-SNS-Automation 本体の **Application Layer** 第一弾として **Idea Generation Foundation** を追加しました。LLM 非依存の Idea Builder / Validator / Public Contract MVP です。
+
+Developer Automation Platform（v1.40.0）は **Completed** — 保守のみ、新レイヤー追加なし。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `content-ideas/1.0` |
+| JSON | `output/content-ideas/content-ideas.json` |
+| Markdown | `output/content-ideas/content-ideas.md` |
+| CLI | `npm run content:ideas` |
+| Public Contract | `extractContentIdeaPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Idea Generation → Content Generation → Image Generation → Publishing → Analytics → Improvement
+     ↑ v1.41.0 MVP
+```
+
+#### MVP Scope
+
+Idea Builder / Idea Validator / Machine Readable JSON / Markdown View / CLI Summary / Public Contract
+
+#### 非対象
+
+AI generation / LLM integration / Prompt optimization / Image generation / Content generation / Hashtag optimization / Publishing / Scheduling / SNS APIs
+
+#### CLI 出力例
+
+```text
+Content Idea Summary
+Ideas: 3
+Categories: 3
+Candidates: 2
+Archived: 1
+```
+
+#### 後方互換
+
+既存 `content-generation/1.0`（`output/content-ideas/latest/`）は維持。v1.41.0 の新出力は `output/content-ideas/content-ideas.json` です。
+
 ### Visualization Foundation（v1.40.0）— Developer Automation Platform Completed
 
 Developer Automation Platform の **最終レイヤー** として **Visualization Foundation** を追加しました。Dashboard / Trend / Historical Public Contract（`extractDashboardPublicContract()` / `extractTrendPublicContract()` / `extractHistoricalPublicContract()`）のみを入力とします。

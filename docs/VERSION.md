@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.40.0**（Visualization Foundation）
+**v1.41.0**（Idea Generation Foundation）
 
-**Platform Status:** Developer Automation Platform **Completed**
+**Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Phase:** v1.41.0+ AI-SNS-Automation 本体開発（Idea → Content → Image → Publishing → Analytics → Improvement）
+**Next Candidate:** v1.42.0 Content Generation Foundation
 
 ---
 
@@ -14,7 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
+| **v1.41.0** | **機能追加** | **✅ 完了** | **Idea Generation Foundation / Content Idea Builder・Validator・Public Contract MVP（LLM 非依存）** |
 | **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
 | **v1.39.0** | **機能追加** | **✅ 完了** | **Historical Analytics Foundation / Dashboard + Trend Public Contract から履歴集計 MVP** |
 | **v1.38.0** | **機能追加** | **✅ 完了** | **Trend Analytics Foundation / Dashboard Public Contract から Workflow Trend MVP** |
@@ -63,6 +63,50 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.41.0 で追加（Idea Generation Foundation）
+
+#### Content Idea MVP
+
+- **`buildContentIdeas()`** … Idea Builder（Pure Function、LLM 非依存）
+- **`validateContentIdeas()`** … schema / ideas 配列検証
+- **`extractContentIdeaPublicContract()`** … 将来レイヤー向け Public Contract
+- **出力** … `output/content-ideas/content-ideas.json` / `content-ideas.md`
+- **CLI** … `npm run content:ideas`
+
+#### Application Layer 開始
+
+| レイヤー | 状態 |
+|----------|------|
+| Idea Generation | **✅ MVP** |
+| Content → Image → Publishing → Analytics → Improvement | 未着手 |
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.42.0 Content Generation Foundation** | Idea Public Contract からコンテンツ生成 MVP |
+
+### 品質状況（v1.41.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **324 PASS** |
+| npm test | **PASS** |
+
+### v1.41.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| content-ideas schema 1.0 | ✅ |
+| Idea Builder / Validator / CLI | ✅ |
+| extractContentIdeaPublicContract | ✅ |
+| JSON = Source / Markdown = View / CLI = Summary | ✅ |
+| LLM / Publishing / SNS API 非実装 | ✅ |
+| content-generation/1.0 後方互換 | ✅ |
+| Test 313–324 | ✅ |
 
 ---
 

@@ -4,6 +4,38 @@
 
 ---
 
+## v1.41.0 — 機能追加（Idea Generation Foundation）
+
+AI-SNS-Automation 本体の **Application Layer** 第一弾として **Idea Generation Foundation** を追加しました。LLM 非依存の Idea Builder / Validator / Public Contract MVP です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Content Idea schema | `content-ideas/1.0` |
+| Idea Builder | `buildContentIdeas()` / `parseContentIdeaInputs()`（Pure Function） |
+| Idea Validator | `validateContentIdeas()` |
+| Public Contract | `extractContentIdeaPublicContract()` |
+| 出力 | `output/content-ideas/content-ideas.json` / `content-ideas.md` |
+| CLI | `npm run content:ideas` |
+| Test 313–324 | Builder / Validator / Markdown / CLI / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **Application Layer 開始** — Developer Automation Platform 完成後の本体開発第一歩
+- **LLM 非実装** — AI 生成 / Prompt 最適化 / Publishing / SNS API は非スコープ
+- **JSON = Source** — Markdown / CLI Summary は JSON からのみ生成
+- **後方互換** — 既存 `content-generation/1.0`（`output/content-ideas/latest/`）は維持
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **324 PASS**（Test 313–324 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.40.0 — 機能追加（Visualization Foundation / Developer Automation Platform Completed）
 
 Dashboard / Trend / Historical Public Contract を入力として、**Visualization Foundation** を追加しました。Developer Automation Platform の **最終レイヤー** として Public Contract 情報の整理のみを行います。

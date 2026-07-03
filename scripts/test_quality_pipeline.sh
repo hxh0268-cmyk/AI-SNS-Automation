@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.40.0 --"
+echo "-- Test 98: VERSION updated to v1.41.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.40.0**（Visualization Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.40.0");
+if (!versionDoc.includes("**v1.41.0**（Idea Generation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.41.0");
 }
-console.log("VERSION v1.40.0 ok");
+console.log("VERSION v1.41.0 ok");
 EOF
-pass "VERSION updated to v1.40.0"
+pass "VERSION updated to v1.41.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.41.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.41.0");
+if (payload.nextVersion !== "v1.42.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.42.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.41.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.41.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.42.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.42.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.41.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.42.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -11087,6 +11087,292 @@ for (const forbiddenWord of [
 console.log("workflow visualization excludes chart graph forecast ok");
 EOF
 pass "workflow visualization excludes chart graph forecast"
+
+echo "-- Test 313: content-ideas schema constant --"
+node --input-type=module <<'EOF'
+import {
+  CONTENT_IDEA_SCHEMA,
+  buildContentIdeas,
+} from "./src/lib/content_idea.js";
+
+const contentIdeas = buildContentIdeas({ ideas: [] }, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+
+if (contentIdeas.schema !== CONTENT_IDEA_SCHEMA) {
+  throw new Error("content-ideas schema constant mismatch");
+}
+if (CONTENT_IDEA_SCHEMA !== "content-ideas/1.0") {
+  throw new Error("CONTENT_IDEA_SCHEMA mismatch");
+}
+
+console.log("content-ideas schema constant ok");
+EOF
+pass "content-ideas schema constant"
+
+echo "-- Test 314: content idea builder --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  parseContentIdeaInputs,
+} from "./src/lib/content_idea.js";
+
+const built = buildContentIdeas(
+  parseContentIdeaInputs({
+    ideas: [
+      {
+        id: "idea-b",
+        title: "Seasonal menu teaser",
+        category: "marketing",
+        status: "candidate",
+        priority: "high",
+        tags: ["seasonal"],
+      },
+      {
+        id: "idea-a",
+        title: "Staff spotlight",
+        category: "culture",
+        status: "archived",
+        priority: "low",
+        tags: ["team"],
+      },
+    ],
+  }),
+  { generatedAt: "2026-07-03T00:00:00.000Z" },
+);
+
+if (built.ideas.length !== 2) {
+  throw new Error("content idea builder must preserve idea count");
+}
+if (built.ideas.map((idea) => idea.id).join(",") !== "idea-a,idea-b") {
+  throw new Error("content idea builder must stable-sort ideas by id");
+}
+
+console.log("content idea builder ok");
+EOF
+pass "content idea builder"
+
+echo "-- Test 315: content idea validator --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  validateContentIdeas,
+} from "./src/lib/content_idea.js";
+
+const valid = validateContentIdeas(
+  buildContentIdeas({
+    ideas: [
+      {
+        id: "idea-001",
+        title: "Test Idea",
+        category: "general",
+        status: "candidate",
+        priority: "medium",
+        tags: [],
+      },
+    ],
+  }),
+);
+
+if (!valid.valid) {
+  throw new Error(`valid content ideas must pass validation: ${valid.errors.join("; ")}`);
+}
+
+const invalid = validateContentIdeas(null);
+if (invalid.valid) {
+  throw new Error("null content ideas must be invalid");
+}
+
+console.log("content idea validator ok");
+EOF
+pass "content idea validator"
+
+echo "-- Test 316: content idea handles empty input --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  extractContentIdeaPublicContract,
+} from "./src/lib/content_idea.js";
+
+const empty = buildContentIdeas({ ideas: [] });
+const contract = extractContentIdeaPublicContract(empty);
+
+if (contract.summary.ideaCount !== 0 || contract.summary.categoryCount !== 0) {
+  throw new Error("empty content ideas must use zero counts");
+}
+
+console.log("content idea handles empty input ok");
+EOF
+pass "content idea handles empty input"
+
+echo "-- Test 317: extractContentIdeaPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  extractContentIdeaPublicContract,
+  parseContentIdeaInputs,
+} from "./src/lib/content_idea.js";
+
+const contentIdeas = buildContentIdeas(parseContentIdeaInputs(null));
+const contract = extractContentIdeaPublicContract(contentIdeas);
+
+if (contract.summary.ideaCount !== 3) {
+  throw new Error("content idea public contract ideaCount mismatch");
+}
+if (contract.summary.candidateCount !== 2 || contract.summary.archivedCount !== 1) {
+  throw new Error("content idea public contract status counts mismatch");
+}
+if (!Array.isArray(contract.ideas) || contract.ideas.length !== 3) {
+  throw new Error("content idea public contract must expose ideas");
+}
+if ("mode" in contract || "generator" in contract) {
+  throw new Error("content idea public contract must not expose internal fields");
+}
+
+console.log("extractContentIdeaPublicContract exposes public contract ok");
+EOF
+pass "extractContentIdeaPublicContract exposes public contract"
+
+echo "-- Test 318: content ideas markdown generated from json --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  parseContentIdeaInputs,
+  renderContentIdeasMarkdown,
+} from "./src/lib/content_idea.js";
+
+const contentIdeas = buildContentIdeas(parseContentIdeaInputs(null));
+const markdown = renderContentIdeasMarkdown(contentIdeas);
+
+for (const expected of [
+  "# Content Ideas",
+  "| Ideas | 3 |",
+  "| Candidates | 2 |",
+  "| Archived | 1 |",
+  "飲食店店長が今日から使えるChatGPT活用5選",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`content ideas markdown must include: ${expected}`);
+  }
+}
+
+console.log("content ideas markdown generated from json ok");
+EOF
+pass "content ideas markdown generated from json"
+
+echo "-- Test 319: content idea CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildContentIdeas,
+  buildContentIdeasSummary,
+  parseContentIdeaInputs,
+} from "./src/lib/content_idea.js";
+
+const summary = buildContentIdeasSummary(
+  buildContentIdeas(parseContentIdeaInputs(null)),
+);
+
+for (const expected of [
+  "Content Idea Summary",
+  "Ideas: 3",
+  "Categories: 3",
+  "Candidates: 2",
+  "Archived: 1",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`content idea CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("content idea CLI summary ok");
+EOF
+pass "content idea CLI summary"
+
+echo "-- Test 320: content-ideas.json generated --"
+npm run content:ideas >/tmp/content_ideas_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/content-ideas/content-ideas.json", "utf8"));
+if (data.schema !== "content-ideas/1.0") {
+  throw new Error("content-ideas.json schema must be content-ideas/1.0");
+}
+if (!Array.isArray(data.ideas) || data.ideas.length !== 3) {
+  throw new Error("content-ideas.json must include default ideas");
+}
+if (!data.ideas.every((idea) => idea.id && idea.title && idea.category && idea.status && idea.priority && Array.isArray(idea.tags))) {
+  throw new Error("content-ideas.json idea shape mismatch");
+}
+
+console.log("content-ideas.json generated ok");
+EOF
+pass "content-ideas.json generated"
+
+echo "-- Test 321: content-ideas.md generated --"
+test -f output/content-ideas/content-ideas.md
+grep -q "# Content Ideas" output/content-ideas/content-ideas.md
+grep -q "Content Idea Summary" /tmp/content_ideas_cli.log
+grep -q "content-ideas.json" /tmp/content_ideas_cli.log
+grep -q "content-ideas.md" /tmp/content_ideas_cli.log
+pass "content-ideas.md generated"
+
+echo "-- Test 322: content:ideas npm script exists --"
+grep -q '"content:ideas": "node scripts/run_content_ideas.js"' package.json
+test -f scripts/run_content_ideas.js
+test -f src/lib/content_idea.js
+pass "content:ideas npm script exists"
+
+echo "-- Test 323: content idea foundation excludes llm ai generation --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/content_idea.js",
+  "scripts/run_content_ideas.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "openai",
+  "gemini",
+  "generateContent",
+  "chat.completions",
+  "prompt optimization",
+  "hashtag",
+  "publish",
+  "schedule",
+]) {
+  if (new RegExp(`\\b${forbidden}\\b`, "i").test(combined)) {
+    throw new Error(`content idea foundation must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("content idea foundation excludes llm ai generation ok");
+EOF
+pass "content idea foundation excludes llm ai generation"
+
+echo "-- Test 324: content generation backward compatibility preserved --"
+node scripts/run_content_generation.js --dry-run >/tmp/content_generation_backward_compat.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const legacy = JSON.parse(
+  fs.readFileSync("output/content-ideas/latest/content-ideas.json", "utf8"),
+);
+if (legacy.schema !== "content-generation/1.0") {
+  throw new Error("legacy content-generation schema must remain content-generation/1.0");
+}
+if (!Array.isArray(legacy.ideas) || legacy.ideas.length !== 3) {
+  throw new Error("legacy content generation output must remain unchanged");
+}
+
+console.log("content generation backward compatibility preserved ok");
+EOF
+pass "content generation backward compatibility preserved"
 
 
 echo ""
