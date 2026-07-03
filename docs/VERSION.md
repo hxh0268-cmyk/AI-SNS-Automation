@@ -2,11 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.37.1**（Architecture Documentation Release）
-
-Documentation MVP — **No production code changes**
-
-**Next Candidate:** v1.38.0 Trend Analytics Foundation
+**v1.38.0**（Trend Analytics Foundation）
 
 ---
 
@@ -14,6 +10,7 @@ Documentation MVP — **No production code changes**
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.38.0** | **機能追加** | **✅ 完了** | **Trend Analytics Foundation / Dashboard Public Contract から Workflow Trend MVP** |
 | **v1.37.1** | **ドキュメント** | **✅ 完了** | **Architecture Documentation MVP / docs/architecture 追加・コード変更なし** |
 | **v1.37.0** | **機能追加** | **✅ 完了** | **Developer Analytics Foundation / Dashboard Public Contract から KPI・Health 生成 MVP** |
 | **v1.36.0** | **機能追加** | **✅ 完了** | **Developer Dashboard Foundation / Timeline を唯一入力とする集計 MVP** |
@@ -59,6 +56,47 @@ Documentation MVP — **No production code changes**
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.38.0 で追加（Trend Analytics Foundation）
+
+#### Workflow Trend MVP
+
+- **`parseTrendInputs()` / `buildWorkflowTrend()`** … Dashboard Public Contract から時系列 Trend 生成
+- **`validateWorkflowTrend()`** … schema / sampleCount / trends 検証
+- **`renderWorkflowTrendMarkdown()`** … trend-report.md（View のみ）
+- **`printWorkflowTrendSummary()`** … CLI Summary
+- **schema** … `developer-automation/workflow-trend/1.0`
+- **出力** … `reports/workflow-trend/workflow-trend.json` / `trend-report.md`
+- **非スコープ** … Forecast / Prediction / Anomaly Detection / ML
+
+#### v1.39.0 以降の候補
+
+| 候補 | 方針 |
+|------|------|
+| Historical Analytics Foundation | Priority 1 残り — 履歴横断分析 |
+| Visualization Foundation | 集計結果の可視化 |
+| Release Automation Foundation | Human Approval Gate 維持 |
+
+### 品質状況（v1.38.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **288 PASS** |
+| npm test | **PASS** |
+
+### v1.38.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| workflow-trend schema 1.0 | ✅ |
+| Trend Builder / Validator / CLI | ✅ |
+| workflow-trend JSON / trend-report.md | ✅ |
+| Dashboard Public Contract のみ入力 | ✅ |
+| Forecast / Prediction / Anomaly 非実装 | ✅ |
+| Test 278–288 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
 
 ---
 

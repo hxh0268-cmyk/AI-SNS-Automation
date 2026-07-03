@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.37.0 --"
+echo "-- Test 98: VERSION updated to v1.38.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.37.0**（Developer Analytics Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.37.0");
+if (!versionDoc.includes("**v1.38.0**（Trend Analytics Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.38.0");
 }
-console.log("VERSION v1.37.0 ok");
+console.log("VERSION v1.38.0 ok");
 EOF
-pass "VERSION updated to v1.37.0"
+pass "VERSION updated to v1.38.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.38.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.38.0");
+if (payload.nextVersion !== "v1.39.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.39.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.38.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.38.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.39.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.39.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.38.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.39.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -9899,6 +9899,383 @@ test -f docs/adr/ADR-0008-dashboard-public-contract.md
 grep -q "Dashboard Public Contract" docs/adr/ADR-0008-dashboard-public-contract.md
 grep -q "Analytics Layer" docs/adr/ADR-0007-developer-analytics-layer-architecture.md
 pass "analytics ADR documents exist"
+
+echo "-- Test 278: workflow-trend schema constant --"
+node --input-type=module <<'EOF'
+import {
+  WORKFLOW_TREND_SCHEMA,
+  buildWorkflowTrend,
+} from "./src/lib/developer_workflow_trend.js";
+
+const trend = buildWorkflowTrend([]);
+if (trend.schema !== WORKFLOW_TREND_SCHEMA) {
+  throw new Error("workflow-trend schema constant mismatch");
+}
+if (WORKFLOW_TREND_SCHEMA !== "developer-automation/workflow-trend/1.0") {
+  throw new Error("WORKFLOW_TREND_SCHEMA must be developer-automation/workflow-trend/1.0");
+}
+
+console.log("workflow-trend schema constant ok");
+EOF
+pass "workflow-trend schema constant"
+
+echo "-- Test 279: workflow trend handles zero samples --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  validateWorkflowTrend,
+} from "./src/lib/developer_workflow_trend.js";
+
+const trend = buildWorkflowTrend([]);
+const validation = validateWorkflowTrend(trend);
+
+if (!validation.valid) {
+  throw new Error(`zero sample trend must validate: ${validation.errors.join("; ")}`);
+}
+if (trend.sampleCount !== 0) {
+  throw new Error("zero sample trend must have sampleCount 0");
+}
+if (trend.trends.successRate.length !== 0) {
+  throw new Error("zero sample trend must have empty series");
+}
+
+console.log("workflow trend handles zero samples ok");
+EOF
+pass "workflow trend handles zero samples"
+
+echo "-- Test 280: workflow trend handles one sample --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  parseTrendInputs,
+} from "./src/lib/developer_workflow_trend.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const parsed = parseTrendInputs([
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    status: "success",
+    summary: {
+      runCount: 2,
+      stepCount: 4,
+      totalDurationMs: 24000,
+      resumeCount: 0,
+    },
+    metrics: {
+      runs: { completed: 2, failed: 0, stopped: 0, unknown: 0 },
+      resume: { count: 0, rate: 0 },
+    },
+  },
+]);
+
+const trend = buildWorkflowTrend(parsed);
+if (trend.sampleCount !== 1) {
+  throw new Error("one sample trend must have sampleCount 1");
+}
+if (trend.trends.successRate[0].value !== 1) {
+  throw new Error("one sample trend successRate must be 1");
+}
+if (trend.trends.duration[0].value !== 12000) {
+  throw new Error("one sample trend duration must be average ms per run");
+}
+
+console.log("workflow trend handles one sample ok");
+EOF
+pass "workflow trend handles one sample"
+
+echo "-- Test 281: workflow trend sorts multiple samples chronologically --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  parseTrendInputs,
+} from "./src/lib/developer_workflow_trend.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const parsed = parseTrendInputs([
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:03.000Z",
+    status: "mixed",
+    summary: { runCount: 1, stepCount: 1, totalDurationMs: 3000, resumeCount: 1 },
+    metrics: { runs: { completed: 0, failed: 1, stopped: 0, unknown: 0 }, resume: { count: 1 } },
+  },
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:01.000Z",
+    status: "success",
+    summary: { runCount: 1, stepCount: 1, totalDurationMs: 1000, resumeCount: 0 },
+    metrics: { runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+  },
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:02.000Z",
+    status: "failed",
+    summary: { runCount: 1, stepCount: 1, totalDurationMs: 2000, resumeCount: 0 },
+    metrics: { runs: { completed: 0, failed: 1, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+  },
+]);
+
+const trend = buildWorkflowTrend(parsed);
+const timestamps = trend.trends.successRate.map((point) => point.generatedAt);
+if (timestamps.join(",") !== "2026-07-02T00:00:01.000Z,2026-07-02T00:00:02.000Z,2026-07-02T00:00:03.000Z") {
+  throw new Error("workflow trend must output chronological series");
+}
+if (trend.sampleCount !== 3) {
+  throw new Error("workflow trend sampleCount must match input count");
+}
+
+console.log("workflow trend sorts multiple samples chronologically ok");
+EOF
+pass "workflow trend sorts multiple samples chronologically"
+
+echo "-- Test 282: workflow-trend.json generated --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  WORKFLOW_TREND_SCHEMA,
+  buildWorkflowTrendFromDashboard,
+} from "./src/lib/developer_workflow_trend.js";
+import {
+  WORKFLOW_DASHBOARD_SCHEMA,
+  writeWorkflowDashboardReport,
+} from "./src/lib/developer_workflow_dashboard.js";
+import { WORKFLOW_TIMELINE_SCHEMA } from "./src/lib/developer_workflow_timeline.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+writeWorkflowDashboardReport(
+  {
+    schema: WORKFLOW_DASHBOARD_SCHEMA,
+    generatedAt: "2026-07-02T00:00:00.000Z",
+    source: { schema: WORKFLOW_TIMELINE_SCHEMA, path: "reports/developer-workflow/latest/workflow-timeline.json" },
+    status: "success",
+    summary: {
+      runCount: 1,
+      stepCount: 1,
+      successCount: 1,
+      failedCount: 0,
+      resumeCount: 0,
+      totalDurationMs: 5000,
+      averageDurationMs: 5000,
+    },
+    metrics: {
+      runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 },
+      steps: { completed: 1, failed: 0, skipped: 0, stopped: 0, unknown: 0 },
+      duration: { totalMs: 5000, averageMs: 5000, minMs: 5000, maxMs: 5000 },
+      resume: { count: 0, rate: 0 },
+    },
+    runs: [],
+    warnings: [],
+  },
+  PROJECT_ROOT,
+);
+
+buildWorkflowTrendFromDashboard({ rootDir: PROJECT_ROOT });
+const payload = JSON.parse(
+  fs.readFileSync(
+    path.join(PROJECT_ROOT, "reports/workflow-trend/workflow-trend.json"),
+    "utf8",
+  ),
+);
+
+if (payload.schema !== WORKFLOW_TREND_SCHEMA) {
+  throw new Error("workflow-trend.json schema mismatch");
+}
+if (typeof payload.sampleCount !== "number") {
+  throw new Error("workflow-trend.json must include sampleCount");
+}
+if (!payload.trends || !Array.isArray(payload.trends.successRate)) {
+  throw new Error("workflow-trend.json must include trends.successRate");
+}
+
+console.log("workflow-trend.json generated ok");
+EOF
+pass "workflow-trend.json generated"
+
+echo "-- Test 283: trend-report.md generated --"
+test -f reports/workflow-trend/trend-report.md
+grep -q "# Workflow Trend Report" reports/workflow-trend/trend-report.md
+grep -q "## Success Rate Trend" reports/workflow-trend/trend-report.md
+grep -q "## Workflow Health Trend" reports/workflow-trend/trend-report.md
+pass "trend-report.md generated"
+
+echo "-- Test 284: workflow trend validator --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  validateWorkflowTrend,
+} from "./src/lib/developer_workflow_trend.js";
+
+const validation = validateWorkflowTrend(buildWorkflowTrend([]));
+if (!validation.valid) {
+  throw new Error(`workflow trend validator must pass: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateWorkflowTrend({});
+if (invalid.valid) {
+  throw new Error("workflow trend validator must fail for invalid trend");
+}
+
+console.log("workflow trend validator ok");
+EOF
+pass "workflow trend validator"
+
+echo "-- Test 285: workflow trend CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildWorkflowTrend,
+  buildWorkflowTrendCliSummary,
+  parseTrendInputs,
+} from "./src/lib/developer_workflow_trend.js";
+import { WORKFLOW_DASHBOARD_SCHEMA } from "./src/lib/developer_workflow_dashboard.js";
+
+const summary = buildWorkflowTrendCliSummary(
+  buildWorkflowTrend(
+    parseTrendInputs([
+      {
+        schema: WORKFLOW_DASHBOARD_SCHEMA,
+        generatedAt: "2026-07-02T00:00:00.000Z",
+        status: "success",
+        summary: { runCount: 1, stepCount: 1, totalDurationMs: 12000, resumeCount: 0 },
+        metrics: { runs: { completed: 1, failed: 0, stopped: 0, unknown: 0 }, resume: { count: 0 } },
+      },
+    ]),
+  ),
+);
+
+for (const expected of [
+  "Workflow Trend Summary",
+  "Snapshots: 1",
+  "Latest Success Rate: 100%",
+  "Latest Failure Rate: 0%",
+  "Latest Resume Rate: 0%",
+  "Latest Duration: 12 sec",
+  "Latest Health: Healthy",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`workflow trend CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("workflow trend CLI summary ok");
+EOF
+node scripts/run_developer_workflow_trend.js >/tmp/developer_workflow_trend_cli.log 2>&1
+grep -q "Workflow Trend Summary" /tmp/developer_workflow_trend_cli.log
+grep -q "workflow-trend.json" /tmp/developer_workflow_trend_cli.log
+grep -q "trend-report.md" /tmp/developer_workflow_trend_cli.log
+pass "workflow trend CLI summary"
+
+echo "-- Test 286: workflow trend does not reference timeline history checkpoint or state --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const trendSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_trend.js"),
+  "utf8",
+);
+
+for (const forbidden of [
+  "developer_workflow_timeline.js",
+  "developer_workflow_history.js",
+  "developer_workflow_resume.js",
+  "developer_workflow_checkpoint.js",
+  "developer_workflow.js",
+  "workflow-timeline.json",
+  "workflow-history.json",
+  "workflow-checkpoint.json",
+  "workflow-state.json",
+  "readWorkflowTimeline",
+  "readWorkflowHistory",
+  "readWorkflowCheckpoint",
+  "readWorkflowState",
+]) {
+  if (trendSource.includes(forbidden)) {
+    throw new Error(`workflow trend must not reference ${forbidden}`);
+  }
+}
+
+console.log("workflow trend does not reference timeline history checkpoint or state ok");
+EOF
+pass "workflow trend does not reference timeline history checkpoint or state"
+
+echo "-- Test 287: workflow trend uses dashboard public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const trendSource = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/developer_workflow_trend.js"),
+  "utf8",
+);
+
+if (!trendSource.includes("extractDashboardPublicContract")) {
+  throw new Error("workflow trend must use extractDashboardPublicContract");
+}
+
+for (const forbidden of [
+  "dashboard.runs",
+  "dashboard.warnings",
+  "dashboard.source",
+  "metrics.runs.completed",
+  "metrics.steps",
+]) {
+  if (trendSource.includes(forbidden)) {
+    throw new Error(`workflow trend must not reference dashboard internal field ${forbidden}`);
+  }
+}
+
+console.log("workflow trend uses dashboard public contract only ok");
+EOF
+pass "workflow trend uses dashboard public contract only"
+
+echo "-- Test 288: workflow trend excludes forecast prediction anomaly --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const trendSource = fs.readFileSync(
+  path.join(projectRoot, "src/lib/developer_workflow_trend.js"),
+  "utf8",
+);
+const cliSource = fs.readFileSync(
+  path.join(projectRoot, "scripts/run_developer_workflow_trend.js"),
+  "utf8",
+);
+const combined = `${trendSource}\n${cliSource}`;
+
+for (const forbiddenWord of ["forecast", "prediction", "anomaly"]) {
+  if (new RegExp(`\\b${forbiddenWord}\\b`, "i").test(combined)) {
+    throw new Error(`workflow trend must not include forbidden feature word: ${forbiddenWord}`);
+  }
+}
+
+for (const forbidden of [
+  "forecast(",
+  "prediction(",
+  "anomaly detection",
+  "anomalydetection",
+  "buildforecast",
+  "buildprediction",
+  "detectanomaly",
+  "correlation analysis",
+  "root cause analysis",
+  "automatic improvement",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`workflow trend must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("workflow trend excludes forecast prediction anomaly ok");
+EOF
+pass "workflow trend excludes forecast prediction anomaly"
 
 echo ""
 echo "All quality pipeline tests passed."

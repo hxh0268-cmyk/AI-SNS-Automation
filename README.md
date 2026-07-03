@@ -1170,6 +1170,32 @@ Latest Current Step
 release-plan
 ```
 
+### Trend Analytics Foundation（v1.38.0）
+
+Dashboard Public Contract を入力として、**Trend Analytics Foundation** を追加しました。Workflow の Success / Failure / Resume Rate / Duration / Health の時系列 Trend を生成します。
+
+Timeline / History / Checkpoint / Workflow State / Dashboard Internal は直接参照しません。Forecast / Prediction / Anomaly Detection / ML は実装していません。
+
+| 項目 | 内容 |
+|------|------|
+| trend schema | `developer-automation/workflow-trend/1.0` |
+| 入力 | Dashboard Public Contract（`workflow-dashboard.json` から抽出） |
+| Trend JSON | `reports/workflow-trend/workflow-trend.json` |
+| Trend Markdown | `reports/workflow-trend/trend-report.md` |
+| CLI | `npm run developer:trend` |
+
+#### CLI 出力例（Trend）
+
+```text
+Workflow Trend Summary
+Snapshots: 10
+Latest Success Rate: 98%
+Latest Failure Rate: 2%
+Latest Resume Rate: 14%
+Latest Duration: 12 sec
+Latest Health: Healthy
+```
+
 ### Developer Analytics Foundation（v1.37.0）
 
 Dashboard Foundation の上に、**Developer Analytics Foundation** を追加しました。workflow-dashboard.json の **Dashboard Public Contract** のみを入力として KPI・Health を生成します。

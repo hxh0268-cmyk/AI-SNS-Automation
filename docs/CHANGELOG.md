@@ -4,6 +4,37 @@
 
 ---
 
+## v1.38.0 — 機能追加（Trend Analytics Foundation）
+
+Dashboard Public Contract を入力として、Developer Automation の **Trend Analytics Foundation** を追加しました。Workflow Trend の時系列 MVP です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Trend schema | `developer-automation/workflow-trend/1.0` |
+| Trend Builder | `buildWorkflowTrend()` / `parseTrendInputs()`（Pure Function） |
+| Trend Validator | `validateWorkflowTrend()` |
+| Trend Report | `reports/workflow-trend/workflow-trend.json` / `trend-report.md` |
+| CLI | `npm run developer:trend` — Workflow Trend Summary |
+| Test 278–288 | schema / 0件・1件・複数件 / JSON / MD / CLI / contract-only / 非 ML |
+
+### 設計判断
+
+- **Dashboard Public Contract Only** — Timeline / History / Checkpoint / State / Dashboard Internal 非参照
+- **MVP 指標のみ** — Success / Failure / Resume Rate / Duration / Workflow Health Trend
+- **非スコープ** — Forecast / Prediction / Anomaly Detection / ML / AI Analysis
+- **JSON Source / Markdown View** — trend-report.md は JSON からのみ生成
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **288 PASS**（Test 278–288 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.37.1 — ドキュメント（Architecture Documentation Release）
 
 Developer Automation の **Architecture Documentation MVP** を追加しました。本番コード変更はありません。
