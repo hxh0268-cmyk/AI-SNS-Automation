@@ -4,6 +4,34 @@
 
 ---
 
+## v1.37.1 — ドキュメント（Architecture Documentation Release）
+
+Developer Automation の **Architecture Documentation MVP** を追加しました。本番コード変更はありません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Architecture Docs | `docs/architecture/`（README / PRINCIPLES / LAYER_MODEL / DEVELOPMENT_WORKFLOW / ROADMAP） |
+| README | Architecture Documentation へのリンク追加 |
+| VERSION | v1.37.1 / Next Candidate v1.38.0 Trend Analytics Foundation |
+| Production Code | **変更なし**（`src/` / `scripts/` / テスト未変更） |
+
+### 設計判断
+
+- **Documentation MVP** — Handbook 過剰拡張を避け、最小5ファイルに限定
+- **Official Docs First** — レイヤー・原則・フロー・ロードマップを公式化
+- **ADR 連携** — 個別判断は既存 ADR（0007 / 0008）を参照
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Production Code | **変更なし** |
+| Quality Pipeline Tests | **277 PASS**（テスト未変更・VERSION 整合は次コードリリースで更新予定） |
+
+---
+
 ## v1.37.0 — 機能追加（Developer Analytics Foundation）
 
 workflow-dashboard.json を唯一の入力として、Developer Automation の **Analytics 基盤（Analytics Foundation）** を追加しました。Dashboard Public Contract のみを参照する KPI / Health レイヤーです。

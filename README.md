@@ -4,6 +4,10 @@
 
 投稿文の作成から、カルーセル（5枚の画像付き投稿）の生成、画像の品質チェック、Instagram に投稿する直前の素材まとめまでを、1 本のコマンドで実行できます。
 
+## Architecture Documentation
+
+Developer Automation のアーキテクチャ原則・レイヤーモデル・開発フローは **[docs/architecture/](docs/architecture/README.md)** を参照してください。
+
 ---
 
 ## このツールでできること

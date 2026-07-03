@@ -2,7 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.37.0**（Developer Analytics Foundation）
+**v1.37.1**（Architecture Documentation Release）
+
+Documentation MVP — **No production code changes**
+
+**Next Candidate:** v1.38.0 Trend Analytics Foundation
 
 ---
 
@@ -10,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.37.1** | **ドキュメント** | **✅ 完了** | **Architecture Documentation MVP / docs/architecture 追加・コード変更なし** |
 | **v1.37.0** | **機能追加** | **✅ 完了** | **Developer Analytics Foundation / Dashboard Public Contract から KPI・Health 生成 MVP** |
 | **v1.36.0** | **機能追加** | **✅ 完了** | **Developer Dashboard Foundation / Timeline を唯一入力とする集計 MVP** |
 | v1.0 | Instagramカルーセル自動生成 | ✅ 完了 | 投稿〜カルーセル〜画像〜出力まで `npm run daily` で一括実行 |
@@ -54,6 +59,42 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.37.1 で追加（Architecture Documentation Release）
+
+#### Documentation MVP
+
+- **`docs/architecture/README.md`** … Architecture Documentation 入口
+- **`docs/architecture/PRINCIPLES.md`** … Developer Automation Rules
+- **`docs/architecture/LAYER_MODEL.md`** … レイヤー構造・Public Contract
+- **`docs/architecture/DEVELOPMENT_WORKFLOW.md`** … ChatGPT / Claude Code フロー
+- **`docs/architecture/ROADMAP.md`** … 優先順位・完了条件
+- **Production Code** … 変更なし
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.38.0 Trend Analytics Foundation** | Priority 1 残り — 時系列トレンド集計 |
+
+### 品質状況（v1.37.1 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Production Code Changes | **なし** |
+| Quality Pipeline Tests | **277 PASS**（テストスクリプト未変更） |
+| Architecture Documentation | **5 files** |
+
+### v1.37.1 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| docs/architecture 追加 | ✅ |
+| README / CHANGELOG / VERSION 更新 | ✅ |
+| src / scripts 未変更 | ✅ |
+| テスト未変更 | ✅ |
 
 ---
 
