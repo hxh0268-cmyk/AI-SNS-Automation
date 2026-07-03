@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.41.0**（Idea Generation Foundation）
+**v1.42.0**（AI Idea Generation Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.42.0 Content Generation Foundation
+**Next Candidate:** v1.43.0 Content Generation Foundation
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.42.0** | **機能追加** | **✅ 完了** | **AI Idea Generation Foundation / Mock AI Generator・Dedup・Ranking・Public Contract MVP** |
 | **v1.41.0** | **機能追加** | **✅ 完了** | **Idea Generation Foundation / Content Idea Builder・Validator・Public Contract MVP（LLM 非依存）** |
 | **v1.40.0** | **機能追加** | **✅ 完了** | **Visualization Foundation / Public Contract 整理 MVP — Developer Automation Platform Completed** |
 | **v1.39.0** | **機能追加** | **✅ 完了** | **Historical Analytics Foundation / Dashboard + Trend Public Contract から履歴集計 MVP** |
@@ -63,6 +64,44 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.42.0 で追加（AI Idea Generation Foundation）
+
+#### AI Content Idea MVP
+
+- **`generateAIIdeas()`** … Mock / deterministic AI Generator（外部 API 非接続）
+- **`deduplicateAIIdeas()`** … title 正規化 + 高 score 優先
+- **`rankAIIdeas()`** … novelty / relevance / usefulness / feasibility → finalScore
+- **`extractAIIdeaPublicContract()`** … 後続レイヤー向け Public Contract
+- **出力** … `output/content-ideas/content-ai-ideas.json` / `content-ai-ideas.md`
+- **CLI** … `npm run content:ai-ideas`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.43.0 Content Generation Foundation** | AI Idea Public Contract からコンテンツ生成 MVP |
+
+### 品質状況（v1.42.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **338 PASS** |
+| npm test | **PASS** |
+
+### v1.42.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| content-ai-ideas schema 1.0 | ✅ |
+| Mock AI Generator / Dedup / Rank | ✅ |
+| extractAIIdeaPublicContract | ✅ |
+| JSON = Source / Markdown = View / CLI = Summary | ✅ |
+| 外部 LLM / Publishing / Hashtag 非実装 | ✅ |
+| v1.41.0 content-ideas/1.0 後方互換 | ✅ |
+| Test 325–338 | ✅ |
 
 ---
 

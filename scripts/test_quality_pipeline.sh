@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.41.0 --"
+echo "-- Test 98: VERSION updated to v1.42.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.41.0**（Idea Generation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.41.0");
+if (!versionDoc.includes("**v1.42.0**（AI Idea Generation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.42.0");
 }
-console.log("VERSION v1.41.0 ok");
+console.log("VERSION v1.42.0 ok");
 EOF
-pass "VERSION updated to v1.41.0"
+pass "VERSION updated to v1.42.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.42.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.42.0");
+if (payload.nextVersion !== "v1.43.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.43.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.42.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.42.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.43.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.43.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.42.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.43.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -11373,6 +11373,331 @@ if (!Array.isArray(legacy.ideas) || legacy.ideas.length !== 3) {
 console.log("content generation backward compatibility preserved ok");
 EOF
 pass "content generation backward compatibility preserved"
+
+echo "-- Test 325: content-ai-ideas schema constant --"
+node --input-type=module <<'EOF'
+import {
+  CONTENT_AI_IDEA_SCHEMA,
+  buildAIIdeaPipeline,
+} from "./src/lib/content_ai_idea.js";
+
+const { output } = buildAIIdeaPipeline(
+  { topic: "test topic", audience: "test audience", count: 3 },
+  { generatedAt: "2026-07-03T00:00:00.000Z", rootDir: "/tmp/content-ai-idea-test-325" },
+);
+
+if (output.schema !== CONTENT_AI_IDEA_SCHEMA) {
+  throw new Error("content-ai-ideas schema constant mismatch");
+}
+if (CONTENT_AI_IDEA_SCHEMA !== "content-ai-ideas/1.0") {
+  throw new Error("CONTENT_AI_IDEA_SCHEMA mismatch");
+}
+
+console.log("content-ai-ideas schema constant ok");
+EOF
+pass "content-ai-ideas schema constant"
+
+echo "-- Test 326: AI idea input parser --"
+node --input-type=module <<'EOF'
+import { parseAIIdeaInputs } from "./src/lib/content_ai_idea.js";
+
+const parsed = parseAIIdeaInputs({
+  topic: "seasonal menu",
+  audience: "cafe owners",
+  count: 25,
+  seedIdeas: [{ id: "idea-001", title: "Seed Idea" }],
+});
+
+if (parsed.topic !== "seasonal menu" || parsed.audience !== "cafe owners") {
+  throw new Error("AI idea input parser must preserve topic and audience");
+}
+if (parsed.count !== 20) {
+  throw new Error("AI idea input parser must cap count at 20");
+}
+if (parsed.seedIdeas.length !== 1) {
+  throw new Error("AI idea input parser must preserve seed ideas");
+}
+
+console.log("AI idea input parser ok");
+EOF
+pass "AI idea input parser"
+
+echo "-- Test 327: AI idea mock generator --"
+node --input-type=module <<'EOF'
+import { generateAIIdeas } from "./src/lib/content_ai_idea.js";
+
+const first = generateAIIdeas({ topic: "mock topic", audience: "mock audience", count: 4 });
+const second = generateAIIdeas({ topic: "mock topic", audience: "mock audience", count: 4 });
+
+if (first.length <= 4) {
+  throw new Error("AI idea mock generator must include duplicate candidate for dedup testing");
+}
+if (JSON.stringify(first.map((idea) => idea.title)) !== JSON.stringify(second.map((idea) => idea.title))) {
+  throw new Error("AI idea mock generator must be deterministic");
+}
+if (!first.every((idea) => idea.scores && typeof idea.finalScore === "number")) {
+  throw new Error("AI idea mock generator must attach scores and finalScore");
+}
+
+console.log("AI idea mock generator ok");
+EOF
+pass "AI idea mock generator"
+
+echo "-- Test 328: AI idea deduplicator --"
+node --input-type=module <<'EOF'
+import { deduplicateAIIdeas, normalizeTitleKey } from "./src/lib/content_ai_idea.js";
+
+if (normalizeTitleKey("  Hello   WORLD ") !== "hello world") {
+  throw new Error("AI idea deduplicator must normalize whitespace and case");
+}
+
+const deduped = deduplicateAIIdeas([
+  {
+    id: "a",
+    title: "Seasonal Menu Ideas",
+    finalScore: 0.7,
+  },
+  {
+    id: "b",
+    title: "  seasonal   menu   ideas  ",
+    finalScore: 0.9,
+  },
+  {
+    id: "c",
+    title: "Unique Idea",
+    finalScore: 0.6,
+  },
+]);
+
+if (deduped.length !== 2) {
+  throw new Error("AI idea deduplicator must remove duplicate titles");
+}
+const winner = deduped.find((idea) => normalizeTitleKey(idea.title) === "seasonal menu ideas");
+if (!winner || winner.id !== "b") {
+  throw new Error("AI idea deduplicator must keep higher score duplicate");
+}
+
+console.log("AI idea deduplicator ok");
+EOF
+pass "AI idea deduplicator"
+
+echo "-- Test 329: AI idea ranking --"
+node --input-type=module <<'EOF'
+import { rankAIIdeas } from "./src/lib/content_ai_idea.js";
+
+const ranked = rankAIIdeas([
+  { id: "b", title: "B", finalScore: 0.7 },
+  { id: "a", title: "A", finalScore: 0.9 },
+  { id: "c", title: "C", finalScore: 0.7 },
+]);
+
+if (ranked.map((idea) => idea.id).join(",") !== "a,b,c") {
+  throw new Error("AI idea ranking must sort by finalScore desc then id asc");
+}
+if (ranked.map((idea) => idea.rank).join(",") !== "1,2,3") {
+  throw new Error("AI idea ranking must assign rank numbers");
+}
+
+console.log("AI idea ranking ok");
+EOF
+pass "AI idea ranking"
+
+echo "-- Test 330: AI idea output validator --"
+node --input-type=module <<'EOF'
+import {
+  buildAIIdeaPipeline,
+  validateAIIdeaOutput,
+} from "./src/lib/content_ai_idea.js";
+
+const { output } = buildAIIdeaPipeline(
+  { count: 2 },
+  { generatedAt: "2026-07-03T00:00:00.000Z", rootDir: "/tmp/content-ai-idea-test-330" },
+);
+const validation = validateAIIdeaOutput(output);
+
+if (!validation.valid) {
+  throw new Error(`AI idea output must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateAIIdeaOutput(null);
+if (invalid.valid) {
+  throw new Error("null AI idea output must be invalid");
+}
+
+console.log("AI idea output validator ok");
+EOF
+pass "AI idea output validator"
+
+echo "-- Test 331: extractAIIdeaPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildAIIdeaPipeline,
+  extractAIIdeaPublicContract,
+} from "./src/lib/content_ai_idea.js";
+
+const { output } = buildAIIdeaPipeline(
+  { count: 3 },
+  { generatedAt: "2026-07-03T00:00:00.000Z", rootDir: "/tmp/content-ai-idea-test-331" },
+);
+const contract = extractAIIdeaPublicContract(output);
+
+if (contract.summary.ideaCount !== output.ideas.length) {
+  throw new Error("AI idea public contract ideaCount mismatch");
+}
+if (!Array.isArray(contract.ideas) || contract.ideas.length === 0) {
+  throw new Error("AI idea public contract must expose ideas");
+}
+if ("generator" in contract || "inputs" in contract || "scores" in contract.ideas[0]) {
+  throw new Error("AI idea public contract must not expose internal fields");
+}
+
+console.log("extractAIIdeaPublicContract exposes public contract ok");
+EOF
+pass "extractAIIdeaPublicContract exposes public contract"
+
+echo "-- Test 332: AI idea markdown generated from json --"
+node --input-type=module <<'EOF'
+import {
+  buildAIIdeaPipeline,
+  buildAIIdeaMarkdown,
+} from "./src/lib/content_ai_idea.js";
+
+const { output } = buildAIIdeaPipeline(
+  { count: 3 },
+  { generatedAt: "2026-07-03T00:00:00.000Z", rootDir: "/tmp/content-ai-idea-test-332" },
+);
+const markdown = buildAIIdeaMarkdown(output);
+
+for (const expected of [
+  "# AI Content Ideas",
+  "| Top Score |",
+  "| Average Score |",
+  "| Rank |",
+]) {
+  if (!markdown.includes(expected)) {
+    throw new Error(`AI idea markdown must include: ${expected}`);
+  }
+}
+
+console.log("AI idea markdown generated from json ok");
+EOF
+pass "AI idea markdown generated from json"
+
+echo "-- Test 333: AI idea CLI summary --"
+node --input-type=module <<'EOF'
+import {
+  buildAIIdeaPipeline,
+  buildAIIdeaSummary,
+} from "./src/lib/content_ai_idea.js";
+
+const { output } = buildAIIdeaPipeline(
+  { count: 3 },
+  { generatedAt: "2026-07-03T00:00:00.000Z", rootDir: "/tmp/content-ai-idea-test-333" },
+);
+const summary = buildAIIdeaSummary(output);
+
+for (const expected of [
+  "AI Idea Summary",
+  "Ideas:",
+  "Top Score:",
+  "Average Score:",
+  "Provider: mock",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`AI idea CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("AI idea CLI summary ok");
+EOF
+pass "AI idea CLI summary"
+
+echo "-- Test 334: content-ai-ideas.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync("output/content-ideas/content-ai-ideas.json", "utf8"),
+);
+if (data.schema !== "content-ai-ideas/1.0") {
+  throw new Error("content-ai-ideas.json schema must be content-ai-ideas/1.0");
+}
+if (!Array.isArray(data.ideas) || data.ideas.length === 0) {
+  throw new Error("content-ai-ideas.json must include ranked ideas");
+}
+if (!data.ideas.every((idea) => typeof idea.rank === "number" && typeof idea.finalScore === "number")) {
+  throw new Error("content-ai-ideas.json idea shape mismatch");
+}
+
+console.log("content-ai-ideas.json generated ok");
+EOF
+pass "content-ai-ideas.json generated"
+
+echo "-- Test 335: content-ai-ideas.md generated --"
+test -f output/content-ideas/content-ai-ideas.md
+grep -q "# AI Content Ideas" output/content-ideas/content-ai-ideas.md
+grep -q "AI Idea Summary" /tmp/content_ai_ideas_cli.log
+grep -q "content-ai-ideas.json" /tmp/content_ai_ideas_cli.log
+grep -q "content-ai-ideas.md" /tmp/content_ai_ideas_cli.log
+pass "content-ai-ideas.md generated"
+
+echo "-- Test 336: content:ai-ideas npm script exists --"
+grep -q '"content:ai-ideas": "node scripts/run_content_ai_ideas.js"' package.json
+test -f scripts/run_content_ai_ideas.js
+test -f src/lib/content_ai_idea.js
+pass "content:ai-ideas npm script exists"
+
+echo "-- Test 337: AI idea foundation excludes publishing and external llm clients --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/content_ai_idea.js",
+  "scripts/run_content_ai_ideas.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "from \"openai\"",
+  "from 'openai'",
+  "@google/genai",
+  "chat.completions",
+  "hashtag",
+  "publish",
+  "schedule",
+  "generateImage",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`AI idea foundation must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("AI idea foundation excludes publishing and external llm clients ok");
+EOF
+pass "AI idea foundation excludes publishing and external llm clients"
+
+echo "-- Test 338: v1.41.0 idea generation backward compatibility preserved --"
+npm run content:ideas >/tmp/content_ideas_backward_compat_v141.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/content-ideas/content-ideas.json", "utf8"));
+if (data.schema !== "content-ideas/1.0") {
+  throw new Error("v1.41.0 content-ideas schema must remain content-ideas/1.0");
+}
+if (!Array.isArray(data.ideas) || data.ideas.length !== 3) {
+  throw new Error("v1.41.0 content:ideas output must remain unchanged");
+}
+
+console.log("v1.41.0 idea generation backward compatibility preserved ok");
+EOF
+grep -q "Content Idea Summary" /tmp/content_ideas_backward_compat_v141.log
+pass "v1.41.0 idea generation backward compatibility preserved"
 
 
 echo ""

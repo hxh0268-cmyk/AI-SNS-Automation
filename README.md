@@ -1170,6 +1170,56 @@ Latest Current Step
 release-plan
 ```
 
+### AI Idea Generation Foundation（v1.42.0）
+
+**AI Idea Generation Foundation** を Application Layer に追加しました。Mock / deterministic AI Generator により投稿アイデア候補を生成し、Deduplicator / Ranking で整理します。
+
+外部 API（OpenAI / Claude / Gemini）には接続しません。Provider は将来差し替え可能な Interface に閉じ込めています。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `content-ai-ideas/1.0` |
+| JSON | `output/content-ideas/content-ai-ideas.json` |
+| Markdown | `output/content-ideas/content-ai-ideas.md` |
+| CLI | `npm run content:ai-ideas` |
+| Public Contract | `extractAIIdeaPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Idea Generation (v1.41.0)
+        ↓
+AI Idea Generation (v1.42.0) ← 今回
+        ↓
+Content → Image → Publishing → Analytics → Improvement
+```
+
+#### MVP Scope
+
+AI Generator（mock）/ Input Parser / Deduplicator / Ranking / JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+投稿本文 / 画像 / ハッシュタグ / 投稿処理 / スケジューラー / 分析 / 外部 LLM 接続
+
+#### CLI 出力例
+
+```text
+AI Idea Summary
+Ideas: 5
+Top Score: 0.875
+Average Score: 0.812
+Provider: mock
+```
+
+#### gitignore
+
+`output/content-ideas/` は `.gitignore` 対象です。生成物はリポジトリに含まれません。
+
+#### 後方互換
+
+v1.41.0 の `npm run content:ideas`（`content-ideas/1.0`）は変更なく動作します。
+
 ### Idea Generation Foundation（v1.41.0）
 
 AI-SNS-Automation 本体の **Application Layer** 第一弾として **Idea Generation Foundation** を追加しました。LLM 非依存の Idea Builder / Validator / Public Contract MVP です。

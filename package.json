@@ -40,6 +40,7 @@
     "developer:trend": "node scripts/run_developer_workflow_trend.js",
     "developer:history-analytics": "node scripts/run_developer_workflow_history_analytics.js",
     "developer:visualization": "node scripts/run_developer_workflow_visualization.js",
-    "content:ideas": "node scripts/run_content_ideas.js"
+    "content:ideas": "node scripts/run_content_ideas.js",
+    "content:ai-ideas": "node scripts/run_content_ai_ideas.js"
   }
 }

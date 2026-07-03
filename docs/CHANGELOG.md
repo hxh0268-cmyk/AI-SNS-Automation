@@ -4,6 +4,39 @@
 
 ---
 
+## v1.42.0 — 機能追加（AI Idea Generation Foundation）
+
+Mock / deterministic AI Generator による **AI Idea Generation Foundation** を追加しました。Deduplicator / Ranking / Public Contract MVP です。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| AI Idea schema | `content-ai-ideas/1.0` |
+| AI Generator | `generateAIIdeas()` — mock provider（外部 API 非接続） |
+| Deduplicator | `deduplicateAIIdeas()` — title 正規化 + score 優先 |
+| Ranking | `rankAIIdeas()` — finalScore 降順 |
+| Public Contract | `extractAIIdeaPublicContract()` |
+| 出力 | `output/content-ideas/content-ai-ideas.json` / `content-ai-ideas.md` |
+| CLI | `npm run content:ai-ideas` |
+| Test 325–338 | Generator / Parser / Dedup / Rank / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **AI = Generator のみ** — Provider 依存を他レイヤーへ漏らさない Interface
+- **外部 API 非接続** — OpenAI / Claude / Gemini は将来差し替え可能
+- **非スコープ** — 投稿本文 / 画像 / ハッシュタグ / 投稿 / スケジューラー / 分析
+- **後方互換** — v1.41.0 `content-ideas/1.0` 維持
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **338 PASS**（Test 325–338 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.41.0 — 機能追加（Idea Generation Foundation）
 
 AI-SNS-Automation 本体の **Application Layer** 第一弾として **Idea Generation Foundation** を追加しました。LLM 非依存の Idea Builder / Validator / Public Contract MVP です。
