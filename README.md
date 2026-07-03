@@ -1170,6 +1170,53 @@ Latest Current Step
 release-plan
 ```
 
+### Analytics Foundation（v1.46.0）
+
+**Analytics Foundation** を Application Layer に追加しました。v1.45.0 の **Publishing Public Contract**（`extractPublishingPublicContract()`）のみを入力とし、**pre-publish Analytics Report** を生成します。
+
+外部 Metrics API / Instagram API / Database / 実投稿データ収集は実装しません。
+
+| 項目 | 内容 |
+|------|------|
+| schema | `analytics/1.0` |
+| JSON | `output/analytics/analytics.json` |
+| Markdown | `output/analytics/analytics.md` |
+| CLI | `npm run analytics` |
+| Public Contract | `extractAnalyticsPublicContract()` |
+
+#### Architecture（Application Layer）
+
+```text
+Publishing (v1.45.0)
+        ↓
+Analytics (v1.46.0) ← 今回（pre-publish 分析）
+        ↓
+Continuous Improvement（未着手）
+```
+
+#### MVP Scope
+
+Readiness / Quality / Checklist Score / Recommendation（ready / review / needs-work）/ JSON / Markdown / CLI Summary / Public Contract
+
+#### 非対象
+
+Instagram API / OAuth / Scheduler / Upload / Retry / Queue / Database / 外部 Metrics API / 実投稿データ収集
+
+#### CLI 出力例
+
+```text
+Analytics Summary
+Reports: 5
+Ready: 5
+Review: 0
+Needs Work: 0
+Average Readiness: 1
+```
+
+#### gitignore
+
+`output/analytics/` は `.gitignore` 対象です。
+
 ### Publishing Foundation（v1.45.0）
 
 **Publishing Foundation** を Application Layer に追加しました。v1.44.0 の **Image Generation Public Contract**（`extractImageGenerationPublicContract()`）のみを入力とし、Instagram 投稿用 **Publishing Package** を生成します。

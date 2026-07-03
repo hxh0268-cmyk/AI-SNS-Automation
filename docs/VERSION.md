@@ -2,11 +2,11 @@
 
 ## 現在のバージョン
 
-**v1.45.0**（Publishing Foundation）
+**v1.46.0**（Analytics Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.46.0 Analytics Foundation
+**Next Candidate:** v1.47.0 Continuous Improvement Foundation
 
 ---
 
@@ -14,6 +14,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.46.0** | **機能追加** | **✅ 完了** | **Analytics Foundation / Publishing Public Contract から pre-publish Analytics MVP** |
 | **v1.45.0** | **機能追加** | **✅ 完了** | **Publishing Foundation / Image Public Contract から Publishing Package MVP** |
 | **v1.44.0** | **機能追加** | **✅ 完了** | **Image Generation Foundation / Content Public Contract から画像 Prompt MVP** |
 | **v1.43.0** | **機能追加** | **✅ 完了** | **Content Generation Foundation / AI Idea Public Contract から投稿本文候補 MVP** |
@@ -67,6 +68,43 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.46.0 で追加（Analytics Foundation）
+
+#### Pre-publish Analytics MVP
+
+- **`buildAnalytics()`** … Publishing Public Contract から readiness / quality / checklist score
+- **`extractAnalyticsPublicContract()`** … 後続レイヤー向け Public Contract
+- **入力** … `extractPublishingPublicContract()` のみ
+- **出力** … `output/analytics/analytics.json` / `analytics.md`
+- **CLI** … `npm run analytics`
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.47.0 Continuous Improvement Foundation** | Analytics Public Contract から改善ループ MVP |
+
+### 品質状況（v1.46.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **391 PASS** |
+| npm test | **PASS** |
+
+### v1.46.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| analytics/1.0 schema | ✅ |
+| Analytics Builder / Validator / CLI | ✅ |
+| extractAnalyticsPublicContract | ✅ |
+| Publishing Public Contract Only | ✅ |
+| 外部 Metrics API / Database 非実装 | ✅ |
+| v1.45.0 後方互換 | ✅ |
+| Test 379–391 | ✅ |
 
 ---
 

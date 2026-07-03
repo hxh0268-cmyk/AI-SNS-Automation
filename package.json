@@ -44,6 +44,7 @@
     "content:ai-ideas": "node scripts/run_content_ai_ideas.js",
     "content:generate": "node scripts/run_content_generation.js",
     "image:generation": "node scripts/run_image_generation.js",
-    "publishing": "node scripts/run_publishing.js"
+    "publishing": "node scripts/run_publishing.js",
+    "analytics": "node scripts/run_analytics.js"
   }
 }

@@ -4,6 +4,36 @@
 
 ---
 
+## v1.46.0 — 機能追加（Analytics Foundation）
+
+Publishing Public Contract から **pre-publish Analytics Report** を生成する **Analytics Foundation** を追加しました。外部 Metrics API / 実投稿データ収集は実装しません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Analytics schema | `analytics/1.0` |
+| Analytics Builder | `buildAnalytics()` — readiness / quality / checklist score |
+| Public Contract | `extractAnalyticsPublicContract()` |
+| 出力 | `output/analytics/analytics.json` / `analytics.md` |
+| CLI | `npm run analytics` |
+| Test 379–391 | Parser / Builder / Validator / Public Contract / 後方互換 |
+
+### 設計判断
+
+- **Publishing Public Contract Only** — `extractPublishingPublicContract()` のみ入力
+- **pre-publish 分析** — metricType `pre-publish`、status `draft-analysis`
+- **外部 API 非接続** — Instagram API / Scheduler / Database / Metrics API 非実装
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **391 PASS**（Test 379–391 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.45.0 — 機能追加（Publishing Foundation）
 
 Image Generation Public Contract から **Publishing Package** を生成する **Publishing Foundation** を追加しました。Instagram API / Scheduler / Upload は実装しません。

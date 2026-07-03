@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.45.0 --"
+echo "-- Test 98: VERSION updated to v1.46.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.45.0**（Publishing Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.45.0");
+if (!versionDoc.includes("**v1.46.0**（Analytics Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.46.0");
 }
-console.log("VERSION v1.45.0 ok");
+console.log("VERSION v1.46.0 ok");
 EOF
-pass "VERSION updated to v1.45.0"
+pass "VERSION updated to v1.46.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.46.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.46.0");
+if (payload.nextVersion !== "v1.47.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.47.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.46.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.46.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.47.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.47.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.46.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.47.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -12672,6 +12672,364 @@ console.log("v1.44.0 image generation backward compatibility preserved ok");
 EOF
 grep -q "Image Generation Summary" /tmp/image_generation_backward_compat_v144.log
 pass "v1.44.0 image generation backward compatibility preserved"
+
+echo "-- Test 379: analytics.js exists --"
+test -f src/lib/analytics.js
+grep -q "ANALYTICS_SCHEMA" src/lib/analytics.js
+grep -q "buildAnalytics" src/lib/analytics.js
+grep -q "extractAnalyticsPublicContract" src/lib/analytics.js
+pass "analytics.js exists"
+
+echo "-- Test 380: analytics input parser --"
+node --input-type=module <<'EOF'
+import { parseAnalyticsArgs } from "./src/lib/analytics.js";
+import { extractPublishingPublicContract } from "./src/lib/publishing.js";
+
+const contract = extractPublishingPublicContract({
+  schema: "publishing/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  packages: [
+    {
+      id: "pkg-001",
+      sourceImagePromptId: "img-prompt-001",
+      title: "Seasonal Menu",
+      caption: "Try our new spring menu today",
+      platform: "instagram",
+      format: "feed",
+      status: "draft",
+      rank: 1,
+    },
+  ],
+});
+const parsed = parseAnalyticsArgs(null, contract);
+
+if (parsed.publishingContract.summary.packageCount !== 1) {
+  throw new Error("analytics input parser must preserve publishing public contract");
+}
+
+console.log("analytics input parser ok");
+EOF
+pass "analytics input parser"
+
+echo "-- Test 381: analytics uses publishing public contract only --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const source = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "src/lib/analytics.js"),
+  "utf8",
+);
+
+if (!source.includes("extractPublishingPublicContract")) {
+  throw new Error("analytics must use extractPublishingPublicContract");
+}
+
+for (const forbidden of [
+  "buildPublishingPackages(",
+  "normalizePublishingPackages(",
+  "pkg.asset",
+  "pkg.checklist",
+  "pkg.imagePrompt",
+  "PUBLISHING_PROVIDER",
+]) {
+  if (source.includes(forbidden)) {
+    throw new Error(`analytics must not reference publishing internal ${forbidden}`);
+  }
+}
+
+console.log("analytics uses publishing public contract only ok");
+EOF
+pass "analytics uses publishing public contract only"
+
+echo "-- Test 382: analytics builder --"
+node --input-type=module <<'EOF'
+import {
+  buildAnalytics,
+  buildAnalyticsReportFromPackage,
+} from "./src/lib/analytics.js";
+import { extractPublishingPublicContract } from "./src/lib/publishing.js";
+
+const contract = extractPublishingPublicContract({
+  schema: "publishing/1.0",
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  packages: [
+    {
+      id: "pkg-001",
+      sourceImagePromptId: "img-prompt-001",
+      title: "Menu Spotlight",
+      caption: "Discover our chef special menu for this season",
+      platform: "instagram",
+      format: "feed",
+      status: "draft",
+      rank: 1,
+    },
+  ],
+});
+const analytics = buildAnalytics(contract, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+});
+
+if (analytics.reports.length !== 1) {
+  throw new Error("analytics builder must create one report per package");
+}
+if (analytics.source !== "publishing-public-contract") {
+  throw new Error("analytics builder must set publishing-public-contract source");
+}
+if (analytics.metricType !== "pre-publish") {
+  throw new Error("analytics builder must set pre-publish metric type");
+}
+
+const report = buildAnalyticsReportFromPackage(contract.packages[0], 0);
+if (!report.readinessScore || !report.qualityScore || !report.checklistScore) {
+  throw new Error("analytics builder must compute scores");
+}
+if (!["ready", "review", "needs-work"].includes(report.recommendation)) {
+  throw new Error("analytics builder must set recommendation");
+}
+
+console.log("analytics builder ok");
+EOF
+pass "analytics builder"
+
+echo "-- Test 383: analytics normalizer --"
+node --input-type=module <<'EOF'
+import { buildAnalytics, normalizeAnalytics } from "./src/lib/analytics.js";
+import { extractPublishingPublicContract } from "./src/lib/publishing.js";
+
+const normalized = normalizeAnalytics(
+  buildAnalytics(
+    extractPublishingPublicContract({
+      schema: "publishing/1.0",
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      packages: [
+        {
+          id: "pkg-b",
+          sourceImagePromptId: "img-b",
+          title: "B Title Here",
+          caption: "Caption for package b with enough detail",
+          platform: "instagram",
+          format: "feed",
+          status: "draft",
+          rank: 2,
+        },
+        {
+          id: "pkg-a",
+          sourceImagePromptId: "img-a",
+          title: "A Title Here",
+          caption: "Caption for package a with enough detail",
+          platform: "instagram",
+          format: "feed",
+          status: "draft",
+          rank: 1,
+        },
+      ],
+    }),
+  ),
+);
+
+if (normalized.reports.map((report) => report.rank).join(",") !== "1,2") {
+  throw new Error("analytics normalizer must stable-sort reports by rank");
+}
+
+console.log("analytics normalizer ok");
+EOF
+pass "analytics normalizer"
+
+echo "-- Test 384: analytics validator --"
+node --input-type=module <<'EOF'
+import {
+  buildAnalyticsPipeline,
+  validateAnalytics,
+} from "./src/lib/analytics.js";
+import { buildPublishingPipeline } from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/analytics-test-384";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildPublishingPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { analytics } = buildAnalyticsPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const validation = validateAnalytics(analytics);
+
+if (!validation.valid) {
+  throw new Error(`analytics must validate: ${validation.errors.join("; ")}`);
+}
+
+const invalid = validateAnalytics(null);
+if (invalid.valid) {
+  throw new Error("null analytics must be invalid");
+}
+
+console.log("analytics validator ok");
+EOF
+pass "analytics validator"
+
+echo "-- Test 385: extractAnalyticsPublicContract exposes public contract --"
+node --input-type=module <<'EOF'
+import {
+  buildAnalyticsPipeline,
+  extractAnalyticsPublicContract,
+} from "./src/lib/analytics.js";
+import { buildPublishingPipeline } from "./src/lib/publishing.js";
+import { buildImageGenerationPipeline } from "./src/lib/image_generation.js";
+import { buildContentGenerationPipeline } from "./src/lib/content_generation.js";
+import { buildAIIdeaPipeline } from "./src/lib/content_ai_idea.js";
+
+const rootDir = "/tmp/analytics-test-385";
+buildAIIdeaPipeline({ count: 1 }, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildContentGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildImageGenerationPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+buildPublishingPipeline(null, { generatedAt: "2026-07-03T00:00:00.000Z", rootDir });
+const { analytics } = buildAnalyticsPipeline(null, {
+  generatedAt: "2026-07-03T00:00:00.000Z",
+  rootDir,
+});
+const contract = extractAnalyticsPublicContract(analytics);
+
+if (contract.summary.reportCount !== analytics.reports.length) {
+  throw new Error("analytics public contract reportCount mismatch");
+}
+if ("readinessScore" in contract.reports[0] || "flags" in contract.reports[0]) {
+  throw new Error("analytics public contract must not expose internal score details");
+}
+
+console.log("extractAnalyticsPublicContract exposes public contract ok");
+EOF
+pass "extractAnalyticsPublicContract exposes public contract"
+
+echo "-- Test 386: analytics.json generated --"
+npm run content:ai-ideas >/tmp/content_ai_ideas_before_analytics.log 2>&1
+npm run content:generate >/tmp/content_generate_before_analytics.log 2>&1
+npm run image:generation >/tmp/image_generation_before_analytics.log 2>&1
+npm run publishing >/tmp/publishing_before_analytics.log 2>&1
+npm run analytics >/tmp/analytics_cli.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/analytics/analytics.json", "utf8"));
+if (data.schema !== "analytics/1.0") {
+  throw new Error("analytics.json schema must be analytics/1.0");
+}
+if (data.source !== "publishing-public-contract") {
+  throw new Error("analytics.json source must be publishing-public-contract");
+}
+if (!Array.isArray(data.reports) || data.reports.length === 0) {
+  throw new Error("analytics.json must include reports");
+}
+if (!data.reports.every((report) => report.recommendation && Array.isArray(report.flags))) {
+  throw new Error("analytics.json report shape mismatch");
+}
+
+console.log("analytics.json generated ok");
+EOF
+pass "analytics.json generated"
+
+echo "-- Test 387: analytics.md generated --"
+test -f output/analytics/analytics.md
+grep -q "# Analytics Report" output/analytics/analytics.md
+grep -q "## Reports" output/analytics/analytics.md
+grep -q "| Recommendation |" output/analytics/analytics.md
+pass "analytics.md generated"
+
+echo "-- Test 388: analytics CLI summary --"
+grep -q "Analytics Summary" /tmp/analytics_cli.log
+grep -q "analytics.json" /tmp/analytics_cli.log
+grep -q "analytics.md" /tmp/analytics_cli.log
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { printAnalyticsSummary } from "./src/lib/analytics.js";
+
+const data = JSON.parse(fs.readFileSync("output/analytics/analytics.json", "utf8"));
+const summary = printAnalyticsSummary(data);
+
+for (const expected of [
+  "Analytics Summary",
+  "Reports:",
+  "Ready:",
+  "Review:",
+  "Needs Work:",
+  "Average Readiness:",
+]) {
+  if (!summary.includes(expected)) {
+    throw new Error(`analytics CLI summary must include: ${expected}`);
+  }
+}
+
+console.log("analytics CLI summary ok");
+EOF
+pass "analytics CLI summary"
+
+echo "-- Test 389: analytics npm script exists --"
+grep -q '"analytics": "node scripts/run_analytics.js"' package.json
+test -f scripts/run_analytics.js
+pass "analytics npm script exists"
+
+echo "-- Test 390: analytics excludes external metrics api and publishing integrations --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const combined = [
+  "src/lib/analytics.js",
+  "scripts/run_analytics.js",
+]
+  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
+  .join("\n");
+
+for (const forbidden of [
+  "Instagram API",
+  "X API",
+  "Facebook API",
+  "Threads API",
+  "OAuth",
+  "access_token",
+  "accessToken",
+  "scheduler",
+  "Retry",
+  "Queue",
+  "database",
+  "Metrics API",
+  "graph.instagram",
+  "insights",
+  "from \"openai\"",
+  "@google/genai",
+]) {
+  if (combined.includes(forbidden)) {
+    throw new Error(`analytics must not include forbidden feature: ${forbidden}`);
+  }
+}
+
+console.log("analytics excludes external metrics api and publishing integrations ok");
+EOF
+pass "analytics excludes external metrics api and publishing integrations"
+
+echo "-- Test 391: v1.45.0 publishing backward compatibility preserved --"
+npm run publishing >/tmp/publishing_backward_compat_v145.log 2>&1
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(fs.readFileSync("output/publishing/publishing.json", "utf8"));
+if (data.schema !== "publishing/1.0") {
+  throw new Error("v1.45.0 publishing schema must remain publishing/1.0");
+}
+if (!Array.isArray(data.packages) || data.packages.length === 0) {
+  throw new Error("v1.45.0 publishing output must remain valid");
+}
+
+console.log("v1.45.0 publishing backward compatibility preserved ok");
+EOF
+grep -q "Publishing Summary" /tmp/publishing_backward_compat_v145.log
+pass "v1.45.0 publishing backward compatibility preserved"
 
 
 echo ""
