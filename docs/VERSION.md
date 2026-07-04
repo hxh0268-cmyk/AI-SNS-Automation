@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.49.0**（Architecture Documentation Foundation）
+**v1.50.0**（Future Entry Criteria Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.50.0
+**Next Candidate:** v1.51.0
 
 ---
 
@@ -16,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.50.0** | **ドキュメント** | **✅ 完了** | **Future Entry Criteria Foundation / Level 3→4 Entry Gate 正式定義** |
 | **v1.49.0** | **ドキュメント** | **✅ 完了** | **Architecture Documentation Foundation / Architecture Governance 正式基準書** |
 | **v1.48.0** | **機能追加** | **✅ 完了** | **Public Contract Catalog & Compatibility Foundation / Application Layer Public Contract 一覧・互換性ルール固定** |
 | **v1.47.0** | **機能追加** | **✅ 完了** | **Continuous Improvement Foundation / Analytics Public Contract から pre-publish 改善 MVP** |
@@ -76,6 +77,45 @@
 
 ---
 
+### v1.50.0 で追加（Future Entry Criteria Foundation）
+
+#### Future Entry Gate 正式定義
+
+- **`FUTURE_ENTRY_CRITERIA.md`** … Level 3→4 Entry Gate、Universal + 領域別 Entry Criteria
+- **Non-Goals Release Criteria** … 実装禁止解除条件の明文化
+- **Required ADR / Reviews** … Provider / Runtime / Scheduler 着手前の Governance 要件
+- **Architecture Governance** … 21 必須文書（v1.49.0 の 20 + 本書）
+- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.51.0** | 次フェーズ候補 |
+
+### 品質状況（v1.50.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **460 PASS** |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+
+### v1.50.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Future Entry Criteria 文書 | ✅ |
+| Architecture Governance docs（21 必須文書） | ✅ |
+| Current Maturity Level 2.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Provider / Runtime / Scheduler / API 非実装 | ✅ |
+| v1.49.0 後方互換 | ✅ |
+| Test 449–460 | ✅ |
+
+---
+
 ### v1.49.0 で追加（Architecture Documentation Foundation）
 
 #### Architecture Governance 正式基準書
@@ -91,9 +131,9 @@
 
 | 候補 | 方針 |
 |------|------|
-| **v1.50.0** | 次フェーズ候補 |
+| **v1.51.0** | 次フェーズ候補 |
 
-### 品質状況（v1.49.0 最新）
+### 品質状況（v1.49.0）
 
 | 項目 | 結果 |
 |------|------|

@@ -6,7 +6,7 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**20 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3）を固定します。
+Architecture Documentation = **Architecture Governance** として、**21 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1）を固定します。
 
 **Current Maturity:** [Level 2.5 — Governance Complete, Future Design Ready](./ARCHITECTURE_MATURITY_MODEL.md#current-maturity)
 
@@ -32,12 +32,14 @@ Architecture Documentation = **Architecture Governance** として、**20 必須
 | 18 | 適合確認 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 追加改善 |
 | 19 | 品質 Governance | [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) | Release 前改善 |
 | 20 | 成熟度 | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) | Release 前改善 |
+| 21 | Future Entry Gate | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | v1.50.0 |
 
 **文書の役割分担:**
 
 | 文書 | 役割 |
 |------|------|
 | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) | **成熟度 Level 0–6** — 現在位置と未到達段階 |
+| [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | **Level 3→4 Entry Gate** — Future 実装着手前条件 |
 | [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) | **Machine Check vs Governance Check** — PASS 数の位置づけ |
 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 変更・release 時の **運用適合確認**（Read + Verify） |
 | [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | Foundation 追加時の **技術確認** |
@@ -59,14 +61,14 @@ Architecture Documentation = **Architecture Governance** として、**20 必須
 
 ---
 
-## 現在フェーズ（v1.49.0）
+## 現在フェーズ（v1.50.0）
 
 | Layer | 状態 |
 |-------|------|
 | Platform Layer（Developer Automation） | **Completed**（v1.40.0、保守のみ） |
 | Application Layer（Content Pipeline） | **Completed**（v1.47.0） |
-| Governance Layer（Catalog + Docs） | **Completed**（v1.48.0–v1.49.0） |
-| Future Layer（Provider / Runtime 等） | **Design Only**（実装禁止） |
+| Governance Layer（Catalog + Docs） | **Completed**（v1.48.0–v1.50.0） |
+| Future Layer（Provider / Runtime 等） | **Design Only + Entry Criteria 文書化**（実装禁止） |
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。
 
@@ -103,4 +105,4 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 3. [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) + [CATALOG_USAGE.md](./CATALOG_USAGE.md)
 4. [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) + [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md)
 5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) + [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
-6. [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)
+6. [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) + [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)

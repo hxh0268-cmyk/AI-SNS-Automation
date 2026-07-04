@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.49.0 --"
+echo "-- Test 98: VERSION updated to v1.50.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.49.0**（Architecture Documentation Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.49.0");
+if (!versionDoc.includes("**v1.50.0**（Future Entry Criteria Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.50.0");
 }
-console.log("VERSION v1.49.0 ok");
+console.log("VERSION v1.50.0 ok");
 EOF
-pass "VERSION updated to v1.49.0"
+pass "VERSION updated to v1.50.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.50.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.50.0");
+if (payload.nextVersion !== "v1.51.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.51.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.50.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.50.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.51.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.51.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.50.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.51.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13920,7 +13920,8 @@ for file in \
   RISK_REGISTER.md \
   ARCHITECTURE_COMPLIANCE_CHECKLIST.md \
   QUALITY_GOVERNANCE.md \
-  ARCHITECTURE_MATURITY_MODEL.md
+  ARCHITECTURE_MATURITY_MODEL.md \
+  FUTURE_ENTRY_CRITERIA.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13955,6 +13956,7 @@ const requiredHeadings = [
   ["ARCHITECTURE_COMPLIANCE_CHECKLIST.md", ["# Architecture Compliance Checklist", "## Universal Compliance Items", "## Foundation Addition", "## Public Contract Change", "## Future Architecture Addition", "## Provider Runtime Scheduler API Pre Addition", "## Release Pre Check", "## Backward Compatibility Check", "## Risk Check", "## ADR Check"]],
   ["QUALITY_GOVERNANCE.md", ["# Quality Governance", "## PASS Count Is Not Sufficient Quality Proof", "## PASS Count Meaning", "## Architecture Quality Requires Governance Review", "## Machine Check vs Governance Check", "## Future Layer And Future Architecture", "## PASS Count Update Procedure"]],
   ["ARCHITECTURE_MATURITY_MODEL.md", ["# Architecture Maturity Model", "## Purpose", "## Scope", "## Non Goals", "## Maturity Levels", "## Level 0: Idea", "## Level 1: Foundation", "## Level 2: Governance", "## Level 3: Future Design", "## Level 4: Implementation Ready", "## Level 5: Production Ready", "## Level 6: Operational Excellence", "## Current Maturity", "## Completed Capabilities", "## Current Limitations", "## Required Evidence", "## Transition Rules", "## Relationship to Quality Governance", "## Relationship to Future Entry Criteria", "## Relationship to Compliance Checklist", "## Completion Criteria"]],
+  ["FUTURE_ENTRY_CRITERIA.md", ["# Future Entry Criteria", "## Purpose", "## Current Maturity Position", "## Scope", "## Non Goals", "## Entry Gate Principle", "## Universal Entry Criteria", "## Provider Entry Criteria", "## Runtime Entry Criteria", "## Scheduler Entry Criteria", "## OAuth Entry Criteria", "## SNS API Entry Criteria", "## External API Entry Criteria", "## Database Entry Criteria", "## Queue Entry Criteria", "## Worker Entry Criteria", "## Cloud Runtime Entry Criteria", "## Real Metrics Entry Criteria", "## Real Automation Entry Criteria", "## Required ADR", "## Required Risk Review", "## Required Compatibility Review", "## Required Public Contract Review", "## Required Compliance Checklist", "## Non Goals Release Criteria", "## v2 Entry Criteria", "## Level 3 to Level 4 Gate", "## Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -13982,9 +13984,10 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "20 必須 Governance 文書" docs/architecture/README.md
+grep -q "21 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
+grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14012,6 +14015,7 @@ const requiredLinks = [
   "./ARCHITECTURE_COMPLIANCE_CHECKLIST.md",
   "./QUALITY_GOVERNANCE.md",
   "./ARCHITECTURE_MATURITY_MODEL.md",
+  "./FUTURE_ENTRY_CRITERIA.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14020,7 +14024,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 20 governance files ok");
+console.log("architecture README links all 21 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14244,8 +14248,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**448 PASS**" docs/VERSION.md
-grep -q "Test 423–448" docs/VERSION.md
+grep -Fq "**460 PASS**" docs/VERSION.md
+grep -q "Test 449–460" docs/VERSION.md
+grep -q "FUTURE_ENTRY_CRITERIA.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14253,8 +14258,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**448 PASS**" docs/CHANGELOG.md
-grep -q "Test 440–448" docs/CHANGELOG.md
+grep -Fq "**460 PASS**" docs/CHANGELOG.md
+grep -q "Test 449–460" docs/CHANGELOG.md
+grep -q "v1.50.0" docs/CHANGELOG.md
+grep -q "Future Entry Criteria" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14342,6 +14349,72 @@ grep -q "Future Entry Criteria" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
 grep -q "Level 3 → Level 4" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
 grep -q "Gate" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
 pass "maturity model links level 3/4 transition to future entry criteria"
+
+echo "-- Test 449: future entry criteria document exists --"
+test -f docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "# Future Entry Criteria" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria document exists"
+
+echo "-- Test 450: docs/architecture/README references future entry criteria --"
+grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
+grep -q "Future Entry Gate" docs/architecture/README.md
+grep -q "21 必須 Governance 文書" docs/architecture/README.md
+pass "docs/architecture/README references future entry criteria"
+
+echo "-- Test 451: README references future entry criteria --"
+grep -q "FUTURE_ENTRY_CRITERIA.md" README.md
+grep -q "Future Entry Criteria Foundation（v1.50.0）" README.md
+grep -q "21 必須 Governance 文書" README.md
+pass "README references future entry criteria"
+
+echo "-- Test 452: CHANGELOG references v1.50.0 --"
+grep -q "## v1.50.0" docs/CHANGELOG.md
+grep -q "Future Entry Criteria Foundation" docs/CHANGELOG.md
+grep -q "FUTURE_ENTRY_CRITERIA.md" docs/CHANGELOG.md
+pass "CHANGELOG references v1.50.0"
+
+echo "-- Test 453: VERSION references v1.50.0 --"
+grep -Fq "**v1.50.0**（Future Entry Criteria Foundation）" docs/VERSION.md
+grep -q "Future Entry Criteria Foundation" docs/VERSION.md
+grep -q "Level 4 Implementation Ready" docs/VERSION.md
+pass "VERSION references v1.50.0"
+
+echo "-- Test 454: future entry criteria includes provider entry criteria --"
+grep -q "## Provider Entry Criteria" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Layer" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes provider entry criteria"
+
+echo "-- Test 455: future entry criteria includes runtime entry criteria --"
+grep -q "## Runtime Entry Criteria" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Runtime Layer" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes runtime entry criteria"
+
+echo "-- Test 456: future entry criteria includes scheduler entry criteria --"
+grep -q "## Scheduler Entry Criteria" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Scheduler" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes scheduler entry criteria"
+
+echo "-- Test 457: future entry criteria includes required adr --"
+grep -q "## Required ADR" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider 着手" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes required adr"
+
+echo "-- Test 458: future entry criteria includes required risk review --"
+grep -q "## Required Risk Review" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "RISK_REGISTER.md" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes required risk review"
+
+echo "-- Test 459: future entry criteria includes required compatibility review --"
+grep -q "## Required Compatibility Review" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "COMPATIBILITY_POLICY.md" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes required compatibility review"
+
+echo "-- Test 460: future entry criteria includes level 3 to level 4 gate --"
+grep -q "## Level 3 to Level 4 Gate" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3 → Level 4 Gate" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Implementation Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "未到達" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria includes level 3 to level 4 gate"
 
 
 echo ""

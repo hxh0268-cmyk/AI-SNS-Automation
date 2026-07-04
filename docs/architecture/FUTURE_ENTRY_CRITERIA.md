@@ -1,0 +1,421 @@
+# Future Entry Criteria
+
+Future Layer および v2 Architecture へ **実装を開始する前** に満たすべき **Entry Gate** を定義する Architecture Governance 基準書です。本書は [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) における **Level 3 → Level 4** 遷移の公式条件を明文化します。
+
+> **重要:** 本書の追加は **設計・Governance のみ** です。Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装を許可しません**。Implementation Ready（Level 4）にも **未到達** です。
+
+---
+
+## Purpose
+
+- Future Layer 実装開始前の **Entry Gate** を唯一の公式基準として固定する
+- [NON_GOALS.md](./NON_GOALS.md) の **解除条件** を明文化する
+- v2 Architecture Completion に向けた **段階的 Entry Criteria** を定義する
+- Machine Check（Quality Pipeline）と Governance Check（Compliance Checklist）の **両方** を Gate に含める
+- [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) に従い、**PASS 数だけでは Gate を通過したと判断しない**
+
+---
+
+## Current Maturity Position
+
+```text
+Current Maturity: Level 2.5 — Governance Complete, Future Design Ready
+```
+
+| 項目 | 状態（v1.50.0） |
+|------|-----------------|
+| Level 1 Foundation | **Completed** |
+| Level 2 Governance | **Completed** |
+| Future Entry Criteria 文書 | **Completed**（本書 — v1.50.0） |
+| Level 3 Future Design Gate | **文書整備完了、Gate 未通過** |
+| Level 4 Implementation Ready | **未到達** |
+| Level 5 Production Ready | **未到達** |
+| Level 6 Operational Excellence | **未到達** |
+
+本書を追加しても **Implementation Ready には到達しません**。Level 4 到達には本書で定義する **Level 3 to Level 4 Gate** の全項目完了が必要です。
+
+---
+
+## Scope
+
+- Universal Entry Criteria（全 Future 実装共通）
+- Provider / Runtime / Scheduler / OAuth / SNS API / External API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation 各領域の **着手前条件**
+- Required ADR / Risk / Compatibility / Public Contract / Compliance Checklist
+- Non-Goals 解除条件
+- v2 Entry Criteria（Architecture Completion 向け）
+- Level 3 → Level 4 Gate 定義
+
+本書は **Governance Layer** の文書であり、Application Layer / Platform Layer の Public Contract を変更しません。
+
+---
+
+## Non Goals
+
+- 本書は **実装計画・実装ロードマップ** ではない
+- 本書の存在だけで Provider / Runtime / Scheduler 等を **実装可能にしない**
+- **Production Ready** / **Operational Excellence** を宣言するものではない
+- Quality Pipeline の **PASS 数増加だけで Gate を通過したとみなさない**
+- 外部 API 呼び出し・OAuth フロー・Database スキーマの **具体実装** を含まない
+- Public Contract Catalog の **破壊的変更** を暗黙に許可しない
+
+---
+
+## Entry Gate Principle
+
+Future Layer へのいかなる実装着手も、以下の **Gate 原則** に従います。
+
+1. **Design Before Code** — [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) に設計が存在すること
+2. **Non-Goals Explicit Release** — [NON_GOALS.md](./NON_GOALS.md) で対象領域の解除が ADR 記録済みであること
+3. **Evidence Before Maturity Claim** — Machine Check + Governance Check + Artifact Evidence
+4. **Public Contract First** — 新規 Contract は Catalog 追加・Compatibility Review 完了後
+5. **No Silent Scope Expansion** — Compliance Checklist + Mandatory Policy Review 必須
+
+```text
+Future 実装着手 =
+  Universal Entry Criteria PASS
+  AND 領域別 Entry Criteria PASS
+  AND Required ADR / Reviews PASS
+  AND Non-Goals Release Criteria PASS
+  AND Level 3 to Level 4 Gate PASS
+```
+
+---
+
+## Universal Entry Criteria
+
+すべての Future Layer 実装 Epic の **共通前提**:
+
+| # | 条件 | Evidence |
+|---|------|----------|
+| U1 | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) — Level 3 Future Design 在住を宣言 | VERSION / CHANGELOG |
+| U2 | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md)（本書）が最新 Governance に含まれる | docs/architecture/README |
+| U3 | [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 対象 Layer の Design Only 節が存在 | ADR 参照 |
+| U4 | [NON_GOALS.md](./NON_GOALS.md) — 対象領域が **まだ禁止** であることを確認（解除前） | Compliance Checklist |
+| U5 | [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) — Mandatory Policy Review 完了 | Review 記録 |
+| U6 | [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) — PASS 数 ≠ Gate 通過を理解した上での判断 | Governance Check |
+| U7 | Quality Pipeline 全 PASS（Machine Check） | CI / local pipeline |
+| U8 | v1.48.0 Public Contract Catalog 後方互換維持 | Catalog diff review |
+
+---
+
+## Provider Entry Criteria
+
+[EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) Provider Addition 節 + 以下:
+
+| # | 条件 |
+|---|------|
+| P1 | Provider Layer 責務が [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) と一致 |
+| P2 | Mock Provider を default、Real Provider は feature flag 設計（ADR） |
+| P3 | Application Public Contract を **入力** とし、Provider 出力は Adapter 経由で shape 変換 |
+| P4 | 新規 Provider Public Contract の Catalog 登録計画 |
+| P5 | Rate limit / auth / retry は Provider/Adapter 内 — Foundation 非公開 |
+| P6 | Provider 追加 ADR（最低 1 件）+ Risk Register 更新 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Runtime Entry Criteria
+
+| # | 条件 |
+|---|------|
+| R1 | Runtime Layer 責務が [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) と一致 |
+| R2 | Foundation は pure function のまま — Runtime は orchestration のみ |
+| R3 | JSON artifact 読み書き + CLI invoke 境界の Public Contract 定義 |
+| R4 | Developer Automation Workflow（Platform）との Runtime 分離 ADR |
+| R5 | Error Handling / Observability 方針（Design） |
+| R6 | Runtime 追加 ADR + Compatibility Review |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Scheduler Entry Criteria
+
+| # | 条件 |
+|---|------|
+| S1 | Scheduler は Future Layer — Application Foundation を直接変更しない |
+| S2 | Cron / queue trigger 設計が Non-Goals 解除 ADR に含まれる |
+| S3 | Idempotency / at-least-once 方針（Design） |
+| S4 | Scheduler Public Contract（schedule spec JSON schema 草案） |
+| S5 | Scheduler ADR + Risk Review（運用負荷） |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## OAuth Entry Criteria
+
+| # | 条件 |
+|---|------|
+| O1 | OAuth は External API / SNS 接続の **前提** — 単独で Foundation に混入しない |
+| O2 | Token storage / rotation 方針（Design — 秘密情報は repo 外） |
+| O3 | Security Review 計画（将来 Epic） |
+| O4 | OAuth scope 最小化原則 ADR |
+| O5 | [NON_GOALS.md](./NON_GOALS.md) OAuth 節の明示解除 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## SNS API Entry Criteria
+
+| # | 条件 |
+|---|------|
+| N1 | SNS API は Provider + Adapter 経由 — Application Layer 直接 HTTP 禁止 |
+| N2 | 自動投稿は [NON_GOALS.md](./NON_GOALS.md) 直到 Explicit Release |
+| N3 | API rate limit / ToS compliance 方針（Design） |
+| N4 | SNS API Public Contract（request/response shape 草案） |
+| N5 | SNS API ADR + Risk Register（アカウント停止リスク） |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## External API Entry Criteria
+
+| # | 条件 |
+|---|------|
+| E1 | LLM / Image / Metrics 等 — Provider 抽象化必須 |
+| E2 | API key は env / secret store — コード・repo 禁止 |
+| E3 | Timeout / retry / circuit breaker 方針（Design） |
+| E4 | External API 追加ごとに Adapter + Catalog 更新 |
+| E5 | External API ADR + Compatibility Review |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Database Entry Criteria
+
+| # | 条件 |
+|---|------|
+| D1 | JSON = Source 原則 — DB は **補助永続化** のみ（ADR で位置づけ） |
+| D2 | Migration / rollback 方針（Design） |
+| D3 | Application Foundation output JSON との整合 |
+| D4 | Database ADR + Risk Review（データ損失） |
+| D5 | [NON_GOALS.md](./NON_GOALS.md) Database 節の明示解除 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Queue Entry Criteria
+
+| # | 条件 |
+|---|------|
+| Q1 | Queue は Runtime / Worker とセット設計 |
+| Q2 | At-least-once / dead-letter 方針（Design） |
+| Q3 | Foundation JSON artifact を message payload とする設計 |
+| Q4 | Queue ADR + Risk Review |
+| Q5 | [NON_GOALS.md](./NON_GOALS.md) Queue 節の明示解除 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Worker Entry Criteria
+
+| # | 条件 |
+|---|------|
+| W1 | Worker は Runtime 配下 — Foundation pure function 維持 |
+| W2 | Horizontal scale / concurrency 方針（Design） |
+| W3 | Worker health / heartbeat Public Contract 草案 |
+| W4 | Worker ADR + Observability 計画 |
+| W5 | [NON_GOALS.md](./NON_GOALS.md) Worker 節の明示解除 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Cloud Runtime Entry Criteria
+
+| # | 条件 |
+|---|------|
+| C1 | Local / CI Runtime 完了後に Cloud Runtime 着手（段階的） |
+| C2 | Cloud provider ロックイン回避方針 ADR |
+| C3 | Secret / IAM / network 境界（Design） |
+| C4 | Cost monitoring 計画（Operational 向け — Level 5+） |
+| C5 | [NON_GOALS.md](./NON_GOALS.md) Cloud 節の明示解除 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Real Metrics Entry Criteria
+
+| # | 条件 |
+|---|------|
+| M1 | Developer Automation metrics（Platform）と Real Metrics（Future）の分離 |
+| M2 | 実投稿・実エンゲージメントデータの取り扱いポリシー（Privacy ADR） |
+| M3 | Metrics Public Contract 草案 |
+| M4 | [NON_GOALS.md](./NON_GOALS.md) Metrics Collection 節の明示解除 |
+| M5 | Risk Review（誤計測・PII） |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Real Automation Entry Criteria
+
+| # | 条件 |
+|---|------|
+| A1 | Continuous Improvement（Application）と Real Automation（Future）の境界 ADR |
+| A2 | Human-in-the-loop / approval gate 必須（初期） |
+| A3 | 自動投稿・自動再投稿は Explicit Non-Goal 直到 Release |
+| A4 | Real Automation Public Contract 草案 |
+| A5 | [NON_GOALS.md](./NON_GOALS.md) 該当節の明示解除 + Security Review 計画 |
+
+**v1.50.0:** 文書化のみ — **実装禁止**
+
+---
+
+## Required ADR
+
+Level 3 → Level 4 Gate 通過に **最低限必要な ADR**:
+
+| ADR 種別 | 内容 |
+|----------|------|
+| Provider 着手 | Provider Layer 境界・Mock default・Catalog 影響 |
+| Runtime 着手 | Orchestration 境界・Foundation 非侵食 |
+| Scheduler 着手 | Trigger モデル・Idempotency |
+| Non-Goals 解除 | 解除対象領域・理由・rollback |
+| Public Contract 追加 | 新 schema / versioning / deprecation |
+
+形式は [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) ADR Format に従う。v1.49.0 ADR-GOV-005/006/007 と矛盾しないこと。
+
+---
+
+## Required Risk Review
+
+| 項目 | 参照 |
+|------|------|
+| Risk Register 更新 | [RISK_REGISTER.md](./RISK_REGISTER.md) |
+| Mitigation Owner 明示 | CHANGE_GOVERNANCE 再定義（Future Epic 開始時） |
+| セキュリティリスク | OAuth / SNS API / External API |
+| 運用リスク | Scheduler / Queue / Worker / Cloud |
+| 互換性リスク | Public Contract 破壊 |
+
+Risk Review 完了 = Register にエントリ追加 + Compliance Checklist Risk Check 節 PASS。
+
+---
+
+## Required Compatibility Review
+
+| 項目 | 参照 |
+|------|------|
+| Public Contract Catalog | [CATALOG_USAGE.md](./CATALOG_USAGE.md) |
+| Compatibility Matrix | [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) |
+| Version Rule | [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) |
+| Deprecation 計画 | [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md) |
+
+新規 Contract は **additive default**。Breaking change は Major + Deprecation 必須。
+
+---
+
+## Required Public Contract Review
+
+| 項目 | 条件 |
+|------|------|
+| Catalog 整合 | 新 Contract が catalog JSON に反映される計画 |
+| Layer Rule | Application / Platform / Future 境界遵守 |
+| Dependency Rule | [DEPENDENCY_RULES.md](./DEPENDENCY_RULES.md) 違反なし |
+| JSON = Source | schema 先行、Markdown = View |
+
+Public Contract Review 完了 = Catalog diff + Compliance Checklist Public Contract 節 PASS。
+
+---
+
+## Required Compliance Checklist
+
+[ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) の以下節を **Future 実装 Epic 開始前** に完了:
+
+- Universal Compliance Items
+- Future Architecture Addition
+- Provider Runtime Scheduler API Pre Addition
+- Backward Compatibility Check
+- Risk Check
+- ADR Check
+- Release Pre Check（該当時）
+
+Governance Check は Machine Check（Quality Pipeline PASS）と **独立** して実施する。
+
+---
+
+## Non Goals Release Criteria
+
+[NON_GOALS.md](./NON_GOALS.md) の各禁止領域を解除するには:
+
+| # | 条件 |
+|---|------|
+| NG1 | 対象領域の Entry Criteria（本書）全項目レビュー完了 |
+| NG2 | 解除専用 ADR（Accepted）— 解除理由・スコープ・rollback |
+| NG3 | ARCHITECTURE_COMPLIANCE_CHECKLIST — Provider Runtime Scheduler API Pre Addition PASS |
+| NG4 | RISK_REGISTER 更新 — 新リスクと mitigation |
+| NG5 | VERSION / CHANGELOG に Non-Goals 解除を記録 |
+| NG6 | Quality Pipeline 全 PASS 維持 |
+
+**一括解除禁止** — 領域ごとに ADR + Gate を通過する。
+
+---
+
+## v2 Entry Criteria
+
+v2 Architecture Completion（Future Layer 実装群の公式完了）に向けた **高水位 Gate**:
+
+| # | 条件 |
+|---|------|
+| V1 | Provider + Adapter MVP（Mock default） |
+| V2 | Runtime MVP（local / CI） |
+| V3 | Scheduler 設計→実装（段階的） |
+| V4 | Public Contract Catalog — Future Layer contracts 登録 |
+| V5 | Level 5 Production Ready 条件の Epic 計画（別途） |
+| V6 | Architecture Maturity Level 4 公式宣言（Evidence 付き） |
+
+v2 Entry Criteria の **詳細 Epic 分解** は Future 実装開始後の ADR で行う。v1.50.0 では **Gate 定義のみ**。
+
+---
+
+## Level 3 to Level 4 Gate
+
+**Architecture Maturity Model** における Level 3（Future Design）から Level 4（Implementation Ready）への **唯一の公式 Gate**:
+
+```text
+Level 3 → Level 4 Gate =
+  [x] Future Entry Criteria 文書（本書）— v1.50.0 完了
+  [ ] Universal Entry Criteria 全項目 PASS
+  [ ] 着手領域の Entry Criteria 全項目 PASS
+  [ ] Required ADR 全件 Accepted
+  [ ] Required Risk Review 完了
+  [ ] Required Compatibility Review 完了
+  [ ] Required Public Contract Review 完了
+  [ ] Required Compliance Checklist 完了
+  [ ] Non Goals Release Criteria 完了（着手領域）
+  [ ] Mandatory Policy Review（CHANGE_GOVERNANCE）
+  [ ] VERSION / CHANGELOG / ADR 整合
+```
+
+| 状態（v1.50.0） | 結果 |
+|-----------------|------|
+| 本書存在 | ✅ |
+| Gate 全項目 | ❌ 未完了 |
+| Level 4 Implementation Ready | **未到達** |
+
+Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
+
+---
+
+## Completion Criteria
+
+Future Entry Criteria 文書自体の完成条件（v1.50.0）:
+
+- [x] 全必須見出し（Purpose 〜 Completion Criteria）
+- [x] Universal + 領域別 Entry Criteria 定義
+- [x] Required ADR / Reviews / Compliance 定義
+- [x] Non-Goals Release Criteria 定義
+- [x] Level 3 to Level 4 Gate 定義
+- [x] Current Maturity Level 2.5 維持、Level 4 未到達明記
+- [x] Quality Governance / Maturity Model との整合
+- [x] Quality Pipeline Test 449–460
+
+**Gate 通過**（Level 4 到達）は v1.50.0 の Completion Criteria **ではない**。

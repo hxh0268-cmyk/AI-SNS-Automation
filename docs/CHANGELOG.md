@@ -4,6 +4,36 @@
 
 ---
 
+## v1.50.0 — ドキュメント（Future Entry Criteria Foundation）
+
+Future Layer 実装開始前に必要な **Level 3 → Level 4 Entry Gate** を [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) として正式定義しました。Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装は行いません**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Future Entry Criteria | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) — Universal + 領域別 Entry Criteria |
+| Architecture Governance | `docs/architecture/` **21 必須文書**（v1.50.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達**（Gate 未通過） |
+| Test 449–460 | Future Entry Criteria 存在 / 参照 / v1.50.0 整合 / Gate 定義 |
+
+### 設計判断
+
+- **Entry Gate Only** — 文書追加 ≠ Implementation Ready
+- **Non-Goals 維持** — 実装禁止対象は ADR + Gate 通過まで解除しない
+- **Quality Governance 整合** — PASS 数だけでは Gate を通過しない
+- **No Implementation** — Production code 変更なし
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **460 PASS**（Test 449–460 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.49.0 — ドキュメント（Architecture Documentation Foundation）
 
 Application Layer / Platform Layer / Governance Layer の **Architecture Governance 正式基準書** を `docs/architecture/` に整備しました。コード Foundation 追加・Provider / Runtime 実装は行いません。
