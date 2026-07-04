@@ -1170,9 +1170,28 @@ Latest Current Step
 release-plan
 ```
 
+### Future Layer Boundary Design（v1.52.0）
+
+**Future Layer Boundary Design** を追加しました。Future Layer 群の **責務・境界・依存方向・Public Contract・データ所有・副作用・Runtime Isolation** を [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) として正式定義します（**23 必須 Governance 文書**）。
+
+**Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**
+
+| 成熟度 | 状態 |
+|--------|------|
+| Future Design（Level 3） | **進行中**（Future Layer Boundaries 追加） |
+| Implementation Ready（Level 4） | **未到達** |
+
+Future Layer Boundaries は **Implementation Ready ではありません。** Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **引き続き非実装** です。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（23 必須 Governance 文書） |
+| Future Layer Boundaries | [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) |
+| Current Maturity | **Level 2.5** — Level 4 **未到達** |
+
 ### Governance Flow Foundation（v1.51.0）
 
-**Governance Flow Foundation** を追加しました。Architecture Governance を **運用可能な Governance Process** へ接続する [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) を正式定義します（**22 必須 Governance 文書**）。
+**Governance Flow Foundation** を追加しました。Architecture Governance を **運用可能な Governance Process** へ接続する [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) を正式定義します（v1.52.0 時点 **23 必須 Governance 文書**）。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1189,7 +1208,7 @@ Governance Flow は **Implementation Ready ではありません。** Provider /
 
 | 項目 | 内容 |
 |------|------|
-| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（22 必須 Governance 文書） |
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（23 必須 Governance 文書） |
 | Governance Process | [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) |
 | Future Entry Gate | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) |
 | Current Maturity | **Level 2.5** — Level 4 **未到達** |
@@ -1213,14 +1232,14 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 | 項目 | 内容 |
 |------|------|
-| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（22 必須 Governance 文書） |
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（23 必須 Governance 文書） |
 | Future Entry Gate | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) |
 | Current Maturity | **Level 2.5** — [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) |
 | Level 4 | **未到達** — Gate 全項目 PASS が必要 |
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.51.0 時点 22 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.52.0 時点 23 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1239,7 +1258,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 
 | 項目 | 内容 |
 |------|------|
-| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（22 必須 Governance 文書） |
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（23 必須 Governance 文書） |
 | Current Maturity | **Level 2.5** — [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) |
 | Quality Governance | [QUALITY_GOVERNANCE.md](docs/architecture/QUALITY_GOVERNANCE.md) — PASS 数 ≠ 品質十分条件 |
 | Governance | Layer / Dependency / Public Contract / Compatibility / Version / Deprecation / Change |
@@ -1260,6 +1279,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) | 成熟度 Level 0–6 / Current Level 2.5 |
 | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) | Level 3→4 Entry Gate / Future 実装着手前条件 |
 | [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) | Governance Process / レビュー・承認実行順序 |
+| [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) | Future Layer 境界 / 責務・依存・データ所有 |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象

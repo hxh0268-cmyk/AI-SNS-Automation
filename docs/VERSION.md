@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.51.0**（Governance Flow Foundation）
+**v1.52.0**（Future Layer Boundary Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.52.0
+**Next Candidate:** v1.53.0
 
 ---
 
@@ -16,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.52.0** | **ドキュメント** | **✅ 完了** | **Future Layer Boundary Design / Future Layer 責務・境界・依存正式定義** |
 | **v1.51.0** | **ドキュメント** | **✅ 完了** | **Governance Flow Foundation / Architecture Governance Process 正式定義** |
 | **v1.50.0** | **ドキュメント** | **✅ 完了** | **Future Entry Criteria Foundation / Level 3→4 Entry Gate 正式定義** |
 | **v1.49.0** | **ドキュメント** | **✅ 完了** | **Architecture Documentation Foundation / Architecture Governance 正式基準書** |
@@ -78,6 +79,46 @@
 
 ---
 
+### v1.52.0 で追加（Future Layer Boundary Design）
+
+#### Future Layer 境界正式定義
+
+- **`FUTURE_LAYER_BOUNDARIES.md`** … 14 Future Layer 責務・依存・データ所有・副作用境界
+- **Allowed / Forbidden Dependencies** … Application Layer 侵食防止
+- **Architecture Governance** … 23 必須文書（v1.51.0 の 22 + 本書）
+- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
+- **Production Code** … 変更なし
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.53.0** | 次フェーズ候補 |
+
+### 品質状況（v1.52.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **482 PASS** |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+
+### v1.52.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Future Layer Boundaries 文書 | ✅ |
+| Architecture Governance docs（23 必須文書） | ✅ |
+| Current Maturity Level 2.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Provider / Runtime / Scheduler / API 非実装 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.51.0 後方互換 | ✅ |
+| Test 471–482 | ✅ |
+
+---
+
 ### v1.51.0 で追加（Governance Flow Foundation）
 
 #### Governance Process 正式定義
@@ -92,9 +133,9 @@
 
 | 候補 | 方針 |
 |------|------|
-| **v1.52.0** | 次フェーズ候補 |
+| **v1.53.0** | 次フェーズ候補 |
 
-### 品質状況（v1.51.0 最新）
+### 品質状況（v1.51.0）
 
 | 項目 | 結果 |
 |------|------|

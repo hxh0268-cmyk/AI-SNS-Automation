@@ -4,6 +4,36 @@
 
 ---
 
+## v1.52.0 — ドキュメント（Future Layer Boundary Design）
+
+Future Layer 群の **責務・境界・依存方向・Public Contract・データ所有・副作用・Runtime Isolation** を [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) として正式定義しました。Production Code / Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装は行いません**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Future Layer Boundaries | [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) — 14 Future Layer 境界定義 |
+| Architecture Governance | `docs/architecture/` **23 必須文書**（v1.52.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 471–482 | Boundaries 存在 / 見出し / 依存方向 / Entry Criteria 連携 / 実装禁止 |
+
+### 設計判断
+
+- **Boundary Design Only** — 境界定義 ≠ Implementation Ready
+- **JSON Source 維持** — Database はまだ source of truth ではない
+- **Future Entry Criteria + Governance Flow 連携**
+- **No Production Code** — コード変更なし |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **482 PASS**（Test 471–482 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.51.0 — ドキュメント（Governance Flow Foundation）
 
 Architecture Governance を **運用可能な Governance Process** へ接続する [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) を追加しました。Production Code / Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装は行いません**。
