@@ -4,6 +4,56 @@
 
 ---
 
+## v1.61.0 — Interaction Lifecycle Design
+
+Interaction Lifecycle Design — Design Only — Production code unchanged。
+
+Layer Interaction Model 完成後の Cross-Layer Interaction Lifecycle を [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) として追加。Lifecycle states / valid・invalid transitions / state・transition ownership / waiting / retry / timeout / cancellation / terminal states / compatibility / anti-patterns を Design Only で固定。Interaction Lifecycle ≠ Runtime Lifecycle / state machine implementation **ではない**。Individual Core Layer 責務 **非再定義**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Interaction Lifecycle Design | [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) |
+| Architecture Governance | **32 必須文書**（v1.61.0 で +1） |
+| Current Maturity | **Level 3.2** — Interaction Lifecycle Complete |
+| Level 4 Implementation Ready | **未到達** |
+| Test 621–640 | Lifecycle Design 存在 / States / Transitions / Boundaries |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **640 PASS**（Test 621–640 含む） |
+| npm test | **PASS** |
+
+---
+
+## v1.60.0 — Layer Interaction Model Design
+
+Layer Interaction Model Design — Design Only — Production code unchanged。
+
+Core Layer Design 完成後の Cross Layer Interaction を [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) として統合定義。Interaction rules / Allowed・Forbidden matrices / Dependency direction / Ownership / Boundary crossing / Compatibility / Governance integration を Design Only で固定。Individual Core Layer 責務 **非再定義**、Queue / Worker / Receiver **実装なし**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Layer Interaction Model Design | [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md)（v1.60.0 Cross Layer 統合） |
+| Architecture Governance | **31 必須文書**（v1.60.0 Cross Layer Design 完成） |
+| Current Maturity | **Level 3.0** — Core Layer Design Complete |
+| Level 4 Implementation Ready | **未到達** |
+| Test 601–620 | Interaction Model 存在 / Matrix / Boundary / Dependency |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **620 PASS**（Test 601–620 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.59.0 — Event Layer Design
 
 Event Layer Design — Design Only — Production code unchanged。

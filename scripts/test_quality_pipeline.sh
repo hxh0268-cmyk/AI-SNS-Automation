@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.59.0 --"
+echo "-- Test 98: VERSION updated to v1.61.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.59.0**（Event Layer Design）")) {
-  throw new Error("docs/VERSION.md current version must be v1.59.0");
+if (!versionDoc.includes("**v1.61.0**（Interaction Lifecycle Design）")) {
+  throw new Error("docs/VERSION.md current version must be v1.61.0");
 }
-console.log("VERSION v1.59.0 ok");
+console.log("VERSION v1.61.0 ok");
 EOF
-pass "VERSION updated to v1.59.0"
+pass "VERSION updated to v1.61.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.60.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.60.0");
+if (payload.nextVersion !== "v1.62.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.62.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.60.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.60.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.62.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.62.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.60.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.62.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13930,7 +13930,8 @@ for file in \
   SCHEDULER_LAYER_DESIGN.md \
   AUTOMATION_LAYER_DESIGN.md \
   WORKFLOW_LAYER_DESIGN.md \
-  EVENT_LAYER_DESIGN.md
+  EVENT_LAYER_DESIGN.md \
+  INTERACTION_LIFECYCLE_DESIGN.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13968,13 +13969,14 @@ const requiredHeadings = [
   ["FUTURE_ENTRY_CRITERIA.md", ["# Future Entry Criteria", "## Purpose", "## Current Maturity Position", "## Scope", "## Non Goals", "## Entry Gate Principle", "## Universal Entry Criteria", "## Provider Entry Criteria", "## Runtime Entry Criteria", "## Scheduler Entry Criteria", "## OAuth Entry Criteria", "## SNS API Entry Criteria", "## External API Entry Criteria", "## Database Entry Criteria", "## Queue Entry Criteria", "## Worker Entry Criteria", "## Cloud Runtime Entry Criteria", "## Real Metrics Entry Criteria", "## Real Automation Entry Criteria", "## Required ADR", "## Required Risk Review", "## Required Compatibility Review", "## Required Public Contract Review", "## Required Compliance Checklist", "## Non Goals Release Criteria", "## v2 Entry Criteria", "## Level 3 to Level 4 Gate", "## Completion Criteria"]],
   ["GOVERNANCE_FLOW.md", ["# Governance Flow", "## Purpose", "## Scope", "## Non Goals", "## Governance Lifecycle", "## Architecture Review Flow", "## Design Review Flow", "## ADR Workflow", "## Risk Review Workflow", "## Compatibility Review Workflow", "## Public Contract Review Workflow", "## Compliance Review Workflow", "## Documentation Update Flow", "## Architecture Change Flow", "## Future Layer Approval Flow", "## Release Governance Flow", "## Quality Governance Integration", "## Future Entry Criteria Integration", "## Completion Criteria", "## Level 3 to Level 4 Role", "## Prohibited Shortcuts", "## Related Documents"]],
   ["FUTURE_LAYER_BOUNDARIES.md", ["# Future Layer Boundaries", "## Purpose", "## Scope", "## Non Goals", "## Current Maturity", "## Boundary Design Principles", "## Future Layer Map", "## Provider Layer Boundary", "## Adapter Layer Boundary", "## Runtime Layer Boundary", "## Scheduler Layer Boundary", "## OAuth Layer Boundary", "## SNS API Layer Boundary", "## External API Layer Boundary", "## Database Layer Boundary", "## Queue Layer Boundary", "## Worker Layer Boundary", "## Cloud Runtime Boundary", "## Cache Boundary", "## Real Metrics Boundary", "## Real Automation Boundary", "## Allowed Dependency Direction", "## Forbidden Dependencies", "## Public Contract Boundaries", "## Data Ownership Boundaries", "## Side Effect Boundaries", "## Runtime Isolation Boundaries", "## Testing Boundaries", "## Documentation Boundaries", "## Future Entry Criteria Integration", "## Governance Flow Integration", "## Completion Criteria", "## Prohibited Shortcuts", "## Related Documents"]],
-  ["LAYER_INTERACTION_MODEL.md", ["# Layer Interaction Model", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Interaction Principles", "## 6. Layer Communication Rules", "## 7. Request / Response Flow", "## 8. Command vs Query Rules", "## 9. Sync / Async Interaction Rules", "## 10. Error Propagation Rules", "## 11. Retry Responsibility", "## 12. Timeout Ownership", "## 13. Transaction Boundaries", "## 14. Event Boundaries", "## 15. State Transition Rules", "## 16. Observability Points", "## 17. Interaction Anti-Patterns", "## 18. Sequence Examples", "## 19. Compatibility Requirements", "## 20. Testing Requirements", "## 21. Documentation Requirements", "## 22. Governance Flow Integration", "## 23. Future Entry Criteria Integration", "## 24. Completion Criteria"]],
+  ["LAYER_INTERACTION_MODEL.md", ["# Layer Interaction Model Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Current Maturity Context", "## 5. Architecture Position", "## 6. Core Layer Responsibilities", "## 7. Interaction Principles", "## 8. Layer Interaction Rules", "## 9. Allowed Interaction Matrix", "## 10. Forbidden Interaction Matrix", "## 11. Dependency Direction Rules", "## 12. Reverse Dependency Rules", "## 13. Circular Dependency Rules", "## 14. Ownership Rules", "## 15. Input Ownership", "## 16. Output Ownership", "## 17. Contract Ownership", "## 18. Boundary Crossing Rules", "## 19. Layer Isolation Rules", "## 20. Communication Principles", "## 21. Data Flow Overview", "## 22. Control Flow Overview", "## 23. Event Flow Overview", "## 24. Event to Automation Boundary", "## 25. Automation to Workflow Boundary", "## 26. Workflow to Scheduler Boundary", "## 27. Scheduler to Runtime Boundary", "## 28. Runtime to Provider Boundary", "## 29. Provider Reverse Dependency Boundary", "## 30. Queue / Worker / Receiver Boundary", "## 31. Adapter / API / Database / Cloud Runtime Boundary", "## 32. Dependency Matrix", "## 33. Version Compatibility Rules", "## 34. Backward Compatibility", "## 35. Extension Rules", "## 36. Governance Integration", "## 37. Future Entry Criteria Integration", "## 38. Anti-Patterns", "## 39. Sequence Examples", "## 40. Testing Strategy", "## 41. Observability", "## 42. Completion Criteria"]],
   ["PROVIDER_LAYER_DESIGN.md", ["# Provider Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Provider Layer Responsibility", "## 7. Provider Abstraction Principles", "## 8. Provider Contract Model", "## 9. Provider Input Contract", "## 10. Provider Output Contract", "## 11. Provider Error Contract", "## 12. Provider Capability Model", "## 13. Provider Configuration Model", "## 14. Provider Credential Boundary", "## 15. Provider Runtime Boundary", "## 16. Provider Adapter Boundary", "## 17. Provider External API Boundary", "## 18. Provider State Ownership", "## 19. Provider Side Effect Rules", "## 20. Provider Observability Rules", "## 21. Provider Testing Strategy", "## 22. Provider Anti-Patterns", "## 23. Provider Extension Criteria", "## 24. Governance Flow Integration", "## 25. Future Entry Criteria Integration", "## 26. Compatibility Requirements", "## 27. Completion Criteria"]],
   ["RUNTIME_LAYER_DESIGN.md", ["# Runtime Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Runtime Principles", "## 8. Runtime Responsibility", "## 9. Runtime Execution Contract", "## 10. Runtime Lifecycle", "## 11. Runtime Execution Context", "## 12. Runtime Orchestration Model", "## 13. Runtime Resource Ownership", "## 14. Runtime State Management", "## 15. Runtime Cancellation Rules", "## 16. Runtime Timeout Rules", "## 17. Runtime Retry Coordination", "## 18. Runtime Error Handling", "## 19. Runtime Provider Interaction", "## 20. Runtime Scheduler Boundary", "## 21. Runtime Automation Boundary", "## 22. Runtime Worker Boundary", "## 23. Runtime Side Effect Rules", "## 24. Runtime Observability", "## 25. Runtime Testing Strategy", "## 26. Runtime Anti-Patterns", "## 27. Sequence Examples", "## 28. Governance Flow Integration", "## 29. Future Entry Criteria Integration", "## 30. Compatibility Requirements", "## 31. Completion Criteria"]],
   ["SCHEDULER_LAYER_DESIGN.md", ["# Scheduler Layer Design", "## Scheduler Purpose", "## Scheduler Scope", "## Scheduler Non-Goals", "## Relationship to Future Layer Boundaries", "## Relationship to Layer Interaction Model", "## Relationship to Runtime Layer Design", "## Scheduler Principles", "## Scheduler Responsibility", "## Scheduling Contract", "## Scheduling Model", "## Trigger Model", "## Trigger Sources", "## Scheduling Context", "## Execution Policy", "## Runtime Coordination", "## Job Ownership", "## Queue Boundary", "## Worker Boundary", "## Retry Policy Boundary", "## Time-based Scheduling", "## Event-based Scheduling", "## Manual Execution", "## Future Automation Boundary", "## Scheduler Side Effect Rules", "## Scheduler State Ownership", "## Scheduler Observability", "## Scheduler Testing Strategy", "## Scheduler Anti-Patterns", "## Sequence Examples", "## Governance Flow Integration", "## Future Entry Criteria Integration", "## Compatibility Requirements", "## Completion Criteria"]],
   ["AUTOMATION_LAYER_DESIGN.md", ["# Automation Layer Design", "## Automation Purpose", "## Automation Scope", "## Automation Non-Goals", "## Relationship to Future Layer Boundaries", "## Relationship to Layer Interaction Model", "## Relationship to Provider Layer Design", "## Relationship to Runtime Layer Design", "## Relationship to Scheduler Layer Design", "## Automation Principles", "## Automation Responsibility", "## Automation Contract", "## Automation Intent Model", "## Workflow Boundary", "## Trigger Boundary", "## Scheduler Boundary", "## Runtime Boundary", "## Provider Boundary", "## Adapter Boundary", "## State Boundary", "## Side Effect Boundary", "## Queue Boundary", "## Worker Boundary", "## Manual Automation", "## Scheduled Automation", "## Event-based Automation", "## Human Approval Boundary", "## Observability", "## Testing Strategy", "## Anti-Patterns", "## Sequence Examples", "## Governance Flow Integration", "## Future Entry Criteria Integration", "## Compatibility Requirements", "## Completion Criteria"]],
   ["WORKFLOW_LAYER_DESIGN.md", ["# Workflow Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Relationship to Runtime Layer Design", "## 8. Relationship to Scheduler Layer Design", "## 9. Relationship to Automation Layer Design", "## 10. Workflow Principles", "## 11. Workflow Responsibility", "## 12. Workflow Contract", "## 13. Workflow Intent Relationship", "## 14. Workflow Step Model", "## 15. Workflow Dependency Model", "## 16. Workflow Transition Model", "## 17. Workflow Input Boundary", "## 18. Workflow Output Boundary", "## 19. Automation Boundary", "## 20. Scheduler Boundary", "## 21. Runtime Boundary", "## 22. Provider Boundary", "## 23. Adapter Boundary", "## 24. State Boundary", "## 25. Side Effect Boundary", "## 26. Queue Boundary", "## 27. Worker Boundary", "## 28. Approval Point Boundary", "## 29. Manual Workflow", "## 30. Scheduled Workflow", "## 31. Event-based Workflow", "## 32. Human Approval Workflow", "## 33. Observability", "## 34. Testing Strategy", "## 35. Anti-Patterns", "## 36. Sequence Examples", "## 37. Governance Flow Integration", "## 38. Future Entry Criteria Integration", "## 39. Compatibility Requirements", "## 40. Completion Criteria"]],
   ["EVENT_LAYER_DESIGN.md", ["# Event Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Relationship to Runtime Layer Design", "## 8. Relationship to Scheduler Layer Design", "## 9. Relationship to Automation Layer Design", "## 10. Relationship to Workflow Layer Design", "## 11. Event Principles", "## 12. Event Responsibility", "## 13. Event Contract", "## 14. Event Classification", "## 15. Manual Event", "## 16. Scheduled Event", "## 17. Webhook Event", "## 18. SNS Event", "## 19. External Event", "## 20. Approval Event", "## 21. System Event", "## 22. Event Input Boundary", "## 23. Event Output Boundary", "## 24. Automation Boundary", "## 25. Workflow Boundary", "## 26. Scheduler Boundary", "## 27. Runtime Boundary", "## 28. Provider Boundary", "## 29. Adapter Boundary", "## 30. State Boundary", "## 31. Side Effect Boundary", "## 32. Queue Boundary", "## 33. Worker Boundary", "## 34. Observability", "## 35. Testing Strategy", "## 36. Anti-Patterns", "## 37. Sequence Examples", "## 38. Governance Flow Integration", "## 39. Future Entry Criteria Integration", "## 40. Compatibility Requirements", "## 41. Completion Criteria"]],
+  ["INTERACTION_LIFECYCLE_DESIGN.md", ["# Interaction Lifecycle Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Relationship to Layer Interaction Model", "## 6. Lifecycle Principles", "## 7. Lifecycle State Definition", "## 8. Initial State", "## 9. Terminal States", "## 10. Non-Terminal States", "## 11. Valid State Transitions", "## 12. Invalid State Transitions", "## 13. State Ownership", "## 14. Transition Ownership", "## 15. State Visibility Rules", "## 16. Lifecycle Isolation Rules", "## 17. Event Boundary", "## 18. Automation Boundary", "## 19. Workflow Boundary", "## 20. Scheduler Boundary", "## 21. Runtime Boundary", "## 22. Provider Boundary", "## 23. Waiting Rules", "## 24. Approval Waiting Rules", "## 25. Scheduler Waiting Rules", "## 26. Runtime Execution Boundary", "## 27. Retry Boundary", "## 28. Timeout Boundary", "## 29. Cancellation Boundary", "## 30. Completion Rules", "## 31. Failure Boundary", "## 32. Recovery Principles", "## 33. Lifecycle Compatibility Rules", "## 34. Version Compatibility", "## 35. Governance Integration", "## 36. Future Entry Criteria Integration", "## 37. State Transition Examples", "## 38. Sequence Examples", "## 39. Testing Strategy", "## 40. Observability", "## 41. Anti-Patterns", "## 42. Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -14002,7 +14004,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14013,7 +14015,7 @@ grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
-grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "INTERACTION_LIFECYCLE_DESIGN.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14051,6 +14053,7 @@ const requiredLinks = [
   "./AUTOMATION_LAYER_DESIGN.md",
   "./WORKFLOW_LAYER_DESIGN.md",
   "./EVENT_LAYER_DESIGN.md",
+  "./INTERACTION_LIFECYCLE_DESIGN.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14059,7 +14062,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 30 governance files ok");
+console.log("architecture README links all 32 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14283,9 +14286,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**600 PASS**" docs/VERSION.md
-grep -q "Test 581–600" docs/VERSION.md
-grep -q "EVENT_LAYER_DESIGN.md" docs/VERSION.md
+grep -Fq "**640 PASS**" docs/VERSION.md
+grep -q "Test 621–640" docs/VERSION.md
+grep -q "INTERACTION_LIFECYCLE_DESIGN.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14293,10 +14296,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**600 PASS**" docs/CHANGELOG.md
-grep -q "Test 581–600" docs/CHANGELOG.md
-grep -q "v1.59.0" docs/CHANGELOG.md
-grep -q "Event Layer Design" docs/CHANGELOG.md
+grep -Fq "**640 PASS**" docs/CHANGELOG.md
+grep -q "Test 621–640" docs/CHANGELOG.md
+grep -q "v1.61.0" docs/CHANGELOG.md
+grep -q "Interaction Lifecycle Design" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14393,7 +14396,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14459,7 +14462,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14524,7 +14527,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -14610,7 +14613,7 @@ pass "future layer boundaries states implementation prohibited and level 4 not r
 
 echo "-- Test 483: layer interaction model document exists --"
 test -f docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "# Layer Interaction Model" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "# Layer Interaction Model Design" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model document exists"
 
 echo "-- Test 484: layer interaction model has purpose scope and non-goals --"
@@ -14619,51 +14622,51 @@ grep -q "## 2. Scope" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "## 3. Non-Goals" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model has purpose scope and non-goals"
 
-echo "-- Test 485: layer interaction model has relationship to future layer boundaries --"
-grep -q "## 4. Relationship to Future Layer Boundaries" docs/architecture/LAYER_INTERACTION_MODEL.md
+echo "-- Test 485: layer interaction model has architecture position and core layer responsibilities --"
+grep -q "## 5. Architecture Position" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 6. Core Layer Responsibilities" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "変更しない" docs/architecture/LAYER_INTERACTION_MODEL.md
-pass "layer interaction model has relationship to future layer boundaries"
+pass "layer interaction model has architecture position and core layer responsibilities"
 
-echo "-- Test 486: layer interaction model has layer communication rules --"
-grep -q "## 6. Layer Communication Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
+echo "-- Test 486: layer interaction model has layer interaction rules --"
+grep -q "## 8. Layer Interaction Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Public Contract 経由のみ" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Cross-layer shortcut" docs/architecture/LAYER_INTERACTION_MODEL.md
-pass "layer interaction model has layer communication rules"
+pass "layer interaction model has layer interaction rules"
 
 echo "-- Test 487: layer interaction model has command vs query rules --"
-grep -q "## 8. Command vs Query Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 20. Communication Principles" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Query" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Command" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model has command vs query rules"
 
 echo "-- Test 488: layer interaction model has sync async interaction rules --"
-grep -q "## 9. Sync / Async Interaction Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Async" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "実装しない" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model has sync async interaction rules"
 
 echo "-- Test 489: layer interaction model has error retry and timeout rules --"
-grep -q "## 10. Error Propagation Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "## 11. Retry Responsibility" docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "## 12. Timeout Ownership" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Error Propagation" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Retry Responsibility" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Timeout Ownership" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model has error retry and timeout rules"
 
-echo "-- Test 490: layer interaction model has transaction event and state rules --"
-grep -q "## 13. Transaction Boundaries" docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "## 14. Event Boundaries" docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "## 15. State Transition Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
-pass "layer interaction model has transaction event and state rules"
+echo "-- Test 490: layer interaction model has flow overview sections --"
+grep -q "## 21. Data Flow Overview" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 23. Event Flow Overview" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 22. Control Flow Overview" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "layer interaction model has flow overview sections"
 
 echo "-- Test 491: layer interaction model has interaction anti-patterns --"
-grep -q "## 17. Interaction Anti-Patterns" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 38. Anti-Patterns" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Layer skipping" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "Hidden retry" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model has interaction anti-patterns"
 
 echo "-- Test 492: layer interaction model integrates governance flow and future entry criteria --"
-grep -q "## 22. Governance Flow Integration" docs/architecture/LAYER_INTERACTION_MODEL.md
-grep -q "## 23. Future Entry Criteria Integration" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 36. Governance Integration" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "## 37. Future Entry Criteria Integration" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/LAYER_INTERACTION_MODEL.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/LAYER_INTERACTION_MODEL.md
 pass "layer interaction model integrates governance flow and future entry criteria"
@@ -15051,7 +15054,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15157,7 +15160,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15265,19 +15268,231 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "30 必須 Governance 文書" docs/architecture/README.md
+grep -q "32 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
-echo "-- Test 600: VERSION documents v1.59.0 and 600 pass --"
-grep -Fq "**v1.59.0**（Event Layer Design）" docs/VERSION.md
+echo "-- Test 600: readme changelog version reference v1.59.0 history --"
+grep -q "Event Layer Design（v1.59.0）" README.md
+grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "## v1.59.0" docs/CHANGELOG.md
 grep -q "### v1.59.0 で追加（Event Layer Design）" docs/VERSION.md
-grep -Fq "**600 PASS**" docs/VERSION.md
-grep -q "30 必須文書" docs/VERSION.md
-grep -q "Test 581–600" docs/VERSION.md
-grep -q "## 36. Anti-Patterns" docs/architecture/EVENT_LAYER_DESIGN.md
-grep -q "## 41. Completion Criteria" docs/architecture/EVENT_LAYER_DESIGN.md
-grep -Fq "Quality Pipeline **600 PASS**" docs/architecture/EVENT_LAYER_DESIGN.md
-pass "VERSION documents v1.59.0 and 600 pass"
+grep -q "Event Layer Design" docs/VERSION.md
+pass "readme changelog version reference v1.59.0 history"
+
+echo "-- Test 601: layer interaction model design document exists --"
+test -f docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "layer interaction model design document exists"
+
+echo "-- Test 602: layer interaction model design title exists --"
+grep -q "# Layer Interaction Model Design" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "layer interaction model design title exists"
+
+echo "-- Test 603: purpose section exists --"
+grep -q "## 1. Purpose" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Interaction Contract" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "purpose section exists"
+
+echo "-- Test 604: scope section exists --"
+grep -q "## 2. Scope" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Allowed / Forbidden Interaction Matrix" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "scope section exists"
+
+echo "-- Test 605: non-goals section exists --"
+grep -q "## 3. Non-Goals" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Individual Core Layer" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "non-goals section exists"
+
+echo "-- Test 606: core layer responsibilities section exists --"
+grep -q "## 6. Core Layer Responsibilities" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "core layer responsibilities section exists"
+
+echo "-- Test 607: allowed interaction matrix exists --"
+grep -q "## 9. Allowed Interaction Matrix" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Event" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Automation Contract" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "allowed interaction matrix exists"
+
+echo "-- Test 608: forbidden interaction matrix exists --"
+grep -q "## 10. Forbidden Interaction Matrix" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Event" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Provider" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "forbidden interaction matrix exists"
+
+echo "-- Test 609: dependency direction rules exists --"
+grep -q "## 11. Dependency Direction Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Event → Automation → Workflow → Scheduler → Runtime → Provider" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "dependency direction rules exists"
+
+echo "-- Test 610: reverse dependency rules exists --"
+grep -q "## 12. Reverse Dependency Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Provider MUST NOT depend on Runtime" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "reverse dependency rules exists"
+
+echo "-- Test 611: circular dependency rules exists --"
+grep -q "## 13. Circular Dependency Rules" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Circular" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "circular dependency rules exists"
+
+echo "-- Test 612: event to automation boundary exists --"
+grep -q "## 24. Event to Automation Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Event MUST NOT" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "event to automation boundary exists"
+
+echo "-- Test 613: automation to workflow boundary exists --"
+grep -q "## 25. Automation to Workflow Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Automation MUST NOT" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "automation to workflow boundary exists"
+
+echo "-- Test 614: workflow to scheduler boundary exists --"
+grep -q "## 26. Workflow to Scheduler Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Workflow MUST NOT" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "workflow to scheduler boundary exists"
+
+echo "-- Test 615: scheduler to runtime boundary exists --"
+grep -q "## 27. Scheduler to Runtime Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Scheduler MUST NOT" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "scheduler to runtime boundary exists"
+
+echo "-- Test 616: runtime to provider boundary exists --"
+grep -q "## 28. Runtime to Provider Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Runtime MAY" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "runtime to provider boundary exists"
+
+echo "-- Test 617: provider reverse dependency boundary exists --"
+grep -q "## 29. Provider Reverse Dependency Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Provider MUST NOT" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "provider reverse dependency boundary exists"
+
+echo "-- Test 618: queue worker receiver boundary exists --"
+grep -q "## 30. Queue / Worker / Receiver Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -q "Queue / Worker / Receiver Boundary" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "queue worker receiver boundary exists"
+
+echo "-- Test 619: completion criteria exists --"
+grep -q "## 42. Completion Criteria" docs/architecture/LAYER_INTERACTION_MODEL.md
+grep -Fq "Quality Pipeline **620 PASS**" docs/architecture/LAYER_INTERACTION_MODEL.md
+pass "completion criteria exists"
+
+echo "-- Test 620: readme changelog version reference v1.60.0 history --"
+grep -q "Layer Interaction Model Design（v1.60.0）" README.md
+grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/README.md
+grep -q "## v1.60.0" docs/CHANGELOG.md
+grep -q "### v1.60.0 で追加（Layer Interaction Model Design）" docs/VERSION.md
+grep -q "Layer Interaction Model Design" docs/VERSION.md
+pass "readme changelog version reference v1.60.0 history"
+
+echo "-- Test 621: interaction lifecycle design document exists --"
+test -f docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "interaction lifecycle design document exists"
+
+echo "-- Test 622: document declares design only status --"
+grep -q "Design Only" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -Fq "本書は **Design Only**" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document declares design only status"
+
+echo "-- Test 623: document defines purpose --"
+grep -q "## 1. Purpose" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Lifecycle Contract" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines purpose"
+
+echo "-- Test 624: document defines scope --"
+grep -q "## 2. Scope" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Lifecycle State Definition" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines scope"
+
+echo "-- Test 625: document defines non-goals --"
+grep -q "## 3. Non-Goals" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Concrete state machine implementation" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines non-goals"
+
+echo "-- Test 626: document references layer interaction model --"
+grep -q "## 5. Relationship to Layer Interaction Model" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document references layer interaction model"
+
+echo "-- Test 627: document defines lifecycle principles --"
+grep -q "## 6. Lifecycle Principles" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Not Runtime Lifecycle" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines lifecycle principles"
+
+echo "-- Test 628: document defines lifecycle states --"
+grep -q "## 7. Lifecycle State Definition" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Created" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Expired" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines lifecycle states"
+
+echo "-- Test 629: document defines initial state --"
+grep -q "## 8. Initial State" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Initial State" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Created" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines initial state"
+
+echo "-- Test 630: document defines terminal states --"
+grep -q "## 9. Terminal States" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Completed" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Aborted" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines terminal states"
+
+echo "-- Test 631: document defines valid transitions --"
+grep -q "## 11. Valid State Transitions" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Created → Validated" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines valid transitions"
+
+echo "-- Test 632: document defines invalid transitions --"
+grep -q "## 12. Invalid State Transitions" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Completed →" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines invalid transitions"
+
+echo "-- Test 633: document defines state ownership --"
+grep -q "## 13. State Ownership" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Writable State Range" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines state ownership"
+
+echo "-- Test 634: document defines transition ownership --"
+grep -q "## 14. Transition Ownership" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Transition Ownership" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines transition ownership"
+
+echo "-- Test 635: document defines waiting rules --"
+grep -q "## 23. Waiting Rules" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "NOT a wait queue implementation" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines waiting rules"
+
+echo "-- Test 636: document defines retry boundary --"
+grep -q "## 27. Retry Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Retry Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "not retry engine" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines retry boundary"
+
+echo "-- Test 637: document defines timeout boundary --"
+grep -q "## 28. Timeout Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Timeout Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "not timeout engine" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines timeout boundary"
+
+echo "-- Test 638: document defines cancellation boundary --"
+grep -q "## 29. Cancellation Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Cancellation Boundary" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "explicit and bounded" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines cancellation boundary"
+
+echo "-- Test 639: document defines anti-patterns --"
+grep -q "## 41. Anti-Patterns" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "Terminal state reversal" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document defines anti-patterns"
+
+echo "-- Test 640: document confirms no implementation production code scope --"
+grep -q "Production Code 変更なし" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -q "no implementation scope" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+grep -Fq "**v1.61.0**（Interaction Lifecycle Design）" docs/VERSION.md
+grep -Fq "**640 PASS**" docs/VERSION.md
+grep -q "32 必須文書" docs/VERSION.md
+grep -q "Test 621–640" docs/VERSION.md
+grep -q "Level 3.2" docs/VERSION.md
+grep -Fq "Quality Pipeline **640 PASS**" docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md
+pass "document confirms no implementation production code scope"
 
 
 echo ""

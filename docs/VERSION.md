@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.59.0**（Event Layer Design）
+**v1.61.0**（Interaction Lifecycle Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.60.0（Event Layer Design review 後に候補決定）
+**Next Candidate:** v1.62.0（Interaction Lifecycle Design review 後に候補決定）
 
 ---
 
@@ -16,6 +16,8 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.61.0** | **ドキュメント** | **✅ 完了** | **Interaction Lifecycle Design / Cross-Layer Lifecycle Contract 設計正式定義** |
+| **v1.60.0** | **ドキュメント** | **✅ 完了** | **Layer Interaction Model Design / Core Layer 間 Interaction・Dependency・Boundary 統合正式定義** |
 | **v1.59.0** | **ドキュメント** | **✅ 完了** | **Event Layer Design / Event Contract・Classification 設計正式定義** |
 | **v1.58.0** | **ドキュメント** | **✅ 完了** | **Workflow Layer Design / Step・Dependency・Transition 構造 Contract 設計正式定義** |
 | **v1.57.0** | **ドキュメント** | **✅ 完了** | **Automation Layer Design / Workflow Intent・Automation Contract 設計正式定義** |
@@ -83,6 +85,83 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.61.0 で追加（Interaction Lifecycle Design）
+
+#### Interaction Lifecycle 設計正式定義
+
+- **`INTERACTION_LIFECYCLE_DESIGN.md`** … Lifecycle States / Valid・Invalid Transitions / State・Transition Ownership / Waiting / Retry / Timeout / Cancellation / Terminal States / Compatibility / Anti-Patterns
+- **Layer Interaction Model 整合** — [LAYER_INTERACTION_MODEL.md](./architecture/LAYER_INTERACTION_MODEL.md) 前提 — Individual Core Layer 責務 **非再定義**
+- **Architecture Governance** … 32 必須文書（v1.60.0 の 31 + 本書）
+- **Current Maturity** … **Level 3.2 — Interaction Lifecycle Complete**、**Level 4 Implementation Ready 未到達**
+- **Interaction Lifecycle ≠ Runtime Lifecycle** — state machine / storage / queue **実装なし**
+- **Production code** … unchanged
+
+### 品質状況（v1.61.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **640 PASS** |
+| Architecture Documents | **32** 必須文書 |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.2** — Interaction Lifecycle Complete |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 621–640 | Interaction Lifecycle Design |
+
+### v1.61.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Interaction Lifecycle Design 文書 | ✅ |
+| Architecture Governance docs（32 必須文書） | ✅ |
+| Lifecycle 実装なし | ✅ |
+| Individual Core Layer 責務非再定義 | ✅ |
+| Current Maturity Level 3.2 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.60.0 後方互換 | ✅ |
+| Test 621–640 | ✅ |
+
+---
+
+### v1.60.0 で追加（Layer Interaction Model Design）
+
+#### Cross Layer Interaction 設計正式定義
+
+- **`LAYER_INTERACTION_MODEL.md`** … Allowed / Forbidden Interaction Matrix / Dependency Direction / Ownership / Event→Automation→Workflow→Scheduler→Runtime→Provider Boundary / Queue・Worker・Receiver Boundary
+- **Core Layer 責務非再定義** — Provider / Runtime / Scheduler / Automation / Workflow / Event Layer Design 整合
+- **Architecture Governance** … 31 必須文書（Cross Layer Design 完成）
+- **Current Maturity** … **Level 3.0 — Core Layer Design Complete**、**Level 4 Implementation Ready 未到達**
+- **Implementation** … なし、Production code unchanged
+
+### 品質状況（v1.60.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **620 PASS** |
+| Architecture Documents | **31** 必須文書 |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.0** — Core Layer Design Complete |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 601–620 | Layer Interaction Model Design |
+
+### v1.60.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Layer Interaction Model Design 文書 | ✅ |
+| Architecture Governance docs（31 必須文書） | ✅ |
+| Core Layer 実装なし | ✅ |
+| Individual Core Layer 責務非再定義 | ✅ |
+| Current Maturity Level 3.0 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.59.0 後方互換 | ✅ |
+| Test 601–620 | ✅ |
 
 ---
 

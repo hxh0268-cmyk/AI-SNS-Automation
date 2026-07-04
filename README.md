@@ -1170,6 +1170,36 @@ Latest Current Step
 release-plan
 ```
 
+### Interaction Lifecycle Design（v1.61.0）
+
+**Interaction Lifecycle Design** を追加しました。Layer Interaction Model 完成後の **Cross-Layer Interaction Lifecycle** を [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) に正式定義します（**32 必須 Governance 文書**）。
+
+**Current Version: v1.61.0** | **Quality Pipeline: 640 PASS**
+
+[Layer Interaction Model Design](docs/architecture/LAYER_INTERACTION_MODEL.md) の **次** に Interaction Lifecycle Design が位置します。**Design Only** — Production code 変更なし。State machine / retry engine / timeout engine / queue **実装なし**。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（32 必須 Governance 文書） |
+| Interaction Lifecycle Design | [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) |
+| Layer Interaction Model | [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) — 責務非変更 |
+| Current Maturity | **Level 3.2** — Interaction Lifecycle Complete — Level 4 **未到達** |
+
+### Layer Interaction Model Design（v1.60.0）
+
+**Layer Interaction Model Design** を追加しました。Core Layer Design 完成後の **Cross Layer Interaction** を [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) に統合定義します（**31 必須 Governance 文書**）。
+
+**Current Version: v1.60.0** | **Quality Pipeline: 620 PASS**
+
+[Event Layer Design](docs/architecture/EVENT_LAYER_DESIGN.md) 完成後、Core Layer 間の Interaction / Dependency / Boundary を **Design Only** で固定。**Production code 変更なし**。Runtime / Provider / Queue / Worker 実装開始ではありません。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（31 必須 Governance 文書） |
+| Layer Interaction Model Design | [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) |
+| Core Layer Designs | Event / Automation / Workflow / Scheduler / Runtime / Provider — **責務非再定義** |
+| Current Maturity | **Level 3.0** — Core Layer Design Complete — Level 4 **未到達** |
+
 ### Event Layer Design（v1.59.0）
 
 **Event Layer Design** を追加しました。Future Automation Architecture の **trigger / input / signal** を Event Contract として [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) に正式定義します（**30 必須 Governance 文書**）。
@@ -1345,7 +1375,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.59.0 時点 30 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.61.0 時点 32 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1386,7 +1416,8 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) | Level 3→4 Entry Gate / Future 実装着手前条件 |
 | [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) | Governance Process / レビュー・承認実行順序 |
 | [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) | Future Layer 境界 / 責務・依存・データ所有 |
-| [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) | Layer 間 Interaction / Command-Query / Sync-Async / Error-Retry |
+| [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) | Interaction Lifecycle Design / States / Transitions / Waiting / Retry / Timeout（v1.61.0） |
+| [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) | Cross Layer Interaction Model Design / Allowed-Forbidden Matrix / Core Layer Boundaries（v1.60.0） |
 | [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) | Provider Layer Design / Contract / Capability / Credential Boundary |
 | [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) | Runtime Layer Design / Execution Contract / Lifecycle / Orchestration |
 | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) | Scheduler Layer Design / Scheduling Contract / Trigger / Execution Policy |

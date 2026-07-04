@@ -6,9 +6,9 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**30 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**32 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1）を固定します。
 
-**Current Maturity:** [Level 2.5 — Governance Complete, Future Design Ready](./ARCHITECTURE_MATURITY_MODEL.md#current-maturity)
+**Current Maturity:** **Level 3.2 — Interaction Lifecycle Complete**（v1.61.0 — Level 3.1 Cross Layer Interaction Complete から昇格。Level 2.5 参照は [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md)）
 
 | # | 領域 | 文書 | v1.49.0 |
 |---|------|------|---------|
@@ -35,13 +35,15 @@ Architecture Documentation = **Architecture Governance** として、**30 必須
 | 21 | Future Entry Gate | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | v1.50.0 |
 | 22 | Governance Process | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | v1.51.0 |
 | 23 | Future Layer Boundaries | [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | v1.52.0 |
-| 24 | Layer Interaction | [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | v1.53.0 |
+| 24 | Layer Interaction Model Design | [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | v1.60.0（v1.53.0 foundation を Cross Layer 統合） |
 | 25 | Provider Layer Design | [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | v1.54.0 |
 | 26 | Runtime Layer Design | [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) | v1.55.0 |
 | 27 | Scheduler Layer Design | [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) | v1.56.0 |
 | 28 | Automation Layer Design | [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) | v1.57.0 |
 | 29 | Workflow Layer Design | [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) | v1.58.0 |
 | 30 | Event Layer Design | [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) | v1.59.0 |
+| 31 | Cross Layer Interaction Model Design | [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | v1.60.0 |
+| 32 | Interaction Lifecycle Design | [INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) | v1.61.0 |
 
 **文書の役割分担:**
 
@@ -51,7 +53,8 @@ Architecture Documentation = **Architecture Governance** として、**30 必須
 | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | **Level 3→4 Entry Gate** — Future 実装着手前条件 |
 | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | **Governance Process** — レビュー・承認の実行順序 |
 | [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | **Future Layer 境界** — 責務・依存・データ所有・副作用 |
-| [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | **Layer 間 Interaction** — 通信・連携・CQ/Sync-Async・Error/Retry |
+| [INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) | **Interaction Lifecycle** — Cross-Layer Lifecycle Contract / States / Transitions / Waiting / Retry / Timeout（Design Only — v1.61.0） |
+| [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | **Cross Layer Interaction Model** — Core Layer 間 Interaction / Dependency / Boundary（Design Only — v1.60.0） |
 | [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | **Provider Layer 設計** — Contract / Capability / Credential（Design Only） |
 | [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) | **Runtime Layer 設計** — Execution Contract / Lifecycle / Orchestration（Design Only） |
 | [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) | **Scheduler Layer 設計** — Scheduling Contract / Trigger / Execution Policy（Design Only） |
@@ -79,14 +82,16 @@ Architecture Documentation = **Architecture Governance** として、**30 必須
 
 ---
 
-## 現在フェーズ（v1.59.0）
+## 現在フェーズ（v1.61.0 — Future Architecture Design Phase）
 
 | Layer | 状態 |
 |-------|------|
 | Platform Layer（Developer Automation） | **Completed**（v1.40.0、保守のみ） |
 | Application Layer（Content Pipeline） | **Completed**（v1.47.0） |
-| Governance Layer（Catalog + Docs + Process + Boundaries + Interaction） | **Completed**（v1.48.0–v1.53.0） |
-| Future Layer（Provider / Runtime / Scheduler / Automation / Workflow / Event 等） | **Design Only + Layer Design 追加**（実装禁止） |
+| Governance Layer（Catalog + Docs + Process + Boundaries） | **Completed**（v1.48.0–v1.53.0） |
+| **Core Layer Design**（Provider / Runtime / Scheduler / Automation / Workflow / Event） | **Complete**（v1.54.0–v1.59.0 — Design Only） |
+| **Cross Layer Design**（Interaction Model + Lifecycle） | **Complete**（v1.60.0–v1.61.0 — Design Only） |
+| Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。
 
@@ -123,4 +128,4 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 3. [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) + [CATALOG_USAGE.md](./CATALOG_USAGE.md)
 4. [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) + [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md)
 5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) + [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) + [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
-6. [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) + [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) + [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) + [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) + [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) + [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) + [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) + [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) + [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) + [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)
+6. [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) + [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) + [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) + [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) + [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) + [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) + [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) + [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) + [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) + [INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) + [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)

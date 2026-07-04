@@ -1,390 +1,672 @@
-# Layer Interaction Model
+# Layer Interaction Model Design
 
-Future Layer **Boundary Design** の上に位置する **Layer 間通信・連携・責務分担ルール** を定義する Architecture Governance 基準書です。Provider / Runtime / Scheduler / Automation 等の **実装前** に、Interaction Contract を固定します。
+Core Layer Design 完成後の **Layer 間 Interaction** を統治する top-level Architecture Contract です。個別 Layer の責務は **再定義しません**。Interaction / Dependency / Ownership / Communication / Boundary Crossing / Compatibility / Governance Rules のみを定義します。
 
-> **重要（v1.53.0）:** 本書は **Architecture Design** のみ。Production Code 変更なし。**Implementation Ready（Level 4）ではありません。** [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) の責務定義は **変更しません**。
+> **重要（v1.60.0）:** 本書は **Design Only**。Production Code 変更なし。**Individual Core Layer responsibilities MUST NOT be redefined.** v1.53.0 Layer Interaction foundation は **Cross Layer Integration 観点で supersede** されます。**Level 4 Implementation Ready 到達を意味しません。**
 
 ---
 
 ## 1. Purpose
 
-- Future Layer 間および Application ↔ Future 間の **通信・連携ルール** を明文化する
-- [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) で定義した **Boundary の上** に Interaction Contract を置く
-- Request / Response / Command / Query / Sync / Async / Error / Retry / Timeout / Transaction / Event / State の **設計前提** を固定する
-- Future Provider / Runtime / Scheduler / Automation 設計の **前提契約** として機能する
-- **Current Maturity Level 2.5** を維持し、Level 4 到達を **宣言しない**
+- 完成した Core Layer（Provider / Runtime / Scheduler / Automation / Workflow / Event）間の **Interaction Contract** を固定する
+- **Contract-based cross-layer access** を MUST とし、skip-layer / reverse / circular dependency を MUST NOT とする
+- [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) および各 `*_LAYER_DESIGN.md` の責務を **変更せず接続** する
+- Future implementation を **explicit interaction rules** で拘束する
+- Architecture を **Level 4 — Implementation Ready** へ近づける **Cross Layer Design** 基準書とする
 
 ---
 
 ## 2. Scope
 
-- Interaction Principles / Layer Communication Rules
-- Request / Response Flow、Command vs Query、Sync / Async
-- Error Propagation、Retry Responsibility、Timeout Ownership
-- Transaction / Event / State Boundaries
-- Observability Points（設計のみ — Real Metrics 非実装）
-- Interaction Anti-Patterns、Sequence Examples（Architecture 記述）
-- [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) / [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Integration
+| 対象 | 内容 |
+|------|------|
+| Interaction Principles / Rules | MUST / MUST NOT / SHOULD 規範 |
+| Allowed / Forbidden Interaction Matrix | Contract ベース許可・禁止 |
+| Dependency Direction / Reverse / Circular Rules | 依存方向固定 |
+| Ownership Rules | Input / Output / Contract ownership |
+| Boundary Crossing Rules | 隣接 Layer contract のみ |
+| Layer Isolation | 非隣接 implementation detail 禁止 |
+| Communication / Data / Control / Event Flow | 設計 overview |
+| Per-boundary sections | Event→Automation … Runtime→Provider |
+| Infrastructure boundaries | Queue / Worker / Receiver / Adapter / API / DB / Cloud |
+| Version / Backward Compatibility / Extension | additive default |
+| Governance / Future Entry / Anti-Patterns / Sequence / Testing / Observability | Design Only |
 
-Platform Layer / Application Layer の **既存 Public Contract** は変更しません。
+Application / Platform Layer の **既存 Public Contract** は変更しません。
 
 ---
 
 ## 3. Non-Goals
 
-- 本書は **実装ロードマップ** ではない
-- Provider / Adapter / Runtime / Scheduler / OAuth / SNS API / External API / Database / Queue / Worker / Cloud Runtime / Cache / Real Metrics / Real Automation / Background Job / Message Broker の **実装を許可しない**
-- **Boundary Design の責務再定義** を行わない
-- Public Contract Catalog の **破壊的変更** を行わない
-- Real Metrics / 外部 API / DB / Queue / Worker の **実体追加** を行わない
-- **Level 4 Implementation Ready** 到達を意味しない
+本書は以下を **行わない**（MUST NOT）:
+
+- Individual Core Layer **責務の再定義**
+- Provider / Runtime / Scheduler / Automation / Workflow / Event **実装**
+- Queue / Worker / Receiver / Adapter / OAuth / SNS API / External API / Database / Cloud Runtime / Cache / Metrics / Background Job **実装**
+- Runtime 起動 / Workflow 実行 / Scheduler 登録 / Provider 呼び出し
+- Event 永続化 / Webhook 受信 / Message Broker 実装
+- **Production Code** 変更
+- **Level 4 Implementation Ready** 到達の宣言
 
 ---
 
-## 4. Relationship to Future Layer Boundaries
+## 4. Current Maturity Context
 
-| 観点 | Future Layer Boundaries | Layer Interaction Model（本書） |
-|------|-------------------------|--------------------------------|
-| 定義対象 | 各 Layer の **責務・所有範囲** | Layer 間の **通信・連携ルール** |
-| 変更関係 | 正（Source of boundary truth） | Boundary を **変更しない** |
-| 依存 | Layer Map / Owns / Forbidden Deps | Boundary 上の **Interaction Contract** |
-| 実装 | Prohibited（v1.53.0） | Prohibited（v1.53.0） |
-
-- **Boundary Design** は各 Layer が **何を所有し、何を所有しないか** を定義する
-- **Interaction Model** は Layer が **どう通信し、誰が Retry/Timeout を担うか** を定義する
-- Interaction Model は Future Provider / Runtime / Scheduler / Automation 設計の **前提契約** である
-- Boundary 文書と矛盾する Interaction は **無効** — 矛盾時は Governance Flow + ADR
-
----
-
-## 5. Interaction Principles
-
-| 原則 | 内容 |
+| 観点 | 状態 |
 |------|------|
-| **Contract First** | すべての Interaction は Public Contract 経由 |
-| **Explicit Direction** | 呼び出し方向は [DEPENDENCY_RULES.md](./DEPENDENCY_RULES.md) に従い明示 |
-| **Minimal Coupling** | Layer 間は Contract のみ共有 — 内部 state 非共有 |
-| **No Hidden Side Effects** | 副作用は owning Layer に隔離 |
-| **Observable Interaction** | 各 Interaction に観測点を定義 |
-| **Failure Explicitness** | Error は Contract として返却 — 握りつぶし禁止 |
-| **Retry Ownership Clarity** | Retry 担当 Layer を Interaction 定義時に固定 |
-| **Timeout Ownership Clarity** | Timeout 値・責任 Layer を明示 |
-| **Backward Compatibility** | Interaction Contract 変更は additive default |
-| **Governance First** | 変更は [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) 経由 |
+| **Current Maturity** | **Level 3.0 — Core Layer Design Complete** |
+| Core Layers | Provider / Runtime / Scheduler / Automation / Workflow / Event — **Design Complete** |
+| Cross Layer Design | **v1.60.0 開始** — 本書 |
+| Target | **Level 4 — Implementation Ready**（**未到達**） |
+| Implementation | **Prohibited** until Future Entry Criteria + ADR |
 
 ---
 
-## 6. Layer Communication Rules
+## 5. Architecture Position
 
-| ルール | 内容 |
-|--------|------|
-| C1 | Layer 間通信は **Public Contract 経由のみ** |
-| C2 | Private Internal State への **直接アクセス禁止** |
-| C3 | **下位 Layer が上位 Layer を呼び出すこと禁止**（依存方向は内→外） |
-| C4 | **Cross-layer shortcut 禁止**（Layer skipping） |
-| C5 | 実装前の **仮想 Interaction** として本書に定義 — コード追加なし（v1.53.0） |
-
-```text
-Application Layer
-  ↔ (Public Contract JSON only)
-Future Layer stack
-  Provider / Adapter / Runtime / Scheduler / Queue / Worker
-  — いずれも Contract boundary を越えない
+```
+Governance Layer (Catalog / Docs / Process / Boundaries)
+        │
+        ▼
+Core Layer Design (Provider … Event) — Complete
+        │
+        ▼
+Cross Layer Interaction Model (本書) — v1.60.0
+        │
+        ▼
+Future Infrastructure (Queue / Worker / Receiver / Adapter …) — Design boundary only
+        │
+        ▼
+Level 4 Implementation Ready — NOT reached
 ```
 
----
-
-## 7. Request / Response Flow
-
-| 要素 | ルール |
-|------|--------|
-| **Request** | 入力 Public Contract を持つ（schema 固定） |
-| **Response** | 出力 Public Contract を持つ |
-| **Error** | Error も **Contract** として扱う（error summary JSON） |
-| **Source** | JSON = Source / Markdown = View / CLI = Summary と **矛盾しない** |
-| **Direction** | Request initiator は依存方向の **呼び出し側** のみ |
-
-Future Interaction でも Foundation artifact JSON が **正** である。
+- **Boundary Design** ([FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md)) — 各 Layer が何を所有するか — **変更しない**
+- **Layer Design** (`*_LAYER_DESIGN.md`) — 各 Layer contract — **変更しない**
+- **Interaction Model（本書）** — Layer が **どう隣接 contract を越えるか** — **接続のみ**
 
 ---
 
-## 8. Command vs Query Rules
+## 6. Core Layer Responsibilities
 
-| 種別 | 定義 | 制約 |
-|------|------|------|
-| **Query** | 状態を **変更しない** 読取専用 Interaction | idempotent、副作用なし |
-| **Command** | 状態変更の **意図** を持つ Interaction | 明示的 Command Contract |
-| **分離** | Command と Query を **同一 Contract に混在させない** | CQRS 風分離（Future 必須） |
+本書は以下の **既存定義を参照するのみ**（再定義しない）:
 
-Future Runtime / Scheduler / Worker では Command / Query 分離を **必須** とする（実装前設計）。
-
----
-
-## 9. Sync / Async Interaction Rules
-
-| 種別 | 用途 | v1.53.0 |
-|------|------|---------|
-| **Sync** | 即時応答が必要な Interaction のみ | 設計定義のみ |
-| **Async** | 長時間処理、外部 API、Queue、Worker、Automation **候補** | **実装しない** |
-
-- Async 設計は将来 **Queue / Worker / Scheduler** 設計の前提とする
-- Sync Contract の背後に Async 振る舞いを **隠さない**（Anti-Pattern）
-- Async 着手前: Scheduler + Queue + Worker Entry Criteria Gate 必須
+| Layer | 責務（要約） | 参照 |
+|-------|-------------|------|
+| **Event** | trigger / input / signal **分類** | [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) |
+| **Automation** | automation **intent** / approval boundary | [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) |
+| **Workflow** | structure / step / dependency / transition | [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) |
+| **Scheduler** | execution timing / trigger **condition** | [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) |
+| **Runtime** | execution lifecycle / orchestration | [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) |
+| **Provider** | capability **abstraction** | [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) |
 
 ---
 
-## 10. Error Propagation Rules
+## 7. Interaction Principles
 
-| ルール | 内容 |
-|--------|------|
-| E1 | Error は **握りつぶさない** — Contract error shape で返却 |
-| E2 | Provider / External API 失敗を Application Layer に **漏らしすぎない** — Adapter で正規化 |
-| E3 | **User-facing failure** と **System-facing failure** を分離 |
-| E4 | Error は Observability Point（§16）で記録可能な shape とする |
-| E5 | 未処理 Error の Layer 越境伝播は **明示的** にのみ許可 |
-
----
-
-## 11. Retry Responsibility
-
-| Layer / 領域 | Retry 責任（設計） |
-|--------------|-------------------|
-| **Provider / External API** | Transient failure retry（rate limit 遵守） |
-| **Adapter** | Retry 後も shape 正規化 — retry ロジックを Application へ漏らさない |
-| **Runtime** | Invoke 失敗の orchestration-level retry（idempotent Command のみ） |
-| **Application Layer** | **Retry しない**（Future external IO 非保持） |
-| **Queue / Worker** | At-least-once 配信 retry（承認後・設計のみ） |
-
-Retry 担当 Layer は Interaction 定義時に **1 箇所** に固定 — hidden retry 禁止。
-
----
-
-## 12. Timeout Ownership
-
-| Layer / 領域 | Timeout 所有（設計） |
-|--------------|---------------------|
-| **Provider / External API** | HTTP / API call timeout |
-| **Runtime** | Pipeline orchestration timeout |
-| **Scheduler** | Trigger window / max wait（将来） |
-| **Application Foundation** | Pure function — **external timeout なし**（v1.47 現状維持） |
-
-Timeout 値は Contract または Runtime config に **明示** — silent timeout 禁止。
-
----
-
-## 13. Transaction Boundaries
-
-- Transaction Boundary は Layer をまたいで **曖昧にしない**
-- 単一 Transaction は **単一 owning Layer** 内で完結（将来 Database 承認後）
-- Cross-layer 「分散トランザクション」は **原則禁止** — Saga / Event 補償は ADR 必須
-- JSON artifact write は **atomic file replace** パターン（現 Application 慣行）を維持
-- Database Transaction は Entry Criteria + ADR 後のみ
-
----
-
-## 14. Event Boundaries
-
-- **Event** は **事実の記録** であり **Command ではない**
-- Event emitter は **事実を起こした Layer** のみ
-- Event payload は Public Contract または **Private event envelope**（Catalog 非公開可）
-- Event 消費は Async / Queue 経由（将来）— Sync handler への混在禁止
-- Event ≠ State — Event は append-only 事実、State は owning Layer が管理
-
----
-
-## 15. State Transition Rules
-
-- **State Transition** の責任は **owning Layer** が持つ
-- Future Runtime / Queue / Worker で状態所有を **分散させない** — 単一 owner 原則
-- Application Foundation pipeline state（`state.json` 等）は **Application / Platform 領域** — Future Layer が上書きしない
-- State 変更は **Command Interaction** 経由のみ
-- Illegal transition は Error Contract で拒否
-
----
-
-## 16. Observability Points
-
-Interaction ごとに以下の **観測点** を設計上定義（Real Metrics **実装なし**）:
-
-| 観測点 | 意味 |
-|--------|------|
-| Request accepted | Contract 検証通過・処理開始 |
-| Response returned | 正常 Response Contract 返却 |
-| Error occurred | Error Contract 返却 |
-| Retry attempted | Retry 担当 Layer が retry 実行 |
-| Timeout occurred | Timeout 所有 Layer が timeout 検知 |
-| State transitioned | Owning Layer が state 変更 |
-| Event emitted | Event 事実が記録 |
-
-Developer Automation metrics（Platform）と Future Real Metrics は **分離**（Boundary 整合）。
-
----
-
-## 17. Interaction Anti-Patterns
-
-| Anti-Pattern | 問題 |
-|--------------|------|
-| **Layer skipping** | Cross-layer shortcut — Dependency 違反 |
-| **Circular call** | Layer 間循環依存 |
-| **Shared mutable state** | Coupling / race |
-| **Hidden retry** | Retry ownership 不明 |
-| **Silent timeout** | Timeout ownership 不明 |
-| **Mixed command/query** | 副作用の不可预测性 |
-| **Internal state leak** | Private state が Contract 外漏洩 |
-| **Provider-specific logic leaking upward** | Application 侵食 |
-| **Runtime-specific logic leaking into Application Layer** | Layer 混同 |
-| **Async behavior hidden behind sync contract** | Contract 嘘 |
-
----
-
-## 18. Sequence Examples
-
-Architecture Sequence（**実装なし**）— 将来 Interaction の参照モデル。
-
-### 18.1 Query Interaction Example
-
-```text
-Application Layer
-  → Query Request Contract (JSON)
-  → Foundation pure function
-  ← Query Response Contract (JSON)
-  (no state change)
-```
-
-### 18.2 Command Interaction Example
-
-```text
-Application Layer
-  → Command Request Contract (JSON)
-  → Owning Layer validates + state transition intent
-  ← Command Response Contract (JSON) or Error Contract
-```
-
-### 18.3 Async Candidate Interaction Example
-
-```text
-Scheduler (future)
-  → enqueue Command envelope
-Queue (future)
-  → deliver to Worker (future)
-Worker (future)
-  → Runtime invoke
-Runtime (future)
-  → Foundation CLI
-  ← artifact JSON
-  (Async — v1.53.0 未実装)
-```
-
-### 18.4 Error Propagation Example
-
-```text
-External API (future Provider)
-  → failure
-Adapter (future)
-  → normalize to Error Contract
-Application Layer
-  ← Error Contract (not raw stack/API body)
-```
-
-### 18.5 Retry Ownership Example
-
-```text
-Provider: transient 503 → retry (max N, backoff)
-Adapter: receives normalized result or Error Contract after retries exhausted
-Application: no retry — receives final Contract only
-```
-
-### 18.6 Timeout Ownership Example
-
-```text
-Provider: owns API timeout (30s)
-Runtime: owns pipeline timeout (5m)
-Application Foundation: no external timeout
-```
-
-### 18.7 Event Emission Example
-
-```text
-Runtime (future): pipeline completed (fact)
-  → emit event: pipeline.completed (Event Contract)
-Queue (future): transport only — not Command
-Subscriber (future): read-only reaction — separate Command if state change needed
-```
-
----
-
-## 19. Compatibility Requirements
-
-- Interaction Contract 追加は **additive default**
-- Breaking Interaction change は [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + ADR + Deprecation
-- 既存 Application Foundation CLI / JSON output と **後方互換** 維持
-- Boundary 文書（[FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md)）との **整合必須**
-
----
-
-## 20. Testing Requirements
-
-Machine Check（Quality Pipeline）で検証:
-
-| 要件 | Test |
+| 原則 | 規範 |
 |------|------|
-| 文書存在 | Test 483 |
-| Purpose / Scope / Non-Goals | Test 484 |
-| Boundary 関係 | Test 485 |
-| Communication / CQ / Sync-Async | Test 486–488 |
-| Error / Retry / Timeout / Transaction / Event / State | Test 489–490 |
-| Anti-Patterns | Test 491 |
-| Governance / Entry Criteria 統合 | Test 492 |
-| README / VERSION / CHANGELOG 整合 | Test 493 |
-
-PASS 数 ≠ Interaction 承認（[QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md)）。
+| **Contract First** | すべての Interaction MUST be Public Contract 経由のみ |
+| **Adjacent Boundary Only** | Layer MUST cross **only** to the next permitted contract boundary |
+| **No Skip Layer** | Cross-layer shortcut MUST NOT occur unless future ADR explicitly allows |
+| **No Reverse Dependency** | Lower layer MUST NOT depend on upper layer |
+| **No Circular Dependency** | Bidirectional runtime dependency MUST NOT exist |
+| **Explicit Ownership** | Input / Output / Contract ownership MUST be declared |
+| **No Hidden Side Effects** | Side effects MUST be isolated to owning Layer |
+| **No Implicit Shared State** | Cross-layer implicit shared state MUST NOT exist |
+| **Observable Interaction** | Each interaction SHOULD declare observability points |
+| **Backward Compatibility** | Contract changes SHOULD be additive by default |
+| **Governance First** | Changes MUST follow [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) |
 
 ---
 
-## 21. Documentation Requirements
+## 8. Layer Interaction Rules
 
-Interaction Model 変更時:
+| Rule ID | 規範 |
+|---------|------|
+| **IR-01** | Interaction MUST use named Layer Contract references |
+| **IR-02** | Interaction MUST NOT pass implementation internals across boundaries |
+| **IR-03** | Interaction MUST NOT bypass Automation when originating from Event |
+| **IR-04** | Interaction MUST NOT reach Provider except via Runtime contract |
+| **IR-05** | Scheduler MUST NOT mutate Workflow structure |
+| **IR-06** | Workflow MUST NOT execute Runtime directly |
+| **IR-07** | Event MUST NOT execute Runtime or Provider |
+| **IR-08** | Provider MUST remain capability abstraction — MUST NOT invoke upper layers |
+| **IR-09** | Future infrastructure MUST NOT be implemented in this phase |
+| **IR-10** | Contradiction with Layer Design MUST be resolved via Governance Flow + ADR |
 
-| 文書 | 更新 |
+---
+
+## 9. Allowed Interaction Matrix
+
+| From | To | Contract | Notes |
+|------|-----|----------|-------|
+| **Event** | **Automation** | Automation Contract | Event classification → intent mapping |
+| **Automation** | **Workflow** | Workflow Contract | Intent → structure |
+| **Workflow** | **Scheduler** | Scheduler Contract | Structure → timing / trigger condition |
+| **Scheduler** | **Runtime** | Runtime Contract | Trigger → lifecycle start / request |
+| **Runtime** | **Provider** | Provider Contract | Lifecycle → capability invocation |
+| **Any Layer** | **Governance** | Documentation reference | Governance Flow / Future Entry Criteria / Public Contract Catalog / Compliance Checklist |
+| **Any Layer** | **Layer Design docs** | Documentation reference | MUST NOT imply runtime call |
+
+**Allowed documentation-level references:**
+
+- [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md)
+- [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md)
+- Public Contract Catalog
+- [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md)
+- Layer-specific `*_LAYER_DESIGN.md`
+
+---
+
+## 10. Forbidden Interaction Matrix
+
+| From | To | Reason |
+|------|-----|--------|
+| **Event** | **Runtime** | Skip Automation / Workflow / Scheduler |
+| **Event** | **Provider** | Skip entire execution chain |
+| **Automation** | **Runtime** | Skip Workflow / Scheduler |
+| **Automation** | **Provider** | Intent layer MUST NOT call capability |
+| **Workflow** | **Runtime** | Skip Scheduler |
+| **Workflow** | **Provider** | Structure layer MUST NOT call capability |
+| **Scheduler** | **Provider** | Timing layer MUST NOT call capability |
+| **Provider** | **Runtime** | Reverse dependency |
+| **Provider** | **Scheduler** | Reverse dependency |
+| **Provider** | **Workflow** | Reverse dependency |
+| **Provider** | **Automation** | Reverse dependency |
+| **Provider** | **Event** | Reverse dependency |
+
+**Also forbidden (MUST NOT):**
+
+- Any layer → **non-adjacent implementation detail**
+- Any layer → **future infrastructure implementation** before ADR
+- **Any bidirectional dependency**
+- **Any circular dependency**
+- **Any implicit shared state**
+- **Any direct database ownership crossing layers**
+- **Queue / Worker / Receiver implementation** in this phase
+
+---
+
+## 11. Dependency Direction Rules
+
+Primary dependency direction MUST follow:
+
+```
+Event → Automation → Workflow → Scheduler → Runtime → Provider
+```
+
+| Rule | 規範 |
 |------|------|
-| [docs/architecture/README.md](./README.md) | 24 文書インデックス |
-| [README.md](../../README.md) | v1.53.0 セクション |
-| [docs/CHANGELOG.md](../CHANGELOG.md) | 設計判断 |
-| [docs/VERSION.md](../VERSION.md) | PASS 数・完成判定 |
-
-Boundary 変更が必要な場合は **別 ADR** — 本書から Boundary を書き換えない。
+| **DD-01** | Upper layer MAY reference lower layer **contract** only |
+| **DD-02** | Lower layer MUST NOT reference upper layer runtime state |
+| **DD-03** | Dependency MUST be acyclic |
+| **DD-04** | [DEPENDENCY_RULES.md](./DEPENDENCY_RULES.md) MUST remain satisfied |
 
 ---
 
-## 22. Governance Flow Integration
+## 12. Reverse Dependency Rules
 
-- Interaction Model 変更は [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) — **future layer design change** 分類
-- Implementation-enabling Interaction（Async 実装等）は **ADR + Risk + Compatibility + Public Contract + Compliance Review** 必須
-- v1.53.0 追加は **architecture governance change** — Production Code 変更なし
-
----
-
-## 23. Future Entry Criteria Integration
-
-- 各 Future Layer Interaction 着手前に [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) 該当 Entry Criteria を **満たす**
-- Interaction Model 定義 ≠ Entry Criteria **充足**
-- Entry Criteria 完了 ≠ **Level 4** 自動到達
-- Async / Queue / Worker Interaction 実装は Queue + Worker + Scheduler Entry Criteria **全 PASS** 後
+| Rule | 規範 |
+|------|------|
+| **RD-01** | Provider MUST NOT depend on Runtime |
+| **RD-02** | Runtime MUST NOT depend on Scheduler for capability semantics |
+| **RD-03** | No lower layer MUST invoke upper layer lifecycle |
+| **RD-04** | Provider reverse calls MUST NOT exist — **Provider Reverse Dependency Boundary** |
 
 ---
 
-## 24. Completion Criteria
+## 13. Circular Dependency Rules
 
-Layer Interaction Model 文書の完成条件（v1.53.0）:
+| Rule | 規範 |
+|------|------|
+| **CD-01** | Circular contract references MUST NOT exist |
+| **CD-02** | Circular runtime callbacks between Core Layers MUST NOT exist |
+| **CD-03** | Retry loops MUST NOT create undeclared circular ownership |
+| **CD-04** | Circular dependency detection SHOULD be part of future compliance checks |
 
-- [x] LAYER_INTERACTION_MODEL.md 存在（全必須見出し §1–§24）
-- [x] Boundary と Interaction の役割分担明確
-- [x] FUTURE_LAYER_BOUNDARIES.md **未変更**
+---
+
+## 14. Ownership Rules
+
+| Ownership Type | Owner |
+|----------------|-------|
+| Event classification | Event Layer |
+| Automation intent | Automation Layer |
+| Workflow structure | Workflow Layer |
+| Trigger timing / condition | Scheduler Layer |
+| Execution lifecycle | Runtime Layer |
+| Capability semantics | Provider Layer |
+| Cross-layer orchestration metadata | Declared in Interaction Contract — not shared implicitly |
+
+---
+
+## 15. Input Ownership
+
+| Layer | Owns Input |
+|-------|------------|
+| Event | eventSource / payloadRef / payloadShape declaration |
+| Automation | intent mapping input |
+| Workflow | step / dependency / transition input |
+| Scheduler | schedule / trigger condition input |
+| Runtime | execution context input |
+| Provider | capability input contract |
+
+Upper layer MUST NOT mutate lower layer input contract schema without governance review.
+
+---
+
+## 16. Output Ownership
+
+| Layer | Owns Output |
+|-------|-------------|
+| Event | classified event contract output |
+| Automation | automation intent decision output |
+| Workflow | workflow structure output |
+| Scheduler | trigger request output |
+| Runtime | lifecycle / orchestration output |
+| Provider | capability result output |
+
+Output MUST cross boundaries only as **contract references**, not raw implementation objects.
+
+---
+
+## 17. Contract Ownership
+
+| Contract | Owner |
+|----------|-------|
+| Event Contract | Event Layer |
+| Automation Contract | Automation Layer |
+| Workflow Contract | Workflow Layer |
+| Scheduler Contract | Scheduler Layer |
+| Runtime Execution Contract | Runtime Layer |
+| Provider Contract | Provider Layer |
+| Interaction rules（本書） | Cross Layer Governance |
+
+Contract versioning MUST follow [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md).
+
+---
+
+## 18. Boundary Crossing Rules
+
+| Rule | 規範 |
+|------|------|
+| **BC-01** | Boundary crossing MUST use adjacent layer contract only |
+| **BC-02** | Boundary crossing MUST NOT embed foreign layer implementation |
+| **BC-03** | Boundary crossing MUST declare correlation / causation where applicable |
+| **BC-04** | Boundary crossing MUST NOT persist foreign layer state |
+| **BC-05** | Skip-layer calls MUST NOT occur — **Cross-layer shortcut forbidden** |
+
+---
+
+## 19. Layer Isolation Rules
+
+| Rule | 規範 |
+|------|------|
+| **LI-01** | Layers MUST NOT share mutable runtime state |
+| **LI-02** | Layers MUST NOT expose internal caches to other layers |
+| **LI-03** | Layers MUST NOT read foreign layer private configuration |
+| **LI-04** | Test doubles MUST respect same isolation boundaries |
+
+---
+
+## 20. Communication Principles
+
+| 観点 | 規範 |
+|------|------|
+| **Command vs Query** | **Command** changes state in owning layer; **Query** MUST NOT hide side effects |
+| **Sync vs Async** | Async handoff to Queue / Worker is **future** — v1.60.0 **実装しない** |
+| **Error Propagation** | Errors MUST propagate via contract — MUST NOT be swallowed |
+| **Retry Responsibility** | Retry owner MUST be declared per interaction — **Hidden retry forbidden** |
+| **Timeout Ownership** | Timeout owner MUST be declared per interaction |
+| **Public Contract** | All messages MUST be Public Contract 経由のみ |
+
+---
+
+## 21. Data Flow Overview
+
+```
+[Event payloadRef]
+      │
+      ▼
+[Automation intent mapping] ── contract ref ──►
+      │
+      ▼
+[Workflow structure] ── contract ref ──►
+      │
+      ▼
+[Scheduler trigger condition] ── contract ref ──►
+      │
+      ▼
+[Runtime execution context] ── contract ref ──►
+      │
+      ▼
+[Provider capability input/output]
+```
+
+Data MUST flow **down** the chain via contract references. Data MUST NOT skip layers.
+
+---
+
+## 22. Control Flow Overview
+
+```
+Event signal classified
+  → Automation evaluates intent
+  → Workflow resolves structure
+  → Scheduler determines when to trigger
+  → Runtime owns lifecycle
+  → Provider executes capability (via Runtime only)
+```
+
+Control MUST NOT bypass Scheduler to reach Runtime from Workflow.
+
+Control MUST NOT bypass Runtime to reach Provider from any upper layer.
+
+---
+
+## 23. Event Flow Overview
+
+Event flow MUST begin at Event Layer classification and MUST NOT terminate at Provider without traversing intermediate contracts.
+
+| Stage | Responsibility |
+|-------|----------------|
+| Ingress (future) | Receiver — **not Event Layer** |
+| Classification | Event Layer |
+| Intent mapping | Automation Layer |
+| Structure binding | Workflow Layer |
+| Trigger scheduling | Scheduler Layer |
+| Execution | Runtime Layer |
+| Capability | Provider Layer |
+
+---
+
+## 24. Event to Automation Boundary
+
+| 観点 | 規範 |
+|------|------|
+| Event role | Event **classifies** trigger / input / signal |
+| Event MUST NOT | Execute automation |
+| Automation role | Automation **decides** whether event maps to automation intent |
+| Contract | Event Contract → Automation Contract reference |
+| Forbidden | Event → Runtime / Provider |
+
+---
+
+## 25. Automation to Workflow Boundary
+
+| 観点 | 規範 |
+|------|------|
+| Automation role | Automation **defines intent** |
+| Workflow role | Workflow **defines structure** |
+| Automation MUST NOT | Define step execution internals |
+| Workflow MUST NOT | Own business trigger classification |
+| Contract | Automation Contract → Workflow Contract |
+
+---
+
+## 26. Workflow to Scheduler Boundary
+
+| 観点 | 規範 |
+|------|------|
+| Workflow role | Defines steps / dependencies / transitions |
+| Scheduler role | Defines **when** execution is triggered |
+| Workflow MUST NOT | Execute runtime |
+| Scheduler MUST NOT | Mutate workflow structure |
+| Contract | Workflow Contract → Scheduler Contract |
+
+---
+
+## 27. Scheduler to Runtime Boundary
+
+| 観点 | 規範 |
+|------|------|
+| Scheduler role | Starts or **requests** execution through Runtime contract |
+| Scheduler MUST NOT | Execute provider capability directly |
+| Runtime role | **Owns lifecycle** |
+| Contract | Scheduler Contract → Runtime Execution Contract |
+| Forbidden | Scheduler → Provider |
+
+---
+
+## 28. Runtime to Provider Boundary
+
+| 観点 | 規範 |
+|------|------|
+| Runtime role | Coordinates execution lifecycle |
+| Provider role | Exposes capability abstraction |
+| Runtime MAY | Call Provider contract |
+| Provider MUST NOT | Know Runtime internals |
+| Contract | Runtime Execution Contract → Provider Contract |
+
+---
+
+## 29. Provider Reverse Dependency Boundary
+
+| 規範 | 内容 |
+|------|------|
+| Provider MUST NOT | Call Runtime / Scheduler / Workflow / Automation / Event |
+| Provider MUST NOT | Initiate upper-layer lifecycle |
+| Provider MUST | Remain capability abstraction only |
+| Runtime MAY | Depend on Provider contracts |
+| Violation | **Forbidden reverse dependency example** — see §39 |
+
+---
+
+## 30. Queue / Worker / Receiver Boundary
+
+| Component | v1.60.0 Status |
+|-----------|----------------|
+| Queue | **future infrastructure** — MUST NOT implement |
+| Worker | **future infrastructure** — MUST NOT implement |
+| Event Receiver | **future infrastructure** — MUST NOT implement |
+| Webhook Receiver | **future infrastructure** — MUST NOT implement |
+| Message Broker | **future infrastructure** — MUST NOT implement |
+
+**Queue / Worker / Receiver Boundary:** Core Layers MUST NOT enqueue, start workers, or receive webhooks in this phase. Async handoff references MAY appear in contracts as **future implementation concern** only.
+
+---
+
+## 31. Adapter / API / Database / Cloud Runtime Boundary
+
+| Component | Boundary |
+|-----------|----------|
+| Adapter | Below Provider — MUST NOT be invoked by upper Core Layers directly |
+| OAuth / SNS API / External API | Below Adapter/Provider — MUST NOT be called from Event / Automation / Workflow / Scheduler |
+| Database | MUST NOT be owned cross-layer — persistence is future infrastructure |
+| Cloud Runtime | MUST NOT be implemented in this phase |
+| Cache / Real Metrics | Design reference only |
+
+Any layer → future infrastructure implementation **before ADR** is **MUST NOT**.
+
+---
+
+## 32. Dependency Matrix
+
+|  | Event | Automation | Workflow | Scheduler | Runtime | Provider |
+|--|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Event** | — | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Automation** | ❌ | — | ✅ | ❌ | ❌ | ❌ |
+| **Workflow** | ❌ | ❌ | — | ✅ | ❌ | ❌ |
+| **Scheduler** | ❌ | ❌ | ❌ | — | ✅ | ❌ |
+| **Runtime** | ❌ | ❌ | ❌ | ❌ | — | ✅ |
+| **Provider** | ❌ | ❌ | ❌ | ❌ | ❌ | — |
+
+✅ = adjacent contract allowed | ❌ = MUST NOT (including reverse / skip)
+
+---
+
+## 33. Version Compatibility Rules
+
+| Rule | 規範 |
+|------|------|
+| **VC-01** | Interaction contract changes SHOULD be additive |
+| **VC-02** | Breaking interaction changes MUST follow [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) |
+| **VC-03** | Layer contract version MUST be declared in cross-layer references |
+| **VC-04** | Compatibility policy MUST align with [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) |
+
+---
+
+## 34. Backward Compatibility
+
+- v1.60.0 Cross Layer Design MUST NOT break Application / Platform Public Contracts
+- v1.53.0 Layer Interaction foundation concepts remain valid where not superseded
+- Additive interaction rules MUST NOT remove prior governance guarantees
+- Layer Design documents MUST remain authoritative for individual layer scope
+
+---
+
+## 35. Extension Rules
+
+| Extension | Requirement |
+|-----------|-------------|
+| New Core Layer interaction | ADR + Governance Flow + matrix update |
+| Skip-layer exception | Explicit ADR ONLY |
+| Infrastructure layer | Future Entry Criteria gate |
+| New contract field | Additive default + documentation |
+
+---
+
+## 36. Governance Integration
+
+| 文書 | Integration |
+|------|-------------|
+| [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | Interaction changes MUST follow governance process |
+| [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | Release / change verification |
+| [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) | Mandatory policy review |
+| [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) | ADR for exceptions |
+
+---
+
+## 37. Future Entry Criteria Integration
+
+- Level 3→4 transition MUST satisfy [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md)
+- Implementation MUST NOT begin until Entry Criteria + Compliance Checklist pass
+- Interaction Model MUST be validated against all Core Layer Design documents before implementation
+
+---
+
+## 38. Anti-Patterns
+
+| Anti-Pattern | Why forbidden |
+|--------------|---------------|
+| **Layer skipping** | Violates adjacent boundary model |
+| **Cross-layer shortcut** | Bypasses ownership and governance |
+| **Hidden retry** | Obscures retry responsibility |
+| **Provider direct call from upper layer** | Violates Runtime boundary |
+| **Reverse dependency** | Breaks acyclic model |
+| **Implicit shared state** | Breaks isolation |
+| **Event → Runtime direct trigger** | Skips intent and structure |
+| **Scheduler → Provider call** | Skips Runtime lifecycle |
+| **Infrastructure implemented early** | Violates Non-Goals |
+
+---
+
+## 39. Sequence Examples
+
+### 1. Event-driven automation flow
+
+```
+External signal (future ingress)
+  → Event: classify as Webhook Event (contract only)
+  → Automation: map to automation intent
+  → Workflow: bind workflow structure
+  → Scheduler: schedule trigger condition
+  → Runtime: start lifecycle
+  → Provider: capability via Runtime contract
+```
+
+### 2. Scheduled workflow flow
+
+```
+Scheduled Event (contract)
+  → Automation: scheduled automation intent
+  → Workflow: workflow structure
+  → Scheduler: time-based trigger
+  → Runtime: execution request
+  → Provider: capability execution
+```
+
+### 3. Manual approval flow
+
+```
+Manual Event (contract)
+  → Automation: intent + approval boundary
+  → Workflow: approval point in structure
+  → (approval gate — future)
+  → Scheduler: post-approval trigger
+  → Runtime → Provider
+```
+
+### 4. Provider capability execution flow
+
+```
+Runtime: lifecycle START
+  → Runtime: resolve Provider Contract ref
+  → Provider: capability invocation (abstraction)
+  → Provider: capability result
+  → Runtime: lifecycle COMPLETE
+```
+
+### 5. Forbidden direct provider call example
+
+```
+Workflow ──X──► Provider   ← MUST NOT (skip Scheduler + Runtime)
+
+Automation ──X──► Provider   ← MUST NOT
+
+Event ──X──► Provider   ← MUST NOT
+```
+
+### 6. Forbidden reverse dependency example
+
+```
+Provider ──X──► Runtime   ← MUST NOT (reverse dependency)
+
+Provider ──X──► Event   ← MUST NOT
+```
+
+---
+
+## 40. Testing Strategy
+
+| 観点 | v1.60.0 |
+|------|---------|
+| Scope | Documentation / matrix / boundary verification |
+| Machine checks | Quality Pipeline Test 601–620 |
+| Implementation tests | **MUST NOT** add in this phase |
+| Compliance | Architecture Compliance Checklist on change |
+| Matrix validation | Allowed / Forbidden matrix MUST be grep-verifiable |
+
+---
+
+## 41. Observability
+
+| Point | Owner |
+|-------|-------|
+| Event classification | Event Layer contract metadata |
+| Intent decision | Automation Layer |
+| Structure resolution | Workflow Layer |
+| Trigger firing | Scheduler Layer |
+| Lifecycle transitions | Runtime Layer |
+| Capability invocation | Provider Layer via Runtime |
+
+Cross-layer correlationId SHOULD propagate via contract references. Real Metrics implementation is **future**.
+
+---
+
+## 42. Completion Criteria
+
+Layer Interaction Model Design 文書の完成条件（v1.60.0）:
+
+- [x] LAYER_INTERACTION_MODEL.md 存在（§1–§42）
+- [x] Core Layer 責務 **非再定義**
+- [x] Allowed / Forbidden Interaction Matrix 定義
+- [x] Event → Automation → Workflow → Scheduler → Runtime → Provider chain 固定
+- [x] Queue / Worker / Receiver / Adapter / API / Database / Cloud Runtime 境界明確
 - [x] Production Code **変更なし**
-- [x] Architecture Documents **24** 必須文書
-- [x] Quality Pipeline **493 PASS**（Test 483–493）
-- [x] Level 4 **未宣言**
-- [x] Implementation **Prohibited** 維持
+- [x] Level 4 Implementation Ready **未到達**
+- [x] Quality Pipeline **620 PASS**（Test 601–620）
+- [x] Architecture Governance **31** 必須文書（Cross Layer Design 完成）
 
 ---
 
@@ -392,9 +674,12 @@ Layer Interaction Model 文書の完成条件（v1.53.0）:
 
 | 文書 | 関係 |
 |------|------|
-| [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | Boundary（What each layer owns） |
-| [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) | 将来設計構想 |
-| [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | Entry Gate |
-| [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | Review Process |
-| [DEPENDENCY_RULES.md](./DEPENDENCY_RULES.md) | 依存方向 |
-| [LAYER_MODEL.md](./LAYER_MODEL.md) | Layer 構造 |
+| [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | Boundary source — **変更しない** |
+| [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) | Event classification |
+| [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) | Automation intent |
+| [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) | Workflow structure |
+| [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) | Scheduler trigger |
+| [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) | Runtime lifecycle |
+| [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | Provider capability |
+| [NON_GOALS.md](./NON_GOALS.md) | 実装禁止 |
+| [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | Level 3→4 gate |
