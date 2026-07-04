@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.50.0**（Future Entry Criteria Foundation）
+**v1.51.0**（Governance Flow Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.51.0
+**Next Candidate:** v1.52.0
 
 ---
 
@@ -16,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.51.0** | **ドキュメント** | **✅ 完了** | **Governance Flow Foundation / Architecture Governance Process 正式定義** |
 | **v1.50.0** | **ドキュメント** | **✅ 完了** | **Future Entry Criteria Foundation / Level 3→4 Entry Gate 正式定義** |
 | **v1.49.0** | **ドキュメント** | **✅ 完了** | **Architecture Documentation Foundation / Architecture Governance 正式基準書** |
 | **v1.48.0** | **機能追加** | **✅ 完了** | **Public Contract Catalog & Compatibility Foundation / Application Layer Public Contract 一覧・互換性ルール固定** |
@@ -77,6 +78,46 @@
 
 ---
 
+### v1.51.0 で追加（Governance Flow Foundation）
+
+#### Governance Process 正式定義
+
+- **`GOVERNANCE_FLOW.md`** … Governance Lifecycle、Review Flow、Release Flow
+- **Future Entry Criteria Integration** … Entry Criteria（What）→ Governance Flow（How）
+- **Architecture Governance** … 22 必須文書（v1.50.0 の 21 + 本書）
+- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
+- **Production Code** … 変更なし
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.52.0** | 次フェーズ候補 |
+
+### 品質状況（v1.51.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **470 PASS** |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+
+### v1.51.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Governance Flow 文書 | ✅ |
+| Architecture Governance docs（22 必須文書） | ✅ |
+| Current Maturity Level 2.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Provider / Runtime / Scheduler / API 非実装 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.50.0 後方互換 | ✅ |
+| Test 461–470 | ✅ |
+
+---
+
 ### v1.50.0 で追加（Future Entry Criteria Foundation）
 
 #### Future Entry Gate 正式定義
@@ -91,9 +132,9 @@
 
 | 候補 | 方針 |
 |------|------|
-| **v1.51.0** | 次フェーズ候補 |
+| **v1.52.0** | 次フェーズ候補 |
 
-### 品質状況（v1.50.0 最新）
+### 品質状況（v1.50.0）
 
 | 項目 | 結果 |
 |------|------|

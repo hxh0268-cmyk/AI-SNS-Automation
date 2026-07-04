@@ -4,6 +4,36 @@
 
 ---
 
+## v1.51.0 — ドキュメント（Governance Flow Foundation）
+
+Architecture Governance を **運用可能な Governance Process** へ接続する [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) を追加しました。Production Code / Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装は行いません**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance Flow | [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) — Lifecycle / Review Flow / Release Flow |
+| Architecture Governance | `docs/architecture/` **22 必須文書**（v1.51.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 461–470 | Governance Flow 存在 / 見出し / Future Entry Criteria 連携 / 実装禁止 |
+
+### 設計判断
+
+- **Process Only** — Governance Flow 追加 ≠ Implementation Ready
+- **Future Entry Criteria Integration** — Entry Criteria（What）→ Flow（How）
+- **Quality Governance 整合** — 470 PASS = Machine Check、Governance Check は別途
+- **No Production Code** — コード変更なし
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **470 PASS**（Test 461–470 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.50.0 — ドキュメント（Future Entry Criteria Foundation）
 
 Future Layer 実装開始前に必要な **Level 3 → Level 4 Entry Gate** を [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) として正式定義しました。Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation の **実装は行いません**。
