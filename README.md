@@ -1170,6 +1170,22 @@ Latest Current Step
 release-plan
 ```
 
+### Workflow Layer Design（v1.58.0）
+
+**Workflow Layer Design** を追加しました。Automation の workflow intent を **step / dependency / transition / approval point** として構造化する [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) を正式定義します（**29 必須 Governance 文書**）。
+
+**Current Version: v1.58.0** | **Quality Pipeline: 580 PASS**
+
+Provider → Runtime → Scheduler → Automation → **Workflow** の Future Layer 関係を Design Only で固定。**Production code unchanged**。Workflow engine / Runtime / Scheduler / Provider 実装開始ではありません。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（29 必須 Governance 文書） |
+| Workflow Layer Design | [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) |
+| Automation Layer Design | [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md)（Automation 責務 — 非変更） |
+| Provider / Runtime / Scheduler | [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) / [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) / [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) |
+| Current Maturity | **Level 2.5** — Future Design Ready — Level 4 **未到達** |
+
 ### Automation Layer Design（v1.57.0）
 
 **Automation Layer Design** を追加しました。**「何を自動化したいのか」** を workflow intent / automation contract / automation boundary として [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) に正式定義します（**28 必須 Governance 文書**）。
@@ -1313,7 +1329,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.57.0 時点 28 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.58.0 時点 29 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1359,6 +1375,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) | Runtime Layer Design / Execution Contract / Lifecycle / Orchestration |
 | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) | Scheduler Layer Design / Scheduling Contract / Trigger / Execution Policy |
 | [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) | Automation Layer Design / Workflow Intent / Automation Contract / Boundary |
+| [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) | Workflow Layer Design / Step / Dependency / Transition / Approval Point |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象

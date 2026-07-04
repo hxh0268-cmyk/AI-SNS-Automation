@@ -4,6 +4,31 @@
 
 ---
 
+## v1.58.0 — Workflow Layer Design
+
+Workflow Layer Design — Design Only — Production code unchanged。
+
+Automation Layer の workflow intent を構造化する [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) を追加。Workflow Contract / Step / Dependency / Transition / Approval Point / Provider・Runtime・Scheduler・Automation Boundary を Design Only で固定。Workflow engine / DAG executor / state machine runtime **ではない**。Workflow **実装なし**、下位 Layer 責務 **非変更**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Workflow Layer Design | [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) |
+| Architecture Governance | **29 必須文書**（v1.58.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 561–580 | Workflow Design 存在 / Contract / Boundary / 実装禁止 |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **580 PASS**（Test 561–580 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.57.0 — Automation Layer Design
 
 Automation Layer Design — Design Only — Production code unchanged。
