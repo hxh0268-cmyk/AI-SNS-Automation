@@ -4,6 +4,31 @@
 
 ---
 
+## v1.59.0 — Event Layer Design
+
+Event Layer Design — Design Only — Production code unchanged。
+
+Future Event Contract を [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) として追加。Manual / Scheduled / Webhook / SNS / External / Approval / System Event 分類、Automation / Workflow / Scheduler / Runtime / Provider / Queue / Worker 境界を Design Only で固定。Event **実装未開始**、receiver / webhook / ingestion **なし**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Event Layer Design | [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) |
+| Architecture Governance | **30 必須文書**（v1.59.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 581–600 | Event Design 存在 / Contract / Classification / Boundary |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **600 PASS**（Test 581–600 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.58.0 — Workflow Layer Design
 
 Workflow Layer Design — Design Only — Production code unchanged。

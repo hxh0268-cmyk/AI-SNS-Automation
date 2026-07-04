@@ -1170,6 +1170,22 @@ Latest Current Step
 release-plan
 ```
 
+### Event Layer Design（v1.59.0）
+
+**Event Layer Design** を追加しました。Future Automation Architecture の **trigger / input / signal** を Event Contract として [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) に正式定義します（**30 必須 Governance 文書**）。
+
+**Current Version: v1.59.0** | **Quality Pipeline: 600 PASS**
+
+[Workflow Layer Design](docs/architecture/WORKFLOW_LAYER_DESIGN.md) の **次** に Event Layer Design が位置します。**Design Only** — Production code 変更なし。**Event implementation は未開始**（receiver / webhook / ingestion なし）。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（30 必須 Governance 文書） |
+| Event Layer Design | [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) |
+| Workflow Layer Design | [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md)（Workflow 責務 — 非変更） |
+| Provider / Runtime / Scheduler / Automation | 各 Layer Design — 責務非変更 |
+| Current Maturity | **Level 2.5** — Future Design Ready — Level 4 **未到達** |
+
 ### Workflow Layer Design（v1.58.0）
 
 **Workflow Layer Design** を追加しました。Automation の workflow intent を **step / dependency / transition / approval point** として構造化する [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) を正式定義します（**29 必須 Governance 文書**）。
@@ -1329,7 +1345,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.58.0 時点 29 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.59.0 時点 30 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1376,6 +1392,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) | Scheduler Layer Design / Scheduling Contract / Trigger / Execution Policy |
 | [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) | Automation Layer Design / Workflow Intent / Automation Contract / Boundary |
 | [WORKFLOW_LAYER_DESIGN.md](docs/architecture/WORKFLOW_LAYER_DESIGN.md) | Workflow Layer Design / Step / Dependency / Transition / Approval Point |
+| [EVENT_LAYER_DESIGN.md](docs/architecture/EVENT_LAYER_DESIGN.md) | Event Layer Design / Event Contract / Classification / Boundaries |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象
