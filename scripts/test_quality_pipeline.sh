@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.55.0 --"
+echo "-- Test 98: VERSION updated to v1.56.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.55.0**（Runtime Layer Design）")) {
-  throw new Error("docs/VERSION.md current version must be v1.55.0");
+if (!versionDoc.includes("**v1.56.0**（Scheduler Layer Design）")) {
+  throw new Error("docs/VERSION.md current version must be v1.56.0");
 }
-console.log("VERSION v1.55.0 ok");
+console.log("VERSION v1.56.0 ok");
 EOF
-pass "VERSION updated to v1.55.0"
+pass "VERSION updated to v1.56.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.56.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.56.0");
+if (payload.nextVersion !== "v1.57.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.57.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.56.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.56.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.57.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.57.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.56.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.57.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13926,7 +13926,8 @@ for file in \
   FUTURE_LAYER_BOUNDARIES.md \
   LAYER_INTERACTION_MODEL.md \
   PROVIDER_LAYER_DESIGN.md \
-  RUNTIME_LAYER_DESIGN.md
+  RUNTIME_LAYER_DESIGN.md \
+  SCHEDULER_LAYER_DESIGN.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13967,6 +13968,7 @@ const requiredHeadings = [
   ["LAYER_INTERACTION_MODEL.md", ["# Layer Interaction Model", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Interaction Principles", "## 6. Layer Communication Rules", "## 7. Request / Response Flow", "## 8. Command vs Query Rules", "## 9. Sync / Async Interaction Rules", "## 10. Error Propagation Rules", "## 11. Retry Responsibility", "## 12. Timeout Ownership", "## 13. Transaction Boundaries", "## 14. Event Boundaries", "## 15. State Transition Rules", "## 16. Observability Points", "## 17. Interaction Anti-Patterns", "## 18. Sequence Examples", "## 19. Compatibility Requirements", "## 20. Testing Requirements", "## 21. Documentation Requirements", "## 22. Governance Flow Integration", "## 23. Future Entry Criteria Integration", "## 24. Completion Criteria"]],
   ["PROVIDER_LAYER_DESIGN.md", ["# Provider Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Provider Layer Responsibility", "## 7. Provider Abstraction Principles", "## 8. Provider Contract Model", "## 9. Provider Input Contract", "## 10. Provider Output Contract", "## 11. Provider Error Contract", "## 12. Provider Capability Model", "## 13. Provider Configuration Model", "## 14. Provider Credential Boundary", "## 15. Provider Runtime Boundary", "## 16. Provider Adapter Boundary", "## 17. Provider External API Boundary", "## 18. Provider State Ownership", "## 19. Provider Side Effect Rules", "## 20. Provider Observability Rules", "## 21. Provider Testing Strategy", "## 22. Provider Anti-Patterns", "## 23. Provider Extension Criteria", "## 24. Governance Flow Integration", "## 25. Future Entry Criteria Integration", "## 26. Compatibility Requirements", "## 27. Completion Criteria"]],
   ["RUNTIME_LAYER_DESIGN.md", ["# Runtime Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Runtime Principles", "## 8. Runtime Responsibility", "## 9. Runtime Execution Contract", "## 10. Runtime Lifecycle", "## 11. Runtime Execution Context", "## 12. Runtime Orchestration Model", "## 13. Runtime Resource Ownership", "## 14. Runtime State Management", "## 15. Runtime Cancellation Rules", "## 16. Runtime Timeout Rules", "## 17. Runtime Retry Coordination", "## 18. Runtime Error Handling", "## 19. Runtime Provider Interaction", "## 20. Runtime Scheduler Boundary", "## 21. Runtime Automation Boundary", "## 22. Runtime Worker Boundary", "## 23. Runtime Side Effect Rules", "## 24. Runtime Observability", "## 25. Runtime Testing Strategy", "## 26. Runtime Anti-Patterns", "## 27. Sequence Examples", "## 28. Governance Flow Integration", "## 29. Future Entry Criteria Integration", "## 30. Compatibility Requirements", "## 31. Completion Criteria"]],
+  ["SCHEDULER_LAYER_DESIGN.md", ["# Scheduler Layer Design", "## Scheduler Purpose", "## Scheduler Scope", "## Scheduler Non-Goals", "## Relationship to Future Layer Boundaries", "## Relationship to Layer Interaction Model", "## Relationship to Runtime Layer Design", "## Scheduler Principles", "## Scheduler Responsibility", "## Scheduling Contract", "## Scheduling Model", "## Trigger Model", "## Trigger Sources", "## Scheduling Context", "## Execution Policy", "## Runtime Coordination", "## Job Ownership", "## Queue Boundary", "## Worker Boundary", "## Retry Policy Boundary", "## Time-based Scheduling", "## Event-based Scheduling", "## Manual Execution", "## Future Automation Boundary", "## Scheduler Side Effect Rules", "## Scheduler State Ownership", "## Scheduler Observability", "## Scheduler Testing Strategy", "## Scheduler Anti-Patterns", "## Sequence Examples", "## Governance Flow Integration", "## Future Entry Criteria Integration", "## Compatibility Requirements", "## Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -13994,7 +13996,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "26 必須 Governance 文書" docs/architecture/README.md
+grep -q "27 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14003,6 +14005,7 @@ grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/README.md
 grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14036,6 +14039,7 @@ const requiredLinks = [
   "./LAYER_INTERACTION_MODEL.md",
   "./PROVIDER_LAYER_DESIGN.md",
   "./RUNTIME_LAYER_DESIGN.md",
+  "./SCHEDULER_LAYER_DESIGN.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14044,7 +14048,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 26 governance files ok");
+console.log("architecture README links all 27 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14268,9 +14272,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**520 PASS**" docs/VERSION.md
-grep -q "Test 506–520" docs/VERSION.md
-grep -q "RUNTIME_LAYER_DESIGN.md" docs/VERSION.md
+grep -Fq "**540 PASS**" docs/VERSION.md
+grep -q "Test 521–540" docs/VERSION.md
+grep -q "SCHEDULER_LAYER_DESIGN.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14278,10 +14282,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**520 PASS**" docs/CHANGELOG.md
-grep -q "Test 506–520" docs/CHANGELOG.md
-grep -q "v1.55.0" docs/CHANGELOG.md
-grep -q "Runtime Layer Design" docs/CHANGELOG.md
+grep -Fq "**540 PASS**" docs/CHANGELOG.md
+grep -q "Test 521–540" docs/CHANGELOG.md
+grep -q "v1.56.0" docs/CHANGELOG.md
+grep -q "Scheduler Layer Design" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14378,7 +14382,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "26 必須 Governance 文書" docs/architecture/README.md
+grep -q "27 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14444,7 +14448,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "26 必須 Governance 文書" docs/architecture/README.md
+grep -q "27 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14509,7 +14513,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "26 必須 Governance 文書" docs/architecture/README.md
+grep -q "27 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -14822,6 +14826,124 @@ grep -q "## 31. Completion Criteria" docs/architecture/RUNTIME_LAYER_DESIGN.md
 grep -Fq "Quality Pipeline **520 PASS**" docs/architecture/RUNTIME_LAYER_DESIGN.md
 grep -Fq "Architecture Documents **26** 必須文書" docs/architecture/RUNTIME_LAYER_DESIGN.md
 pass "runtime layer design has completion criteria section"
+
+echo "-- Test 521: scheduler layer design document exists --"
+test -f docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "# Scheduler Layer Design" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design document exists"
+
+echo "-- Test 522: scheduler layer design linked from docs/architecture/README.md --"
+grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "Scheduler Layer Design" docs/architecture/README.md
+pass "scheduler layer design linked from docs/architecture/README.md"
+
+echo "-- Test 523: scheduler layer design linked from README.md --"
+grep -q "SCHEDULER_LAYER_DESIGN.md" README.md
+grep -q "Scheduler Layer Design（v1.56.0）" README.md
+pass "scheduler layer design linked from README.md"
+
+echo "-- Test 524: scheduler layer design documented in CHANGELOG --"
+grep -q "## v1.56.0" docs/CHANGELOG.md
+grep -q "Scheduler Layer Design" docs/CHANGELOG.md
+grep -q "SCHEDULER_LAYER_DESIGN.md" docs/CHANGELOG.md
+pass "scheduler layer design documented in CHANGELOG"
+
+echo "-- Test 525: VERSION references v1.56.0 scheduler layer design --"
+grep -Fq "**v1.56.0**（Scheduler Layer Design）" docs/VERSION.md
+grep -q "### v1.56.0 で追加（Scheduler Layer Design）" docs/VERSION.md
+grep -q "Scheduler Layer Design" docs/VERSION.md
+pass "VERSION references v1.56.0 scheduler layer design"
+
+echo "-- Test 526: scheduler layer design has purpose section --"
+grep -q "## Scheduler Purpose" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "実行そのものを担当しない" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has purpose section"
+
+echo "-- Test 527: scheduler layer design has scope section --"
+grep -q "## Scheduler Scope" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduling Contract" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has scope section"
+
+echo "-- Test 528: scheduler layer design has non-goals section --"
+grep -q "## Scheduler Non-Goals" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Cron implementation" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Queue implementation" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has non-goals section"
+
+echo "-- Test 529: scheduler layer design has relationship to runtime layer design section --"
+grep -q "## Relationship to Runtime Layer Design" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -Fq "Runtime 責務変更 **禁止**" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has relationship to runtime layer design section"
+
+echo "-- Test 530: scheduler layer design has principles section --"
+grep -q "## Scheduler Principles" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduling Contract First" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has principles section"
+
+echo "-- Test 531: scheduler layer design has responsibility section --"
+grep -q "## Scheduler Responsibility" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Runtime delegation" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has responsibility section"
+
+echo "-- Test 532: scheduler layer design has scheduling contract section --"
+grep -q "## Scheduling Contract" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "scheduleId" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "targetRuntimeContract" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has scheduling contract section"
+
+echo "-- Test 533: scheduler layer design has trigger model section --"
+grep -q "## Trigger Model" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "triggerType" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has trigger model section"
+
+echo "-- Test 534: scheduler layer design has runtime coordination section --"
+grep -q "## Runtime Coordination" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "execution request" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Runtime owns execution lifecycle" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has runtime coordination section"
+
+echo "-- Test 535: scheduler layer design has queue boundary section --"
+grep -q "## Queue Boundary" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -Fq "Scheduler は Queue を **所有しない**" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "enqueue 実装を定義しない" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has queue boundary section"
+
+echo "-- Test 536: scheduler layer design has worker boundary section --"
+grep -q "## Worker Boundary" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -Fq "Scheduler は Worker を **起動しない**" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has worker boundary section"
+
+echo "-- Test 537: scheduler layer design has retry policy boundary section --"
+grep -q "## Retry Policy Boundary" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "retry policy" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Runtime / Queue / Worker" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has retry policy boundary section"
+
+echo "-- Test 538: scheduler layer design has future automation boundary section --"
+grep -q "## Future Automation Boundary" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Automation workflow" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has future automation boundary section"
+
+echo "-- Test 539: scheduler layer design has anti-patterns section --"
+grep -q "## Scheduler Anti-Patterns" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler directly invokes Provider" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler owns Runtime lifecycle" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler implements Queue" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler implements Worker" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler performs external API calls" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler stores execution state as source of truth" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler performs retry execution" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler mutates Public Contracts" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler bypasses Governance Flow" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -q "Scheduler introduces production automation before Level 4" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has anti-patterns section"
+
+echo "-- Test 540: scheduler layer design has completion criteria section --"
+grep -q "## Completion Criteria" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -Fq "Quality Pipeline **540 PASS**" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+grep -Fq "Architecture Documents **27** 必須文書" docs/architecture/SCHEDULER_LAYER_DESIGN.md
+pass "scheduler layer design has completion criteria section"
 
 
 echo ""

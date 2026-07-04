@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Scheduler Layer Design（v1.56.0）
+
+**Scheduler Layer Design** を追加しました。Runtime を **いつ・どの条件で** 起動する Scheduling Contract を [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) として正式定義します（**27 必須 Governance 文書**）。
+
+**Current Version: v1.56.0** | **Quality Pipeline: 540 PASS**
+
+[Runtime Layer Design](docs/architecture/RUNTIME_LAYER_DESIGN.md) の **次** に Scheduler Layer Design が位置します。**Design Only** — Scheduler / Cron / Queue / Worker 実装開始ではありません。Runtime 責務は変更しません。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（27 必須 Governance 文書） |
+| Scheduler Layer Design | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) |
+| Runtime Layer Design | [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md)（Runtime 責務 — 非変更） |
+| Current Maturity | **Level 2.5** — Level 4 **未到達** |
+
 ### Runtime Layer Design（v1.55.0）
 
 **Runtime Layer Design** を追加しました。Provider を含む各 Layer の **上位実行契約** を [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) として正式定義します（**26 必須 Governance 文書**）。
@@ -1283,7 +1298,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.55.0 時点 26 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.56.0 時点 27 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1327,6 +1342,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [LAYER_INTERACTION_MODEL.md](docs/architecture/LAYER_INTERACTION_MODEL.md) | Layer 間 Interaction / Command-Query / Sync-Async / Error-Retry |
 | [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) | Provider Layer Design / Contract / Capability / Credential Boundary |
 | [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) | Runtime Layer Design / Execution Contract / Lifecycle / Orchestration |
+| [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) | Scheduler Layer Design / Scheduling Contract / Trigger / Execution Policy |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象

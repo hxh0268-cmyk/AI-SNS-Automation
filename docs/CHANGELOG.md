@@ -4,6 +4,41 @@
 
 ---
 
+## v1.56.0 — Scheduler Layer Design
+
+- Add Scheduler Layer Design as the Future Scheduler scheduling contract.
+- Define scheduler purpose, scope, non-goals, principles, responsibility, scheduling contract, trigger model, scheduling context, execution policy, runtime coordination, job ownership, queue boundary, worker boundary, retry boundary, time-based scheduling, event-based scheduling, manual execution, future automation boundary, observability, testing strategy, anti-patterns, governance integration, future entry criteria integration, compatibility requirements, and completion criteria.
+- Clarify that Scheduler decides when and under what conditions Runtime is requested, while Runtime owns execution lifecycle and orchestration.
+- Keep Scheduler, Runtime, Queue, Worker, and Automation implementation out of scope.
+- Extend quality pipeline coverage from 520 PASS to 540 PASS.
+
+[SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) を追加。Scheduling Contract / Trigger Model / Execution Policy / Runtime Coordination / Queue・Worker Boundary を Design Only で固定。Scheduler **実装なし**、Runtime 責務 **非変更**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Scheduler Layer Design | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) |
+| Architecture Governance | **27 必須文書**（v1.56.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 521–540 | Scheduler Design 存在 / Scheduling Contract / Boundary / 実装禁止 |
+
+### 設計判断
+
+- **Scheduler Design Only** — Cron / Queue / Worker / Runtime 実装禁止
+- **Runtime 責務非変更** — [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) 整合
+- **No Production Code** — コード変更なし
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **540 PASS**（Test 521–540 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.55.0 — ドキュメント（Runtime Layer Design）
 
 将来 Runtime 実装の **上位実行契約** を [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) として正式定義しました。Runtime execution contract / lifecycle / execution context / orchestration / cancellation / timeout / retry coordination / error handling / provider interaction / scheduler boundary / observability / testing strategy / anti-patterns / sequence examples を Design Only で固定。Runtime **実装なし**、Provider 責務 **非変更**、Production Code **変更なし**。
