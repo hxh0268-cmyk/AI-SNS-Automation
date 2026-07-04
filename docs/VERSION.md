@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.56.0**（Scheduler Layer Design）
+**v1.57.0**（Automation Layer Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.57.0（TBD — Future Layer Design 継続候補）
+**Next Candidate:** v1.58.0（TBD — Future Layer Design 継続候補）
 
 ---
 
@@ -16,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.57.0** | **ドキュメント** | **✅ 完了** | **Automation Layer Design / Workflow Intent・Automation Contract 設計正式定義** |
 | **v1.56.0** | **ドキュメント** | **✅ 完了** | **Scheduler Layer Design / Scheduling Contract・Trigger・Execution Policy 設計正式定義** |
 | **v1.55.0** | **ドキュメント** | **✅ 完了** | **Runtime Layer Design / Execution Contract・Lifecycle・Orchestration 設計正式定義** |
 | **v1.54.0** | **ドキュメント** | **✅ 完了** | **Provider Layer Design / Provider Contract・Capability 設計正式定義** |
@@ -83,6 +84,43 @@
 
 ---
 
+### v1.57.0 で追加（Automation Layer Design）
+
+#### Automation Layer 設計正式定義
+
+- **`AUTOMATION_LAYER_DESIGN.md`** … Workflow Intent / Automation Contract / Automation Boundary / Approval Boundary / Provider・Runtime・Scheduler Boundary
+- **下位 Layer 責務非変更** — Scheduler / Runtime / Provider Layer Design 整合
+- **Architecture Governance** … 28 必須文書（v1.56.0 の 27 + 本書）
+- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
+- **Automation 実装** … なし、Production Code 変更なし
+
+### 品質状況（v1.57.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **560 PASS** |
+| Architecture Documents | **28** 必須文書 |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 541–560 | Automation Layer Design |
+
+### v1.57.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Automation Layer Design 文書 | ✅ |
+| Architecture Governance docs（28 必須文書） | ✅ |
+| Automation 実装なし | ✅ |
+| Scheduler / Runtime / Provider 責務非変更 | ✅ |
+| Current Maturity Level 2.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.56.0 後方互換 | ✅ |
+| Test 541–560 | ✅ |
+
+---
+
 ### v1.56.0 で追加（Scheduler Layer Design）
 
 #### Scheduler Layer 設計正式定義
@@ -90,31 +128,14 @@
 - **`SCHEDULER_LAYER_DESIGN.md`** … Scheduling Contract / Trigger Model / Scheduling Context / Execution Policy / Runtime Coordination / Queue・Worker Boundary / Retry Policy Boundary
 - **Runtime 責務非変更** — [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) 整合
 - **Architecture Governance** … 27 必須文書（v1.55.0 の 26 + 本書）
-- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
 - **Scheduler 実装** … なし、Production Code 変更なし
 
-### 品質状況（v1.56.0 最新）
+### 品質状況（v1.56.0）
 
 | 項目 | 結果 |
 |------|------|
 | Quality Pipeline Tests | **540 PASS** |
 | Architecture Documents | **27** 必須文書 |
-| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
-| Level 4 Implementation Ready | **未到達** |
-| npm test | **PASS** |
-
-### v1.56.0 完成判定
-
-| 項目 | 状態 |
-|------|------|
-| Scheduler Layer Design 文書 | ✅ |
-| Architecture Governance docs（27 必須文書） | ✅ |
-| Scheduler 実装なし | ✅ |
-| Runtime 責務非変更 | ✅ |
-| Current Maturity Level 2.5 | ✅ |
-| Level 4 Implementation Ready 未到達 | ✅ |
-| Production Code 変更なし | ✅ |
-| v1.55.0 後方互換 | ✅ |
 | Test 521–540 | ✅ |
 
 ---

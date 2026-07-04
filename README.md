@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Automation Layer Design（v1.57.0）
+
+**Automation Layer Design** を追加しました。**「何を自動化したいのか」** を workflow intent / automation contract / automation boundary として [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) に正式定義します（**28 必須 Governance 文書**）。
+
+**Current Version: v1.57.0** | **Quality Pipeline: 560 PASS**
+
+[Scheduler Layer Design](docs/architecture/SCHEDULER_LAYER_DESIGN.md) の **次** に Automation Layer Design が位置します。**Design Only** — Production code unchanged。Automation / Runtime / Scheduler / Queue / Worker 実装開始ではありません。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（28 必須 Governance 文書） |
+| Automation Layer Design | [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) |
+| Scheduler Layer Design | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md)（Scheduler 責務 — 非変更） |
+| Current Maturity | **Level 2.5** — Future Design Ready — Level 4 **未到達** |
+
 ### Scheduler Layer Design（v1.56.0）
 
 **Scheduler Layer Design** を追加しました。Runtime を **いつ・どの条件で** 起動する Scheduling Contract を [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) として正式定義します（**27 必須 Governance 文書**）。
@@ -1298,7 +1313,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.56.0 時点 27 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.57.0 時点 28 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1343,6 +1358,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) | Provider Layer Design / Contract / Capability / Credential Boundary |
 | [RUNTIME_LAYER_DESIGN.md](docs/architecture/RUNTIME_LAYER_DESIGN.md) | Runtime Layer Design / Execution Contract / Lifecycle / Orchestration |
 | [SCHEDULER_LAYER_DESIGN.md](docs/architecture/SCHEDULER_LAYER_DESIGN.md) | Scheduler Layer Design / Scheduling Contract / Trigger / Execution Policy |
+| [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) | Automation Layer Design / Workflow Intent / Automation Contract / Boundary |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象

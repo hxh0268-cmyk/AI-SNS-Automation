@@ -4,6 +4,31 @@
 
 ---
 
+## v1.57.0 — Automation Layer Design
+
+Automation Layer Design — Design Only — Production code unchanged。
+
+将来 Automation の **workflow intent / automation contract / automation boundary** を [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) として正式定義。Automation Contract / Intent Model / Provider・Runtime・Scheduler Boundary / Queue・Worker Boundary / Human Approval / Sequence Examples を Design Only で固定。Automation **実装なし**、下位 Layer 責務 **非変更**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Automation Layer Design | [AUTOMATION_LAYER_DESIGN.md](docs/architecture/AUTOMATION_LAYER_DESIGN.md) |
+| Architecture Governance | **28 必須文書**（v1.57.0 で +1） |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 541–560 | Automation Design 存在 / Contract / Boundary / 実装禁止 |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **560 PASS**（Test 541–560 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.56.0 — Scheduler Layer Design
 
 - Add Scheduler Layer Design as the Future Scheduler scheduling contract.

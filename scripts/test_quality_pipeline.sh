@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.56.0 --"
+echo "-- Test 98: VERSION updated to v1.57.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.56.0**（Scheduler Layer Design）")) {
-  throw new Error("docs/VERSION.md current version must be v1.56.0");
+if (!versionDoc.includes("**v1.57.0**（Automation Layer Design）")) {
+  throw new Error("docs/VERSION.md current version must be v1.57.0");
 }
-console.log("VERSION v1.56.0 ok");
+console.log("VERSION v1.57.0 ok");
 EOF
-pass "VERSION updated to v1.56.0"
+pass "VERSION updated to v1.57.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.57.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.57.0");
+if (payload.nextVersion !== "v1.58.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.58.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.57.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.57.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.58.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.58.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.57.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.58.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13927,7 +13927,8 @@ for file in \
   LAYER_INTERACTION_MODEL.md \
   PROVIDER_LAYER_DESIGN.md \
   RUNTIME_LAYER_DESIGN.md \
-  SCHEDULER_LAYER_DESIGN.md
+  SCHEDULER_LAYER_DESIGN.md \
+  AUTOMATION_LAYER_DESIGN.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13969,6 +13970,7 @@ const requiredHeadings = [
   ["PROVIDER_LAYER_DESIGN.md", ["# Provider Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Provider Layer Responsibility", "## 7. Provider Abstraction Principles", "## 8. Provider Contract Model", "## 9. Provider Input Contract", "## 10. Provider Output Contract", "## 11. Provider Error Contract", "## 12. Provider Capability Model", "## 13. Provider Configuration Model", "## 14. Provider Credential Boundary", "## 15. Provider Runtime Boundary", "## 16. Provider Adapter Boundary", "## 17. Provider External API Boundary", "## 18. Provider State Ownership", "## 19. Provider Side Effect Rules", "## 20. Provider Observability Rules", "## 21. Provider Testing Strategy", "## 22. Provider Anti-Patterns", "## 23. Provider Extension Criteria", "## 24. Governance Flow Integration", "## 25. Future Entry Criteria Integration", "## 26. Compatibility Requirements", "## 27. Completion Criteria"]],
   ["RUNTIME_LAYER_DESIGN.md", ["# Runtime Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Runtime Principles", "## 8. Runtime Responsibility", "## 9. Runtime Execution Contract", "## 10. Runtime Lifecycle", "## 11. Runtime Execution Context", "## 12. Runtime Orchestration Model", "## 13. Runtime Resource Ownership", "## 14. Runtime State Management", "## 15. Runtime Cancellation Rules", "## 16. Runtime Timeout Rules", "## 17. Runtime Retry Coordination", "## 18. Runtime Error Handling", "## 19. Runtime Provider Interaction", "## 20. Runtime Scheduler Boundary", "## 21. Runtime Automation Boundary", "## 22. Runtime Worker Boundary", "## 23. Runtime Side Effect Rules", "## 24. Runtime Observability", "## 25. Runtime Testing Strategy", "## 26. Runtime Anti-Patterns", "## 27. Sequence Examples", "## 28. Governance Flow Integration", "## 29. Future Entry Criteria Integration", "## 30. Compatibility Requirements", "## 31. Completion Criteria"]],
   ["SCHEDULER_LAYER_DESIGN.md", ["# Scheduler Layer Design", "## Scheduler Purpose", "## Scheduler Scope", "## Scheduler Non-Goals", "## Relationship to Future Layer Boundaries", "## Relationship to Layer Interaction Model", "## Relationship to Runtime Layer Design", "## Scheduler Principles", "## Scheduler Responsibility", "## Scheduling Contract", "## Scheduling Model", "## Trigger Model", "## Trigger Sources", "## Scheduling Context", "## Execution Policy", "## Runtime Coordination", "## Job Ownership", "## Queue Boundary", "## Worker Boundary", "## Retry Policy Boundary", "## Time-based Scheduling", "## Event-based Scheduling", "## Manual Execution", "## Future Automation Boundary", "## Scheduler Side Effect Rules", "## Scheduler State Ownership", "## Scheduler Observability", "## Scheduler Testing Strategy", "## Scheduler Anti-Patterns", "## Sequence Examples", "## Governance Flow Integration", "## Future Entry Criteria Integration", "## Compatibility Requirements", "## Completion Criteria"]],
+  ["AUTOMATION_LAYER_DESIGN.md", ["# Automation Layer Design", "## Automation Purpose", "## Automation Scope", "## Automation Non-Goals", "## Relationship to Future Layer Boundaries", "## Relationship to Layer Interaction Model", "## Relationship to Provider Layer Design", "## Relationship to Runtime Layer Design", "## Relationship to Scheduler Layer Design", "## Automation Principles", "## Automation Responsibility", "## Automation Contract", "## Automation Intent Model", "## Workflow Boundary", "## Trigger Boundary", "## Scheduler Boundary", "## Runtime Boundary", "## Provider Boundary", "## Adapter Boundary", "## State Boundary", "## Side Effect Boundary", "## Queue Boundary", "## Worker Boundary", "## Manual Automation", "## Scheduled Automation", "## Event-based Automation", "## Human Approval Boundary", "## Observability", "## Testing Strategy", "## Anti-Patterns", "## Sequence Examples", "## Governance Flow Integration", "## Future Entry Criteria Integration", "## Compatibility Requirements", "## Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -13996,7 +13998,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "27 必須 Governance 文書" docs/architecture/README.md
+grep -q "28 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14006,6 +14008,7 @@ grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/README.md
 grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14040,6 +14043,7 @@ const requiredLinks = [
   "./PROVIDER_LAYER_DESIGN.md",
   "./RUNTIME_LAYER_DESIGN.md",
   "./SCHEDULER_LAYER_DESIGN.md",
+  "./AUTOMATION_LAYER_DESIGN.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14048,7 +14052,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 27 governance files ok");
+console.log("architecture README links all 28 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14272,9 +14276,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**540 PASS**" docs/VERSION.md
-grep -q "Test 521–540" docs/VERSION.md
-grep -q "SCHEDULER_LAYER_DESIGN.md" docs/VERSION.md
+grep -Fq "**560 PASS**" docs/VERSION.md
+grep -q "Test 541–560" docs/VERSION.md
+grep -q "AUTOMATION_LAYER_DESIGN.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14282,10 +14286,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**540 PASS**" docs/CHANGELOG.md
-grep -q "Test 521–540" docs/CHANGELOG.md
-grep -q "v1.56.0" docs/CHANGELOG.md
-grep -q "Scheduler Layer Design" docs/CHANGELOG.md
+grep -Fq "**560 PASS**" docs/CHANGELOG.md
+grep -q "Test 541–560" docs/CHANGELOG.md
+grep -q "v1.57.0" docs/CHANGELOG.md
+grep -q "Automation Layer Design" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14382,7 +14386,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "27 必須 Governance 文書" docs/architecture/README.md
+grep -q "28 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14448,7 +14452,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "27 必須 Governance 文書" docs/architecture/README.md
+grep -q "28 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14513,7 +14517,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "27 必須 Governance 文書" docs/architecture/README.md
+grep -q "28 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -14848,11 +14852,13 @@ grep -q "Scheduler Layer Design" docs/CHANGELOG.md
 grep -q "SCHEDULER_LAYER_DESIGN.md" docs/CHANGELOG.md
 pass "scheduler layer design documented in CHANGELOG"
 
-echo "-- Test 525: VERSION references v1.56.0 scheduler layer design --"
-grep -Fq "**v1.56.0**（Scheduler Layer Design）" docs/VERSION.md
+echo "-- Test 525: readme changelog version reference v1.56.0 history --"
+grep -q "Scheduler Layer Design（v1.56.0）" README.md
+grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "## v1.56.0" docs/CHANGELOG.md
 grep -q "### v1.56.0 で追加（Scheduler Layer Design）" docs/VERSION.md
 grep -q "Scheduler Layer Design" docs/VERSION.md
-pass "VERSION references v1.56.0 scheduler layer design"
+pass "readme changelog version reference v1.56.0 history"
 
 echo "-- Test 526: scheduler layer design has purpose section --"
 grep -q "## Scheduler Purpose" docs/architecture/SCHEDULER_LAYER_DESIGN.md
@@ -14944,6 +14950,110 @@ grep -q "## Completion Criteria" docs/architecture/SCHEDULER_LAYER_DESIGN.md
 grep -Fq "Quality Pipeline **540 PASS**" docs/architecture/SCHEDULER_LAYER_DESIGN.md
 grep -Fq "Architecture Documents **27** 必須文書" docs/architecture/SCHEDULER_LAYER_DESIGN.md
 pass "scheduler layer design has completion criteria section"
+
+echo "-- Test 541: automation layer design document exists --"
+test -f docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation layer design document exists"
+
+echo "-- Test 542: automation layer design title exists --"
+grep -q "# Automation Layer Design" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation layer design title exists"
+
+echo "-- Test 543: automation layer design purpose section exists --"
+grep -q "## Automation Purpose" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "workflow intent" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation layer design purpose section exists"
+
+echo "-- Test 544: automation layer design scope section exists --"
+grep -q "## Automation Scope" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "automation contract" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation layer design scope section exists"
+
+echo "-- Test 545: automation layer design non-goals section exists --"
+grep -q "## Automation Non-Goals" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Real Automation を実装しない" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation layer design non-goals section exists"
+
+echo "-- Test 546: provider boundary prohibits direct provider calls --"
+grep -q "## Provider Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Provider direct call 禁止" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "直接呼び出さない" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "provider boundary prohibits direct provider calls"
+
+echo "-- Test 547: runtime boundary prohibits execution logic --"
+grep -q "## Runtime Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "execution logic を持たない" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -Fq "Runtime **を生成しない**" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "runtime boundary prohibits execution logic"
+
+echo "-- Test 548: scheduler boundary prohibits scheduling logic --"
+grep -q "## Scheduler Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "scheduling logic を持たない" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -Fq "Scheduler **を生成しない**" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "scheduler boundary prohibits scheduling logic"
+
+echo "-- Test 549: queue boundary prohibits queue implementation --"
+grep -q "## Queue Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "queue implementation 禁止" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "queue boundary prohibits queue implementation"
+
+echo "-- Test 550: worker boundary prohibits worker implementation --"
+grep -q "## Worker Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "worker implementation 禁止" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "worker boundary prohibits worker implementation"
+
+echo "-- Test 551: side effect boundary exists --"
+grep -q "## Side Effect Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Side Effect を発生させない" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "side effect boundary exists"
+
+echo "-- Test 552: human approval boundary exists --"
+grep -q "## Human Approval Boundary" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Human Approval" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "approvalRequiredAutomation" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "human approval boundary exists"
+
+echo "-- Test 553: automation contract includes automationId --"
+grep -q "## Automation Contract" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "automationId" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation contract includes automationId"
+
+echo "-- Test 554: automation contract includes workflowIntent --"
+grep -q "workflowIntent" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation contract includes workflowIntent"
+
+echo "-- Test 555: automation contract includes targetSchedulerContract --"
+grep -q "targetSchedulerContract" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation contract includes targetSchedulerContract"
+
+echo "-- Test 556: automation contract includes targetRuntimeContract --"
+grep -q "targetRuntimeContract" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "automation contract includes targetRuntimeContract"
+
+echo "-- Test 557: anti-patterns section exists --"
+grep -q "## Anti-Patterns" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Automation から Provider を直接呼ぶ" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -q "Automation が Runtime を生成する" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "anti-patterns section exists"
+
+echo "-- Test 558: completion criteria section exists --"
+grep -q "## Completion Criteria" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+grep -Fq "Quality Pipeline **560 PASS**" docs/architecture/AUTOMATION_LAYER_DESIGN.md
+pass "completion criteria section exists"
+
+echo "-- Test 559: architecture README references automation layer design --"
+grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "Automation Layer Design" docs/architecture/README.md
+grep -q "28 必須 Governance 文書" docs/architecture/README.md
+pass "architecture README references automation layer design"
+
+echo "-- Test 560: VERSION documents v1.57.0 and 560 pass --"
+grep -Fq "**v1.57.0**（Automation Layer Design）" docs/VERSION.md
+grep -q "### v1.57.0 で追加（Automation Layer Design）" docs/VERSION.md
+grep -Fq "**560 PASS**" docs/VERSION.md
+grep -q "28 必須文書" docs/VERSION.md
+grep -q "Test 541–560" docs/VERSION.md
+pass "VERSION documents v1.57.0 and 560 pass"
 
 
 echo ""
