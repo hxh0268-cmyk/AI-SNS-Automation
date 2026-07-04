@@ -6,7 +6,7 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**24 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**25 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model 1 + v1.54.0 Provider Layer Design 1）を固定します。
 
 **Current Maturity:** [Level 2.5 — Governance Complete, Future Design Ready](./ARCHITECTURE_MATURITY_MODEL.md#current-maturity)
 
@@ -36,6 +36,7 @@ Architecture Documentation = **Architecture Governance** として、**24 必須
 | 22 | Governance Process | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | v1.51.0 |
 | 23 | Future Layer Boundaries | [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | v1.52.0 |
 | 24 | Layer Interaction | [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | v1.53.0 |
+| 25 | Provider Layer Design | [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | v1.54.0 |
 
 **文書の役割分担:**
 
@@ -46,6 +47,7 @@ Architecture Documentation = **Architecture Governance** として、**24 必須
 | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) | **Governance Process** — レビュー・承認の実行順序 |
 | [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) | **Future Layer 境界** — 責務・依存・データ所有・副作用 |
 | [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) | **Layer 間 Interaction** — 通信・連携・CQ/Sync-Async・Error/Retry |
+| [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | **Provider Layer 設計** — Contract / Capability / Credential（Design Only） |
 | [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) | **Machine Check vs Governance Check** — PASS 数の位置づけ |
 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 変更・release 時の **運用適合確認**（Read + Verify） |
 | [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | Foundation 追加時の **技術確認** |
@@ -67,14 +69,14 @@ Architecture Documentation = **Architecture Governance** として、**24 必須
 
 ---
 
-## 現在フェーズ（v1.53.0）
+## 現在フェーズ（v1.54.0）
 
 | Layer | 状態 |
 |-------|------|
 | Platform Layer（Developer Automation） | **Completed**（v1.40.0、保守のみ） |
 | Application Layer（Content Pipeline） | **Completed**（v1.47.0） |
 | Governance Layer（Catalog + Docs + Process + Boundaries + Interaction） | **Completed**（v1.48.0–v1.53.0） |
-| Future Layer（Provider / Runtime 等） | **Design Only + Boundaries + Interaction Model**（実装禁止） |
+| Future Layer（Provider / Runtime 等） | **Design Only + Provider Layer Design 追加**（実装禁止） |
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。
 
@@ -111,4 +113,4 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 3. [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) + [CATALOG_USAGE.md](./CATALOG_USAGE.md)
 4. [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) + [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md)
 5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) + [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) + [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
-6. [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) + [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) + [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) + [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)
+6. [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) + [FUTURE_LAYER_BOUNDARIES.md](./FUTURE_LAYER_BOUNDARIES.md) + [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) + [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) + [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)
