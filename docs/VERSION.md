@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.54.0**（Provider Layer Design）
+**v1.55.0**（Runtime Layer Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Next Candidate:** v1.55.0（Runtime Layer Design）
+**Next Candidate:** v1.56.0（Scheduler Layer Design）
 
 ---
 
@@ -16,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.55.0** | **ドキュメント** | **✅ 完了** | **Runtime Layer Design / Execution Contract・Lifecycle・Orchestration 設計正式定義** |
 | **v1.54.0** | **ドキュメント** | **✅ 完了** | **Provider Layer Design / Provider Contract・Capability 設計正式定義** |
 | **v1.53.0** | **ドキュメント** | **✅ 完了** | **Layer Interaction Model / Future Layer 間通信・連携ルール正式定義** |
 | **v1.52.0** | **ドキュメント** | **✅ 完了** | **Future Layer Boundary Design / Future Layer 責務・境界・依存正式定義** |
@@ -81,6 +82,48 @@
 
 ---
 
+### v1.55.0 で追加（Runtime Layer Design）
+
+#### Runtime Layer 設計正式定義
+
+- **`RUNTIME_LAYER_DESIGN.md`** … Execution Contract / Lifecycle / Execution Context / Orchestration / Cancellation / Timeout / Retry / Error / Provider Interaction / Scheduler Boundary
+- **Provider 責務非変更** — [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) 整合
+- **Architecture Governance** … 26 必須文書（v1.54.0 の 25 + 本書）
+- **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
+- **Runtime 実装** … なし、Production Code 変更なし
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.56.0** | Scheduler Layer Design |
+
+### 品質状況（v1.55.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **520 PASS** |
+| Architecture Documents | **26** 必須文書 |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+
+### v1.55.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Runtime Layer Design 文書 | ✅ |
+| Architecture Governance docs（26 必須文書） | ✅ |
+| Runtime 実装なし | ✅ |
+| Provider 責務非変更 | ✅ |
+| Current Maturity Level 2.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.54.0 後方互換 | ✅ |
+| Test 506–520 | ✅ |
+
+---
+
 ### v1.54.0 で追加（Provider Layer Design）
 
 #### Provider Layer 設計正式定義
@@ -91,33 +134,12 @@
 - **Current Maturity** … **Level 2.5** 維持、**Level 4 Implementation Ready 未到達**
 - **Provider 実装** … なし、Production Code 変更なし
 
-#### Next Candidate
-
-| 候補 | 方針 |
-|------|------|
-| **v1.55.0** | Runtime Layer Design |
-
-### 品質状況（v1.54.0 最新）
+### 品質状況（v1.54.0）
 
 | 項目 | 結果 |
 |------|------|
 | Quality Pipeline Tests | **505 PASS** |
 | Architecture Documents | **25** 必須文書 |
-| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
-| Level 4 Implementation Ready | **未到達** |
-| npm test | **PASS** |
-
-### v1.54.0 完成判定
-
-| 項目 | 状態 |
-|------|------|
-| Provider Layer Design 文書 | ✅ |
-| Architecture Governance docs（25 必須文書） | ✅ |
-| Provider 実装なし | ✅ |
-| Current Maturity Level 2.5 | ✅ |
-| Level 4 Implementation Ready 未到達 | ✅ |
-| Production Code 変更なし | ✅ |
-| v1.53.0 後方互換 | ✅ |
 | Test 494–505 | ✅ |
 
 ---

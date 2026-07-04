@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.54.0 --"
+echo "-- Test 98: VERSION updated to v1.55.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.54.0**（Provider Layer Design）")) {
-  throw new Error("docs/VERSION.md current version must be v1.54.0");
+if (!versionDoc.includes("**v1.55.0**（Runtime Layer Design）")) {
+  throw new Error("docs/VERSION.md current version must be v1.55.0");
 }
-console.log("VERSION v1.54.0 ok");
+console.log("VERSION v1.55.0 ok");
 EOF
-pass "VERSION updated to v1.54.0"
+pass "VERSION updated to v1.55.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.55.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.55.0");
+if (payload.nextVersion !== "v1.56.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.56.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.55.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.55.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.56.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.56.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.55.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.56.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13925,7 +13925,8 @@ for file in \
   GOVERNANCE_FLOW.md \
   FUTURE_LAYER_BOUNDARIES.md \
   LAYER_INTERACTION_MODEL.md \
-  PROVIDER_LAYER_DESIGN.md
+  PROVIDER_LAYER_DESIGN.md \
+  RUNTIME_LAYER_DESIGN.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13965,6 +13966,7 @@ const requiredHeadings = [
   ["FUTURE_LAYER_BOUNDARIES.md", ["# Future Layer Boundaries", "## Purpose", "## Scope", "## Non Goals", "## Current Maturity", "## Boundary Design Principles", "## Future Layer Map", "## Provider Layer Boundary", "## Adapter Layer Boundary", "## Runtime Layer Boundary", "## Scheduler Layer Boundary", "## OAuth Layer Boundary", "## SNS API Layer Boundary", "## External API Layer Boundary", "## Database Layer Boundary", "## Queue Layer Boundary", "## Worker Layer Boundary", "## Cloud Runtime Boundary", "## Cache Boundary", "## Real Metrics Boundary", "## Real Automation Boundary", "## Allowed Dependency Direction", "## Forbidden Dependencies", "## Public Contract Boundaries", "## Data Ownership Boundaries", "## Side Effect Boundaries", "## Runtime Isolation Boundaries", "## Testing Boundaries", "## Documentation Boundaries", "## Future Entry Criteria Integration", "## Governance Flow Integration", "## Completion Criteria", "## Prohibited Shortcuts", "## Related Documents"]],
   ["LAYER_INTERACTION_MODEL.md", ["# Layer Interaction Model", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Interaction Principles", "## 6. Layer Communication Rules", "## 7. Request / Response Flow", "## 8. Command vs Query Rules", "## 9. Sync / Async Interaction Rules", "## 10. Error Propagation Rules", "## 11. Retry Responsibility", "## 12. Timeout Ownership", "## 13. Transaction Boundaries", "## 14. Event Boundaries", "## 15. State Transition Rules", "## 16. Observability Points", "## 17. Interaction Anti-Patterns", "## 18. Sequence Examples", "## 19. Compatibility Requirements", "## 20. Testing Requirements", "## 21. Documentation Requirements", "## 22. Governance Flow Integration", "## 23. Future Entry Criteria Integration", "## 24. Completion Criteria"]],
   ["PROVIDER_LAYER_DESIGN.md", ["# Provider Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Provider Layer Responsibility", "## 7. Provider Abstraction Principles", "## 8. Provider Contract Model", "## 9. Provider Input Contract", "## 10. Provider Output Contract", "## 11. Provider Error Contract", "## 12. Provider Capability Model", "## 13. Provider Configuration Model", "## 14. Provider Credential Boundary", "## 15. Provider Runtime Boundary", "## 16. Provider Adapter Boundary", "## 17. Provider External API Boundary", "## 18. Provider State Ownership", "## 19. Provider Side Effect Rules", "## 20. Provider Observability Rules", "## 21. Provider Testing Strategy", "## 22. Provider Anti-Patterns", "## 23. Provider Extension Criteria", "## 24. Governance Flow Integration", "## 25. Future Entry Criteria Integration", "## 26. Compatibility Requirements", "## 27. Completion Criteria"]],
+  ["RUNTIME_LAYER_DESIGN.md", ["# Runtime Layer Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Relationship to Future Layer Boundaries", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Provider Layer Design", "## 7. Runtime Principles", "## 8. Runtime Responsibility", "## 9. Runtime Execution Contract", "## 10. Runtime Lifecycle", "## 11. Runtime Execution Context", "## 12. Runtime Orchestration Model", "## 13. Runtime Resource Ownership", "## 14. Runtime State Management", "## 15. Runtime Cancellation Rules", "## 16. Runtime Timeout Rules", "## 17. Runtime Retry Coordination", "## 18. Runtime Error Handling", "## 19. Runtime Provider Interaction", "## 20. Runtime Scheduler Boundary", "## 21. Runtime Automation Boundary", "## 22. Runtime Worker Boundary", "## 23. Runtime Side Effect Rules", "## 24. Runtime Observability", "## 25. Runtime Testing Strategy", "## 26. Runtime Anti-Patterns", "## 27. Sequence Examples", "## 28. Governance Flow Integration", "## 29. Future Entry Criteria Integration", "## 30. Compatibility Requirements", "## 31. Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -13992,7 +13994,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "25 必須 Governance 文書" docs/architecture/README.md
+grep -q "26 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14000,6 +14002,7 @@ grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/README.md
 grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14032,6 +14035,7 @@ const requiredLinks = [
   "./FUTURE_LAYER_BOUNDARIES.md",
   "./LAYER_INTERACTION_MODEL.md",
   "./PROVIDER_LAYER_DESIGN.md",
+  "./RUNTIME_LAYER_DESIGN.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14040,7 +14044,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 25 governance files ok");
+console.log("architecture README links all 26 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14264,9 +14268,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**505 PASS**" docs/VERSION.md
-grep -q "Test 494–505" docs/VERSION.md
-grep -q "PROVIDER_LAYER_DESIGN.md" docs/VERSION.md
+grep -Fq "**520 PASS**" docs/VERSION.md
+grep -q "Test 506–520" docs/VERSION.md
+grep -q "RUNTIME_LAYER_DESIGN.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14274,10 +14278,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**505 PASS**" docs/CHANGELOG.md
-grep -q "Test 494–505" docs/CHANGELOG.md
-grep -q "v1.54.0" docs/CHANGELOG.md
-grep -q "Provider Layer Design" docs/CHANGELOG.md
+grep -Fq "**520 PASS**" docs/CHANGELOG.md
+grep -q "Test 506–520" docs/CHANGELOG.md
+grep -q "v1.55.0" docs/CHANGELOG.md
+grep -q "Runtime Layer Design" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14374,7 +14378,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "25 必須 Governance 文書" docs/architecture/README.md
+grep -q "26 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14440,7 +14444,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "25 必須 Governance 文書" docs/architecture/README.md
+grep -q "26 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14505,7 +14509,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "25 必須 Governance 文書" docs/architecture/README.md
+grep -q "26 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -14732,19 +14736,92 @@ grep -q "GOVERNANCE_FLOW.md" docs/architecture/PROVIDER_LAYER_DESIGN.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/PROVIDER_LAYER_DESIGN.md
 pass "provider layer design integrates governance flow compatibility and entry criteria"
 
-echo "-- Test 505: readme changelog version reference v1.54.0 25 documents 505 pass --"
+echo "-- Test 505: readme changelog version reference v1.54.0 history --"
 grep -q "Provider Layer Design（v1.54.0）" README.md
 grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
-grep -q "25 必須 Governance 文書" docs/architecture/README.md
 grep -q "## v1.54.0" docs/CHANGELOG.md
-grep -q "25 必須文書" docs/CHANGELOG.md
-grep -Fq "**505 PASS**" docs/CHANGELOG.md
-grep -Fq "**v1.54.0**（Provider Layer Design）" docs/VERSION.md
-grep -Fq "**505 PASS**" docs/VERSION.md
-grep -q "25 必須文書" docs/VERSION.md
-grep -q "Level 4 Implementation Ready" docs/VERSION.md
-grep -q "未到達" docs/VERSION.md
-pass "readme changelog version reference v1.54.0 25 documents 505 pass"
+grep -q "### v1.54.0 で追加（Provider Layer Design）" docs/VERSION.md
+grep -q "Provider Layer Design" docs/VERSION.md
+pass "readme changelog version reference v1.54.0 history"
+
+echo "-- Test 506: runtime layer design document exists --"
+test -f docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "# Runtime Layer Design" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design document exists"
+
+echo "-- Test 507: runtime layer design linked from docs/architecture/README.md --"
+grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "Runtime Layer Design" docs/architecture/README.md
+pass "runtime layer design linked from docs/architecture/README.md"
+
+echo "-- Test 508: runtime layer design linked from root README.md --"
+grep -q "RUNTIME_LAYER_DESIGN.md" README.md
+grep -q "Runtime Layer Design（v1.55.0）" README.md
+pass "runtime layer design linked from root README.md"
+
+echo "-- Test 509: runtime layer design has purpose section --"
+grep -q "## 1. Purpose" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "execution contract" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has purpose section"
+
+echo "-- Test 510: runtime layer design has non-goals section --"
+grep -q "## 3. Non-Goals" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "Runtime implementation" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has non-goals section"
+
+echo "-- Test 511: runtime layer design does not define provider responsibility --"
+grep -Fq "Provider 責務変更 **禁止**" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/RUNTIME_LAYER_DESIGN.md
+! grep -q "## 6. Provider Layer Responsibility" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design does not define provider responsibility"
+
+echo "-- Test 512: runtime layer design does not introduce production implementation --"
+grep -Fq "Production Code 変更なし" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -Fq "Runtime **実装なし**" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "Design Only" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design does not introduce production implementation"
+
+echo "-- Test 513: runtime layer design has lifecycle section --"
+grep -q "## 10. Runtime Lifecycle" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "pending → validated → running" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has lifecycle section"
+
+echo "-- Test 514: runtime layer design has execution context section --"
+grep -q "## 11. Runtime Execution Context" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "run_id" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has execution context section"
+
+echo "-- Test 515: runtime layer design has orchestration model section --"
+grep -q "## 12. Runtime Orchestration Model" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "invoke Foundation CLI" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has orchestration model section"
+
+echo "-- Test 516: runtime layer design has cancellation rules section --"
+grep -q "## 15. Runtime Cancellation Rules" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -Fq "Cancelled は **failed ではない**" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has cancellation rules section"
+
+echo "-- Test 517: runtime layer design has timeout rules section --"
+grep -q "## 16. Runtime Timeout Rules" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "Runtime deadline" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has timeout rules section"
+
+echo "-- Test 518: runtime layer design has retry coordination section --"
+grep -q "## 17. Runtime Retry Coordination" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "runtime_retry_requested" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has retry coordination section"
+
+echo "-- Test 519: runtime layer design has provider interaction section --"
+grep -q "## 19. Runtime Provider Interaction" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "never" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -q "external API directly" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has provider interaction section"
+
+echo "-- Test 520: runtime layer design has completion criteria section --"
+grep -q "## 31. Completion Criteria" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -Fq "Quality Pipeline **520 PASS**" docs/architecture/RUNTIME_LAYER_DESIGN.md
+grep -Fq "Architecture Documents **26** 必須文書" docs/architecture/RUNTIME_LAYER_DESIGN.md
+pass "runtime layer design has completion criteria section"
 
 
 echo ""
