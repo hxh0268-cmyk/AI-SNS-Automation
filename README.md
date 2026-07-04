@@ -1172,13 +1172,28 @@ release-plan
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（18 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（20 必須文書）を `docs/architecture/` に整備します。
+
+**Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
+
+| 成熟度 | 状態 |
+|--------|------|
+| Foundation（Level 1） | **Completed** |
+| Governance（Level 2） | **Completed** |
+| Future Design（Level 3） | **Ready**（Future Entry Criteria 未完成） |
+| Implementation Ready（Level 4） | **未到達** |
+| Production Ready（Level 5） | **未到達** |
+| Operational Excellence（Level 6） | **未到達** |
+
+**Quality Pipeline の PASS 数だけでは Architecture 品質の十分条件ではありません。** Machine Check（Quality Pipeline）と Governance Check（Compliance Checklist）をセットで判断します — [QUALITY_GOVERNANCE.md](docs/architecture/QUALITY_GOVERNANCE.md)。
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture（Design Only）** であり、**現時点では非実装** です。
 
 | 項目 | 内容 |
 |------|------|
-| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（18 必須 Governance 文書） |
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（20 必須 Governance 文書） |
+| Current Maturity | **Level 2.5** — [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) |
+| Quality Governance | [QUALITY_GOVERNANCE.md](docs/architecture/QUALITY_GOVERNANCE.md) — PASS 数 ≠ 品質十分条件 |
 | Governance | Layer / Dependency / Public Contract / Compatibility / Version / Deprecation / Change |
 | Future | [FUTURE_ARCHITECTURE.md](docs/architecture/FUTURE_ARCHITECTURE.md)（Design Only） |
 | Non-Goals | [NON_GOALS.md](docs/architecture/NON_GOALS.md) |
@@ -1193,6 +1208,8 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [CATALOG_USAGE.md](docs/architecture/CATALOG_USAGE.md) | Public Contract Catalog 利用 |
 | [CHANGE_GOVERNANCE.md](docs/architecture/CHANGE_GOVERNANCE.md) | 変更判断基準（Mandatory Policy Review） |
 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 運用適合確認チェックリスト |
+| [QUALITY_GOVERNANCE.md](docs/architecture/QUALITY_GOVERNANCE.md) | Quality Pipeline と Governance Check の分離 |
+| [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) | 成熟度 Level 0–6 / Current Level 2.5 |
 | [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
 
 #### 非対象

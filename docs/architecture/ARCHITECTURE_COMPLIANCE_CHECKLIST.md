@@ -2,7 +2,7 @@
 
 Architecture Governance **適合確認チェックリスト** です。将来の変更時に「読むだけ」で終わらせず、merge / release 前に **実際に確認する運用項目** を固定します。
 
-> **関連:** 変更判断の公式フローは [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) の **Mandatory Policy Review** を正とします。Foundation 追加の技術詳細は [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) を併用してください。
+> **関連:** 変更判断の公式フローは [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) の **Mandatory Policy Review** を正とします。Foundation 追加の技術詳細は [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) を併用してください。Quality Pipeline PASS 数だけでは品質十分とみなさない — [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) を参照。
 
 ---
 
@@ -24,7 +24,7 @@ Architecture Governance **適合確認チェックリスト** です。将来の
 - [ ] **README 更新要否確認** — ルート [README.md](../../README.md) と [docs/architecture/README.md](./README.md)
 - [ ] **CHANGELOG 更新要否確認** — [docs/CHANGELOG.md](../CHANGELOG.md)
 - [ ] **VERSION 更新要否確認** — [docs/VERSION.md](../VERSION.md) / Test 98
-- [ ] **Quality Pipeline 追加・維持確認** — 既存 PASS 維持 + 新規テスト追加
+- [ ] **Quality Pipeline 追加・維持確認** — 既存 PASS 維持 + 新規テスト追加（[QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md): PASS 数は十分条件ではない）
 - [ ] **Provider / Runtime / Scheduler / SNS API 等の実装禁止確認** — [NON_GOALS.md](./NON_GOALS.md) 非該当
 
 ---
@@ -90,7 +90,10 @@ Provider / Adapter / Runtime / Scheduler / External SNS API 実装 **着手前**
 release 候補（commit / tag 前の Human Review 用）:
 
 - [ ] Universal Compliance Items すべて
-- [ ] Quality Pipeline **全件 PASS**
+- [ ] Quality Pipeline **全件 PASS**（Machine Check — 十分条件ではない）
+- [ ] [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) 該当節完了（Governance Check）
+- [ ] [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) Release Gate Summary 整合
+- [ ] [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) — 変更が Maturity Level 宣言に該当しないこと（または ADR 記録済み）
 - [ ] docs/VERSION.md current version 整合（Test 98）
 - [ ] docs/CHANGELOG.md エントリあり
 - [ ] backward compatibility テスト PASS（直前 Minor の N-1 レイヤー）

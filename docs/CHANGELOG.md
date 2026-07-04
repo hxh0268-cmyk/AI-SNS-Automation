@@ -12,10 +12,10 @@ Application Layer / Platform Layer / Governance Layer の **Architecture Governa
 
 | 項目 | 内容 |
 |------|------|
-| Architecture Governance | `docs/architecture/` **18 必須文書**（v1.49.0 新規 15 + 更新 2 + Compliance Checklist 1） |
+| Architecture Governance | `docs/architecture/` **20 必須文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3） |
 | カバー領域 | Layer / Dependency / Public Contract / Compatibility / Version / Deprecation / Change |
 | Future Architecture | Design Only（実装禁止） |
-| Test 423–433 | 必須ファイル / 見出し / Governance / Compliance Checklist / Non-Goals / Non-scope |
+| Test 423–448 | 必須ファイル / Governance / Compliance / Quality Governance / Maturity Model / Non-scope |
 
 ### 追加改善（v1.49.0）
 
@@ -23,6 +23,10 @@ Application Layer / Platform Layer / Governance Layer の **Architecture Governa
 |------|------|
 | Architecture Compliance Checklist | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md) — 変更・release 時の運用適合確認 |
 | Test 431–433 | Compliance Checklist 存在 / README リンク / 必須項目確認 |
+| Quality Governance | [QUALITY_GOVERNANCE.md](docs/architecture/QUALITY_GOVERNANCE.md) — PASS 数は品質の十分条件ではない |
+| Test 434–439 | Quality Governance 文書 / README / VERSION / CHANGELOG 整合 |
+| Architecture Maturity Model | [ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md) — Level 0–6、Current Level 2.5 |
+| Test 440–448 | Maturity Model 存在 / 見出し / Level 2.5 / README リンク / 未到達宣言 |
 
 ### 設計判断
 
@@ -34,7 +38,7 @@ Application Layer / Platform Layer / Governance Layer の **Architecture Governa
 
 | 項目 | 結果 |
 |------|------|
-| Quality Pipeline Tests | **433 PASS**（Test 423–433 含む） |
+| Quality Pipeline Tests | **448 PASS**（Test 423–448 含む） |
 | npm test | **PASS** |
 
 ---

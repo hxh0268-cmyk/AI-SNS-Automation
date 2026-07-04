@@ -80,8 +80,10 @@
 
 #### Architecture Governance 正式基準書
 
-- **`docs/architecture/`** … 18 必須 Governance 文書（新規 15 + 更新 2 + Compliance Checklist 1）
+- **`docs/architecture/`** … 20 必須 Governance 文書（新規 15 + 更新 2 + Compliance Checklist + Quality Governance + Maturity Model）
 - **`ARCHITECTURE_COMPLIANCE_CHECKLIST.md`** … 変更・release 時の運用適合確認
+- **`QUALITY_GOVERNANCE.md`** … Machine Check vs Governance Check、PASS 数の位置づけ
+- **`ARCHITECTURE_MATURITY_MODEL.md`** … 成熟度 Level 0–6、**Current Maturity: Level 2.5**
 - **Future Architecture** … Design Only（Provider / Runtime / Scheduler / API 非実装）
 - **Catalog 連携** … v1.48.0 Public Contract Catalog と整合
 
@@ -95,21 +97,25 @@
 
 | 項目 | 結果 |
 |------|------|
-| Quality Pipeline Tests | **433 PASS** |
+| Quality Pipeline Tests | **448 PASS** |
+| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
 | npm test | **PASS** |
 
 ### v1.49.0 完成判定
 
 | 項目 | 状態 |
 |------|------|
-| Architecture Governance docs（18 必須文書） | ✅ |
+| Architecture Governance docs（20 必須文書） | ✅ |
 | Architecture Compliance Checklist | ✅ |
+| Quality Governance | ✅ |
+| Architecture Maturity Model | ✅ |
+| Current Maturity Level 2.5 | ✅ |
 | Layer / Dependency / Public Contract Policy | ✅ |
 | Compatibility / Versioning / Deprecation Policy | ✅ |
 | Future Architecture Design Only | ✅ |
 | Provider / Runtime / API 非実装 | ✅ |
 | v1.48.0 後方互換 | ✅ |
-| Test 423–433 | ✅ |
+| Test 423–448 | ✅ |
 
 ---
 

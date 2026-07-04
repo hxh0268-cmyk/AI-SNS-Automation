@@ -13918,7 +13918,9 @@ for file in \
   ARCHITECTURE_DECISIONS.md \
   EXTENSION_CHECKLIST.md \
   RISK_REGISTER.md \
-  ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+  ARCHITECTURE_COMPLIANCE_CHECKLIST.md \
+  QUALITY_GOVERNANCE.md \
+  ARCHITECTURE_MATURITY_MODEL.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13951,6 +13953,8 @@ const requiredHeadings = [
   ["EXTENSION_CHECKLIST.md", ["# Extension Checklist"]],
   ["RISK_REGISTER.md", ["# Risk Register", "## Mitigation Owner"]],
   ["ARCHITECTURE_COMPLIANCE_CHECKLIST.md", ["# Architecture Compliance Checklist", "## Universal Compliance Items", "## Foundation Addition", "## Public Contract Change", "## Future Architecture Addition", "## Provider Runtime Scheduler API Pre Addition", "## Release Pre Check", "## Backward Compatibility Check", "## Risk Check", "## ADR Check"]],
+  ["QUALITY_GOVERNANCE.md", ["# Quality Governance", "## PASS Count Is Not Sufficient Quality Proof", "## PASS Count Meaning", "## Architecture Quality Requires Governance Review", "## Machine Check vs Governance Check", "## Future Layer And Future Architecture", "## PASS Count Update Procedure"]],
+  ["ARCHITECTURE_MATURITY_MODEL.md", ["# Architecture Maturity Model", "## Purpose", "## Scope", "## Non Goals", "## Maturity Levels", "## Level 0: Idea", "## Level 1: Foundation", "## Level 2: Governance", "## Level 3: Future Design", "## Level 4: Implementation Ready", "## Level 5: Production Ready", "## Level 6: Operational Excellence", "## Current Maturity", "## Completed Capabilities", "## Current Limitations", "## Required Evidence", "## Transition Rules", "## Relationship to Quality Governance", "## Relationship to Future Entry Criteria", "## Relationship to Compliance Checklist", "## Completion Criteria"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -13978,7 +13982,9 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "18 必須 Governance 文書" docs/architecture/README.md
+grep -q "20 必須 Governance 文書" docs/architecture/README.md
+grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
+grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14004,6 +14010,8 @@ const requiredLinks = [
   "./EXTENSION_CHECKLIST.md",
   "./RISK_REGISTER.md",
   "./ARCHITECTURE_COMPLIANCE_CHECKLIST.md",
+  "./QUALITY_GOVERNANCE.md",
+  "./ARCHITECTURE_MATURITY_MODEL.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14012,7 +14020,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 18 governance files ok");
+console.log("architecture README links all 20 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14206,6 +14214,134 @@ for (const required of [
 console.log("architecture compliance checklist includes required items ok");
 EOF
 pass "architecture compliance checklist includes required items"
+
+echo "-- Test 434: quality governance document exists --"
+test -f docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "# Quality Governance" docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "## Machine Check vs Governance Check" docs/architecture/QUALITY_GOVERNANCE.md
+pass "quality governance document exists"
+
+echo "-- Test 435: quality governance states pass count is not sufficient quality proof --"
+grep -q "PASS Count Is Not Sufficient Quality Proof" docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "十分条件ではありません" docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "自動検証範囲" docs/architecture/QUALITY_GOVERNANCE.md
+pass "quality governance states pass count is not sufficient quality proof"
+
+echo "-- Test 436: quality governance links quality to architecture compliance checklist --"
+grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "Architecture Compliance Checklist" docs/architecture/QUALITY_GOVERNANCE.md
+grep -q "Governance Check" docs/architecture/QUALITY_GOVERNANCE.md
+pass "quality governance links quality to architecture compliance checklist"
+
+echo "-- Test 437: README references quality governance --"
+grep -q "QUALITY_GOVERNANCE.md" README.md
+grep -q "Quality Governance" README.md
+grep -q "PASS 数だけでは" README.md
+pass "README references quality governance"
+
+echo "-- Test 438: VERSION documents quality governance improvement --"
+grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
+grep -q "Quality Governance" docs/VERSION.md
+grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
+grep -q "Level 2.5" docs/VERSION.md
+grep -Fq "**448 PASS**" docs/VERSION.md
+grep -q "Test 423–448" docs/VERSION.md
+pass "VERSION documents quality governance improvement"
+
+echo "-- Test 439: CHANGELOG documents quality governance improvement --"
+grep -q "Quality Governance" docs/CHANGELOG.md
+grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
+grep -q "Architecture Maturity Model" docs/CHANGELOG.md
+grep -q "Level 2.5" docs/CHANGELOG.md
+grep -Fq "**448 PASS**" docs/CHANGELOG.md
+grep -q "Test 440–448" docs/CHANGELOG.md
+pass "CHANGELOG documents quality governance improvement"
+
+echo "-- Test 440: architecture maturity model exists --"
+test -f docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "# Architecture Maturity Model" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity model exists"
+
+echo "-- Test 441: architecture maturity model has required headings --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+
+const maturityPath = path.join("docs/architecture/ARCHITECTURE_MATURITY_MODEL.md");
+const content = fs.readFileSync(maturityPath, "utf8");
+const requiredHeadings = [
+  "# Architecture Maturity Model",
+  "## Purpose",
+  "## Scope",
+  "## Non Goals",
+  "## Maturity Levels",
+  "## Level 0: Idea",
+  "## Level 1: Foundation",
+  "## Level 2: Governance",
+  "## Level 3: Future Design",
+  "## Level 4: Implementation Ready",
+  "## Level 5: Production Ready",
+  "## Level 6: Operational Excellence",
+  "## Current Maturity",
+  "## Completed Capabilities",
+  "## Current Limitations",
+  "## Required Evidence",
+  "## Transition Rules",
+  "## Relationship to Quality Governance",
+  "## Relationship to Future Entry Criteria",
+  "## Relationship to Compliance Checklist",
+  "## Completion Criteria",
+];
+
+for (const heading of requiredHeadings) {
+  if (!content.includes(heading)) {
+    throw new Error(`ARCHITECTURE_MATURITY_MODEL.md must include heading: ${heading}`);
+  }
+}
+
+console.log("architecture maturity model required headings exist ok");
+EOF
+pass "architecture maturity model has required headings"
+
+echo "-- Test 442: current maturity is level 2.5 --"
+grep -q "Current Maturity: Level 2.5" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Governance Complete, Future Design Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "current maturity is level 2.5"
+
+echo "-- Test 443: README references architecture maturity model --"
+grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
+grep -q "Level 2.5" README.md
+grep -q "Future Design Ready" README.md
+pass "README references architecture maturity model"
+
+echo "-- Test 444: docs/architecture/README references architecture maturity model --"
+grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
+grep -q "Level 2.5" docs/architecture/README.md
+pass "docs/architecture/README references architecture maturity model"
+
+echo "-- Test 445: maturity model states implementation ready is not reached --"
+grep -q "Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Not reached" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "maturity model states implementation ready is not reached"
+
+echo "-- Test 446: maturity model states production ready is not reached --"
+grep -q "Production Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 5 Production Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Operational Excellence" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "maturity model states production ready is not reached"
+
+echo "-- Test 447: maturity model links maturity to quality governance --"
+grep -q "QUALITY_GOVERNANCE.md" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "PASS 数は Maturity Level を直接上げない" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Machine Check + Governance Check + Evidence" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "maturity model links maturity to quality governance"
+
+echo "-- Test 448: maturity model links level 3/4 transition to future entry criteria --"
+grep -q "Future Entry Criteria" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3 → Level 4" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Gate" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "maturity model links level 3/4 transition to future entry criteria"
 
 
 echo ""

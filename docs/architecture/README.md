@@ -6,7 +6,9 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**18 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + 追加改善 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**20 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3）を固定します。
+
+**Current Maturity:** [Level 2.5 — Governance Complete, Future Design Ready](./ARCHITECTURE_MATURITY_MODEL.md#current-maturity)
 
 | # | 領域 | 文書 | v1.49.0 |
 |---|------|------|---------|
@@ -28,11 +30,15 @@ Architecture Documentation = **Architecture Governance** として、**18 必須
 | 16 | 拡張チェック | [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | 新規 |
 | 17 | リスク | [RISK_REGISTER.md](./RISK_REGISTER.md) | 新規 |
 | 18 | 適合確認 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 追加改善 |
+| 19 | 品質 Governance | [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) | Release 前改善 |
+| 20 | 成熟度 | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) | Release 前改善 |
 
 **文書の役割分担:**
 
 | 文書 | 役割 |
 |------|------|
+| [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) | **成熟度 Level 0–6** — 現在位置と未到達段階 |
+| [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) | **Machine Check vs Governance Check** — PASS 数の位置づけ |
 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 変更・release 時の **運用適合確認**（Read + Verify） |
 | [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | Foundation 追加時の **技術確認** |
 | [LAYER_MODEL.md](./LAYER_MODEL.md) | Layer **構造** と **依存方向**（What / How layers relate） |
@@ -96,5 +102,5 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 2. [LAYER_MODEL.md](./LAYER_MODEL.md) + [LAYER_INVARIANTS.md](./LAYER_INVARIANTS.md)
 3. [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) + [CATALOG_USAGE.md](./CATALOG_USAGE.md)
 4. [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) + [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md)
-5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
+5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md) + [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
 6. [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)
