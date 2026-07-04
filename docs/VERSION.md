@@ -2,11 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.48.0**（Public Contract Catalog & Compatibility Foundation）
+**v1.49.0**（Architecture Documentation Foundation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
-**Next Candidate:** v1.49.0
+**Application Layer Status:** **Completed**（v1.47.0）
+
+**Next Candidate:** v1.50.0
 
 ---
 
@@ -14,6 +16,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.49.0** | **ドキュメント** | **✅ 完了** | **Architecture Documentation Foundation / Architecture Governance 正式基準書** |
 | **v1.48.0** | **機能追加** | **✅ 完了** | **Public Contract Catalog & Compatibility Foundation / Application Layer Public Contract 一覧・互換性ルール固定** |
 | **v1.47.0** | **機能追加** | **✅ 完了** | **Continuous Improvement Foundation / Analytics Public Contract から pre-publish 改善 MVP** |
 | **v1.46.0** | **機能追加** | **✅ 完了** | **Analytics Foundation / Publishing Public Contract から pre-publish Analytics MVP** |
@@ -70,6 +73,43 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.49.0 で追加（Architecture Documentation Foundation）
+
+#### Architecture Governance 正式基準書
+
+- **`docs/architecture/`** … 18 必須 Governance 文書（新規 15 + 更新 2 + Compliance Checklist 1）
+- **`ARCHITECTURE_COMPLIANCE_CHECKLIST.md`** … 変更・release 時の運用適合確認
+- **Future Architecture** … Design Only（Provider / Runtime / Scheduler / API 非実装）
+- **Catalog 連携** … v1.48.0 Public Contract Catalog と整合
+
+#### Next Candidate
+
+| 候補 | 方針 |
+|------|------|
+| **v1.50.0** | 次フェーズ候補 |
+
+### 品質状況（v1.49.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **433 PASS** |
+| npm test | **PASS** |
+
+### v1.49.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Architecture Governance docs（18 必須文書） | ✅ |
+| Architecture Compliance Checklist | ✅ |
+| Layer / Dependency / Public Contract Policy | ✅ |
+| Compatibility / Versioning / Deprecation Policy | ✅ |
+| Future Architecture Design Only | ✅ |
+| Provider / Runtime / API 非実装 | ✅ |
+| v1.48.0 後方互換 | ✅ |
+| Test 423–433 | ✅ |
 
 ---
 

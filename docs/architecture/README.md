@@ -1,59 +1,100 @@
-# Architecture Documentation
+# Architecture Governance
 
-AI-SNS-Automation の **Developer Automation** および Phase2 拡張に関するアーキテクチャドキュメントの入口です。
-
-Architecture は目的ではなく、**AI-SNS-Automation を完成させるための手段** です。本ディレクトリは **Documentation MVP（v1.37.1）** として、最小限の公式ドキュメントを提供します。
+AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.0 Architecture Documentation Foundation 以降、本ディレクトリは README の補足ではなく、長期保守・将来拡張・Public Contract・Compatibility・Version・変更判断の **唯一の公式 Governance 入口** です。
 
 ---
 
-## このディレクトリの目的
+## Governance Scope
 
-- レイヤー構造と依存方向を共有する
-- Developer Automation Rules を明文化する
-- ChatGPT / Claude Code の役割分担と開発フローを固定する
-- ロードマップと完了条件を参照可能にする
-- 実装判断の根拠を ADR とあわせて辿れるようにする
+Architecture Documentation = **Architecture Governance** として、**18 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + 追加改善 1）を固定します。
+
+| # | 領域 | 文書 | v1.49.0 |
+|---|------|------|---------|
+| 1 | 入口 | [README.md](./README.md) | 更新 |
+| 2 | 全体構造 | [OVERVIEW.md](./OVERVIEW.md) | 新規 |
+| 3 | レイヤー構造 | [LAYER_MODEL.md](./LAYER_MODEL.md) | 更新 |
+| 4 | 不変条件 | [LAYER_INVARIANTS.md](./LAYER_INVARIANTS.md) | 新規 |
+| 5 | 依存ルール | [DEPENDENCY_RULES.md](./DEPENDENCY_RULES.md) | 新規 |
+| 6 | Public Contract | [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) | 新規 |
+| 7 | Catalog 利用 | [CATALOG_USAGE.md](./CATALOG_USAGE.md) | 新規 |
+| 8 | 互換性 | [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) | 新規 |
+| 9 | バージョン | [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) | 新規 |
+| 10 | 非推奨 | [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md) | 新規 |
+| 11 | 変更判断 | [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) | 新規 |
+| 12 | 拡張方針 | [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) | 新規 |
+| 13 | 将来設計 | [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) | 新規 |
+| 14 | 非目標 | [NON_GOALS.md](./NON_GOALS.md) | 新規 |
+| 15 | 設計判断 | [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) | 新規 |
+| 16 | 拡張チェック | [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | 新規 |
+| 17 | リスク | [RISK_REGISTER.md](./RISK_REGISTER.md) | 新規 |
+| 18 | 適合確認 | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 追加改善 |
+
+**文書の役割分担:**
+
+| 文書 | 役割 |
+|------|------|
+| [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 変更・release 時の **運用適合確認**（Read + Verify） |
+| [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md) | Foundation 追加時の **技術確認** |
+| [LAYER_MODEL.md](./LAYER_MODEL.md) | Layer **構造** と **依存方向**（What / How layers relate） |
+| [LAYER_INVARIANTS.md](./LAYER_INVARIANTS.md) | 破ってはいけない **不変条件**（Must never break） |
+| [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) | **将来設計**（Design Only — 実装前の構想） |
+| [NON_GOALS.md](./NON_GOALS.md) | **現時点の実装禁止**（What not to build now） |
 
 ---
 
-## ドキュメント一覧
+## 固定原則
+
+- **MVP First** — 最小構成で公式基準を確立する
+- **Machine Readable First** — Public Contract Catalog（JSON）を Source とする
+- **JSON = Source / Markdown = View / CLI = Summary**
+- **Pure Functions / Side Effect Minimum**
+- **Public Contract First / Backward Compatibility**
+- **Official Docs First / Claude Code First / Architecture First / Governance First**
+
+---
+
+## 現在フェーズ（v1.49.0）
+
+| Layer | 状態 |
+|-------|------|
+| Platform Layer（Developer Automation） | **Completed**（v1.40.0、保守のみ） |
+| Application Layer（Content Pipeline） | **Completed**（v1.47.0） |
+| Governance Layer（Catalog + Docs） | **Completed**（v1.48.0–v1.49.0） |
+| Future Layer（Provider / Runtime 等） | **Design Only**（実装禁止） |
+
+Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。
+
+---
+
+## レガシー参照（v1.37.1 以前）
+
+以下は Developer Automation 初期の Documentation MVP として残しています。Governance 判断は **本 README および v1.49.0 以降の正式基準書** を優先してください。
 
 | ファイル | 内容 |
 |----------|------|
-| [PRINCIPLES.md](./PRINCIPLES.md) | Developer Automation Rules |
-| [LAYER_MODEL.md](./LAYER_MODEL.md) | レイヤー構造・責務・依存方向 |
-| [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md) | 設計〜実装〜リリースのフロー |
-| [ROADMAP.md](./ROADMAP.md) | 優先順位と今後の拡張方針 |
-
----
-
-## 推奨される読む順番
-
-1. **PRINCIPLES.md** — 判断基準を把握する
-2. **LAYER_MODEL.md** — レイヤーと Public Contract を理解する
-3. **DEVELOPMENT_WORKFLOW.md** — 日常の設計・実装フローを確認する
-4. **ROADMAP.md** — 次に何を作るかを確認する
+| [PRINCIPLES.md](./PRINCIPLES.md) | Developer Automation Rules（初期版） |
+| [DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md) | 設計〜実装フロー |
+| [ROADMAP.md](./ROADMAP.md) | 初期ロードマップ |
 
 ---
 
 ## ADR との関係
 
-Architecture Documentation は **方針と構造** を説明します。**個別の設計決定** は ADR（Architecture Decision Record）に記録します。
-
 | 種別 | 場所 | 役割 |
 |------|------|------|
-| Architecture Docs | `docs/architecture/` | 原則・レイヤー・フロー・ロードマップ |
-| ADR | `docs/adr/` | 特定バージョン・特定機能の設計判断 |
+| Architecture Governance | `docs/architecture/` | 公式基準・不変条件・変更判断 |
+| ADR | `docs/adr/` | 個別設計決定の記録 |
+| Public Contract Catalog | `reports/public-contract-catalog/latest/` | Machine Readable な Contract 一覧 |
 
-例: Analytics Layer と Dashboard Public Contract は [ADR-0007](../adr/ADR-0007-developer-analytics-layer-architecture.md) / [ADR-0008](../adr/ADR-0008-dashboard-public-contract.md) を参照してください。
+個別 ADR は [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) から辿ります。
 
 ---
 
-## Documentation MVP について
+## 推奨読了順序
 
-v1.37.1 時点では以下は **意図的に含めていません**。
-
-- MANIFESTO / DECISION_TREE / CONTRACT_POLICY / SCHEMA_POLICY
-- TESTING_STRATEGY / VERSIONING / GLOSSARY
-
-必要になったタイミングで段階的に拡張します。Architecture Handbook の過剰拡張は行いません。
+1. [OVERVIEW.md](./OVERVIEW.md)
+2. [LAYER_MODEL.md](./LAYER_MODEL.md) + [LAYER_INVARIANTS.md](./LAYER_INVARIANTS.md)
+3. [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) + [CATALOG_USAGE.md](./CATALOG_USAGE.md)
+4. [COMPATIBILITY_POLICY.md](./COMPATIBILITY_POLICY.md) + [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) + [DEPRECATION_POLICY.md](./DEPRECATION_POLICY.md)
+5. [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) + [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](./ARCHITECTURE_COMPLIANCE_CHECKLIST.md) + [EXTENSION_GUIDE.md](./EXTENSION_GUIDE.md) + [EXTENSION_CHECKLIST.md](./EXTENSION_CHECKLIST.md)
+6. [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) + [NON_GOALS.md](./NON_GOALS.md) + [RISK_REGISTER.md](./RISK_REGISTER.md)

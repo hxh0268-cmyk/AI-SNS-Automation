@@ -4,6 +4,41 @@
 
 ---
 
+## v1.49.0 — ドキュメント（Architecture Documentation Foundation）
+
+Application Layer / Platform Layer / Governance Layer の **Architecture Governance 正式基準書** を `docs/architecture/` に整備しました。コード Foundation 追加・Provider / Runtime 実装は行いません。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Architecture Governance | `docs/architecture/` **18 必須文書**（v1.49.0 新規 15 + 更新 2 + Compliance Checklist 1） |
+| カバー領域 | Layer / Dependency / Public Contract / Compatibility / Version / Deprecation / Change |
+| Future Architecture | Design Only（実装禁止） |
+| Test 423–433 | 必須ファイル / 見出し / Governance / Compliance Checklist / Non-Goals / Non-scope |
+
+### 追加改善（v1.49.0）
+
+| 項目 | 内容 |
+|------|------|
+| Architecture Compliance Checklist | [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md) — 変更・release 時の運用適合確認 |
+| Test 431–433 | Compliance Checklist 存在 / README リンク / 必須項目確認 |
+
+### 設計判断
+
+- **Official Docs First** — README 補足ではなく Governance 基準書として記述
+- **Catalog 連携** — v1.48.0 Public Contract Catalog と整合
+- **No Implementation** — Provider / Runtime / Scheduler / API / DB 非実装
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **433 PASS**（Test 423–433 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.48.0 — 機能追加（Public Contract Catalog & Compatibility Foundation）
 
 Application Layer Foundation 群（v1.41.0〜v1.47.0）の **Public Contract Catalog** と **Compatibility Matrix** を追加しました。Provider / Runtime / 外部 API 接続は実装しません。

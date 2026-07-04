@@ -6,7 +6,7 @@
 
 ## Architecture Documentation
 
-Developer Automation のアーキテクチャ原則・レイヤーモデル・開発フローは **[docs/architecture/](docs/architecture/README.md)** を参照してください。
+Developer Automation の **Architecture Governance**（レイヤー・Public Contract・Compatibility・変更判断の正式基準）は **[docs/architecture/](docs/architecture/README.md)** を参照してください。
 
 ---
 
@@ -1169,6 +1169,35 @@ Latest Run Step Count
 Latest Current Step
 release-plan
 ```
+
+### Architecture Documentation Foundation（v1.49.0）
+
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（18 必須文書）を `docs/architecture/` に整備します。
+
+Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture（Design Only）** であり、**現時点では非実装** です。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（18 必須 Governance 文書） |
+| Governance | Layer / Dependency / Public Contract / Compatibility / Version / Deprecation / Change |
+| Future | [FUTURE_ARCHITECTURE.md](docs/architecture/FUTURE_ARCHITECTURE.md)（Design Only） |
+| Non-Goals | [NON_GOALS.md](docs/architecture/NON_GOALS.md) |
+
+#### Architecture Governance 文書
+
+| 文書 | 内容 |
+|------|------|
+| [OVERVIEW.md](docs/architecture/OVERVIEW.md) | 全体構造・Platform / Application / Future Layer |
+| [LAYER_MODEL.md](docs/architecture/LAYER_MODEL.md) | 責務・依存方向・境界 |
+| [PUBLIC_CONTRACT_POLICY.md](docs/architecture/PUBLIC_CONTRACT_POLICY.md) | Public Contract ライフサイクル |
+| [CATALOG_USAGE.md](docs/architecture/CATALOG_USAGE.md) | Public Contract Catalog 利用 |
+| [CHANGE_GOVERNANCE.md](docs/architecture/CHANGE_GOVERNANCE.md) | 変更判断基準（Mandatory Policy Review） |
+| [ARCHITECTURE_COMPLIANCE_CHECKLIST.md](docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md) | 運用適合確認チェックリスト |
+| [RISK_REGISTER.md](docs/architecture/RISK_REGISTER.md) | リスク登録 |
+
+#### 非対象
+
+Provider 実装 / Runtime 実行 / Scheduler / OAuth / SNS API / Database / Real Metrics / 自動投稿 — 設計文書のみ
 
 ### Public Contract Catalog & Compatibility Foundation（v1.48.0）
 

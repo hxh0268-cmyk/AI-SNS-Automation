@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.48.0 --"
+echo "-- Test 98: VERSION updated to v1.49.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.48.0**（Public Contract Catalog & Compatibility Foundation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.48.0");
+if (!versionDoc.includes("**v1.49.0**（Architecture Documentation Foundation）")) {
+  throw new Error("docs/VERSION.md current version must be v1.49.0");
 }
-console.log("VERSION v1.48.0 ok");
+console.log("VERSION v1.49.0 ok");
 EOF
-pass "VERSION updated to v1.48.0"
+pass "VERSION updated to v1.49.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.49.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.49.0");
+if (payload.nextVersion !== "v1.50.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.50.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.49.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.49.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.50.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.50.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.49.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.50.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13898,6 +13898,314 @@ console.log("v1.47.0 continuous improvement backward compatibility preserved ok"
 EOF
 grep -q "Continuous Improvement Summary" /tmp/continuous_improvement_backward_compat_v147.log
 pass "v1.47.0 continuous improvement backward compatibility preserved"
+
+echo "-- Test 423: docs/architecture required governance files exist --"
+for file in \
+  README.md \
+  OVERVIEW.md \
+  LAYER_MODEL.md \
+  LAYER_INVARIANTS.md \
+  DEPENDENCY_RULES.md \
+  PUBLIC_CONTRACT_POLICY.md \
+  CATALOG_USAGE.md \
+  COMPATIBILITY_POLICY.md \
+  VERSIONING_POLICY.md \
+  DEPRECATION_POLICY.md \
+  CHANGE_GOVERNANCE.md \
+  EXTENSION_GUIDE.md \
+  FUTURE_ARCHITECTURE.md \
+  NON_GOALS.md \
+  ARCHITECTURE_DECISIONS.md \
+  EXTENSION_CHECKLIST.md \
+  RISK_REGISTER.md \
+  ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+do
+  test -f "docs/architecture/${file}"
+done
+pass "docs/architecture required governance files exist"
+
+echo "-- Test 424: docs/architecture required headings exist --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const architectureDir = path.join(PROJECT_ROOT, "docs/architecture");
+
+const requiredHeadings = [
+  ["OVERVIEW.md", ["# Overview", "## Platform Layer", "## Application Layer", "## Future Layer", "## Current Phase", "## Completed Foundations"]],
+  ["LAYER_MODEL.md", ["# Layer Model", "## Responsibilities", "## Dependency Direction", "## Layer Boundary", "## Prohibited Dependencies", "## Public Contract Only", "## Circular Dependency Prohibition"]],
+  ["LAYER_INVARIANTS.md", ["# Layer Invariants", "## Platform Application Separation", "## Internal API Prohibition", "## Cross Layer Prohibition", "## Public Contract Only", "## Circular Dependency Prohibition"]],
+  ["DEPENDENCY_RULES.md", ["# Dependency Rules", "## Foundation Dependencies", "## Dependency Rule", "## Layer Rule", "## Compatibility Matrix"]],
+  ["PUBLIC_CONTRACT_POLICY.md", ["# Public Contract Policy", "## Public Surface", "## Internal Surface", "## Backward Compatibility", "## Contract Lifecycle"]],
+  ["CATALOG_USAGE.md", ["# Catalog Usage", "## Public Contract Catalog", "## JSON Source", "## Markdown View", "## CLI Summary", "## Usage Rules"]],
+  ["COMPATIBILITY_POLICY.md", ["# Compatibility Policy", "## Compatibility Matrix", "## Compatibility Decision", "## Change Rules", "## Major Change Criteria", "## Minor Change Criteria"]],
+  ["VERSIONING_POLICY.md", ["# Versioning Policy", "## SemVer", "## Patch", "## Minor", "## Major", "## Version Rules"]],
+  ["DEPRECATION_POLICY.md", ["# Deprecation Policy", "## Deprecated", "## Warning", "## Removal Candidate", "## Removed"]],
+  ["CHANGE_GOVERNANCE.md", ["# Change Governance", "## Change Criteria", "## Mandatory Policy Review", "## Foundation Addition Criteria", "## Layer Change Criteria", "## Contract Change Criteria", "## Version Change Criteria"]],
+  ["EXTENSION_GUIDE.md", ["# Extension Guide", "## Foundation Addition", "## Provider Addition", "## Runtime Addition", "## Scheduler Addition", "## API Addition", "## Current Non Implementation"]],
+  ["FUTURE_ARCHITECTURE.md", ["# Future Architecture", "## Provider Layer", "## Adapter Layer", "## Runtime Layer", "## Automation Layer", "## Cloud Layer", "## v2 Roadmap", "## Design Only"]],
+  ["NON_GOALS.md", ["# Non Goals", "## Provider", "## OAuth", "## Scheduler", "## Queue", "## Worker", "## Cache", "## Database", "## Metrics Collection", "## External API", "## SNS API", "## Runtime", "## Cloud"]],
+  ["ARCHITECTURE_DECISIONS.md", ["# Architecture Decisions", "## ADR Format", "## Accepted Decisions", "### v1.49.0 Primary Decisions"]],
+  ["EXTENSION_CHECKLIST.md", ["# Extension Checklist"]],
+  ["RISK_REGISTER.md", ["# Risk Register", "## Mitigation Owner"]],
+  ["ARCHITECTURE_COMPLIANCE_CHECKLIST.md", ["# Architecture Compliance Checklist", "## Universal Compliance Items", "## Foundation Addition", "## Public Contract Change", "## Future Architecture Addition", "## Provider Runtime Scheduler API Pre Addition", "## Release Pre Check", "## Backward Compatibility Check", "## Risk Check", "## ADR Check"]],
+  ["README.md", ["# Architecture Governance", "## Governance Scope"]],
+];
+
+for (const [fileName, headings] of requiredHeadings) {
+  const content = fs.readFileSync(path.join(architectureDir, fileName), "utf8");
+  for (const heading of headings) {
+    if (!content.includes(heading)) {
+      throw new Error(`${fileName} must include heading: ${heading}`);
+    }
+  }
+}
+
+console.log("docs/architecture required headings exist ok");
+EOF
+pass "docs/architecture required headings exist"
+
+echo "-- Test 425: README links to docs/architecture governance --"
+grep -q "docs/architecture/README.md" README.md
+grep -q "Architecture Governance" README.md
+grep -q "Architecture Documentation Foundation（v1.49.0）" README.md
+pass "README links to docs/architecture governance"
+
+echo "-- Test 426: architecture documentation treated as governance --"
+grep -q "Architecture Governance" docs/architecture/README.md
+grep -q "Official Docs First" docs/architecture/README.md
+grep -q "Governance First" docs/architecture/README.md
+grep -q "正式基準書" docs/architecture/README.md
+grep -q "18 必須 Governance 文書" docs/architecture/README.md
+grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
+grep -q "v1.49.0 新規 15" docs/architecture/README.md
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const readme = fs.readFileSync("docs/architecture/README.md", "utf8");
+const requiredLinks = [
+  "./README.md",
+  "./OVERVIEW.md",
+  "./LAYER_MODEL.md",
+  "./LAYER_INVARIANTS.md",
+  "./DEPENDENCY_RULES.md",
+  "./PUBLIC_CONTRACT_POLICY.md",
+  "./CATALOG_USAGE.md",
+  "./COMPATIBILITY_POLICY.md",
+  "./VERSIONING_POLICY.md",
+  "./DEPRECATION_POLICY.md",
+  "./CHANGE_GOVERNANCE.md",
+  "./EXTENSION_GUIDE.md",
+  "./FUTURE_ARCHITECTURE.md",
+  "./NON_GOALS.md",
+  "./ARCHITECTURE_DECISIONS.md",
+  "./EXTENSION_CHECKLIST.md",
+  "./RISK_REGISTER.md",
+  "./ARCHITECTURE_COMPLIANCE_CHECKLIST.md",
+];
+
+for (const link of requiredLinks) {
+  if (!readme.includes(`](${link})`)) {
+    throw new Error(`docs/architecture/README.md must link to ${link}`);
+  }
+}
+
+console.log("architecture README links all 18 governance files ok");
+EOF
+pass "architecture documentation treated as governance"
+
+echo "-- Test 427: future architecture is design only --"
+grep -q "Design Only" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "実装禁止" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "## Design Only" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "Provider Layer" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "Runtime Layer" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "NON_GOALS.md" docs/architecture/FUTURE_ARCHITECTURE.md
+grep -q "将来設計" docs/architecture/FUTURE_ARCHITECTURE.md
+pass "future architecture is design only"
+
+echo "-- Test 428: non goals include prohibited implementations --"
+grep -q "実装禁止" docs/architecture/NON_GOALS.md
+grep -q "FUTURE_ARCHITECTURE.md" docs/architecture/NON_GOALS.md
+grep -q "## Provider" docs/architecture/NON_GOALS.md
+grep -q "## OAuth" docs/architecture/NON_GOALS.md
+grep -q "## Scheduler" docs/architecture/NON_GOALS.md
+grep -q "## Database" docs/architecture/NON_GOALS.md
+grep -q "## Queue" docs/architecture/NON_GOALS.md
+grep -q "## Worker" docs/architecture/NON_GOALS.md
+grep -q "## Cache" docs/architecture/NON_GOALS.md
+grep -q "## Metrics Collection" docs/architecture/NON_GOALS.md
+grep -q "## Runtime" docs/architecture/NON_GOALS.md
+grep -q "## Cloud" docs/architecture/NON_GOALS.md
+grep -q "## SNS API" docs/architecture/NON_GOALS.md
+pass "non goals include prohibited implementations"
+
+echo "-- Test 429: governance policy documents exist --"
+for file in \
+  PUBLIC_CONTRACT_POLICY.md \
+  COMPATIBILITY_POLICY.md \
+  VERSIONING_POLICY.md \
+  DEPRECATION_POLICY.md \
+  CHANGE_GOVERNANCE.md
+do
+  test -f "docs/architecture/${file}"
+done
+grep -q "# Public Contract Policy" docs/architecture/PUBLIC_CONTRACT_POLICY.md
+grep -q "# Compatibility Policy" docs/architecture/COMPATIBILITY_POLICY.md
+grep -q "# Versioning Policy" docs/architecture/VERSIONING_POLICY.md
+grep -q "# Deprecation Policy" docs/architecture/DEPRECATION_POLICY.md
+grep -q "# Change Governance" docs/architecture/CHANGE_GOVERNANCE.md
+grep -q "## Mandatory Policy Review" docs/architecture/CHANGE_GOVERNANCE.md
+grep -q "Risk Register" docs/architecture/CHANGE_GOVERNANCE.md
+grep -q "# v1.49.0 Primary Decisions" docs/architecture/ARCHITECTURE_DECISIONS.md || grep -q "### v1.49.0 Primary Decisions" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "ADR-GOV-005" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "ADR-GOV-006" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "ADR-GOV-007" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "LAYER_INVARIANTS.md" docs/architecture/LAYER_MODEL.md
+grep -q "LAYER_MODEL.md" docs/architecture/LAYER_INVARIANTS.md
+grep -q "## Mitigation Owner" docs/architecture/RISK_REGISTER.md
+pass "governance policy documents exist"
+
+echo "-- Test 430: v1.49.0 did not add forbidden implementation files --"
+node --input-type=module <<'EOF'
+import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+
+/** @returns {string[]} */
+function listAddedPaths() {
+  try {
+    const output = execSync("git diff --name-only --diff-filter=A HEAD", {
+      cwd: PROJECT_ROOT,
+      encoding: "utf8",
+    }).trim();
+
+    if (!output) {
+      return [];
+    }
+
+    return output.split("\n").filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+/** @returns {string[]} */
+function listUntrackedPaths() {
+  try {
+    const output = execSync("git ls-files --others --exclude-standard", {
+      cwd: PROJECT_ROOT,
+      encoding: "utf8",
+    }).trim();
+
+    if (!output) {
+      return [];
+    }
+
+    return output.split("\n").filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+const forbiddenPatterns = [
+  /provider/i,
+  /adapter/i,
+  /runtime/i,
+  /scheduler/i,
+  /oauth/i,
+  /sns_api/i,
+  /database/i,
+  /queue/i,
+  /worker/i,
+  /cloud_runtime/i,
+  /real_metrics/i,
+  /real_automation/i,
+];
+
+const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
+  .filter(
+    (relativePath) =>
+      (relativePath.startsWith("src/lib/") || relativePath.startsWith("scripts/")) &&
+      relativePath.endsWith(".js"),
+  );
+
+for (const relativePath of candidatePaths) {
+  for (const pattern of forbiddenPatterns) {
+    if (pattern.test(relativePath)) {
+      throw new Error(`v1.49.0 must not add forbidden implementation file: ${relativePath}`);
+    }
+  }
+}
+
+if (candidatePaths.length > 0) {
+  throw new Error(
+    `v1.49.0 must remain docs-only; unexpected new implementation files: ${candidatePaths.join(", ")}`,
+  );
+}
+
+console.log("v1.49.0 did not add forbidden implementation files ok");
+EOF
+npm run public-contract:catalog >/tmp/public_contract_catalog_backward_compat_v148.log 2>&1
+grep -q "Public Contract Catalog Summary" /tmp/public_contract_catalog_backward_compat_v148.log
+pass "v1.49.0 did not add forbidden implementation files"
+
+echo "-- Test 431: architecture compliance checklist exists --"
+test -f docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "# Architecture Compliance Checklist" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+pass "architecture compliance checklist exists"
+
+echo "-- Test 432: architecture compliance checklist linked from README files --"
+grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
+grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" README.md
+pass "architecture compliance checklist linked from README files"
+
+echo "-- Test 433: architecture compliance checklist includes required items --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const content = fs.readFileSync(
+  "docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md",
+  "utf8",
+);
+
+for (const required of [
+  "Layer Rule 確認",
+  "Dependency Rule 確認",
+  "Public Contract Policy 確認",
+  "Internal API 漏出なし",
+  "Compatibility Policy 確認",
+  "Catalog 更新要否確認",
+  "Versioning Policy 確認",
+  "Deprecation Policy 確認",
+  "CHANGE_GOVERNANCE 確認",
+  "RISK_REGISTER 更新要否確認",
+  "ARCHITECTURE_DECISIONS 更新要否確認",
+  "README 更新要否確認",
+  "CHANGELOG 更新要否確認",
+  "VERSION 更新要否確認",
+  "Quality Pipeline 追加・維持確認",
+  "Provider / Runtime / Scheduler / SNS API 等の実装禁止確認",
+  "## Foundation Addition",
+  "## Public Contract Change",
+  "## Future Architecture Addition",
+  "## Release Pre Check",
+  "## Backward Compatibility Check",
+  "## Risk Check",
+  "## ADR Check",
+]) {
+  if (!content.includes(required)) {
+    throw new Error(`architecture compliance checklist must include: ${required}`);
+  }
+}
+
+console.log("architecture compliance checklist includes required items ok");
+EOF
+pass "architecture compliance checklist includes required items"
 
 
 echo ""

@@ -1,94 +1,86 @@
 # Layer Model
 
-Developer Automation Platform の正式なレイヤー構造です。
+AI-SNS-Automation の **Layer 構造と依存方向** を定義する Architecture Governance 基準書です。
+
+> **関連:** 破ってはいけない不変条件は [LAYER_INVARIANTS.md](./LAYER_INVARIANTS.md) を参照してください。本書は構造（What）と依存方向（How layers relate）、不変条件書は禁止事項（Must never break）を担当します。
 
 ---
 
-## レイヤー構造
+## Responsibilities
+
+| Layer | 責務 | 完了状態 |
+|-------|------|----------|
+| **Platform Layer** | Developer Automation Workflow の実行・履歴・集計・可視化 | Completed（v1.40.0） |
+| **Application Layer** | SNS コンテンツ生成パイプライン（pre-publish MVP） | Completed（v1.47.0） |
+| **Governance Layer** | Public Contract Catalog と Architecture Documentation | Completed（v1.48.0–v1.49.0） |
+| **Future Layer** | Provider / Adapter / Runtime / Automation / Cloud | Design Only |
+
+Platform Layer 内部の Workflow → State → Checkpoint → History → Timeline → Dashboard → Analytics チェーンは、Platform Layer 内の **一方向依存** を維持します（v1.37.1 以前の Layer Model を Platform 内部構造として継承）。
+
+---
+
+## Dependency Direction
 
 ```text
-Workflow
-↓
-Workflow State
-↓
-Checkpoint
-↓
-History
-↓
-Timeline
-↓
-Dashboard
-↓
-Analytics
+Future Layer
+    ↓ Public Contract Only
+Application Layer
+    ✕ (no dependency)
+Platform Layer
 ```
 
-各レイヤーは **一方向の依存** のみを持ちます。上位レイヤーは下位レイヤーの出力を入力としますが、下位レイヤーは上位を参照しません。
+- **下位 → 上位** の依存は禁止
+- **Platform → Application** の依存は禁止
+- **Application → Platform Internal** の依存は禁止
+- **Future → Foundation Internal** の依存は禁止
+- **Foundation 間** は upstream `extract*PublicContract()` のみ許可
 
 ---
 
-## 各レイヤーの責務
+## Layer Boundary
 
-| レイヤー | 責務 | 主な出力例 |
-|----------|------|------------|
-| **Workflow** | 開発自動化ステップの実行 | workflow context / 実行結果 |
-| **Workflow State** | STOPPED 等の再開可能状態の保存 | `workflow-state.json` |
-| **Checkpoint** | state 位置・互換性・resume 安全性の検証 | `workflow-checkpoint.json` |
-| **History** | 実行履歴の append-only 記録 | `workflow-history.json` |
-| **Timeline** | History の時系列表示 Source | `workflow-timeline.json` |
-| **Dashboard** | Timeline の集計・表示用データ | `workflow-dashboard.json` |
-| **Analytics** | Dashboard Public Contract から KPI・Health | `workflow-analytics.json` |
+| 境界 | ルール |
+|------|--------|
+| Platform ↔ Application | 完全分離。共有は Governance 文書と Catalog のみ |
+| Application ↔ Future | Future は Public Contract のみ参照 |
+| Governance ↔ 全 Layer | 文書化・Catalog 生成。実行時副作用なし |
+| Foundation ↔ Foundation | Public Contract エッジのみ（Compatibility Matrix 準拠） |
 
----
-
-## 依存方向
-
-- **Workflow** は Git 操作や Release Automation を内包しない（Human Approval Gate 維持）
-- **Timeline** は History のみを入力とする
-- **Dashboard** は Timeline のみを入力とする
-- **Analytics** は **Dashboard Public Contract のみ** を入力とする
-
-### 禁止される直接依存（Analytics 以降を含む）
-
-Analytics および将来の Analytics 派生レイヤーは、以下を **直接参照してはいけません**。
-
-- Timeline
-- History
-- Checkpoint
-- Workflow State
-- Dashboard Internal（`runs` / `warnings` / `source` / 詳細 metrics 等）
+Layer Boundary を越えた import、内部 builder 呼び出し、private field 参照は **Layer 違反** として禁止します。
 
 ---
 
-## Public Contract First
+## Prohibited Dependencies
 
-レイヤー間のデータ受け渡しは **公開 Contract** で行います。
+以下の依存は **すべての Layer で禁止** です。
 
-### Dashboard Public Contract（Analytics が利用可能）
-
-| 区分 | 公開項目 |
-|------|----------|
-| metadata | `schema`, `generatedAt` |
-| summary | `runCount`, `stepCount`, `totalDurationMs` |
-| metrics | `successfulRuns`, `failedRuns`, `resumedRuns` |
-| status | `workflowHealth` |
-
-詳細は [ADR-0008](../adr/ADR-0008-dashboard-public-contract.md) を参照してください。
+- 循環参照（Foundation 間・Layer 間）
+- 上流 Foundation が下流 Foundation に依存すること
+- `build*` / `normalize*` / internal score / internal flags への直接依存
+- Timeline / History / Checkpoint / Workflow State への Analytics 派生からの直接参照（Platform 内部ルール）
+- Future Provider / Runtime が Application 内部モジュールを import すること
 
 ---
 
-## Analytics の入力制約
+## Public Contract Only
 
-Analytics Builder は次のみを行います。
+Layer 間および Foundation 間のデータ受け渡しは **Public Contract extract 関数** の出力のみを正とします。
 
-1. Dashboard JSON から **Public Contract を抽出**
-2. KPI（Success Rate / Failure Rate / Resume Rate / Average Duration）を算出
-3. Health（healthy / warning / critical）と code を生成
-4. Analytics JSON を出力
+| 区分 | 例 |
+|------|-----|
+| 公開 | `extractPublishingPublicContract()` の `packages[]` |
+| 非公開 | `readinessScore`, `flags`, `asset`, `checklist`, internal builder |
 
-Analytics は Dashboard の代替データソースにならず、Timeline イベントの補正・再構築も行いません。
+Public Contract の追加は Minor、削除・改名は Major として [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) に従います。
 
 ---
 
-## 将来レイヤー
+## Circular Dependency Prohibition
 
-Trend Analytics / Historical Analytics / Visualization は、原則として **Timeline または Dashboard / Analytics** を入力とし、History / Checkpoint / Workflow State を直接参照しません（[ROADMAP.md](./ROADMAP.md) 参照）。
+循環参照は Architecture Governance 上 **Critical 違反** です。
+
+- Compatibility Matrix に cyclic edge を追加してはならない
+- import graph に cycle が発生した場合、Foundation 追加を revert する
+- Catalog の `compatibilityMatrix[].cyclic` は常に `false` であること
+
+循環参照の検出は Code Review と Quality Pipeline の Non-scope / Public Contract テストで継続確認します。
