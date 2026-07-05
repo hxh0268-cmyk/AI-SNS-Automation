@@ -4,6 +4,31 @@
 
 ---
 
+## v1.64.0 — Interaction Error Model Design
+
+Interaction Error Model Design — Design Only — Production code unchanged。
+
+Interaction State Model 完成後の Cross-Layer **Failure Information Contract** を [INTERACTION_ERROR_MODEL.md](docs/architecture/INTERACTION_ERROR_MODEL.md) として追加。Minimal contract（interactionId / errorId / errorType / errorSourceLayer / errorClassification）、Error Classification / Ownership / Read / Write / Propagation / Immutability rules、Failure / Rejection / Abortion / Expiration / Timeout / Cancellation / Retry / Recovery boundaries、Lifecycle / State / Context / Metadata / Runtime Exception 分離を Design Only で固定。**Lifecycle semantics SSOT は INTERACTION_LIFECYCLE_DESIGN.md — 再定義なし**。**State representation SSOT は INTERACTION_STATE_MODEL.md — 再定義なし**。Retry Engine / Recovery Engine / Runtime Exception / Logging / Monitoring **実装なし**、Production Code **変更なし**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Interaction Error Model Design | [INTERACTION_ERROR_MODEL.md](docs/architecture/INTERACTION_ERROR_MODEL.md) |
+| Architecture Governance | **35 必須文書**（v1.64.0 で +1） |
+| Current Maturity | **Level 3.5** — Interaction Error Model Complete |
+| Level 4 Implementation Ready | **未到達** |
+| Test 681–700 | Error Model 存在 / Minimal Contract / Classification / Ownership / Boundaries |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **700 PASS**（Test 681–700 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.63.0 — Interaction State Model Design
 
 Interaction State Model Design — Design Only — Production code unchanged。

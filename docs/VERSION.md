@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.63.0**（Interaction State Model Design）
+**v1.64.0**（Interaction Error Model Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
@@ -10,7 +10,7 @@
 
 **Phase:** Future Architecture Design Phase
 
-**Next Candidate:** v1.64.0（Interaction State Model Design review 後に候補決定）
+**Next Candidate:** v1.65.0（Interaction Error Model Design review 後に候補決定）
 
 ---
 
@@ -18,6 +18,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.64.0** | **ドキュメント** | **✅ 完了** | **Interaction Error Model Design / Cross-Layer Failure Information Contract 設計正式定義** |
 | **v1.63.0** | **ドキュメント** | **✅ 完了** | **Interaction State Model Design / Cross-Layer State Information Contract 設計正式定義** |
 | **v1.62.0** | **ドキュメント** | **✅ 完了** | **Interaction Context Design / Cross-Layer Context Contract 設計正式定義** |
 | **v1.61.0** | **ドキュメント** | **✅ 完了** | **Interaction Lifecycle Design / Cross-Layer Lifecycle Contract 設計正式定義** |
@@ -89,6 +90,46 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.64.0 で追加（Interaction Error Model Design）
+
+#### Interaction Error Model 設計正式定義
+
+- **`INTERACTION_ERROR_MODEL.md`** … Minimal Error Information Contract / errorId / errorClassification / Error Ownership / Read・Write・Propagation Rules / Failure・Rejection・Abortion・Expiration / Timeout・Cancellation / Retry・Recovery Boundaries / Anti-Patterns
+- **Lifecycle Authority SSOT** — [INTERACTION_LIFECYCLE_DESIGN.md](./architecture/INTERACTION_LIFECYCLE_DESIGN.md) — Lifecycle States / Transitions **非再定義**
+- **State SSOT** — [INTERACTION_STATE_MODEL.md](./architecture/INTERACTION_STATE_MODEL.md) — lifecycleState / stateRevision **非再定義**
+- **Context 整合** — [INTERACTION_CONTEXT_DESIGN.md](./architecture/INTERACTION_CONTEXT_DESIGN.md) — contextRef loose reference only
+- **Architecture Governance** … 35 必須文書（v1.63.0 の 34 + 本書）
+- **Current Maturity** … **Level 3.5 — Interaction Error Model Complete**、**Level 4 Implementation Ready 未到達**
+- **Production code** … No changes
+
+### 品質状況（v1.64.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **700 PASS** |
+| Architecture Documents | **35** 必須文書 |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.5** — Interaction Error Model Complete |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 681–700 | Interaction Error Model Design |
+
+### v1.64.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Interaction Error Model Design 文書 | ✅ |
+| Architecture Governance docs（35 必須文書） | ✅ |
+| Lifecycle / State / Context semantics 非再定義 | ✅ |
+| Retry / Recovery / Exception 実装なし | ✅ |
+| Current Maturity Level 3.5 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.63.0 後方互換 | ✅ |
+| Test 681–700 | ✅ |
 
 ---
 

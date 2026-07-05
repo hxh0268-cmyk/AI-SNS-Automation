@@ -1170,6 +1170,22 @@ Latest Current Step
 release-plan
 ```
 
+### Interaction Error Model Design（v1.64.0）
+
+**Interaction Error Model Design** を追加しました。Interaction State Model 完成後の **Cross-Layer Failure Information Contract** を [INTERACTION_ERROR_MODEL.md](docs/architecture/INTERACTION_ERROR_MODEL.md) に正式定義します（**35 必須 Governance 文書**）。
+
+**Current Version: v1.64.0** | **Quality Pipeline: 700 PASS**
+
+[Interaction State Model Design](docs/architecture/INTERACTION_STATE_MODEL.md) の **次** に Interaction Error Model Design が位置します。**Design Only** — Production code 変更なし。**Lifecycle / State / Context SSOT 非再定義** — Retry Engine / Recovery Engine / Runtime Exception / Logging / Monitoring **実装なし**。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md)（35 必須 Governance 文書） |
+| Interaction Error Model Design | [INTERACTION_ERROR_MODEL.md](docs/architecture/INTERACTION_ERROR_MODEL.md) |
+| Interaction State Model Design | [INTERACTION_STATE_MODEL.md](docs/architecture/INTERACTION_STATE_MODEL.md) — State SSOT |
+| Interaction Lifecycle Design | [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) — Lifecycle Authority SSOT |
+| Current Maturity | **Level 3.5** — Interaction Error Model Complete — Level 4 **未到達** |
+
 ### Interaction State Model Design（v1.63.0）
 
 **Interaction State Model Design** を追加しました。Interaction Context 完成後の **Cross-Layer State Information Contract** を [INTERACTION_STATE_MODEL.md](docs/architecture/INTERACTION_STATE_MODEL.md) に正式定義します（**34 必須 Governance 文書**）。
@@ -1405,7 +1421,7 @@ Provider / Runtime / Scheduler / OAuth / SNS API / Database / Queue / Worker / C
 
 ### Architecture Documentation Foundation（v1.49.0）
 
-**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.63.0 時点 34 必須文書）を `docs/architecture/` に整備します。
+**Architecture Documentation Foundation** を **Architecture Governance** として追加しました。v1.41.0〜v1.48.0 で確立した Public Contract・Compatibility・Version・変更判断の **正式基準書**（v1.64.0 時点 35 必須文書）を `docs/architecture/` に整備します。
 
 **Current Maturity: Level 2.5 — Governance Complete, Future Design Ready**（[ARCHITECTURE_MATURITY_MODEL.md](docs/architecture/ARCHITECTURE_MATURITY_MODEL.md)）
 
@@ -1446,6 +1462,7 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 | [FUTURE_ENTRY_CRITERIA.md](docs/architecture/FUTURE_ENTRY_CRITERIA.md) | Level 3→4 Entry Gate / Future 実装着手前条件 |
 | [GOVERNANCE_FLOW.md](docs/architecture/GOVERNANCE_FLOW.md) | Governance Process / レビュー・承認実行順序 |
 | [FUTURE_LAYER_BOUNDARIES.md](docs/architecture/FUTURE_LAYER_BOUNDARIES.md) | Future Layer 境界 / 責務・依存・データ所有 |
+| [INTERACTION_ERROR_MODEL.md](docs/architecture/INTERACTION_ERROR_MODEL.md) | Interaction Error Model Design / Failure Information / Classification / Ownership / Propagation（v1.64.0） |
 | [INTERACTION_STATE_MODEL.md](docs/architecture/INTERACTION_STATE_MODEL.md) | Interaction State Model Design / lifecycleState / stateRevision / Ownership（v1.63.0） |
 | [INTERACTION_CONTEXT_DESIGN.md](docs/architecture/INTERACTION_CONTEXT_DESIGN.md) | Interaction Context Design / Context Contract / Ownership / Read-Write-Mutation（v1.62.0） |
 | [INTERACTION_LIFECYCLE_DESIGN.md](docs/architecture/INTERACTION_LIFECYCLE_DESIGN.md) | Interaction Lifecycle Design / States / Transitions / Waiting / Retry / Timeout（v1.61.0） |
