@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.64.0 --"
+echo "-- Test 98: VERSION updated to v1.65.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.64.0**（Interaction Error Model Design）")) {
-  throw new Error("docs/VERSION.md current version must be v1.64.0");
+if (!versionDoc.includes("**v1.65.0**（Interaction Metadata Model Design）")) {
+  throw new Error("docs/VERSION.md current version must be v1.65.0");
 }
-console.log("VERSION v1.64.0 ok");
+console.log("VERSION v1.65.0 ok");
 EOF
-pass "VERSION updated to v1.64.0"
+pass "VERSION updated to v1.65.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.65.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.65.0");
+if (payload.nextVersion !== "v1.66.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.66.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.65.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.65.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.66.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.66.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.65.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.66.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13934,7 +13934,8 @@ for file in \
   INTERACTION_LIFECYCLE_DESIGN.md \
   INTERACTION_CONTEXT_DESIGN.md \
   INTERACTION_STATE_MODEL.md \
-  INTERACTION_ERROR_MODEL.md
+  INTERACTION_ERROR_MODEL.md \
+  INTERACTION_METADATA_MODEL.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13983,6 +13984,7 @@ const requiredHeadings = [
   ["INTERACTION_CONTEXT_DESIGN.md", ["# Interaction Context Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Relationship to Layer Interaction Model", "## 6. Relationship to Interaction Lifecycle", "## 7. Context Principles", "## 8. Context Definition", "## 9. Context vs Lifecycle", "## 10. Context vs State", "## 11. Context vs Error", "## 12. Context vs Metadata", "## 13. Minimal Context Contract", "## 14. Required Context Fields", "## 15. Optional Context Fields", "## 16. Forbidden Context Fields", "## 17. Context Ownership", "## 18. Context Read Rules", "## 19. Context Write Rules", "## 20. Context Mutation Rules", "## 21. Context Immutability Rules", "## 22. Context Visibility Rules", "## 23. Context Propagation Rules", "## 24. Context Boundary Crossing Rules", "## 25. Layer-Specific Context Access", "## 26. Event Context Boundary", "## 27. Automation Context Boundary", "## 28. Workflow Context Boundary", "## 29. Scheduler Context Boundary", "## 30. Runtime Context Boundary", "## 31. Provider Context Boundary", "## 32. Approval Context Rules", "## 33. Waiting Context Rules", "## 34. Retry Context Rules", "## 35. Timeout Context Rules", "## 36. Cancellation Context Rules", "## 37. Completion Context Rules", "## 38. Failure Context Rules", "## 39. Compatibility Rules", "## 40. Version Compatibility", "## 41. Governance Integration", "## 42. Future Entry Criteria Integration", "## 43. Context Examples", "## 44. Anti-Patterns", "## 45. Testing Strategy", "## 46. Observability", "## 47. Completion Criteria"]],
   ["INTERACTION_STATE_MODEL.md", ["# Interaction State Model Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Architecture Position", "## 6. Relationship to Layer Interaction Model", "## 7. Relationship to Interaction Lifecycle", "## 8. Relationship to Interaction Context", "## 9. State Model Principles", "## 10. Lifecycle Authority", "## 11. State Information Definition", "## 12. State Model vs Lifecycle", "## 13. State Model vs Context", "## 14. State Model vs Runtime Lifecycle", "## 15. State Model vs Error", "## 16. State Model vs Metadata", "## 17. Minimal State Information Contract", "## 18. Required State Information", "## 19. Optional State Information", "## 20. Forbidden State Information", "## 21. State Representation Rules", "## 22. State Identity Rules", "## 23. State Revision Rules", "## 24. State Ownership", "## 25. State Ownership vs Transition Ownership", "## 26. State Read Rules", "## 27. State Write Rules", "## 28. State Update Rules", "## 29. State Immutability Rules", "## 30. State Snapshot Principles", "## 31. State Transition Recording Boundary", "## 32. State History Boundary", "## 33. State Consistency Rules", "## 34. State Concurrency Boundary", "## 35. State Persistence Boundary", "## 36. State Recovery Boundary", "## 37. Layer-Specific State Access", "## 38. Event State Boundary", "## 39. Automation State Boundary", "## 40. Workflow State Boundary", "## 41. Scheduler State Boundary", "## 42. Runtime State Boundary", "## 43. Provider State Boundary", "## 44. Waiting and Approval State Rules", "## 45. Retry and Timeout State Boundary", "## 46. Cancellation State Boundary", "## 47. Completion and Failure State Rules", "## 48. Terminal State Rules", "## 49. Compatibility Rules", "## 50. Cross-Model Version Compatibility", "## 51. Governance Integration", "## 52. Future Entry Criteria Integration", "## 53. State Model Examples", "## 54. Anti-Patterns", "## 55. Testing Strategy", "## 56. Observability Boundary", "## 57. Completion Criteria"]],
   ["INTERACTION_ERROR_MODEL.md", ["# Interaction Error Model Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Architecture Position", "## 6. Relationship to Layer Interaction Model", "## 7. Relationship to Interaction Lifecycle", "## 8. Relationship to Interaction Context", "## 9. Relationship to Interaction State Model", "## 10. Error Model Principles", "## 11. Error Information Definition", "## 12. Error Model vs Lifecycle", "## 13. Error Model vs State", "## 14. Error Model vs Context", "## 15. Error Model vs Metadata", "## 16. Error Model vs Runtime Exception", "## 17. Minimal Error Information Contract", "## 18. Required Error Information", "## 19. Optional Error Information", "## 20. Forbidden Error Information", "## 21. Error Classification Rules", "## 22. Error Severity Rules", "## 23. Error Source Rules", "## 24. Error Ownership", "## 25. Error Read Rules", "## 26. Error Write Rules", "## 27. Error Propagation Rules", "## 28. Error Immutability Rules", "## 29. Error Correlation Rules", "## 30. Error Boundary Crossing Rules", "## 31. Lifecycle Failure Boundary", "## 32. Rejection Boundary", "## 33. Abortion Boundary", "## 34. Expiration Boundary", "## 35. Timeout Error Boundary", "## 36. Cancellation Error Boundary", "## 37. Retry Error Boundary", "## 38. Recovery Error Boundary", "## 39. Layer-Specific Error Access", "## 40. Event Error Boundary", "## 41. Automation Error Boundary", "## 42. Workflow Error Boundary", "## 43. Scheduler Error Boundary", "## 44. Runtime Error Boundary", "## 45. Provider Error Boundary", "## 46. Error Consistency Rules", "## 47. Error Compatibility Rules", "## 48. Cross-Model Version Compatibility", "## 49. Governance Integration", "## 50. Future Entry Criteria Integration", "## 51. Error Model Examples", "## 52. Anti-Patterns", "## 53. Testing Strategy", "## 54. Observability Boundary", "## 55. Completion Criteria"]],
+  ["INTERACTION_METADATA_MODEL.md", ["# Interaction Metadata Model Design", "## 1. Title", "## 2. Status", "## 3. Purpose", "## 4. Scope", "## 5. Non-Goals", "## 6. Design Principles", "## 7. Architecture Authority", "## 8. Existing Model Relationships", "## 9. Metadata Definition", "## 10. Metadata Characteristics", "## 11. Supplemental Information Principle", "## 12. Non-Authoritative Principle", "## 13. Metadata vs Layer Interaction", "## 14. Metadata vs Lifecycle", "## 15. Metadata vs Context", "## 16. Metadata vs State", "## 17. Metadata vs Error", "## 18. Metadata vs Business Payload", "## 19. Metadata Information Model", "## 20. Minimal Metadata Information Contract", "## 21. Required Fields", "## 22. Excluded Fields", "## 23. Metadata Identity", "## 24. Interaction Correlation", "## 25. Metadata Namespace", "## 26. Reserved Namespaces", "## 27. Extension Namespace", "## 28. Namespace Ownership", "## 29. Namespace Collision Rules", "## 30. Namespace Semantic Stability", "## 31. Metadata Type", "## 32. Metadata Source Layer", "## 33. Metadata Value Representation", "## 34. Metadata Ownership", "## 35. Metadata Read Rules", "## 36. Metadata Write Rules", "## 37. Metadata Propagation Rules", "## 38. Metadata Immutability", "## 39. Metadata Replacement", "## 40. Metadata Supersession", "## 41. Metadata Correlation", "## 42. Metadata Boundary Crossing", "## 43. Metadata Sensitivity", "## 44. Secret Boundary", "## 45. Credential and Token Boundary", "## 46. PII Boundary", "## 47. Metadata Size Boundary", "## 48. Nested Metadata Boundary", "## 49. Serialization Boundary", "## 50. Layer-Specific Metadata Access", "## 51. Event Metadata Boundary", "## 52. Automation Metadata Boundary", "## 53. Workflow Metadata Boundary", "## 54. Scheduler Metadata Boundary", "## 55. Runtime Metadata Boundary", "## 56. Provider Metadata Boundary", "## 57. Compatibility Rules", "## 58. Cross-Model Version Compatibility", "## 59. Extension Governance", "## 60. Governance Integration", "## 61. Future Entry Criteria Integration", "## 62. Observability Boundary", "## 63. Testing Strategy", "## 64. Anti-Patterns", "## 65. Completion Criteria", "## 66. Level 4 Readiness Boundary"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -14010,7 +14012,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14021,8 +14023,8 @@ grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "RUNTIME_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
+grep -q "INTERACTION_METADATA_MODEL.md" docs/architecture/README.md
 grep -q "INTERACTION_ERROR_MODEL.md" docs/architecture/README.md
-grep -q "INTERACTION_STATE_MODEL.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14064,6 +14066,7 @@ const requiredLinks = [
   "./INTERACTION_CONTEXT_DESIGN.md",
   "./INTERACTION_STATE_MODEL.md",
   "./INTERACTION_ERROR_MODEL.md",
+  "./INTERACTION_METADATA_MODEL.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14072,7 +14075,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 35 governance files ok");
+console.log("architecture README links all 36 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14296,9 +14299,9 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**700 PASS**" docs/VERSION.md
-grep -q "Test 681–700" docs/VERSION.md
-grep -q "INTERACTION_ERROR_MODEL.md" docs/VERSION.md
+grep -Fq "**720 PASS**" docs/VERSION.md
+grep -q "Test 701–720" docs/VERSION.md
+grep -q "INTERACTION_METADATA_MODEL.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14306,10 +14309,10 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**700 PASS**" docs/CHANGELOG.md
-grep -q "Test 681–700" docs/CHANGELOG.md
-grep -q "v1.64.0" docs/CHANGELOG.md
-grep -q "Interaction Error Model Design" docs/CHANGELOG.md
+grep -Fq "**720 PASS**" docs/CHANGELOG.md
+grep -q "Test 701–720" docs/CHANGELOG.md
+grep -q "v1.65.0" docs/CHANGELOG.md
+grep -q "Interaction Metadata Model Design" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14406,7 +14409,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14472,7 +14475,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14537,7 +14540,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15064,7 +15067,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15170,7 +15173,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15278,7 +15281,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "35 必須 Governance 文書" docs/architecture/README.md
+grep -q "36 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -15822,16 +15825,152 @@ grep -q "## 52. Anti-Patterns" docs/architecture/INTERACTION_ERROR_MODEL.md
 grep -q "Redefining lifecycle failure states" docs/architecture/INTERACTION_ERROR_MODEL.md
 pass "document defines compatibility rules and anti-patterns"
 
-echo "-- Test 700: document confirms design only and no production implementation scope --"
-grep -q "Production Code 変更なし" docs/architecture/INTERACTION_ERROR_MODEL.md
-grep -q "no implementation scope" docs/architecture/INTERACTION_ERROR_MODEL.md
-grep -Fq "**v1.64.0**（Interaction Error Model Design）" docs/VERSION.md
-grep -Fq "**700 PASS**" docs/VERSION.md
-grep -q "35 必須文書" docs/VERSION.md
-grep -q "Test 681–700" docs/VERSION.md
-grep -q "Level 3.5" docs/VERSION.md
-grep -Fq "Quality Pipeline **700 PASS**" docs/architecture/INTERACTION_ERROR_MODEL.md
-pass "document confirms design only and no production implementation scope"
+echo "-- Test 700: readme changelog version reference v1.64.0 history --"
+grep -q "Interaction Error Model Design（v1.64.0）" README.md
+grep -q "INTERACTION_ERROR_MODEL.md" docs/architecture/README.md
+grep -q "## v1.64.0" docs/CHANGELOG.md
+grep -q "### v1.64.0 で追加（Interaction Error Model Design）" docs/VERSION.md
+grep -q "Interaction Error Model Design" docs/VERSION.md
+pass "readme changelog version reference v1.64.0 history"
+
+echo "-- Test 701: interaction metadata model design document exists --"
+test -f docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "interaction metadata model design document exists"
+
+echo "-- Test 702: document declares design only status --"
+grep -q "Design Only" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -Fq "本書は **Design Only**" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document declares design only status"
+
+echo "-- Test 703: document defines purpose scope and non-goals --"
+grep -q "## 3. Purpose" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 4. Scope" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 5. Non-Goals" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines purpose scope and non-goals"
+
+echo "-- Test 704: document references layer interaction model --"
+grep -q "## 13. Metadata vs Layer Interaction" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "LAYER_INTERACTION_MODEL.md" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document references layer interaction model"
+
+echo "-- Test 705: document references interaction lifecycle design --"
+grep -q "## 14. Metadata vs Lifecycle" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "INTERACTION_LIFECYCLE_DESIGN.md" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document references interaction lifecycle design"
+
+echo "-- Test 706: document references interaction context design --"
+grep -q "## 15. Metadata vs Context" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "INTERACTION_CONTEXT_DESIGN.md" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document references interaction context design"
+
+echo "-- Test 707: document references interaction state model design --"
+grep -q "## 16. Metadata vs State" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "INTERACTION_STATE_MODEL.md" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document references interaction state model design"
+
+echo "-- Test 708: document references interaction error model design --"
+grep -q "## 17. Metadata vs Error" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "INTERACTION_ERROR_MODEL.md" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document references interaction error model design"
+
+echo "-- Test 709: document defines bounded supplemental descriptive metadata information --"
+grep -q "bounded, namespaced, typed, non-authoritative supplemental descriptive information" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 9. Metadata Definition" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Non-authoritative" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines bounded supplemental descriptive metadata information"
+
+echo "-- Test 710: document distinguishes metadata from context state error and business payload --"
+grep -q "## 15. Metadata vs Context" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 16. Metadata vs State" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 17. Metadata vs Error" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 18. Metadata vs Business Payload" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "MUST NOT replicate context.payload" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document distinguishes metadata from context state error and business payload"
+
+echo "-- Test 711: document defines minimal metadata information contract and required fields --"
+grep -q "## 20. Minimal Metadata Information Contract" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "interactionId" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "metadataId" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "metadataNamespace" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "metadataType" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "metadataSourceLayer" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "metadataValue is excluded" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines minimal metadata information contract and required fields"
+
+echo "-- Test 712: document defines metadata value representation and prohibits arbitrary key-value storage --"
+grep -q "## 33. Metadata Value Representation" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "arbitrary key-value" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "unrestricted object" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "arbitrary JSON" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines metadata value representation and prohibits arbitrary key-value storage"
+
+echo "-- Test 713: document defines namespace reserved namespace and extension governance --"
+grep -q "## 25. Metadata Namespace" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 26. Reserved Namespaces" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 27. Extension Namespace" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 59. Extension Governance" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Namespace does not grant semantic authority" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "extension.lifecycle" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines namespace reserved namespace and extension governance"
+
+echo "-- Test 714: document defines metadata ownership read and write rules --"
+grep -q "## 34. Metadata Ownership" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 35. Metadata Read Rules" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 36. Metadata Write Rules" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Unrestricted cross-layer read is forbidden" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines metadata ownership read and write rules"
+
+echo "-- Test 715: document defines propagation and boundary crossing rules --"
+grep -q "## 37. Metadata Propagation Rules" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 42. Metadata Boundary Crossing" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Metadata propagation is NOT automatic" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines propagation and boundary crossing rules"
+
+echo "-- Test 716: document defines immutability replacement and supersession rules --"
+grep -q "## 38. Metadata Immutability" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 39. Metadata Replacement" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 40. Metadata Supersession" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Published Metadata is immutable" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines immutability replacement and supersession rules"
+
+echo "-- Test 717: document defines sensitivity secret credential token and pii boundaries --"
+grep -q "## 43. Metadata Sensitivity" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 44. Secret Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 45. Credential and Token Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 46. PII Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Sensitivity classification does not implement authorization" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "restricted classification does not permit secrets" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines sensitivity secret credential token and pii boundaries"
+
+echo "-- Test 718: document defines size nested and serialization boundaries --"
+grep -q "## 47. Metadata Size Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 48. Nested Metadata Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 49. Serialization Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "shallow and bounded" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "implementation-neutral" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines size nested and serialization boundaries"
+
+echo "-- Test 719: document defines layer-specific access provider boundary compatibility and anti-patterns --"
+grep -q "## 50. Layer-Specific Metadata Access" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 56. Provider Metadata Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 57. Compatibility Rules" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 64. Anti-Patterns" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "MUST be normalized before cross-layer propagation" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "arbitrary key-value bag" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document defines layer-specific access provider boundary compatibility and anti-patterns"
+
+echo "-- Test 720: document confirms design only production code exclusion cross layer design completion and level 4 readiness boundary --"
+grep -q "Production Code 変更なし" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "no implementation scope" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -Fq "**v1.65.0**（Interaction Metadata Model Design）" docs/VERSION.md
+grep -Fq "**720 PASS**" docs/VERSION.md
+grep -q "36 必須文書" docs/VERSION.md
+grep -q "Test 701–720" docs/VERSION.md
+grep -q "Cross Layer Design Complete" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "## 66. Level 4 Readiness Boundary" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -q "Level 4 Implementation Ready" docs/architecture/INTERACTION_METADATA_MODEL.md
+grep -Fq "Quality Pipeline **720 PASS**" docs/architecture/INTERACTION_METADATA_MODEL.md
+pass "document confirms design only production code exclusion cross layer design completion and level 4 readiness boundary"
 
 
 echo ""

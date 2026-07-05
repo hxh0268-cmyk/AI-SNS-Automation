@@ -4,6 +4,31 @@
 
 ---
 
+## v1.65.0 — Interaction Metadata Model Design
+
+Interaction Metadata Model Design — Design Only — Production code unchanged。
+
+Interaction Error Model 完成後の Cross-Layer **Supplemental Descriptive Information Contract** を [INTERACTION_METADATA_MODEL.md](docs/architecture/INTERACTION_METADATA_MODEL.md) として追加。Minimal Metadata Identity Contract（interactionId / metadataId / metadataNamespace / metadataType / metadataSourceLayer — metadataValue excluded）、Metadata Value Representation / Namespace / Extension Governance / Ownership / Read / Write / Propagation / Immutability / Replacement / Supersession / Sensitivity / Secret / Credential / Token / PII / Size / Nested / Serialization boundaries を Design Only で固定。**Lifecycle / Context / State / Error SSOT 非再定義**。**Cross Layer Design Complete** — Level 4 Implementation Ready **未到達**。次フェーズ: Final Architecture Review / Level 4 Entry Review。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Interaction Metadata Model Design | [INTERACTION_METADATA_MODEL.md](docs/architecture/INTERACTION_METADATA_MODEL.md) |
+| Architecture Governance | **36 必須文書**（v1.65.0 で +1） |
+| Current Maturity | **Level 3.6** — Interaction Metadata Model Complete / Cross Layer Design Complete |
+| Level 4 Implementation Ready | **未到達** |
+| Test 701–720 | Metadata Model 存在 / Minimal Contract / Namespace / Boundaries / Cross Layer Complete |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **720 PASS**（Test 701–720 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.64.0 — Interaction Error Model Design
 
 Interaction Error Model Design — Design Only — Production code unchanged。

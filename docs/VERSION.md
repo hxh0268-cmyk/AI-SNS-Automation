@@ -2,7 +2,7 @@
 
 ## 現在のバージョン
 
-**v1.64.0**（Interaction Error Model Design）
+**v1.65.0**（Interaction Metadata Model Design）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
@@ -10,7 +10,11 @@
 
 **Phase:** Future Architecture Design Phase
 
-**Next Candidate:** v1.65.0（Interaction Error Model Design review 後に候補決定）
+**Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
+
+**Next Phase:** Final Architecture Review / Level 4 Entry Review
+
+**Next Candidate:** v1.66.0（Final Architecture Review 後に候補決定）
 
 ---
 
@@ -18,6 +22,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.65.0** | **ドキュメント** | **✅ 完了** | **Interaction Metadata Model Design / Cross-Layer Supplemental Descriptive Information Contract 設計正式定義 / Cross Layer Design Complete** |
 | **v1.64.0** | **ドキュメント** | **✅ 完了** | **Interaction Error Model Design / Cross-Layer Failure Information Contract 設計正式定義** |
 | **v1.63.0** | **ドキュメント** | **✅ 完了** | **Interaction State Model Design / Cross-Layer State Information Contract 設計正式定義** |
 | **v1.62.0** | **ドキュメント** | **✅ 完了** | **Interaction Context Design / Cross-Layer Context Contract 設計正式定義** |
@@ -90,6 +95,50 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.65.0 で追加（Interaction Metadata Model Design）
+
+#### Interaction Metadata Model 設計正式定義
+
+- **`INTERACTION_METADATA_MODEL.md`** … Minimal Metadata Identity Contract / Metadata Value Representation / Namespace / Extension Governance / Ownership / Read・Write・Propagation / Immutability / Replacement / Supersession / Sensitivity / Secret / Credential / Token / PII / Size / Nested / Serialization Boundaries / Anti-Patterns
+- **Lifecycle Authority SSOT** — [INTERACTION_LIFECYCLE_DESIGN.md](./architecture/INTERACTION_LIFECYCLE_DESIGN.md) — **非再定義**
+- **Context SSOT** — [INTERACTION_CONTEXT_DESIGN.md](./architecture/INTERACTION_CONTEXT_DESIGN.md) — **非侵食**
+- **State SSOT** — [INTERACTION_STATE_MODEL.md](./architecture/INTERACTION_STATE_MODEL.md) — **非再定義**
+- **Error SSOT** — [INTERACTION_ERROR_MODEL.md](./architecture/INTERACTION_ERROR_MODEL.md) — **非再定義**
+- **Architecture Governance** … 36 必須文書（v1.64.0 の 35 + 本書）
+- **Current Maturity** … **Level 3.6 — Interaction Metadata Model Complete / Cross Layer Design Complete**
+- **Level 4 Implementation Ready** … **未到達** — Next: Final Architecture Review / Level 4 Entry Review
+- **Production code** … No changes
+
+### 品質状況（v1.65.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **720 PASS** |
+| Architecture Documents | **36** 必須文書 |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.6** — Interaction Metadata Model Complete / Cross Layer Design Complete |
+| Cross Layer Design | **Complete** |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 701–720 | Interaction Metadata Model Design |
+
+### v1.65.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Interaction Metadata Model Design 文書 | ✅ |
+| Architecture Governance docs（36 必須文書） | ✅ |
+| Lifecycle / Context / State / Error semantics 非再定義 | ✅ |
+| Metadata runtime / storage / access control 実装なし | ✅ |
+| Cross Layer Design Complete | ✅ |
+| Current Maturity Level 3.6 | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| v1.64.0 後方互換 | ✅ |
+| Test 701–720 | ✅ |
 
 ---
 
