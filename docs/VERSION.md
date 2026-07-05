@@ -2,19 +2,25 @@
 
 ## 現在のバージョン
 
-**v1.65.0**（Interaction Metadata Model Design）
+**v1.66.0**（Architecture Governance Stabilization / Level 4 Entry Preparation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Future Architecture Design Phase
+**Phase:** Architecture Governance Stabilization / Level 4 Entry Preparation
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
-**Next Phase:** Final Architecture Review / Level 4 Entry Review
+**Final Architecture Review:** **Completed**（Decision B — remediation v1.66.0）
 
-**Next Candidate:** v1.66.0（Final Architecture Review 後に候補決定）
+**Level 4 Entry Review Ready:** **Yes**
+
+**Level 4 Implementation Ready:** **Not Yet**
+
+**Next Phase:** Formal Level 4 Entry Review
+
+**Next Candidate:** v1.67.0（Level 4 Entry Review 後に候補決定）
 
 ---
 
@@ -22,6 +28,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.66.0** | **ドキュメント** | **✅ 完了** | **Architecture Governance Stabilization / Level 4 Entry Preparation — Entry Gate / Compliance / Risk / Review governance synchronized** |
 | **v1.65.0** | **ドキュメント** | **✅ 完了** | **Interaction Metadata Model Design / Cross-Layer Supplemental Descriptive Information Contract 設計正式定義 / Cross Layer Design Complete** |
 | **v1.64.0** | **ドキュメント** | **✅ 完了** | **Interaction Error Model Design / Cross-Layer Failure Information Contract 設計正式定義** |
 | **v1.63.0** | **ドキュメント** | **✅ 完了** | **Interaction State Model Design / Cross-Layer State Information Contract 設計正式定義** |
@@ -95,6 +102,52 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.66.0 で追加（Architecture Governance Stabilization / Level 4 Entry Preparation）
+
+#### Governance Stabilization 正式定義
+
+- **Final Architecture Review remediation** — Decision B findings addressed（Critical Blocker: 0）
+- **`FUTURE_ENTRY_CRITERIA.md`** … Level 3→4 Gate strengthened（G-01–G-27）/ Final Architecture Review Requirement / Deferred Operational Semantics / Public Contract Catalog Scope
+- **`ARCHITECTURE_MATURITY_MODEL.md`** … Level 3.7 current maturity / Level 3 sub-levels
+- **`ARCHITECTURE_COMPLIANCE_CHECKLIST.md`** … Core Layer / Cross Layer / Architecture Authority / Cross Model / Metadata / Final Architecture Review / Level 4 Entry sections
+- **`RISK_REGISTER.md`** … Cross Layer / Level 4 Entry risks（CL-001–CL-013）
+- **`GOVERNANCE_FLOW.md`** … Final Architecture Review Flow / Cross Layer Design Review Flow
+- **Cross-document repairs** — INTERACTION_STATE_MODEL / RUNTIME_LAYER_DESIGN / INTERACTION_CONTEXT_DESIGN / PUBLIC_CONTRACT_POLICY
+- **Quality Pipeline** … Test 572 repair + governance consistency tests 721–742
+- **Current Maturity** … **Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready**
+- **Level 4 Implementation Ready** … **未到達**
+- **Production code** … No changes
+
+### 品質状況（v1.66.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **742 PASS** |
+| Architecture Documents | **36** 必須文書（新規追加なし — governance sync） |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.7** — Architecture Governance Stabilized / Level 4 Entry Review Ready |
+| Level 4 Entry Review Ready | **Yes** |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 721–742 | Architecture Governance Stabilization |
+
+### v1.66.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Governance maturity synchronized | ✅ |
+| Level 3→4 Gate strengthened | ✅ |
+| Final Architecture Review governance encoded | ✅ |
+| Compliance Checklist extended | ✅ |
+| Risk Register extended | ✅ |
+| Cross-document staleness repaired | ✅ |
+| Level 4 Entry Review Ready | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| Test 721–742 | ✅ |
 
 ---
 

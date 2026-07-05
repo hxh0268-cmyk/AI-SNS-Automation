@@ -170,7 +170,19 @@ pending → validated → running → { completed | failed | cancelled }
 | `failed` | Error Contract 記録 |
 | `cancelled` | 取消完了 |
 
-Illegal transition → Error Contract。Lifecycle は **Runtime が所有**。
+Illegal transition → Error Contract。
+
+### Runtime Lifecycle vs Interaction Lifecycle（v1.66.0）
+
+| 観点 | Runtime Execution Lifecycle | Interaction Lifecycle |
+|------|----------------------------|---------------------|
+| **Authority** | **Runtime owns** Runtime execution lifecycle **within Runtime boundary** | **SSOT:** [INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) — cross-layer interaction states / transitions |
+| **Scope** | Runtime internal execution phases（pending / running / …） | Cross-layer Interaction states（Created / Running / Failed / …） |
+| **Relationship** | Related but **not identical** authorities | Interaction Lifecycle ≠ Runtime Lifecycle |
+| **Runtime MUST NOT** | Redefine Interaction Lifecycle states | Add unauthorized Interaction Lifecycle transitions |
+| **Interaction Lifecycle MUST NOT** | Replace Runtime internal phase management | — |
+
+Runtime MAY update Interaction State representation within Lifecycle-authorized Runtime responsibility — per [INTERACTION_STATE_MODEL.md](./INTERACTION_STATE_MODEL.md). Runtime MUST NOT own entire Interaction Lifecycle.
 
 ---
 

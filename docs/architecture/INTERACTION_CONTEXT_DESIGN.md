@@ -198,7 +198,14 @@ inputRef:             "<input-contract-ref>"
 | `inputRef` / `outputRef` | I/O contract refs | 各 Layer（所有範囲内） |
 | `constraintRef` | Timing / policy constraint ref | Scheduler |
 | `errorRef` | Error model 参照（payload 非所有） | Runtime |
-| `metadataRef` | Metadata model 参照 | Any（declaration only） |
+| `metadataRef` | Metadata model 参照（**declaration only — does not grant Metadata ownership**） | Any（declaration only） |
+
+**metadataRef clarification（v1.66.0）:**
+
+- `metadataRef` in Context is a **loose reference only** — not a Metadata payload carrier
+- Declaring `metadataRef` does **NOT** grant Metadata semantic ownership
+- Metadata creation / write authority remains governed by [INTERACTION_METADATA_MODEL.md](./INTERACTION_METADATA_MODEL.md)
+- Context MUST NOT embed Metadata payload / MUST NOT mutate Metadata / MUST NOT use metadataRef to bypass Metadata ownership rules
 
 Optional field 追加は **additive compatible**。
 

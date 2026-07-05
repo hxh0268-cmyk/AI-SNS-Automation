@@ -19,20 +19,23 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 2.5 — Governance Complete, Future Design Ready
+Current Maturity: Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready
 ```
 
-| 項目 | 状態（v1.50.0） |
+| 項目 | 状態（v1.66.0） |
 |------|-----------------|
 | Level 1 Foundation | **Completed** |
 | Level 2 Governance | **Completed** |
-| Future Entry Criteria 文書 | **Completed**（本書 — v1.50.0） |
-| Level 3 Future Design Gate | **文書整備完了、Gate 未通過** |
+| Level 3 Future Design | **Completed**（Core Layer + Cross Layer Design Complete — v1.59.0 / v1.65.0） |
+| Level 3.7 Governance Stabilization | **Completed**（v1.66.0 — Entry Gate / Compliance / Risk / Review governance synchronized） |
+| Final Architecture Review | **Completed**（Decision B remediation — v1.66.0） |
 | Level 4 Implementation Ready | **未到達** |
 | Level 5 Production Ready | **未到達** |
 | Level 6 Operational Excellence | **未到達** |
 
-本書を追加しても **Implementation Ready には到達しません**。Level 4 到達には本書で定義する **Level 3 to Level 4 Gate** の全項目完了が必要です。
+**Historical note:** v1.50.0 時点は Level 2.5 — Governance Complete, Future Design Ready でした。Level 3.x サブレベルは [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) を参照。
+
+本書を更新しても **Implementation Ready には到達しません**。Level 4 到達には本書で定義する **Level 3 to Level 4 Gate** の全項目完了が必要です。
 
 ---
 
@@ -378,44 +381,147 @@ v2 Entry Criteria の **詳細 Epic 分解** は Future 実装開始後の ADR �
 
 ## Level 3 to Level 4 Gate
 
-**Architecture Maturity Model** における Level 3（Future Design）から Level 4（Implementation Ready）への **唯一の公式 Gate**:
+**Architecture Maturity Model** における Level 3（Future Design）から Level 4（Implementation Ready）への **唯一の公式 Gate**。
+
+> **v1.66.0:** 本 Gate は **強化・明文化** されました。Gate 項目の更新 **≠ Gate 通過**。v1.66.0 時点では **Level 4 Implementation Ready 未到達**。
+
+### Gate Status Semantics
+
+| Status | Meaning |
+|--------|---------|
+| **Satisfied** | Evidence confirmed — objective criteria met |
+| **Partially Satisfied** | Some evidence exists — not sufficient for Gate pass |
+| **Not Satisfied** | Required evidence missing or failed |
+| **Not Applicable** | Criterion does not apply to current scope |
+| **Ambiguous** | Evidence insufficient for objective classification — requires human review |
+
+### Level 3 → Level 4 Gate Criteria
+
+| ID | Requirement | Authority | Evidence | Status (v1.66.0) |
+|----|-------------|-----------|----------|------------------|
+| G-01 | Future Entry Criteria document current | GOVERNANCE_FLOW | docs/architecture/FUTURE_ENTRY_CRITERIA.md | **Partially Satisfied** |
+| G-02 | **Core Layer Design Complete** | Core Layer Designs v1.54–v1.59 | VERSION / architecture README | **Satisfied** |
+| G-03 | **Cross Layer Design Complete** | Cross Layer Designs v1.60–v1.65 | VERSION / architecture README | **Satisfied** |
+| G-04 | **Architecture Authority Review Complete** | SSOT chain documented | Cross Layer docs + Compliance §Architecture Authority | **Partially Satisfied** |
+| G-05 | **Core Layer Review Complete** | Layer Designs | Compliance §Core Layer | **Partially Satisfied** |
+| G-06 | **Cross Layer Review Complete** | Interaction models | Compliance §Cross Layer + Final Architecture Review | **Partially Satisfied** |
+| G-07 | **Contract Review Complete** | Public Contract Policy | Catalog + Layer contracts | **Partially Satisfied** |
+| G-08 | **Compatibility Review Complete** | COMPATIBILITY_POLICY | Review record required | **Not Satisfied** |
+| G-09 | **Governance Review Complete** | GOVERNANCE_FLOW | Mandatory Policy Review record | **Not Satisfied** |
+| G-10 | **Risk Review Complete** | RISK_REGISTER | Cross Layer risks registered | **Partially Satisfied** |
+| G-11 | **Architecture Compliance Review Complete** | ARCHITECTURE_COMPLIANCE_CHECKLIST | Checklist execution record | **Not Satisfied** |
+| G-12 | **Final Architecture Review Complete** | GOVERNANCE_FLOW §Final Architecture Review | Review report + remediation evidence | **Partially Satisfied** |
+| G-13 | **Critical Blocker = 0** | Final Architecture Review | Review classification record | **Satisfied** |
+| G-14 | **Unresolved Major Gap = 0** | Final Architecture Review + remediation | Post-remediation review | **Partially Satisfied** |
+| G-15 | Production boundaries clear | NON_GOALS | All future impl prohibited | **Satisfied** |
+| G-16 | Implementation prerequisites identifiable | FUTURE_ENTRY_CRITERIA §Deferred Operational Semantics | Documented prerequisites | **Partially Satisfied** |
+| G-17 | Required ADRs identified | ARCHITECTURE_DECISIONS | ADR inventory per implementation domain | **Not Satisfied** |
+| G-18 | Required compatibility reviews identified | CHANGE_GOVERNANCE | Review plan per domain | **Not Satisfied** |
+| G-19 | Required risk reviews identified | RISK_REGISTER | Review cadence + owner | **Partially Satisfied** |
+| G-20 | Required compliance reviews identified | ARCHITECTURE_COMPLIANCE_CHECKLIST | Checklist sections mapped | **Partially Satisfied** |
+| G-21 | Implementation sequencing derivable | Layer Interaction + Entry Criteria | Sequencing evidence | **Partially Satisfied** |
+| G-22 | **Level 4 Entry Decision recorded** | Governance Review artifact | Formal Entry Review decision | **Not Satisfied** |
+| G-23 | Universal Entry Criteria all PASS | §Universal Entry Criteria | Per-criterion evidence | **Not Satisfied** |
+| G-24 | Domain Entry Criteria PASS (target domain) | Provider/Runtime/… sections | Per-domain evidence | **Not Satisfied** |
+| G-25 | Non-Goals Release Criteria (target domain) | §Non Goals Release Criteria | Domain-specific ADR | **Not Satisfied** |
+| G-26 | Public Contract Catalog scope decision | §Public Contract Catalog Scope | ADR before Future catalog extension | **Partially Satisfied** |
+| G-27 | VERSION / CHANGELOG / ADR alignment | VERSIONING_POLICY | Release docs consistent | **Partially Satisfied** |
 
 ```text
-Level 3 → Level 4 Gate =
-  [x] Future Entry Criteria 文書（本書）— v1.50.0 完了
-  [ ] Universal Entry Criteria 全項目 PASS
-  [ ] 着手領域の Entry Criteria 全項目 PASS
-  [ ] Required ADR 全件 Accepted
-  [ ] Required Risk Review 完了
-  [ ] Required Compatibility Review 完了
-  [ ] Required Public Contract Review 完了
-  [ ] Required Compliance Checklist 完了
-  [ ] Non Goals Release Criteria 完了（着手領域）
-  [ ] Mandatory Policy Review（CHANGE_GOVERNANCE）
-  [ ] VERSION / CHANGELOG / ADR 整合
+Level 3 → Level 4 Gate PASS =
+  ALL Gate criteria (G-01 … G-27) = Satisfied or Not Applicable
+  AND Critical Blocker = 0
+  AND unresolved Major Gap = 0
+  AND Level 4 Entry Decision = Proceed (human governance artifact)
 ```
 
-| 状態（v1.50.0） | 結果 |
+| 状態（v1.66.0） | 結果 |
 |-----------------|------|
-| 本書存在 | ✅ |
-| Gate 全項目 | ❌ 未完了 |
+| Gate definition | ✅ Strengthened |
+| Gate 全項目 Satisfied | ❌ **未完了** |
+| Level 4 Entry Review Ready | ✅ **Prepared**（v1.66.0 remediation） |
 | Level 4 Implementation Ready | **未到達** |
 
 Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
 
 ---
 
+## Final Architecture Review Requirement
+
+Before **Level 4 Entry Decision**, a **Final Architecture Review** MUST be completed per [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) §Final Architecture Review Flow.
+
+| Input | Required |
+|-------|----------|
+| Core Layer Design Complete | ✅ |
+| Cross Layer Design Complete | ✅ |
+| Governance baseline available | ✅ |
+| Future Entry Criteria available | ✅ |
+| Compliance Checklist available | ✅ |
+| Risk Register available | ✅ |
+
+| Output | Required |
+|--------|----------|
+| Findings classified (Critical / Major / Minor / Improvement / No Issue) | ✅ |
+| Remediation decision recorded | ✅ |
+| Level 4 readiness assessment | ✅ |
+| Evidence artifact | Human review record |
+
+**Quality Pipeline PASS alone MUST NOT satisfy Final Architecture Review.**
+
+---
+
+## Deferred Operational Semantics Boundary
+
+The following operational semantics are **intentionally deferred** — **not implemented** at v1.66.0:
+
+| Concern | Lifecycle Authority | Error Authority | Implementation |
+|---------|--------------------|-----------------|--------------------|
+| **Retry coordination** | Lifecycle transition semantics only ([INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) §27) | Failure description only — no retryRef | **Deferred — ADR required before Level 4 implementation** |
+| **Recovery coordination** | Lifecycle recovery principles only | No recoveryRef | **Deferred — ADR required before implementation** |
+| **Retry exhaustion** | Not fully specified | — | **Level 4 prerequisite — must resolve before retry behavior** |
+| **Partial completion** | Terminal rules partial | Descriptive only | **Level 4 prerequisite — must resolve before recovery behavior** |
+| **Cross-layer idempotency** | — | — | **Deferred — ownership ADR required** |
+| **Duplicate interaction handling** | — | — | **Unowned — explicit decision required before implementation** |
+
+**Forbidden without ADR:**
+- Any Layer independently creating a **Cross-Layer Retry Engine**
+- Any Layer independently creating a **Recovery Engine**
+- Provider owning retry coordination
+- Runtime or Scheduler **automatically** owning cross-layer retry policy
+- Treating layer-local `idempotencyKey` fields as global cross-layer authority
+
+---
+
+## Public Contract Catalog Scope
+
+**Current catalog authority (v1.66.0):** Application Layer Public Contracts only — `reports/public-contract-catalog/latest/public-contract-catalog.json`.
+
+| Scope | Status |
+|-------|--------|
+| Application Layer extract contracts | **In catalog** |
+| Future Layer / Interaction / Cross Layer Design contracts | **Not in catalog — by design** |
+| Machine-readable runtime schemas | **Not required for Level 4 Entry Review Ready** |
+
+**Level 4 pre-implementation prerequisite:** Before Future Layer implementation, an **Accepted ADR** MUST define Public Contract Catalog scope extension (if applicable) + Compatibility Review. Implementation MUST NOT bypass Public Contract governance.
+
+See [PUBLIC_CONTRACT_POLICY.md](./PUBLIC_CONTRACT_POLICY.md) and v2 Entry Criteria V4.
+
+---
+
 ## Completion Criteria
 
-Future Entry Criteria 文書自体の完成条件（v1.50.0）:
+Future Entry Criteria 文書の完成条件（v1.50.0 baseline + v1.66.0 stabilization）:
 
 - [x] 全必須見出し（Purpose 〜 Completion Criteria）
 - [x] Universal + 領域別 Entry Criteria 定義
 - [x] Required ADR / Reviews / Compliance 定義
 - [x] Non-Goals Release Criteria 定義
-- [x] Level 3 to Level 4 Gate 定義
-- [x] Current Maturity Level 2.5 維持、Level 4 未到達明記
+- [x] Level 3 to Level 4 Gate 定義 — **v1.66.0 strengthened**
+- [x] Final Architecture Review Requirement — **v1.66.0**
+- [x] Deferred Operational Semantics Boundary — **v1.66.0**
+- [x] Public Contract Catalog Scope — **v1.66.0**
+- [x] Current Maturity aligned with ARCHITECTURE_MATURITY_MODEL — **v1.66.0**
+- [x] Level 4 Implementation Ready **未到達** 明記
 - [x] Quality Governance / Maturity Model との整合
-- [x] Quality Pipeline Test 449–460
 
-**Gate 通過**（Level 4 到達）は v1.50.0 の Completion Criteria **ではない**。
+**Gate 通過**（Level 4 到達）は v1.66.0 の Completion Criteria **ではない**。

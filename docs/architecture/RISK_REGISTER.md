@@ -27,6 +27,28 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 
 ---
 
+## Cross Layer / Level 4 Entry Risk（v1.66.0）
+
+| ID | Risk | Affected Authority | Impact | Likelihood | Mitigation | Remaining Exposure | L4 Entry Impact |
+|----|------|-------------------|--------|------------|------------|-------------------|-----------------|
+| CL-001 | Governance maturity drift（docs contradict VERSION） | Maturity / Entry Criteria | High | Medium | v1.66.0 sync + Quality Pipeline governance tests | Low after remediation | Blocks Entry if unresolved |
+| CL-002 | Runtime Lifecycle vs Interaction Lifecycle confusion | Runtime / Lifecycle SSOT | High | Medium | RUNTIME_LAYER_DESIGN disambiguation + Compliance | Medium until impl | Major at implementation |
+| CL-003 | Metadata dumping ground | Metadata Model | High | Medium | INTERACTION_METADATA_MODEL boundaries + Compliance | Medium until runtime | Major at implementation |
+| CL-004 | Retry / Recovery ad hoc implementation | Lifecycle / Error | High | High | FUTURE_ENTRY_CRITERIA §Deferred Operational Semantics | **High** — deferred by design | **Prerequisite before retry impl** |
+| CL-005 | Cross-layer idempotency ownership ambiguity | Event / Scheduler / Runtime | Medium | High | Explicit deferral + ADR requirement | **High** — unowned | Prerequisite before idempotency impl |
+| CL-006 | Duplicate interaction handling unowned | Cross Layer | Medium | Medium | Explicit deferral in Entry Criteria | Medium | Prerequisite before dedup impl |
+| CL-007 | Provider raw response leakage | Provider / Error / Metadata | Critical | Medium | Normalization rules across models | Medium until impl | Critical at implementation |
+| CL-008 | Runtime Exception leakage into contracts | Error / Metadata / Context | High | Medium | Forbidden fields + Compliance | Low at design | Major at implementation |
+| CL-009 | Uncontrolled extension.* namespace | Metadata | Medium | Medium | Extension Governance + Compliance | Low | Major if bypass occurs |
+| CL-010 | Quality Pipeline false confidence | Quality Governance | Medium | Medium | QUALITY_GOVERNANCE + Final Architecture Review | Medium | Blocks naive L4 claim |
+| CL-011 | Premature Level 4 Implementation Ready declaration | Maturity Model | Critical | Low | Gate criteria + human review | Low after v1.66.0 | Critical |
+| CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
+| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | Catalog scope ADR prerequisite | **High** — intentional deferral | Prerequisite before Future impl |
+
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006, CL-013 remain **open exposure** until ADR + implementation-phase decisions.
+
+---
+
 ## Compatibility Risk
 
 | ID | Risk | Impact | Likelihood | Mitigation |
@@ -67,5 +89,6 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | Risk Register 全体 | Minor release |
 | CR / DR 高 Impact | 毎 Foundation 変更 |
 | AR-003 Future 実装圧力 | 毎 Epic 開始前 |
+| CL-001 … CL-013 Cross Layer / L4 Entry | Final Architecture Review + Level 4 Entry Review |
 
 新リスク発見時は本 Register に ID を付与して追記します。

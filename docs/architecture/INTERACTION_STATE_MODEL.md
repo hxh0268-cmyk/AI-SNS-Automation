@@ -195,21 +195,25 @@ State Information is:
 
 ## 15. State Model vs Error
 
-| 観点 | State | Error（将来） |
-|------|-------|-------------|
-| 役割 | lifecycleState representation | failure classification / propagation |
-| v1.63.0 | State Information defined | Error Model **not defined** |
-| 禁止 | Error semantics in State Information | — |
+| 観点 | State | Error Model（SSOT — v1.64.0） |
+|------|-------|-------------------------------|
+| 役割 | lifecycleState / stateRevision **representation** | failure classification / propagation / ownership |
+| Authority | State Model owns state **representation** only | [INTERACTION_ERROR_MODEL.md](./INTERACTION_ERROR_MODEL.md) owns failure information |
+| Reference | State MUST NOT embed Error payload | Error MAY reference stateRevisionRef — loose ref only |
+| 禁止 | Error semantics / errorClassification in State Information | State MUST NOT mutate Error Model |
+
+**State does not own Error semantics.** Error and Metadata remain independent Models.
 
 ---
 
 ## 16. State Model vs Metadata
 
-| 観点 | State | Metadata（将来） |
-|------|-------|------------------|
-| 役割 | authoritative current state representation | trace / audit / diagnostic |
-| 禁止 | metrics / logging / tracing payload in State | — |
-| Observability | MAY expose fields for future observation — not telemetry backend | Separate concern |
+| 観点 | State | Metadata Model（SSOT — v1.65.0） |
+|------|-------|----------------------------------|
+| 役割 | authoritative current state **representation** | bounded supplemental descriptive information |
+| Authority | State Model owns lifecycleState / stateRevision | [INTERACTION_METADATA_MODEL.md](./INTERACTION_METADATA_MODEL.md) owns metadata governance |
+| Reference | State MUST NOT embed Metadata payload | Metadata MUST NOT replicate state.revision / state.snapshot |
+| 禁止 | metrics / logging / tracing payload in State | Metadata MUST NOT substitute for State storage |
 
 ---
 

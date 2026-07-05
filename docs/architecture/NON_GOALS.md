@@ -1,6 +1,8 @@
 # Non Goals
 
-v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。以下は Architecture Governance 上、現フェーズでは実装・merge してはなりません。
+v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。
+
+> **Current Phase（v1.66.0）:** Architecture Governance Stabilization / Level 4 Entry Preparation — **Implementation Ready 未到達**。以下は **引き続き実装禁止** です。以下は Architecture Governance 上、現フェーズでは実装・merge してはなりません。
 
 > **境界:** 将来どう実装するかの **設計構想** は [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) を参照してください。Non-Goals = 今すぐ作ってはいけないもの、Future Architecture = 将来 Epic で検討する構想。
 

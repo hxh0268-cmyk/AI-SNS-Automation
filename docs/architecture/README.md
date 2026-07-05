@@ -8,7 +8,9 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 Architecture Documentation = **Architecture Governance** として、**36 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1）を固定します。
 
-**Current Maturity:** **Level 3.6 — Interaction Metadata Model Complete / Cross Layer Design Complete**（v1.65.0 — Level 3.5 Interaction Error Model Complete から昇格。Level 2.5 参照は [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md)）
+**Current Maturity:** **Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready**（v1.66.0 — Level 3.6 Cross Layer Design Complete から昇格。Level 2.5 参照は [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md)）
+
+> **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **36**（重複ファイルカウントではない）。
 
 | # | 領域 | 文書 | v1.49.0 |
 |---|------|------|---------|
@@ -90,7 +92,7 @@ Architecture Documentation = **Architecture Governance** として、**36 必須
 
 ---
 
-## 現在フェーズ（v1.65.0 — Future Architecture Design Phase）
+## 現在フェーズ（v1.66.0 — Architecture Governance Stabilization / Level 4 Entry Preparation）
 
 | Layer | 状態 |
 |-------|------|
@@ -99,7 +101,8 @@ Architecture Documentation = **Architecture Governance** として、**36 必須
 | Governance Layer（Catalog + Docs + Process + Boundaries） | **Completed**（v1.48.0–v1.53.0） |
 | **Core Layer Design**（Provider / Runtime / Scheduler / Automation / Workflow / Event） | **Complete**（v1.54.0–v1.59.0 — Design Only） |
 | **Cross Layer Design**（Interaction Model + Lifecycle + Context + State + Error + Metadata） | **Complete**（v1.60.0–v1.65.0 — Design Only） |
-| **Final Architecture Review / Level 4 Entry Review** | **Next Phase** — Level 4 Implementation Ready **未到達** |
+| **Architecture Governance Stabilization** | **Complete**（v1.66.0 — Entry Gate / Compliance / Risk / Review sync） |
+| **Formal Level 4 Entry Review** | **Ready to begin** — Level 4 Implementation Ready **未到達** |
 | Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。

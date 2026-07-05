@@ -12,7 +12,8 @@ Architecture Governance を **静的文書群** から **運用可能な Governa
 - [CHANGE_GOVERNANCE.md](./CHANGE_GOVERNANCE.md) の判断基準を **実行フロー** に落とす
 - Machine Check（Quality Pipeline）と Governance Check（Compliance Checklist）の **役割分担** をプロセス上固定する
 - [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) を **レビュー順序** に変換する
-- **Current Maturity Level 2.5** を維持し、Level 4 到達を **宣言しない**
+- **Current Maturity Level 3.7** — Architecture Governance Stabilized / Level 4 Entry Review Ready（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md)）
+- Level 4 Implementation Ready 到達を **宣言しない**
 
 ---
 
@@ -321,16 +322,83 @@ Governance Flow 文書自体の完成条件（v1.51.0）:
 
 ---
 
+## Final Architecture Review Flow
+
+**Final Architecture Review** is a mandatory governance step **after Cross Layer Design Complete** and **before Level 4 Entry Decision**.
+
+### Input（required）
+
+| Input | Authority |
+|-------|-----------|
+| Core Layer Design Complete | v1.54–v1.59 Layer Designs |
+| Cross Layer Design Complete | v1.60–v1.65 Interaction models |
+| Governance baseline | FUTURE_ENTRY_CRITERIA / ARCHITECTURE_MATURITY_MODEL |
+| Compatibility governance | COMPATIBILITY_POLICY |
+| Compliance Checklist | ARCHITECTURE_COMPLIANCE_CHECKLIST |
+| Risk Register | RISK_REGISTER |
+
+### Review Scope
+
+- Architecture completeness / consistency
+- Authority integrity / responsibility separation
+- Dependency direction / boundary consistency
+- Contract completeness / compatibility readiness
+- Governance completeness / risk coverage / compliance readiness
+- Implementation prerequisites / remaining gaps
+
+### Finding Classifications
+
+| Classification | Action |
+|----------------|--------|
+| **Critical Blocker** | Stop Level 4 Entry — redesign or major remediation |
+| **Major Gap** | Remediation required before Level 4 Entry |
+| **Minor Gap** | Correct before or during stabilization |
+| **Improvement Opportunity** | Optional enhancement |
+| **No Issue** | Confirmed consistent |
+
+### Possible Decisions
+
+| Decision | Meaning |
+|----------|---------|
+| **Proceed to Level 4 Entry Review** | No Critical Blocker; Major Gaps resolved or accepted with ADR |
+| **Architecture Stabilization / Remediation Required** | Major Gaps require documentation/governance fix（v1.66.0 path） |
+| **Architecture Redesign Required** | Critical Blocker — SSOT conflict |
+
+### Output（required artifact）
+
+- Review evidence（human record）
+- Gap classification counts
+- Remediation decision
+- Level 4 readiness assessment
+
+**Quality Pipeline PASS MUST NOT substitute for Final Architecture Review.**
+
+---
+
+## Cross Layer Design Review Flow
+
+Cross Layer Design 変更時（v1.60–v1.65 models）:
+
+1. Read SSOT chain — Lifecycle → Context → State → Error → Metadata
+2. Verify no authority overlap / no semantic redefinition
+3. Run Cross Model Compliance（ARCHITECTURE_COMPLIANCE_CHECKLIST §Cross Model）
+4. Update Risk Register if new Cross Layer risks identified
+5. Extend Quality Pipeline with governance consistency checks only
+
+---
+
 ## Level 3 to Level 4 Role
 
-本書は Level 3（Future Design 進行中）における **運用 Process** を定義する。
+本書は Level 3（Future Design **Complete**）から Level 4 Entry Review への **運用 Process** を定義する。
 
-| 項目 | v1.51.0 状態 |
+| 項目 | v1.66.0 状態 |
 |------|--------------|
-| Current Maturity | **Level 2.5** — Governance Complete, Future Design Ready |
-| Level 3 Future Design | **進行中**（Governance Flow 追加） |
+| Current Maturity | **Level 3.7** — Architecture Governance Stabilized / Level 4 Entry Review Ready |
+| Level 3 Future Design | **Completed** |
+| Final Architecture Review | **Completed**（Decision B → v1.66.0 remediation） |
+| Level 4 Entry Review Ready | **Yes** |
 | Level 4 Implementation Ready | **未到達** |
-| 本書の役割 | Entry Criteria → 実行順序への変換 |
+| 本書の役割 | Entry Criteria → 実行順序 + Final Architecture Review |
 | Gate 通過 | **未完了** |
 
 Level 4 到達には [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Level 3 to Level 4 Gate **全項目** + 本 Governance Flow の **全 Review 完了** が必要。

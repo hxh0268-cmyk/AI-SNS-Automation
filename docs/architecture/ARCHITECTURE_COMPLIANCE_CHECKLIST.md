@@ -130,6 +130,109 @@ release 候補（commit / tag 前の Human Review 用）:
 
 ---
 
+## Core Layer Design Compliance
+
+Core Layer Design 変更または Level 4 Entry Review 時に確認（Design Only — v1.54–v1.59）:
+
+- [ ] [EVENT_LAYER_DESIGN.md](./EVENT_LAYER_DESIGN.md) — Event responsibility / boundary
+- [ ] [AUTOMATION_LAYER_DESIGN.md](./AUTOMATION_LAYER_DESIGN.md) — Automation intent boundary
+- [ ] [WORKFLOW_LAYER_DESIGN.md](./WORKFLOW_LAYER_DESIGN.md) — Workflow structure boundary
+- [ ] [SCHEDULER_LAYER_DESIGN.md](./SCHEDULER_LAYER_DESIGN.md) — Scheduling boundary — no scheduling engine implementation
+- [ ] [RUNTIME_LAYER_DESIGN.md](./RUNTIME_LAYER_DESIGN.md) — Execution boundary — Runtime execution lifecycle ≠ Interaction Lifecycle
+- [ ] [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) — Provider normalization boundary
+- [ ] No skip-layer dependency / no reverse dependency / no circular dependency
+- [ ] No production implementation files added
+
+---
+
+## Cross Layer Design Compliance
+
+Cross Layer Design 変更または Level 4 Entry Review 時に確認（Design Only — v1.60–v1.65）:
+
+- [ ] [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) — interaction structure / boundary
+- [ ] [INTERACTION_LIFECYCLE_DESIGN.md](./INTERACTION_LIFECYCLE_DESIGN.md) — lifecycle SSOT
+- [ ] [INTERACTION_CONTEXT_DESIGN.md](./INTERACTION_CONTEXT_DESIGN.md) — context carrier contract
+- [ ] [INTERACTION_STATE_MODEL.md](./INTERACTION_STATE_MODEL.md) — state representation SSOT
+- [ ] [INTERACTION_ERROR_MODEL.md](./INTERACTION_ERROR_MODEL.md) — failure information SSOT
+- [ ] [INTERACTION_METADATA_MODEL.md](./INTERACTION_METADATA_MODEL.md) — supplemental metadata governance
+- [ ] Cross Layer models do not redefine Core Layer responsibilities
+- [ ] Core Layer models do not invade Cross Layer authorities
+
+---
+
+## Architecture Authority Compliance
+
+- [ ] Lifecycle states / transitions — SSOT: INTERACTION_LIFECYCLE_DESIGN only
+- [ ] State representation — SSOT: INTERACTION_STATE_MODEL only
+- [ ] Context contract — SSOT: INTERACTION_CONTEXT_DESIGN only
+- [ ] Error information — SSOT: INTERACTION_ERROR_MODEL only
+- [ ] Metadata information — SSOT: INTERACTION_METADATA_MODEL only
+- [ ] No authority overlap / no semantic redefinition across models
+- [ ] No circular authority / no hidden authority transfer
+- [ ] Reference-only cross-model links — no embedded payloads
+
+---
+
+## Cross Model Compliance
+
+Verify relationship boundaries（reference [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Gate G-04）:
+
+- [ ] Lifecycle × Context — no lifecycle entity in Context
+- [ ] Lifecycle × State — State references SSOT lifecycle values only
+- [ ] Lifecycle × Error — classification does not alone determine transitions
+- [ ] Lifecycle × Metadata — no lifecycle.* namespace authority bypass
+- [ ] Context × State — Context does not substitute for State
+- [ ] Context × Error — errorRef reference only
+- [ ] Context × Metadata — metadataRef reference only; no ownership via Context
+- [ ] State × Error — no stateRevision mutation from Error
+- [ ] State × Metadata — State does not store Metadata semantics
+- [ ] Error × Metadata — no Error payload in Metadata / vice versa
+
+---
+
+## Metadata Compliance
+
+Per [INTERACTION_METADATA_MODEL.md](./INTERACTION_METADATA_MODEL.md):
+
+- [ ] bounded / namespaced / typed / non-authoritative
+- [ ] no secret / credential / token / unrestricted PII
+- [ ] no raw Provider response / Runtime Exception / stack trace
+- [ ] no arbitrary JSON / unrestricted nesting / dumping ground
+- [ ] metadataValue excluded from Minimal Identity Contract
+- [ ] extension.* namespace does not bypass Architecture Authority
+
+---
+
+## Final Architecture Review Compliance
+
+Before Level 4 Entry Decision:
+
+- [ ] Final Architecture Review completed per [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md)
+- [ ] Findings classified (Critical / Major / Minor / Improvement / No Issue)
+- [ ] Critical Blocker count recorded
+- [ ] Major Gap count recorded
+- [ ] Remediation decision recorded
+- [ ] Review evidence artifact available
+- [ ] Quality Pipeline PASS **not** used as sole review evidence
+
+---
+
+## Level 4 Entry Compliance
+
+Formal Level 4 Entry Review（**not** Implementation Ready declaration）:
+
+- [ ] [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Gate evaluated criterion-by-criterion
+- [ ] Unresolved Critical Blocker = 0
+- [ ] Unresolved Major Gap = 0（or explicitly accepted with ADR）
+- [ ] Required ADRs identified per implementation domain
+- [ ] Required Compatibility / Risk / Compliance reviews identified
+- [ ] Implementation prerequisites documented（including deferred semantics）
+- [ ] Implementation sequencing derivable from Architecture
+- [ ] Level 4 Entry Decision recorded（Proceed / Remediation / Redesign）
+- [ ] Level 4 Implementation Ready **not declared** unless Gate fully Satisfied
+
+---
+
 ## Usage Notes
 
 | タイミング | 使用する節 |
@@ -138,7 +241,10 @@ release 候補（commit / tag 前の Human Review 用）:
 | Foundation 追加 Epic | Foundation Addition + Universal |
 | Contract 変更 | Public Contract Change + Backward Compatibility |
 | Future 設計 PR | Future Architecture Addition |
-| v2 実装 Epic 開始前 | Provider Runtime Scheduler API Pre Addition |
+| Core / Cross Layer 設計 PR | Core Layer + Cross Layer + Architecture Authority + Cross Model |
+| Metadata 設計 PR | Metadata Compliance + Cross Layer |
+| v2 実装 Epic 開始前 | Provider Runtime Scheduler API Pre Addition + Level 4 Entry |
+| Final Architecture Review | Final Architecture Review Compliance |
 | release 前 | Release Pre Check + 該当節すべて |
 
 本チェックリストは Governance **運用面** の確認です。Machine Readable な Contract 一覧は Public Contract Catalog JSON を正とします。
