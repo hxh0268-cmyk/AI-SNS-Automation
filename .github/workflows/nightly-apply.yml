@@ -274,7 +274,7 @@ jobs:
 
       - name: Upload quality pipeline reports
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-apply-${{ github.run_id }}
           path: |
