@@ -37,15 +37,27 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-004 | Retry / Recovery ad hoc implementation | Lifecycle / Error | High | High | FUTURE_ENTRY_CRITERIA §Deferred Operational Semantics | **High** — deferred by design | **Prerequisite before retry impl** |
 | CL-005 | Cross-layer idempotency ownership ambiguity | Event / Scheduler / Runtime | Medium | High | Explicit deferral + ADR requirement | **High** — unowned | Prerequisite before idempotency impl |
 | CL-006 | Duplicate interaction handling unowned | Cross Layer | Medium | Medium | Explicit deferral in Entry Criteria | Medium | Prerequisite before dedup impl |
-| CL-007 | Provider raw response leakage | Provider / Error / Metadata | Critical | Medium | Normalization rules across models | Medium until impl | Critical at implementation |
+| CL-007 | Provider raw response leakage | Provider / Error / Metadata | Critical | Medium | ADR-0010 normalization prohibition + PROVIDER_ENTRY_PREPARATION_REVIEW | Medium until impl | Critical at implementation |
 | CL-008 | Runtime Exception leakage into contracts | Error / Metadata / Context | High | Medium | Forbidden fields + Compliance | Low at design | Major at implementation |
 | CL-009 | Uncontrolled extension.* namespace | Metadata | Medium | Medium | Extension Governance + Compliance | Low | Major if bypass occurs |
 | CL-010 | Quality Pipeline false confidence | Quality Governance | Medium | Medium | QUALITY_GOVERNANCE + Final Architecture Review | Medium | Blocks naive L4 claim |
 | CL-011 | Premature Level 4 Implementation Ready declaration | Maturity Model | Critical | Low | Gate criteria + human review | Low after v1.66.0 | Critical |
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
-| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | Catalog scope ADR prerequisite | **High** — intentional deferral | Prerequisite before Future impl |
+| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 scope decision + additive strategy | **Medium** — governance mitigated; catalog gap until Contract Definition Phase | Prerequisite before Future impl |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006, CL-013 remain **open exposure** until ADR + implementation-phase decisions.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **governance mitigated**（ADR-0011）— catalog JSON gap **intentional** until Contract Definition Phase.
+
+---
+
+## Provider Entry Preparation Risk（v1.68.0）
+
+| ID | Risk | Affected Authority | Impact | Likelihood | Mitigation | Remaining Exposure | Provider Impl Impact |
+|----|------|-------------------|--------|------------|------------|-------------------|---------------------|
+| PR-001 | Mock vs Real Provider confusion | Provider / ADR-0010 | High | Medium | Mock default policy + feature flag design | Medium until impl | Blocks safe default path |
+| PR-002 | Premature Real Provider external IO | Provider / NON_GOALS | Critical | Medium | Not Yet Authorized + G-25 Not Satisfied | **High** until Non-Goals Release | Critical |
+| PR-003 | Provider boundary overreach（owns Runtime/Retry/Idempotency） | Layer boundaries | High | Medium | ADR-0010 non-ownership table | Low at governance | Major at implementation |
+| PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 — no catalog change + bypass prohibition | Low | Critical if bypassed |
+| PR-005 | Non-Goals Release skipped before impl | NON_GOALS / G-25 | Critical | Low | G-25 Not Satisfied — separate Release ADR required | **High** until G-25 Satisfied | Critical |
 
 ---
 
@@ -90,5 +102,6 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CR / DR 高 Impact | 毎 Foundation 変更 |
 | AR-003 Future 実装圧力 | 毎 Epic 開始前 |
 | CL-001 … CL-013 Cross Layer / L4 Entry | Final Architecture Review + Level 4 Entry Review |
+| PR-001 … PR-005 Provider Entry Preparation | Provider Entry Preparation Review + Provider Production ADR gate |
 
 新リスク発見時は本 Register に ID を付与して追記します。

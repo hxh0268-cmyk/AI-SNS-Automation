@@ -233,6 +233,25 @@ Formal Level 4 Entry Review（**not** Implementation Ready declaration）:
 
 ---
 
+## Provider Entry Preparation Compliance
+
+Per [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) + [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md):
+
+- [ ] Provider Entry Criteria P1–P6 reviewed with evidence
+- [ ] Mock Provider default / Real Provider feature flag policy documented
+- [ ] Application Public Contract input boundary confirmed
+- [ ] Adapter normalization boundary — no raw Provider response leakage
+- [ ] Provider does not own Runtime / Scheduler / OAuth / retry coordination / cross-layer idempotency
+- [ ] ADR-0010 + ADR-0011 accepted
+- [ ] G-26 Catalog scope decision Satisfied
+- [ ] G-25 Non-Goals Release **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision
+- [ ] Provider Production Implementation **Not Yet Authorized**
+- [ ] Provider Level 4 Implementation Ready **not declared**
+- [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+- [ ] Catalog generator / reports **unchanged**
+
+---
+
 ## Usage Notes
 
 | タイミング | 使用する節 |

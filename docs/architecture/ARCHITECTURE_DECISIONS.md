@@ -128,6 +128,8 @@ Platform / Application 個別 ADR は `docs/adr/` を参照:
 - [ADR-0007](../adr/ADR-0007-developer-analytics-layer-architecture.md) — Developer Analytics Layer
 - [ADR-0008](../adr/ADR-0008-dashboard-public-contract.md) — Dashboard Public Contract
 - [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md) — Level 4 Entry Strategy（v1.67.0）
+- [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md) — Provider Layer Entry Preparation（v1.68.0）
+- [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md) — Public Contract Catalog Future Layer Scope（v1.68.0）
 
 ### v1.67.0 Level 4 Entry Review Decision
 
@@ -141,3 +143,18 @@ Platform / Application 個別 ADR は `docs/adr/` を参照:
 | **Review Trigger** | Provider Entry Preparation completion |
 
 Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md)
+
+### v1.68.0 Provider Entry Preparation Governance
+
+| 項目 | 内容 |
+|------|------|
+| **Status** | Accepted（v1.68.0） |
+| **Context** | v1.67.0 Conditionally Ready; First Target Domain = Provider Entry Preparation |
+| **Decision** | ADR-0010 Provider prep boundaries; ADR-0011 Catalog scope; Production Implementation prohibited |
+| **Alternatives** | Immediate Provider impl / Catalog extension now — rejected |
+| **Consequences** | Provider Entry Preparation Governance Complete; G-26 Satisfied; G-25 Not Satisfied（Reason: Pending separate Provider Non-Goals Release Decision） |
+| **Review Trigger** | Non-Goals Release ADR / Contract Definition Phase |
+
+Full record: [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) + [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md) + [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md)
+
+新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

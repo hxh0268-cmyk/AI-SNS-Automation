@@ -2,27 +2,27 @@
 
 ## 現在のバージョン
 
-**v1.67.0**（Formal Level 4 Entry Review Decision）
+**v1.68.0**（Provider Entry Preparation Governance）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Formal Level 4 Entry Review Decision / Provider Layer Entry Preparation（next）
+**Phase:** Provider Entry Preparation Governance Complete / Provider Non-Goals Release（next）
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
-**Final Architecture Review:** **Completed**（Decision B — remediation v1.66.0）
+**Level 4 Entry Decision:** **Conditionally Ready**（v1.67.0）
 
-**Level 4 Entry Decision:** **Conditionally Ready**（v1.67.0 — [LEVEL_4_ENTRY_REVIEW.md](architecture/LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md)）
+**Provider Entry Preparation:** **Governance Complete**（v1.68.0 — [PROVIDER_ENTRY_PREPARATION_REVIEW.md](architecture/PROVIDER_ENTRY_PREPARATION_REVIEW.md)）
+
+**Provider Production Implementation:** **Not Yet Authorized**
 
 **Level 4 Implementation Ready:** **Not Yet**
 
-**First Target Domain:** **Provider Layer Entry Preparation**
+**Next Phase:** Provider Non-Goals Release / Contract Definition Phase
 
-**Next Phase:** Provider Layer Entry Preparation
-
-**Next Candidate:** v1.68.0（Provider Entry Preparation 後に候補決定）
+**Next Candidate:** v1.69.0（Provider Non-Goals Release 後に候補決定）
 
 ---
 
@@ -30,6 +30,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.68.0** | **ドキュメント** | **✅ 完了** | **Provider Entry Preparation Governance — ADR-0010 / ADR-0011 / PROVIDER_ENTRY_PREPARATION_REVIEW** |
 | **v1.67.0** | **ドキュメント** | **✅ 完了** | **Formal Level 4 Entry Review Decision — Conditionally Ready / Domain-based Incremental Entry / ADR-0009** |
 | **v1.66.0** | **ドキュメント** | **✅ 完了** | **Architecture Governance Stabilization / Level 4 Entry Preparation — Entry Gate / Compliance / Risk / Review governance synchronized** |
 | **v1.65.0** | **ドキュメント** | **✅ 完了** | **Interaction Metadata Model Design / Cross-Layer Supplemental Descriptive Information Contract 設計正式定義 / Cross Layer Design Complete** |
@@ -105,6 +106,48 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.68.0 で追加（Provider Entry Preparation Governance）
+
+#### Provider Entry Preparation 正式記録
+
+- **`PROVIDER_ENTRY_PREPARATION_REVIEW.md`** … Provider Entry Preparation governance evidence
+- **`ADR-0010-provider-layer-entry-preparation.md`** … Provider boundaries / P1–P6 evidence / Mock default policy
+- **`ADR-0011-public-contract-catalog-future-layer-scope.md`** … Catalog scope decision（G-26 Satisfied）
+- **Provider Entry Preparation** … **Governance Complete**
+- **Provider Production Implementation** … **Not Yet Authorized**
+- **G-25 Non-Goals Release** … **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision
+- **G-26 Catalog scope** … **Satisfied**
+- **Production code / Catalog generator** … No changes
+
+### 品質状況（v1.68.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **774 PASS** |
+| Architecture Documents | **38** 必須文書 |
+| Production code | **unchanged** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.9** — Provider Entry Preparation Governance Complete |
+| Provider Production Implementation | **Not Yet Authorized** |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 759–774 | Provider Entry Preparation governance |
+
+### v1.68.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0010 / ADR-0011 accepted | ✅ |
+| Provider Entry Preparation Governance Complete | ✅ |
+| G-26 Satisfied | ✅ |
+| G-25 Not Satisfied maintained | ✅ |
+| Provider Production Implementation Not Yet Authorized | ✅ |
+| Production Code 変更なし | ✅ |
+| Catalog unchanged | ✅ |
+| Test 759–774 | ✅ |
 
 ---
 

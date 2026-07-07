@@ -6,11 +6,11 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**37 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**38 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1）を固定します。
 
-**Current Maturity:** **Level 3.8 — Formal Level 4 Entry Review Complete / Conditionally Ready**（v1.67.0 — Formal Decision: Conditionally Ready。Level 3.7 参照は [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md)）
+**Current Maturity:** **Level 3.9 — Provider Entry Preparation Governance Complete**（v1.68.0 — Provider Production Implementation **Not Yet Authorized**）
 
-> **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **37**（重複ファイルカウントではない）。
+> **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **38**（重複ファイルカウントではない）。
 
 | # | 領域 | 文書 | v1.49.0 |
 |---|------|------|---------|
@@ -51,11 +51,13 @@ Architecture Documentation = **Architecture Governance** として、**37 必須
 | 35 | Interaction Error Model Design | [INTERACTION_ERROR_MODEL.md](./INTERACTION_ERROR_MODEL.md) | v1.64.0 |
 | 36 | Interaction Metadata Model Design | [INTERACTION_METADATA_MODEL.md](./INTERACTION_METADATA_MODEL.md) | v1.65.0 |
 | 37 | Level 4 Entry Review | [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) | v1.67.0 |
+| 38 | Provider Entry Preparation Review | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) | v1.68.0 |
 
 **文書の役割分担:**
 
 | 文書 | 役割 |
 |------|------|
+| [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) | **Provider Entry Preparation Review** — P1–P6 / U1–U8 / Gate update / Not Yet Authorized evidence（v1.68.0） |
 | [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) | **Formal Level 4 Entry Review** — Entry Decision / G-01–G-27 evaluation / Conditionally Ready evidence（v1.67.0） |
 | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) | **成熟度 Level 0–6** — 現在位置と未到達段階 |
 | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) | **Level 3→4 Entry Gate** — Future 実装着手前条件 |
@@ -94,7 +96,7 @@ Architecture Documentation = **Architecture Governance** として、**37 必須
 
 ---
 
-## 現在フェーズ（v1.67.0 — Formal Level 4 Entry Review Decision）
+## 現在フェーズ（v1.68.0 — Provider Entry Preparation Governance）
 
 | Layer | 状態 |
 |-------|------|
@@ -104,8 +106,9 @@ Architecture Documentation = **Architecture Governance** として、**37 必須
 | **Core Layer Design**（Provider / Runtime / Scheduler / Automation / Workflow / Event） | **Complete**（v1.54.0–v1.59.0 — Design Only） |
 | **Cross Layer Design**（Interaction Model + Lifecycle + Context + State + Error + Metadata） | **Complete**（v1.60.0–v1.65.0 — Design Only） |
 | **Architecture Governance Stabilization** | **Complete**（v1.66.0） |
-| **Formal Level 4 Entry Review** | **Complete**（v1.67.0 — **Conditionally Ready**） |
-| **First Target Domain** | **Provider Layer Entry Preparation** — Production Implementation **禁止** |
+| **Formal Level 4 Entry Review** | **Complete**（v1.67.0 — Conditionally Ready） |
+| **Provider Entry Preparation** | **Governance Complete**（v1.68.0 — ADR-0010 / ADR-0011） |
+| **Provider Production Implementation** | **Not Yet Authorized** — G-25 Not Satisfied（Reason: Pending separate Provider Non-Goals Release Decision） |
 | Level 4 Implementation Ready | **未到達** |
 | Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 

@@ -1170,6 +1170,23 @@ Latest Current Step
 release-plan
 ```
 
+### Provider Entry Preparation Governance（v1.68.0）
+
+**Provider Entry Preparation Governance** を実施しました。Provider Layer を First Target Domain として Entry Preparation に必要な Governance Evidence を固定（**38 必須 Governance 文書** — Production Implementation **Not Yet Authorized**）。
+
+**Current Version: v1.68.0** | **Quality Pipeline: 774 PASS**
+
+Provider Entry Preparation: **Governance Complete** — Provider Level 4 Implementation Ready **未宣言**。G-25 Non-Goals Release **Not Satisfied**（Reason: Pending separate Provider Non-Goals Release Decision）。G-26 Catalog scope **Satisfied**（[ADR-0011](docs/adr/ADR-0011-public-contract-catalog-future-layer-scope.md)）。
+
+| 項目 | 内容 |
+|------|------|
+| 入口 | [docs/architecture/README.md](docs/architecture/README.md) |
+| Provider Entry Review | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](docs/architecture/PROVIDER_ENTRY_PREPARATION_REVIEW.md) |
+| Provider Entry ADR | [ADR-0010](docs/adr/ADR-0010-provider-layer-entry-preparation.md) |
+| Catalog Scope ADR | [ADR-0011](docs/adr/ADR-0011-public-contract-catalog-future-layer-scope.md) |
+| Current Maturity | **Level 3.9** — Provider Entry Preparation Governance Complete |
+| Next Phase | **Provider Non-Goals Release / Contract Definition Phase** |
+
 ### Formal Level 4 Entry Review Decision（v1.67.0）
 
 **Formal Level 4 Entry Review Decision** を実施しました。Governance Evidence として **Conditionally Ready** を記録（**37 必須 Governance 文書** — Production Implementation 禁止）。

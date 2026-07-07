@@ -4,6 +4,34 @@
 
 ---
 
+## v1.68.0 — Provider Entry Preparation Governance
+
+Provider Entry Preparation Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。
+
+Provider Layer Entry Preparation に必要な Governance Decision / Review / Evidence を追加。ADR-0010（Provider boundaries）/ ADR-0011（Catalog scope）/ PROVIDER_ENTRY_PREPARATION_REVIEW。**Provider Production Implementation Not Yet Authorized**。G-25 Not Satisfied（Reason: Pending separate Provider Non-Goals Release Decision）。G-26 Satisfied。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Provider Entry Review | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](architecture/PROVIDER_ENTRY_PREPARATION_REVIEW.md) |
+| Provider Entry ADR | [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md) |
+| Catalog Scope ADR | [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md) |
+| Provider Entry Preparation | **Governance Complete** |
+| Provider Production Implementation | **Not Yet Authorized** |
+| G-25 Non-Goals Release | **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision |
+| Current Maturity | **Level 3.9** |
+| Test 759–774 | Provider Entry Preparation governance |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **774 PASS**（Test 759–774 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.67.0 — Formal Level 4 Entry Review Decision
 
 Formal Level 4 Entry Review Decision — Design / Documentation / Governance Only — Production code unchanged。
