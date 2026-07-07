@@ -4,6 +4,32 @@
 
 ---
 
+## v1.69.0 — Provider Contract Definition Governance
+
+Provider Contract Definition Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。
+
+PROVIDER_LAYER_DESIGN.md を Contract Authority として維持し、ADR-0012 `providerContracts[]` additive extension strategy を確定。P4 Satisfied / G-24 Satisfied。**Provider Production Implementation Not Yet Authorized**。G-25 Not Satisfied。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Contract Definition Review | [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md) |
+| Catalog Extension ADR | [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md) |
+| P4 / G-24 | **Satisfied** |
+| G-25 / G-26 | Not Satisfied / Satisfied |
+| Current Maturity | **Level 3.10** |
+| Test 775–793 | Provider Contract Definition governance |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **793 PASS**（Test 775–793 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.68.0 — Provider Entry Preparation Governance
 
 Provider Entry Preparation Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。

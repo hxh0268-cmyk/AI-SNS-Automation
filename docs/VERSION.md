@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.68.0**（Provider Entry Preparation Governance）
+**v1.69.0**（Provider Contract Definition Governance）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Entry Preparation Governance Complete / Provider Non-Goals Release（next）
+**Phase:** Provider Contract Definition Governance Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -16,13 +16,15 @@
 
 **Provider Entry Preparation:** **Governance Complete**（v1.68.0 — [PROVIDER_ENTRY_PREPARATION_REVIEW.md](architecture/PROVIDER_ENTRY_PREPARATION_REVIEW.md)）
 
+**Provider Contract Definition:** **Governance Complete**（v1.69.0 — [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md)）
+
 **Provider Production Implementation:** **Not Yet Authorized**
 
 **Level 4 Implementation Ready:** **Not Yet**
 
-**Next Phase:** Provider Non-Goals Release / Contract Definition Phase
+**Next Phase Candidate:** Provider Non-Goals Release Review
 
-**Next Candidate:** v1.69.0（Provider Non-Goals Release 後に候補決定）
+**Next Candidate:** v1.70.0（Human Review / Release Decision 後の候補）
 
 ---
 
@@ -30,6 +32,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.69.0** | **ドキュメント** | **✅ 完了** | **Provider Contract Definition Governance — ADR-0012 / providerContracts[] strategy / P4+G-24 Satisfied** |
 | **v1.68.0** | **ドキュメント** | **✅ 完了** | **Provider Entry Preparation Governance — ADR-0010 / ADR-0011 / PROVIDER_ENTRY_PREPARATION_REVIEW** |
 | **v1.67.0** | **ドキュメント** | **✅ 完了** | **Formal Level 4 Entry Review Decision — Conditionally Ready / Domain-based Incremental Entry / ADR-0009** |
 | **v1.66.0** | **ドキュメント** | **✅ 完了** | **Architecture Governance Stabilization / Level 4 Entry Preparation — Entry Gate / Compliance / Risk / Review governance synchronized** |
@@ -106,6 +109,46 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.69.0 で追加（Provider Contract Definition Governance）
+
+#### Provider Contract Definition 正式記録
+
+- **`PROVIDER_CONTRACT_DEFINITION_REVIEW.md`** … Contract Definition governance evidence（not SSOT）
+- **`ADR-0012-provider-contract-catalog-extension-strategy.md`** … `providerContracts[]` additive extension strategy
+- **Contract Authority** … [PROVIDER_LAYER_DESIGN.md](architecture/PROVIDER_LAYER_DESIGN.md) maintained
+- **P4** … **Satisfied** / **G-24** … **Satisfied**
+- **G-25** … **Not Satisfied** / **G-26** … **Satisfied**
+- **Provider Production Implementation** … **Not Yet Authorized**
+- **Catalog generator / reports / production code** … No changes
+
+### 品質状況（v1.69.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **793 PASS** |
+| Architecture Documents | **39** 必須文書 |
+| Production code | **unchanged** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.10** — Provider Contract Definition Governance Complete |
+| Provider Production Implementation | **Not Yet Authorized** |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 775–793 | Provider Contract Definition governance |
+
+### v1.69.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0012 accepted | ✅ |
+| PROVIDER_LAYER_DESIGN authority maintained | ✅ |
+| P4 Satisfied / G-24 Satisfied | ✅ |
+| G-25 Not Satisfied maintained | ✅ |
+| Provider Production Implementation Not Yet Authorized | ✅ |
+| Catalog unchanged | ✅ |
+| Test 775–793 | ✅ |
 
 ---
 

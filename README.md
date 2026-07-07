@@ -1170,6 +1170,22 @@ Latest Current Step
 release-plan
 ```
 
+### Provider Contract Definition Governance（v1.69.0）
+
+**Provider Contract Definition Governance** を実施しました。[PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) を Contract Authority として維持し、`providerContracts[]` additive extension strategy を確定（**39 必須 Governance 文書** — Catalog / Production code **unchanged**）。
+
+**Current Version: v1.69.0** | **Quality Pipeline: 793 PASS**
+
+Provider Contract Definition: **Governance Complete** — P4 **Satisfied** / G-24 **Satisfied** / G-25 **Not Satisfied** / G-26 **Satisfied**。Provider Production Implementation **Not Yet Authorized**。Provider Level 4 Implementation Ready **未宣言**。
+
+| 項目 | 内容 |
+|------|------|
+| Contract Authority | [PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) |
+| Contract Definition Review | [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md) |
+| Catalog Extension ADR | [ADR-0012](docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md) |
+| Current Maturity | **Level 3.10** — Provider Contract Definition Governance Complete |
+| Next Phase Candidate | **Provider Non-Goals Release Review** |
+
 ### Provider Entry Preparation Governance（v1.68.0）
 
 **Provider Entry Preparation Governance** を実施しました。Provider Layer を First Target Domain として Entry Preparation に必要な Governance Evidence を固定（**38 必須 Governance 文書** — Production Implementation **Not Yet Authorized**）。

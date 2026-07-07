@@ -155,6 +155,29 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 | **Consequences** | Provider Entry Preparation Governance Complete; G-26 Satisfied; G-25 Not Satisfied（Reason: Pending separate Provider Non-Goals Release Decision） |
 | **Review Trigger** | Non-Goals Release ADR / Contract Definition Phase |
 
-Full record: [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) + [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md) + [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md)
+- [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md) — Provider Contract Catalog Extension Strategy（v1.69.0）
+
+### Decision Chain（Provider Domain — v1.68.0–v1.69.0）
+
+```text
+ADR-0010 Provider Entry Preparation
+  → ADR-0011 Catalog scope（Application-only authority）
+    → ADR-0012 providerContracts[] additive extension strategy
+      → PROVIDER_CONTRACT_DEFINITION_REVIEW（evidence — not SSOT）
+        → Future: Governance-approved Catalog extension Release
+```
+
+### v1.69.0 Provider Contract Definition Governance
+
+| 項目 | 内容 |
+|------|------|
+| **Status** | Accepted（v1.69.0） |
+| **Context** | v1.68.0 Provider Entry Preparation Complete; P4 Partially Satisfied; catalog unchanged |
+| **Decision** | `providerContracts[]` additive strategy; PROVIDER_LAYER_DESIGN authority maintained; catalog unchanged |
+| **Alternatives** | Provider in publicContracts[] / catalog change now — rejected |
+| **Consequences** | P4 Satisfied; G-24 Satisfied; G-25 Not Satisfied; Provider Production Not Yet Authorized |
+| **Review Trigger** | Catalog extension Release / Provider Non-Goals Release ADR |
+
+Full record: [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md) + [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.68.0 --"
+echo "-- Test 98: VERSION updated to v1.69.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.68.0**（Provider Entry Preparation Governance）")) {
-  throw new Error("docs/VERSION.md current version must be v1.68.0");
+if (!versionDoc.includes("**v1.69.0**（Provider Contract Definition Governance）")) {
+  throw new Error("docs/VERSION.md current version must be v1.69.0");
 }
-console.log("VERSION v1.68.0 ok");
+console.log("VERSION v1.69.0 ok");
 EOF
-pass "VERSION updated to v1.68.0"
+pass "VERSION updated to v1.69.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.69.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.69.0");
+if (payload.nextVersion !== "v1.70.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.70.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.69.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.69.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.70.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.70.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.69.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.70.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13937,7 +13937,8 @@ for file in \
   INTERACTION_ERROR_MODEL.md \
   INTERACTION_METADATA_MODEL.md \
   LEVEL_4_ENTRY_REVIEW.md \
-  PROVIDER_ENTRY_PREPARATION_REVIEW.md
+  PROVIDER_ENTRY_PREPARATION_REVIEW.md \
+  PROVIDER_CONTRACT_DEFINITION_REVIEW.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13989,6 +13990,7 @@ const requiredHeadings = [
   ["INTERACTION_METADATA_MODEL.md", ["# Interaction Metadata Model Design", "## 1. Title", "## 2. Status", "## 3. Purpose", "## 4. Scope", "## 5. Non-Goals", "## 6. Design Principles", "## 7. Architecture Authority", "## 8. Existing Model Relationships", "## 9. Metadata Definition", "## 10. Metadata Characteristics", "## 11. Supplemental Information Principle", "## 12. Non-Authoritative Principle", "## 13. Metadata vs Layer Interaction", "## 14. Metadata vs Lifecycle", "## 15. Metadata vs Context", "## 16. Metadata vs State", "## 17. Metadata vs Error", "## 18. Metadata vs Business Payload", "## 19. Metadata Information Model", "## 20. Minimal Metadata Information Contract", "## 21. Required Fields", "## 22. Excluded Fields", "## 23. Metadata Identity", "## 24. Interaction Correlation", "## 25. Metadata Namespace", "## 26. Reserved Namespaces", "## 27. Extension Namespace", "## 28. Namespace Ownership", "## 29. Namespace Collision Rules", "## 30. Namespace Semantic Stability", "## 31. Metadata Type", "## 32. Metadata Source Layer", "## 33. Metadata Value Representation", "## 34. Metadata Ownership", "## 35. Metadata Read Rules", "## 36. Metadata Write Rules", "## 37. Metadata Propagation Rules", "## 38. Metadata Immutability", "## 39. Metadata Replacement", "## 40. Metadata Supersession", "## 41. Metadata Correlation", "## 42. Metadata Boundary Crossing", "## 43. Metadata Sensitivity", "## 44. Secret Boundary", "## 45. Credential and Token Boundary", "## 46. PII Boundary", "## 47. Metadata Size Boundary", "## 48. Nested Metadata Boundary", "## 49. Serialization Boundary", "## 50. Layer-Specific Metadata Access", "## 51. Event Metadata Boundary", "## 52. Automation Metadata Boundary", "## 53. Workflow Metadata Boundary", "## 54. Scheduler Metadata Boundary", "## 55. Runtime Metadata Boundary", "## 56. Provider Metadata Boundary", "## 57. Compatibility Rules", "## 58. Cross-Model Version Compatibility", "## 59. Extension Governance", "## 60. Governance Integration", "## 61. Future Entry Criteria Integration", "## 62. Observability Boundary", "## 63. Testing Strategy", "## 64. Anti-Patterns", "## 65. Completion Criteria", "## 66. Level 4 Readiness Boundary"]],
   ["LEVEL_4_ENTRY_REVIEW.md", ["# Level 4 Entry Review", "## Purpose", "## Review Scope", "## Reviewed Baseline", "## Review Authority", "## Evidence Sources", "## Review Method", "## Repository Verification Result", "## Architecture Compliance Assessment", "## G-01〜G-27 Formal Evaluation Matrix", "## Critical Blocker Assessment", "## Major Gap Assessment", "## Post-Remediation Assessment", "## Deferred Items Assessment", "## Retry / Recovery Governance Assessment", "## Idempotency / Duplicate Interaction Governance Assessment", "## Public Contract Catalog Assessment", "## Implementation Prerequisites", "## Level 4 Entry Strategy", "## First Target Domain Decision", "## Conditions for Level 4 Implementation Ready", "## Formal Decision", "## Prohibited Actions", "## Completion Criteria", "## Related Documents"]],
   ["PROVIDER_ENTRY_PREPARATION_REVIEW.md", ["# Provider Entry Preparation Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.67.0", "## Architecture Authority Review", "## Universal Entry Criteria U1〜U8 Review", "## Provider Entry Criteria P1〜P6 Review", "## Public Contract Review", "## Compatibility Review", "## Risk Review", "## Compliance Review", "## Non-Goals Release Criteria Review", "## Public Contract Catalog Scope Decision", "## Deferred Operational Semantics Impact", "## Production Boundary Confirmation", "## Gate Status Update", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
+  ["PROVIDER_CONTRACT_DEFINITION_REVIEW.md", ["# Provider Contract Definition Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.68.0", "## Architecture Authority Review", "## Existing Provider Contract Model Review", "## Provider Contract Identity Review", "## Provider Input Contract Boundary Review", "## Provider Output Contract Shape Review", "## Provider Error Contract Boundary Review", "## Provider Capability Declaration Review", "## Provider Configuration Boundary Review", "## Credential Exclusion Review", "## Raw Provider Response Exclusion Review", "## Adapter Normalization Boundary Review", "## Application Public Contract Input Relationship Review", "## Cross Layer Authority Relationship Review", "## Provider-local vs Cross-layer Retry Boundary Review", "## Deferred Operational Semantics Review", "## Public Contract Catalog Additive Extension Strategy Review", "## Compatibility Review", "## Risk Review", "## Compliance Review", "## P1–P6 Re-evaluation", "## P4 Evidence", "## G-24 Re-evaluation", "## G-25 Status Confirmation", "## G-26 Status Confirmation", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -14016,7 +14018,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14370,20 +14372,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.9 --"
-grep -q "Level 3.9" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Provider Entry Preparation Governance Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "current maturity is level 3.9"
+echo "-- Test 442: current maturity is level 3.10 --"
+grep -q "Level 3.10" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Contract Definition Governance Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "current maturity is level 3.10"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.9" README.md
-grep -q "Provider Entry Preparation" README.md
+grep -q "Level 3.10" README.md
+grep -q "Provider Contract Definition" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.9" docs/architecture/README.md
+grep -q "Level 3.10" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: maturity model states implementation ready is not reached --"
@@ -14418,7 +14420,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14484,7 +14486,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14549,7 +14551,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15076,7 +15078,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15187,7 +15189,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15295,7 +15297,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "38 必須 Governance 文書" docs/architecture/README.md
+grep -q "39 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -15981,13 +15983,13 @@ grep -q "### v1.65.0 で追加（Interaction Metadata Model Design）" docs/VERS
 grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
-echo "-- Test 721: architecture maturity model declares provider entry preparation --"
-grep -q "Provider Entry Preparation" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.9" docs/architecture/README.md
-grep -q "Level 3.9" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "architecture maturity model declares provider entry preparation"
+echo "-- Test 721: architecture maturity model declares provider contract definition --"
+grep -q "Provider Contract Definition" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.10" docs/architecture/README.md
+grep -q "Level 3.10" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "architecture maturity model declares provider contract definition"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.9 — Provider Entry Preparation Governance Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.10 — Provider Contract Definition Governance Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Not Yet Authorized" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16094,11 +16096,11 @@ grep -q "Application Layer Public Contracts only" docs/architecture/FUTURE_ENTRY
 grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
-echo "-- Test 741: architecture readme declares provider entry preparation governance --"
-grep -q "Level 3.9 — Provider Entry Preparation Governance Complete" docs/architecture/README.md
-grep -q "Provider Entry Preparation" docs/architecture/README.md
+echo "-- Test 741: architecture readme declares provider contract definition governance --"
+grep -q "Level 3.10 — Provider Contract Definition Governance Complete" docs/architecture/README.md
+grep -q "Provider Contract Definition" docs/architecture/README.md
 grep -q "Not Yet Authorized" docs/architecture/README.md
-pass "architecture readme declares provider entry preparation governance"
+pass "architecture readme declares provider contract definition governance"
 
 echo "-- Test 742: readme changelog version reference v1.67.0 history --"
 grep -q "Formal Level 4 Entry Review Decision（v1.67.0）" README.md
@@ -16249,22 +16251,22 @@ grep -q "public_contract_catalog.js" docs/adr/ADR-0011-public-contract-catalog-f
 pass "adr 0011 catalog unchanged no future layer registration"
 
 echo "-- Test 766: future entry criteria g26 catalog scope satisfied --"
-grep -q "G-26" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| G-26 \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| G-26 Catalog scope decision \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "ADR-0011" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Satisfied" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria g26 catalog scope satisfied"
 
 echo "-- Test 767: future entry criteria g25 non goals release not satisfied --"
-grep -q "G-25" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Not Satisfied" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| G-25 \|.*\*\*Not Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| G-25 Non-Goals Release \|.*\*\*Not Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Pending separate Provider Non-Goals Release Decision" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria g25 non goals release not satisfied"
 
-echo "-- Test 768: future entry criteria g24 provider partially satisfied --"
-grep -q "G-24" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Partially Satisfied" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "PROVIDER_ENTRY_PREPARATION_REVIEW.md" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "future entry criteria g24 provider partially satisfied"
+echo "-- Test 768: future entry criteria g24 provider satisfied --"
+grep -E '\| G-24 \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| G-24 Provider Entry Criteria \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "PROVIDER_CONTRACT_DEFINITION_REVIEW.md" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria g24 provider satisfied"
 
 echo "-- Test 769: provider entry preparation governance complete decision --"
 grep -q "Governance Complete" docs/architecture/PROVIDER_ENTRY_PREPARATION_REVIEW.md
@@ -16294,13 +16296,139 @@ test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js reports/pu
 test -z "$(git diff --cached --name-only -- src/lib/public_contract_catalog.js reports/public-contract-catalog/ 2>/dev/null || true)"
 pass "public contract catalog generator and reports unchanged"
 
-echo "-- Test 774: v1.68.0 provider entry preparation documented --"
-grep -Fq "**v1.68.0**（Provider Entry Preparation Governance）" docs/VERSION.md
+echo "-- Test 774: readme changelog version reference v1.68.0 history --"
+grep -q "Provider Entry Preparation Governance（v1.68.0）" README.md
+grep -q "## v1.68.0" docs/CHANGELOG.md
+grep -q "### v1.68.0 で追加（Provider Entry Preparation Governance）" docs/VERSION.md
 grep -Fq "**774 PASS**" docs/VERSION.md
 grep -q "Test 759–774" docs/VERSION.md
-grep -q "ADR-0010" docs/CHANGELOG.md
+pass "readme changelog version reference v1.68.0 history"
+
+echo "-- Test 775: adr 0012 provider contract catalog extension strategy exists --"
+test -f docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "# ADR-0012: Provider Contract Catalog Extension Strategy" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "ADR-0011" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+pass "adr 0012 provider contract catalog extension strategy exists"
+
+echo "-- Test 776: provider contract definition review document exists --"
+test -f docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "# Provider Contract Definition Review" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "## Final Decision" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "PROVIDER_LAYER_DESIGN.md" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+pass "provider contract definition review document exists"
+
+echo "-- Test 777: adr 0012 required catalog extension decisions --"
+grep -q "providerContracts\[\]" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "publicContracts\[\]" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "compatibilityMatrix" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "No change in v1.69.0" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "No duplicate SSOT" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+pass "adr 0012 required catalog extension decisions"
+
+echo "-- Test 778: providerContracts additive extension strategy documented --"
+grep -q "additive extension model" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "providerContracts\[\]" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "providerContracts\[\]" docs/architecture/ARCHITECTURE_DECISIONS.md
+pass "providerContracts additive extension strategy documented"
+
+echo "-- Test 779: publicContracts semantics unchanged --"
+grep -q "Unchanged" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "MUST NOT" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "publicContracts\[\]" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+pass "publicContracts semantics unchanged"
+
+echo "-- Test 780: compatibilityMatrix semantics unchanged --"
+grep -q "compatibilityMatrix" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "compatibilityMatrix" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "UNCHANGED semantics" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+pass "compatibilityMatrix semantics unchanged"
+
+echo "-- Test 781: catalog generator unchanged for v1.69.0 --"
+grep -q "public_contract_catalog.js" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "No change in v1.69.0" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js 2>/dev/null || true)"
+pass "catalog generator unchanged for v1.69.0"
+
+echo "-- Test 782: catalog json and markdown reports unchanged --"
+grep -q "Catalog JSON / Markdown reports" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+test -z "$(git diff --name-only -- reports/public-contract-catalog/ 2>/dev/null || true)"
+pass "catalog json and markdown reports unchanged"
+
+echo "-- Test 783: p4 satisfied evidence documented --"
+grep -E '\| P4 \| \*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| P4 Provider Catalog registration plan \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| \*\*P4\*\* \| \*\*Satisfied\*\*' docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "ADR-0012" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "p4 satisfied evidence documented"
+
+echo "-- Test 784: g24 satisfied documented --"
+grep -E '\| G-24 \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| \*\*G-24\*\* \| \*\*Satisfied\*\*' docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "G-24 Re-evaluation" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+pass "g24 satisfied documented"
+
+echo "-- Test 785: g25 not satisfied maintained --"
+grep -E '\| G-25 \|.*\*\*Not Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| \*\*G-25\*\* \| \*\*Not Satisfied\*\*' docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "Pending separate Provider Non-Goals Release Decision" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "g25 not satisfied maintained"
+
+echo "-- Test 786: g26 satisfied maintained --"
+grep -E '\| G-26 \|.*\*\*Satisfied\*\*' docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -E '\| \*\*G-26\*\* \| \*\*Satisfied\*\*' docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "ADR-0011" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+pass "g26 satisfied maintained"
+
+echo "-- Test 787: provider production implementation not yet authorized --"
+grep -q "Not Yet Authorized" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "Not Yet Authorized" docs/VERSION.md
+grep -q "Not Yet Authorized" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "provider production implementation not yet authorized"
+
+echo "-- Test 788: provider level 4 implementation ready not declared --"
+grep -q "Not Declared" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "未到達" docs/VERSION.md
+grep -q "Not Yet" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+pass "provider level 4 implementation ready not declared"
+
+echo "-- Test 789: cl 004 cl 005 cl 006 deferred unchanged --"
+grep -q "CL-004" docs/architecture/RISK_REGISTER.md
+grep -q "CL-005" docs/architecture/RISK_REGISTER.md
+grep -q "CL-006" docs/architecture/RISK_REGISTER.md
+grep -q "deferred" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "Unchanged" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "Provider-local vs Cross-layer Retry Boundary Review" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "retry execution semantics" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "Cross-layer retry coordination" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+pass "cl 004 cl 005 cl 006 deferred unchanged"
+
+echo "-- Test 790: provider raw response leakage prohibited --"
+grep -q "raw" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "MUST NOT" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "Raw Provider Response Exclusion Review" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+pass "provider raw response leakage prohibited"
+
+echo "-- Test 791: credentials secrets tokens excluded from provider contract --"
+grep -q "Credential exclusion" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "Credential Exclusion Review" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "token" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+pass "credentials secrets tokens excluded from provider contract"
+
+echo "-- Test 792: no duplicate provider contract ssot --"
+grep -q "No duplicate SSOT" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "No duplicate Contract SSOT" docs/architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md
+grep -q "PROVIDER_LAYER_DESIGN.md" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
+grep -q "Provider Contract Definition Governance Compliance" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+pass "no duplicate provider contract ssot"
+
+echo "-- Test 793: v1.69.0 provider contract definition governance documented --"
+grep -Fq "**v1.69.0**（Provider Contract Definition Governance）" docs/VERSION.md
+grep -Fq "**793 PASS**" docs/VERSION.md
+grep -q "Test 775–793" docs/VERSION.md
+grep -q "ADR-0012" docs/CHANGELOG.md
+grep -q "Provider Contract Definition Governance" docs/CHANGELOG.md
 grep -q "Production code unchanged" docs/CHANGELOG.md || grep -q "Catalog unchanged" docs/CHANGELOG.md
-pass "v1.68.0 provider entry preparation documented"
+pass "v1.69.0 provider contract definition governance documented"
 
 
 echo ""

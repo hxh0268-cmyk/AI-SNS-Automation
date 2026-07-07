@@ -19,20 +19,22 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.9 — Provider Entry Preparation Governance Complete
+Current Maturity: Level 3.10 — Provider Contract Definition Governance Complete
 ```
 
-| 項目 | 状態（v1.68.0） |
+| 項目 | 状態（v1.69.0） |
 |------|-----------------|
 | Level 1 Foundation | **Completed** |
 | Level 2 Governance | **Completed** |
 | Level 3 Future Design | **Completed**（Core Layer + Cross Layer Design Complete — v1.59.0 / v1.65.0） |
 | Level 3.7 Governance Stabilization | **Completed**（v1.66.0） |
 | Level 3.8 Formal Level 4 Entry Review | **Completed**（v1.67.0 — Conditionally Ready） |
-| Level 3.9 Provider Entry Preparation | **Completed**（v1.68.0 — Governance only） |
+| Level 3.9 Provider Entry Preparation | **Completed**（v1.68.0） |
+| Level 3.10 Provider Contract Definition | **Completed**（v1.69.0 — Governance only） |
 | Final Architecture Review | **Completed**（Decision B remediation — v1.66.0） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | Provider Entry Preparation | **Governance Complete**（[PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md)） |
+| Provider Contract Definition Governance | **Complete**（[PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md)） |
 | Provider Production Implementation | **Not Yet Authorized** |
 | Level 4 Implementation Ready | **未到達** |
 | Level 5 Production Ready | **未到達** |
@@ -119,18 +121,20 @@ Future 実装着手 =
 | P5 | Rate limit / auth / retry は Provider/Adapter 内 — Foundation 非公開 |
 | P6 | Provider 追加 ADR（最低 1 件）+ Risk Register 更新 |
 
-**v1.68.0 Provider Entry Preparation Evidence:** [ADR-0010](../adr/ADR-0010-provider-layer-entry-preparation.md) + [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md)
+**v1.69.0 Provider Contract Definition Evidence:** [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md) + [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md) + [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md)
 
-| # | Status（v1.68.0） | Evidence |
+| # | Status（v1.69.0） | Evidence |
 |---|-------------------|----------|
 | P1 | **Satisfied** | PROVIDER_LAYER_DESIGN + ADR-0010 |
 | P2 | **Satisfied** | ADR-0010 Mock default / feature flag policy |
 | P3 | **Satisfied** | ADR-0010 input + Adapter boundary |
-| P4 | **Partially Satisfied** | ADR-0011 plan — catalog unchanged |
-| P5 | **Satisfied** | ADR-0010 Adapter boundary |
-| P6 | **Satisfied** | ADR-0010 + PR-001–PR-005 |
+| P4 | **Satisfied** | ADR-0011 + ADR-0012 `providerContracts[]` strategy |
+| P5 | **Satisfied** | ADR-0010 / ADR-0012 Provider-local retry boundary |
+| P6 | **Satisfied** | ADR-0010 + ADR-0012 + PR-001–PR-005 |
 
-**Aggregate（G-24）:** **Partially Satisfied** — P4 partial. **Not Production Implementation PASS.**
+**Aggregate（G-24）:** **Satisfied** — P1–P6 all Satisfied. **Not Production Implementation PASS** — G-25 Not Satisfied.
+
+**v1.68.0（historical）:** P4 Partially Satisfied — superseded by v1.69.0 Contract Definition Governance.
 
 **v1.50.0:** 文書化のみ — **実装禁止**
 
@@ -440,7 +444,7 @@ v2 Entry Criteria の **詳細 Epic 分解** は Future 実装開始後の ADR �
 | G-21 | Implementation sequencing derivable | Layer Interaction + Entry Criteria + ADR-0009 | Sequencing evidence | **Satisfied** |
 | G-22 | **Level 4 Entry Decision recorded** | [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) | Formal Decision: Conditionally Ready | **Satisfied** |
 | G-23 | Universal Entry Criteria all PASS | §Universal Entry Criteria | Per-criterion evidence | **Not Satisfied** |
-| G-24 | Domain Entry Criteria PASS (target domain) | Provider/Runtime/… sections | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) | **Partially Satisfied** |
+| G-24 | Domain Entry Criteria PASS (target domain) | Provider/Runtime/… sections | [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md) | **Satisfied** |
 | G-25 | Non-Goals Release Criteria (target domain) | §Non Goals Release Criteria | Domain-specific ADR | **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision |
 | G-26 | Public Contract Catalog scope decision | [ADR-0011](../adr/ADR-0011-public-contract-catalog-future-layer-scope.md) | Scope ADR accepted | **Satisfied** |
 | G-27 | VERSION / CHANGELOG / ADR alignment | VERSIONING_POLICY | Release docs consistent | **Satisfied** |
@@ -453,16 +457,19 @@ Level 3 → Level 4 Gate PASS =
   AND Level 4 Entry Decision = Proceed (human governance artifact)
 ```
 
-| 状態（v1.68.0） | 結果 |
+| 状態（v1.69.0） | 結果 |
 |-----------------|------|
 | Gate definition | ✅ Complete |
 | Level 4 Entry Decision（G-22） | ✅ Conditionally Ready |
 | Provider Entry Preparation（Governance） | ✅ **Complete**（v1.68.0） |
-| Provider Production Implementation | ❌ **Not Yet Authorized** |
+| Provider Contract Definition Governance | ✅ **Complete**（v1.69.0） |
+| P4 Provider Catalog registration plan | ✅ **Satisfied**（ADR-0012 strategy） |
+| G-24 Provider Entry Criteria | ✅ **Satisfied** |
 | G-25 Non-Goals Release | ❌ **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision |
-| G-26 Catalog scope decision | ✅ **Satisfied**（ADR-0011） |
+| G-26 Catalog scope decision | ✅ **Satisfied**（ADR-0011 + ADR-0012） |
+| Provider Production Implementation | ❌ **Not Yet Authorized** |
 | Level 4 Implementation Ready | **未到達** |
-| First Target Domain | **Provider Layer** — Entry Preparation complete; Implementation next gate |
+| First Target Domain | **Provider Layer** — Entry Preparation + Contract Definition complete; Implementation next gate |
 
 Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
 
@@ -545,6 +552,7 @@ Future Entry Criteria 文書の完成条件（v1.50.0 baseline + v1.66.0 stabili
 - [x] Current Maturity aligned with ARCHITECTURE_MATURITY_MODEL — **v1.66.0**
 - [x] Level 4 Entry Decision recorded — **v1.67.0**
 - [x] Provider Entry Preparation governance — **v1.68.0**（ADR-0010 / ADR-0011 / PROVIDER_ENTRY_PREPARATION_REVIEW）
+- [x] Provider Contract Definition Governance — **v1.69.0**（ADR-0012 + PROVIDER_CONTRACT_DEFINITION_REVIEW）
 - [x] Level 4 Implementation Ready **未到達** 明記
 - [x] Quality Governance / Maturity Model との整合
 

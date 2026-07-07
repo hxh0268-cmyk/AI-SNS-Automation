@@ -252,6 +252,30 @@ Per [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.m
 
 ---
 
+## Provider Contract Definition Governance Compliance
+
+Per [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md) + [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md):
+
+- [ ] PROVIDER_LAYER_DESIGN.md authority maintained — no duplicate Provider Contract SSOT
+- [ ] ADR-0012 accepted
+- [ ] `providerContracts[]` additive extension strategy documented
+- [ ] `publicContracts[]` semantics unchanged
+- [ ] `compatibilityMatrix` semantics unchanged
+- [ ] Catalog generator / reports unchanged
+- [ ] P4 Satisfied
+- [ ] G-24 Satisfied
+- [ ] G-25 Not Satisfied — Reason: Pending separate Provider Non-Goals Release Decision
+- [ ] G-26 Satisfied
+- [ ] Provider Production Implementation **Not Yet Authorized**
+- [ ] Provider Level 4 Implementation Ready **Not Declared**
+- [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
+- [ ] Provider raw response leakage prohibited
+- [ ] Credential / secret / token excluded from Provider Contract
+- [ ] Cross-layer retry ownership ambiguity not prematurely resolved
+- [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+
+---
+
 ## Usage Notes
 
 | タイミング | 使用する節 |
