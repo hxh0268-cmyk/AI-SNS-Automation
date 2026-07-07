@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.66.0 --"
+echo "-- Test 98: VERSION updated to v1.67.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.66.0**（Architecture Governance Stabilization / Level 4 Entry Preparation）")) {
-  throw new Error("docs/VERSION.md current version must be v1.66.0");
+if (!versionDoc.includes("**v1.67.0**（Formal Level 4 Entry Review Decision）")) {
+  throw new Error("docs/VERSION.md current version must be v1.67.0");
 }
-console.log("VERSION v1.66.0 ok");
+console.log("VERSION v1.67.0 ok");
 EOF
-pass "VERSION updated to v1.66.0"
+pass "VERSION updated to v1.67.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.67.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.67.0");
+if (payload.nextVersion !== "v1.68.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.68.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.67.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.67.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.68.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.68.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.67.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.68.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13935,7 +13935,8 @@ for file in \
   INTERACTION_CONTEXT_DESIGN.md \
   INTERACTION_STATE_MODEL.md \
   INTERACTION_ERROR_MODEL.md \
-  INTERACTION_METADATA_MODEL.md
+  INTERACTION_METADATA_MODEL.md \
+  LEVEL_4_ENTRY_REVIEW.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13985,6 +13986,7 @@ const requiredHeadings = [
   ["INTERACTION_STATE_MODEL.md", ["# Interaction State Model Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Architecture Position", "## 6. Relationship to Layer Interaction Model", "## 7. Relationship to Interaction Lifecycle", "## 8. Relationship to Interaction Context", "## 9. State Model Principles", "## 10. Lifecycle Authority", "## 11. State Information Definition", "## 12. State Model vs Lifecycle", "## 13. State Model vs Context", "## 14. State Model vs Runtime Lifecycle", "## 15. State Model vs Error", "## 16. State Model vs Metadata", "## 17. Minimal State Information Contract", "## 18. Required State Information", "## 19. Optional State Information", "## 20. Forbidden State Information", "## 21. State Representation Rules", "## 22. State Identity Rules", "## 23. State Revision Rules", "## 24. State Ownership", "## 25. State Ownership vs Transition Ownership", "## 26. State Read Rules", "## 27. State Write Rules", "## 28. State Update Rules", "## 29. State Immutability Rules", "## 30. State Snapshot Principles", "## 31. State Transition Recording Boundary", "## 32. State History Boundary", "## 33. State Consistency Rules", "## 34. State Concurrency Boundary", "## 35. State Persistence Boundary", "## 36. State Recovery Boundary", "## 37. Layer-Specific State Access", "## 38. Event State Boundary", "## 39. Automation State Boundary", "## 40. Workflow State Boundary", "## 41. Scheduler State Boundary", "## 42. Runtime State Boundary", "## 43. Provider State Boundary", "## 44. Waiting and Approval State Rules", "## 45. Retry and Timeout State Boundary", "## 46. Cancellation State Boundary", "## 47. Completion and Failure State Rules", "## 48. Terminal State Rules", "## 49. Compatibility Rules", "## 50. Cross-Model Version Compatibility", "## 51. Governance Integration", "## 52. Future Entry Criteria Integration", "## 53. State Model Examples", "## 54. Anti-Patterns", "## 55. Testing Strategy", "## 56. Observability Boundary", "## 57. Completion Criteria"]],
   ["INTERACTION_ERROR_MODEL.md", ["# Interaction Error Model Design", "## 1. Purpose", "## 2. Scope", "## 3. Non-Goals", "## 4. Design Status", "## 5. Architecture Position", "## 6. Relationship to Layer Interaction Model", "## 7. Relationship to Interaction Lifecycle", "## 8. Relationship to Interaction Context", "## 9. Relationship to Interaction State Model", "## 10. Error Model Principles", "## 11. Error Information Definition", "## 12. Error Model vs Lifecycle", "## 13. Error Model vs State", "## 14. Error Model vs Context", "## 15. Error Model vs Metadata", "## 16. Error Model vs Runtime Exception", "## 17. Minimal Error Information Contract", "## 18. Required Error Information", "## 19. Optional Error Information", "## 20. Forbidden Error Information", "## 21. Error Classification Rules", "## 22. Error Severity Rules", "## 23. Error Source Rules", "## 24. Error Ownership", "## 25. Error Read Rules", "## 26. Error Write Rules", "## 27. Error Propagation Rules", "## 28. Error Immutability Rules", "## 29. Error Correlation Rules", "## 30. Error Boundary Crossing Rules", "## 31. Lifecycle Failure Boundary", "## 32. Rejection Boundary", "## 33. Abortion Boundary", "## 34. Expiration Boundary", "## 35. Timeout Error Boundary", "## 36. Cancellation Error Boundary", "## 37. Retry Error Boundary", "## 38. Recovery Error Boundary", "## 39. Layer-Specific Error Access", "## 40. Event Error Boundary", "## 41. Automation Error Boundary", "## 42. Workflow Error Boundary", "## 43. Scheduler Error Boundary", "## 44. Runtime Error Boundary", "## 45. Provider Error Boundary", "## 46. Error Consistency Rules", "## 47. Error Compatibility Rules", "## 48. Cross-Model Version Compatibility", "## 49. Governance Integration", "## 50. Future Entry Criteria Integration", "## 51. Error Model Examples", "## 52. Anti-Patterns", "## 53. Testing Strategy", "## 54. Observability Boundary", "## 55. Completion Criteria"]],
   ["INTERACTION_METADATA_MODEL.md", ["# Interaction Metadata Model Design", "## 1. Title", "## 2. Status", "## 3. Purpose", "## 4. Scope", "## 5. Non-Goals", "## 6. Design Principles", "## 7. Architecture Authority", "## 8. Existing Model Relationships", "## 9. Metadata Definition", "## 10. Metadata Characteristics", "## 11. Supplemental Information Principle", "## 12. Non-Authoritative Principle", "## 13. Metadata vs Layer Interaction", "## 14. Metadata vs Lifecycle", "## 15. Metadata vs Context", "## 16. Metadata vs State", "## 17. Metadata vs Error", "## 18. Metadata vs Business Payload", "## 19. Metadata Information Model", "## 20. Minimal Metadata Information Contract", "## 21. Required Fields", "## 22. Excluded Fields", "## 23. Metadata Identity", "## 24. Interaction Correlation", "## 25. Metadata Namespace", "## 26. Reserved Namespaces", "## 27. Extension Namespace", "## 28. Namespace Ownership", "## 29. Namespace Collision Rules", "## 30. Namespace Semantic Stability", "## 31. Metadata Type", "## 32. Metadata Source Layer", "## 33. Metadata Value Representation", "## 34. Metadata Ownership", "## 35. Metadata Read Rules", "## 36. Metadata Write Rules", "## 37. Metadata Propagation Rules", "## 38. Metadata Immutability", "## 39. Metadata Replacement", "## 40. Metadata Supersession", "## 41. Metadata Correlation", "## 42. Metadata Boundary Crossing", "## 43. Metadata Sensitivity", "## 44. Secret Boundary", "## 45. Credential and Token Boundary", "## 46. PII Boundary", "## 47. Metadata Size Boundary", "## 48. Nested Metadata Boundary", "## 49. Serialization Boundary", "## 50. Layer-Specific Metadata Access", "## 51. Event Metadata Boundary", "## 52. Automation Metadata Boundary", "## 53. Workflow Metadata Boundary", "## 54. Scheduler Metadata Boundary", "## 55. Runtime Metadata Boundary", "## 56. Provider Metadata Boundary", "## 57. Compatibility Rules", "## 58. Cross-Model Version Compatibility", "## 59. Extension Governance", "## 60. Governance Integration", "## 61. Future Entry Criteria Integration", "## 62. Observability Boundary", "## 63. Testing Strategy", "## 64. Anti-Patterns", "## 65. Completion Criteria", "## 66. Level 4 Readiness Boundary"]],
+  ["LEVEL_4_ENTRY_REVIEW.md", ["# Level 4 Entry Review", "## Purpose", "## Review Scope", "## Reviewed Baseline", "## Review Authority", "## Evidence Sources", "## Review Method", "## Repository Verification Result", "## Architecture Compliance Assessment", "## G-01〜G-27 Formal Evaluation Matrix", "## Critical Blocker Assessment", "## Major Gap Assessment", "## Post-Remediation Assessment", "## Deferred Items Assessment", "## Retry / Recovery Governance Assessment", "## Idempotency / Duplicate Interaction Governance Assessment", "## Public Contract Catalog Assessment", "## Implementation Prerequisites", "## Level 4 Entry Strategy", "## First Target Domain Decision", "## Conditions for Level 4 Implementation Ready", "## Formal Decision", "## Prohibited Actions", "## Completion Criteria", "## Related Documents"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -14012,7 +14014,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14025,6 +14027,7 @@ grep -q "SCHEDULER_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "INTERACTION_METADATA_MODEL.md" docs/architecture/README.md
 grep -q "INTERACTION_ERROR_MODEL.md" docs/architecture/README.md
+grep -q "LEVEL_4_ENTRY_REVIEW.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_COMPLIANCE_CHECKLIST.md" docs/architecture/README.md
 grep -q "v1.49.0 新規 15" docs/architecture/README.md
 node --input-type=module <<'EOF'
@@ -14067,6 +14070,7 @@ const requiredLinks = [
   "./INTERACTION_STATE_MODEL.md",
   "./INTERACTION_ERROR_MODEL.md",
   "./INTERACTION_METADATA_MODEL.md",
+  "./LEVEL_4_ENTRY_REVIEW.md",
 ];
 
 for (const link of requiredLinks) {
@@ -14075,7 +14079,7 @@ for (const link of requiredLinks) {
   }
 }
 
-console.log("architecture README links all 36 governance files ok");
+console.log("architecture README links all 37 governance files ok");
 EOF
 pass "architecture documentation treated as governance"
 
@@ -14299,10 +14303,10 @@ grep -q "QUALITY_GOVERNANCE.md" docs/VERSION.md
 grep -q "Quality Governance" docs/VERSION.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/VERSION.md
 grep -q "Level 2.5" docs/VERSION.md
-grep -Fq "**742 PASS**" docs/VERSION.md
-grep -q "Test 721–742" docs/VERSION.md
-grep -q "Level 3.7" docs/VERSION.md
-grep -q "INTERACTION_METADATA_MODEL.md" docs/VERSION.md
+grep -Fq "**758 PASS**" docs/VERSION.md
+grep -q "Test 743–758" docs/VERSION.md
+grep -q "Level 3.8" docs/VERSION.md
+grep -q "LEVEL_4_ENTRY_REVIEW.md" docs/VERSION.md
 pass "VERSION documents quality governance improvement"
 
 echo "-- Test 439: CHANGELOG documents quality governance improvement --"
@@ -14310,10 +14314,11 @@ grep -q "Quality Governance" docs/CHANGELOG.md
 grep -q "QUALITY_GOVERNANCE.md" docs/CHANGELOG.md
 grep -q "Architecture Maturity Model" docs/CHANGELOG.md
 grep -q "Level 2.5" docs/CHANGELOG.md
-grep -Fq "**742 PASS**" docs/CHANGELOG.md
-grep -q "Test 721–742" docs/CHANGELOG.md
-grep -q "v1.66.0" docs/CHANGELOG.md
-grep -q "Architecture Governance Stabilization" docs/CHANGELOG.md
+grep -Fq "**758 PASS**" docs/CHANGELOG.md
+grep -q "Test 743–758" docs/CHANGELOG.md
+grep -q "v1.67.0" docs/CHANGELOG.md
+grep -q "Formal Level 4 Entry Review Decision" docs/CHANGELOG.md
+grep -q "Conditionally Ready" docs/CHANGELOG.md
 pass "CHANGELOG documents quality governance improvement"
 
 echo "-- Test 440: architecture maturity model exists --"
@@ -14362,20 +14367,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.7 --"
-grep -q "Current Maturity: Level 3.7" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Architecture Governance Stabilized / Level 4 Entry Review Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-pass "current maturity is level 3.7"
+echo "-- Test 442: current maturity is level 3.8 --"
+grep -q "Current Maturity: Level 3.8" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Formal Level 4 Entry Review Complete / Conditionally Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "current maturity is level 3.8"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.7" README.md
-grep -q "Level 4 Entry Review Ready" README.md
+grep -q "Level 3.8" README.md
+grep -q "Conditionally Ready" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.7" docs/architecture/README.md
+grep -q "Level 3.8" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: maturity model states implementation ready is not reached --"
@@ -14410,7 +14415,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14476,7 +14481,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14541,7 +14546,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15068,7 +15073,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15179,7 +15184,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15287,7 +15292,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "36 必須 Governance 文書" docs/architecture/README.md
+grep -q "37 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -15973,15 +15978,15 @@ grep -q "### v1.65.0 で追加（Interaction Metadata Model Design）" docs/VERS
 grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
-echo "-- Test 721: architecture maturity model declares level 3.7 --"
-grep -q "Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Level 4 Entry Review Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-pass "architecture maturity model declares level 3.7"
+echo "-- Test 721: architecture maturity model declares level 3.8 --"
+grep -q "Level 3.8 — Formal Level 4 Entry Review Complete / Conditionally Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 4 Entry Decision" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity model declares level 3.8"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Level 4 Implementation Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "未到達" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.8 — Formal Level 4 Entry Review Complete / Conditionally Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 4 Entry Decision" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Conditionally Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
 
 echo "-- Test 723: cross layer design complete requirement in entry gate --"
@@ -16086,19 +16091,118 @@ grep -q "Application Layer Public Contracts only" docs/architecture/FUTURE_ENTRY
 grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
-echo "-- Test 741: architecture readme declares level 4 entry review ready --"
-grep -q "Level 3.7 — Architecture Governance Stabilized / Level 4 Entry Review Ready" docs/architecture/README.md
-grep -q "Formal Level 4 Entry Review" docs/architecture/README.md
-grep -Fq "Level 4 Implementation Ready **未到達**" docs/architecture/README.md
-pass "architecture readme declares level 4 entry review ready"
+echo "-- Test 741: architecture readme declares conditionally ready entry decision --"
+grep -q "Level 3.8 — Formal Level 4 Entry Review Complete / Conditionally Ready" docs/architecture/README.md
+grep -q "Conditionally Ready" docs/architecture/README.md
+grep -Fq "Level 4 Implementation Ready" docs/architecture/README.md
+grep -q "未到達" docs/architecture/README.md
+pass "architecture readme declares conditionally ready entry decision"
 
-echo "-- Test 742: v1.66.0 governance stabilization documented and production unchanged --"
-grep -Fq "**v1.66.0**（Architecture Governance Stabilization / Level 4 Entry Preparation）" docs/VERSION.md
+echo "-- Test 742: readme changelog version reference v1.66.0 history --"
+grep -q "Architecture Governance Stabilization（v1.66.0）" README.md
+grep -q "## v1.66.0" docs/CHANGELOG.md
+grep -q "### v1.66.0 で追加（Architecture Governance Stabilization / Level 4 Entry Preparation）" docs/VERSION.md
 grep -Fq "**742 PASS**" docs/VERSION.md
 grep -q "Test 721–742" docs/VERSION.md
+pass "readme changelog version reference v1.66.0 history"
+
+echo "-- Test 743: level 4 entry review document exists --"
+test -f docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "# Level 4 Entry Review" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "## Formal Decision" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "level 4 entry review document exists"
+
+echo "-- Test 744: formal decision conditionally ready recorded --"
+grep -q "Formal Decision" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Conditionally Ready" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -Fq "**Conditionally Ready**" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "formal decision conditionally ready recorded"
+
+echo "-- Test 745: level 4 implementation ready remains not yet --"
+grep -q "Level 4 Implementation Ready" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -Fq "**Not Yet**" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Level 4 Implementation Ready" docs/VERSION.md
+grep -q "Not Yet" docs/VERSION.md
+pass "level 4 implementation ready remains not yet"
+
+echo "-- Test 746: critical blocker zero and major gap zero --"
+grep -q "Critical Blocker" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -Fq "**0**" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Unresolved Major Gap" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "critical blocker zero and major gap zero"
+
+echo "-- Test 747: adr 0009 level 4 entry strategy exists --"
+test -f docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "# ADR-0009: Level 4 Entry Strategy" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Domain-based Incremental Level 4 Entry" docs/adr/ADR-0009-level-4-entry-strategy.md
+pass "adr 0009 level 4 entry strategy exists"
+
+echo "-- Test 748: repository wide level 4 unlock rejected --"
+grep -q "Repository-wide Level 4 一括解除は採用しない" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Repository-wide unlock" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "repository wide level 4 unlock rejected"
+
+echo "-- Test 749: first target domain provider layer entry preparation --"
+grep -q "Provider Layer Entry Preparation" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Provider Layer Entry Preparation" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "First Target Domain" docs/VERSION.md
+pass "first target domain provider layer entry preparation"
+
+echo "-- Test 750: provider production implementation prohibited --"
+grep -q "Provider Production Implementation" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Production Implementation" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Prohibited" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "provider production implementation prohibited"
+
+echo "-- Test 751: public contract catalog scope adr deferred to provider phase --"
+grep -q "Public Contract Catalog scope ADR" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Provider Entry Preparation" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Catalog scope extension ADR" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "public contract catalog scope adr deferred to provider phase"
+
+echo "-- Test 752: future entry criteria g22 entry decision satisfied --"
+grep -q "G-22" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 4 Entry Decision recorded" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Conditionally Ready" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "LEVEL_4_ENTRY_REVIEW.md" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria g22 entry decision satisfied"
+
+echo "-- Test 753: architecture decisions references adr 0009 --"
+grep -q "ADR-0009" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "Level 4 Entry Strategy" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "LEVEL_4_ENTRY_REVIEW.md" docs/architecture/ARCHITECTURE_DECISIONS.md
+pass "architecture decisions references adr 0009"
+
+echo "-- Test 754: recommended domain sequence documented --"
+grep -q "Provider → Runtime → Scheduler → Automation → Workflow → Event" docs/adr/ADR-0009-level-4-entry-strategy.md
+grep -q "Provider → Runtime → Scheduler" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "recommended domain sequence documented"
+
+echo "-- Test 755: g01 g27 evaluation matrix in entry review --"
+grep -q "G-01" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "G-27" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Formal Evaluation Matrix" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "g01 g27 evaluation matrix in entry review"
+
+echo "-- Test 756: architecture redesign and additional stabilization not required --"
+grep -q "Architecture Redesign Required" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -Fq "**No**" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "Additional Architecture Stabilization Required" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "architecture redesign and additional stabilization not required"
+
+echo "-- Test 757: entry review references v1.66 baseline --"
+grep -q "v1.66.0" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "6adc081" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+grep -q "742 PASS" docs/architecture/LEVEL_4_ENTRY_REVIEW.md
+pass "entry review references v1.66 baseline"
+
+echo "-- Test 758: v1.67.0 entry review decision documented and production unchanged --"
+grep -Fq "**v1.67.0**（Formal Level 4 Entry Review Decision）" docs/VERSION.md
+grep -Fq "**758 PASS**" docs/VERSION.md
+grep -q "Test 743–758" docs/VERSION.md
 grep -q "Production code unchanged" docs/CHANGELOG.md
-grep -q "no implementation scope" docs/architecture/FUTURE_ENTRY_CRITERIA.md || grep -q "Implementation Ready 未到達" docs/VERSION.md
-pass "v1.66.0 governance stabilization documented and production unchanged"
+grep -q "ADR-0009" docs/CHANGELOG.md
+pass "v1.67.0 entry review decision documented and production unchanged"
 
 
 echo ""

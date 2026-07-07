@@ -4,6 +4,35 @@
 
 ---
 
+## v1.67.0 — Formal Level 4 Entry Review Decision
+
+Formal Level 4 Entry Review Decision — Design / Documentation / Governance Only — Production code unchanged。
+
+Formal Level 4 Entry Review を実施し、**Formal Decision = Conditionally Ready** を Governance Evidence として固定。**Level 4 Implementation Ready 未到達**。Domain-based Incremental Level 4 Entry（ADR-0009）を採用。First Target Domain = **Provider Layer Entry Preparation**（Production Implementation 禁止）。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Level 4 Entry Review | [LEVEL_4_ENTRY_REVIEW.md](architecture/LEVEL_4_ENTRY_REVIEW.md) — G-01–G-27 evaluation |
+| Entry Strategy ADR | [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md) |
+| Formal Decision | **Conditionally Ready** |
+| Critical Blocker | **0** |
+| Unresolved Major Gap | **0** |
+| First Target Domain | **Provider Layer Entry Preparation** |
+| Current Maturity | **Level 3.8** — Formal Level 4 Entry Review Complete / Conditionally Ready |
+| Level 4 Implementation Ready | **未到達** |
+| Test 743–758 | Entry Review governance checks |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **758 PASS**（Test 743–758 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.66.0 — Architecture Governance Stabilization / Level 4 Entry Preparation
 
 Architecture Governance Stabilization — Design / Documentation / Governance Only — Production code unchanged。

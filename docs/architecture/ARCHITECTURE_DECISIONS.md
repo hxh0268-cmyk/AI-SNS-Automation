@@ -127,5 +127,17 @@ Platform / Application 個別 ADR は `docs/adr/` を参照:
 
 - [ADR-0007](../adr/ADR-0007-developer-analytics-layer-architecture.md) — Developer Analytics Layer
 - [ADR-0008](../adr/ADR-0008-dashboard-public-contract.md) — Dashboard Public Contract
+- [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md) — Level 4 Entry Strategy（v1.67.0）
 
-新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。
+### v1.67.0 Level 4 Entry Review Decision
+
+| 項目 | 内容 |
+|------|------|
+| **Status** | Accepted（v1.67.0） |
+| **Context** | v1.66.0 governance baseline; Formal Level 4 Entry Review required before domain entry |
+| **Decision** | Domain-based Incremental Level 4 Entry; First Target Domain = Provider Layer Entry Preparation |
+| **Alternatives** | Repository-wide Level 4 unlock — rejected |
+| **Consequences** | Entry path approved conditionally; Production Implementation prohibited; Catalog scope ADR deferred |
+| **Review Trigger** | Provider Entry Preparation completion |
+
+Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md)

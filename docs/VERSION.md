@@ -2,25 +2,27 @@
 
 ## 現在のバージョン
 
-**v1.66.0**（Architecture Governance Stabilization / Level 4 Entry Preparation）
+**v1.67.0**（Formal Level 4 Entry Review Decision）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Architecture Governance Stabilization / Level 4 Entry Preparation
+**Phase:** Formal Level 4 Entry Review Decision / Provider Layer Entry Preparation（next）
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
 **Final Architecture Review:** **Completed**（Decision B — remediation v1.66.0）
 
-**Level 4 Entry Review Ready:** **Yes**
+**Level 4 Entry Decision:** **Conditionally Ready**（v1.67.0 — [LEVEL_4_ENTRY_REVIEW.md](architecture/LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](../adr/ADR-0009-level-4-entry-strategy.md)）
 
 **Level 4 Implementation Ready:** **Not Yet**
 
-**Next Phase:** Formal Level 4 Entry Review
+**First Target Domain:** **Provider Layer Entry Preparation**
 
-**Next Candidate:** v1.67.0（Level 4 Entry Review 後に候補決定）
+**Next Phase:** Provider Layer Entry Preparation
+
+**Next Candidate:** v1.68.0（Provider Entry Preparation 後に候補決定）
 
 ---
 
@@ -28,6 +30,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.67.0** | **ドキュメント** | **✅ 完了** | **Formal Level 4 Entry Review Decision — Conditionally Ready / Domain-based Incremental Entry / ADR-0009** |
 | **v1.66.0** | **ドキュメント** | **✅ 完了** | **Architecture Governance Stabilization / Level 4 Entry Preparation — Entry Gate / Compliance / Risk / Review governance synchronized** |
 | **v1.65.0** | **ドキュメント** | **✅ 完了** | **Interaction Metadata Model Design / Cross-Layer Supplemental Descriptive Information Contract 設計正式定義 / Cross Layer Design Complete** |
 | **v1.64.0** | **ドキュメント** | **✅ 完了** | **Interaction Error Model Design / Cross-Layer Failure Information Contract 設計正式定義** |
@@ -102,6 +105,47 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.67.0 で追加（Formal Level 4 Entry Review Decision）
+
+#### Formal Level 4 Entry Review 正式記録
+
+- **`LEVEL_4_ENTRY_REVIEW.md`** … Formal Level 4 Entry Review governance evidence（G-01–G-27 evaluation / Formal Decision）
+- **`ADR-0009-level-4-entry-strategy.md`** … Domain-based Incremental Level 4 Entry Strategy
+- **Formal Decision** … **Conditionally Ready**
+- **Level 4 Implementation Ready** … **未到達**
+- **Critical Blocker** … **0**
+- **Unresolved Major Gap** … **0**
+- **First Target Domain** … **Provider Layer Entry Preparation**
+- **Entry Strategy** … **Domain-based Incremental Level 4 Entry**（Provider → Runtime → Scheduler → Automation → Workflow → Event）
+- **Production code** … No changes
+
+### 品質状況（v1.67.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **758 PASS** |
+| Architecture Documents | **37** 必須文書 |
+| Production code | **unchanged** |
+| Current Maturity | **Level 3.8** — Formal Level 4 Entry Review Complete / Conditionally Ready |
+| Level 4 Entry Decision | **Conditionally Ready** |
+| Level 4 Implementation Ready | **未到達** |
+| npm test | **PASS** |
+| Test 743–758 | Formal Level 4 Entry Review governance |
+
+### v1.67.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| Formal Level 4 Entry Review executed | ✅ |
+| Formal Decision Conditionally Ready recorded | ✅ |
+| ADR-0009 Entry Strategy accepted | ✅ |
+| G-22 Level 4 Entry Decision Satisfied | ✅ |
+| Level 4 Implementation Ready 未到達 | ✅ |
+| Production Code 変更なし | ✅ |
+| Test 743–758 | ✅ |
 
 ---
 
