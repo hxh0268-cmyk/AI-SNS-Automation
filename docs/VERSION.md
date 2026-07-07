@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.70.0**（Provider Non-Goals Release Decision Governance）
+**v1.71.0**（Provider Level 4 Implementation Ready Decision Governance）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Non-Goals Release Decision Governance Complete
+**Phase:** Provider Level 4 Implementation Ready Decision Governance Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -20,15 +20,19 @@
 
 **Provider Non-Goals Release Decision:** **Governance Complete**（v1.70.0 — [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](architecture/PROVIDER_NON_GOALS_RELEASE_REVIEW.md)）
 
+**Provider Level 4 Implementation Ready:** **Declared**（v1.71.0 — domain-specific — [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](architecture/PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md)）
+
+**Repository-wide Level 4 Implementation Ready:** **Not Declared**
+
 **Provider Production Implementation:** **Not Started**
 
 **Mock Provider Production Implementation:** **Not Started**
 
-**Level 4 Implementation Ready:** **Not Declared**
+**Catalog Extension Release:** **Required** before Mock Provider Production Implementation
 
-**Next Phase Candidate:** Provider Level 4 Implementation Ready Review
+**Next Phase Candidate:** Governance-approved Provider Public Contract Catalog Extension Release
 
-**Next Candidate:** v1.71.0（Human Review / Release Decision 後の候補）
+**Next Candidate:** v1.72.0（Human Review / Release Decision 後の候補）
 
 ---
 
@@ -36,6 +40,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.71.0** | **ドキュメント** | **✅ 完了** | **Provider Level 4 Implementation Ready Decision — ADR-0014 / domain-specific Declared** |
 | **v1.70.0** | **ドキュメント** | **✅ 完了** | **Provider Non-Goals Release Decision — ADR-0013 / G-25 Satisfied / Mock partial release only** |
 | **v1.69.0** | **ドキュメント** | **✅ 完了** | **Provider Contract Definition Governance — ADR-0012 / providerContracts[] strategy / P4+G-24 Satisfied** |
 | **v1.68.0** | **ドキュメント** | **✅ 完了** | **Provider Entry Preparation Governance — ADR-0010 / ADR-0011 / PROVIDER_ENTRY_PREPARATION_REVIEW** |
@@ -114,6 +119,45 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.71.0 で追加（Provider Level 4 Implementation Ready Decision Governance）
+
+#### Provider Level 4 Implementation Ready 正式記録
+
+- **`PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md`** … U1–U8 / G-07/08/18 applicability evidence
+- **`ADR-0014-provider-level-4-implementation-ready-decision.md`** … domain-specific L4 Ready Declared
+- **Provider Level 4 Implementation Ready** … **Declared**（domain-specific）
+- **Repository-wide Level 4 Implementation Ready** … **Not Declared**
+- **G-23** … **Not Satisfied**（repository-wide）
+- **Catalog Extension Release** … **Required** before Mock Provider Production Implementation
+- **Production code / Catalog** … No changes
+
+### 品質状況（v1.71.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **831 PASS** |
+| Architecture Documents | **41** 必須文書 |
+| Production code | **unchanged** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.12** — Provider Level 4 Implementation Ready Decision Complete |
+| Provider L4 Implementation Ready | **Declared**（domain-specific） |
+| Provider Production Implementation | **Not Started** |
+| npm test | **PASS** |
+| Test 813–831 | Provider Level 4 Implementation Ready governance |
+
+### v1.71.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0014 accepted | ✅ |
+| Provider L4 Ready Declared | ✅ |
+| Repository-wide L4 Not Declared | ✅ |
+| Catalog Extension dependency documented | ✅ |
+| Production Not Started | ✅ |
+| Test 813–831 | ✅ |
 
 ---
 

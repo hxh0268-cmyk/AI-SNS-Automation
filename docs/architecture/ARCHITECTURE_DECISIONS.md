@@ -157,8 +157,9 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 
 - [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md) — Provider Contract Catalog Extension Strategy（v1.69.0）
 - [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md) — Provider Non-Goals Release Decision（v1.70.0）
+- [ADR-0014](../adr/ADR-0014-provider-level-4-implementation-ready-decision.md) — Provider Level 4 Implementation Ready Decision（v1.71.0）
 
-### Decision Chain（Provider Domain — v1.68.0–v1.70.0）
+### Decision Chain（Provider Domain — v1.68.0–v1.71.0）
 
 ```text
 ADR-0010 Provider Entry Preparation
@@ -167,8 +168,10 @@ ADR-0010 Provider Entry Preparation
       → PROVIDER_CONTRACT_DEFINITION_REVIEW（evidence — not SSOT）
         → ADR-0013 Provider Non-Goals Release（Mock partial release only）
           → PROVIDER_NON_GOALS_RELEASE_REVIEW（evidence）
-            → Future: Provider Level 4 Implementation Ready Decision
-            → Future: Governance-approved Catalog extension Release
+            → ADR-0014 Provider Level 4 Implementation Ready（domain-specific Declared）
+              → PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW（evidence）
+                → Future: Governance-approved Catalog Extension Release
+                → Future: Mock Provider Production Implementation Release
 ```
 
 ### v1.69.0 Provider Contract Definition Governance
@@ -196,5 +199,18 @@ Full record: [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINI
 | **Review Trigger** | Provider Level 4 Implementation Ready Review |
 
 Full record: [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md) + [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md)
+
+### v1.71.0 Provider Level 4 Implementation Ready Decision Governance
+
+| 項目 | 内容 |
+|------|------|
+| **Status** | Accepted（v1.71.0） |
+| **Context** | v1.70.0 Non-Goals Release Complete; G-24/25/26 Satisfied; G-23 Not Satisfied |
+| **Decision** | Provider domain L4 Implementation Ready **Declared**; repository-wide **Not Declared**; Production Not Started |
+| **Alternatives** | Repository-wide L4 / Mock impl in same release — rejected |
+| **Consequences** | U1–U8 Satisfied; Catalog Extension prerequisite; PR-005 reframed |
+| **Review Trigger** | Catalog Extension Release / Mock Provider Production Implementation |
+
+Full record: [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md) + [ADR-0014](../adr/ADR-0014-provider-level-4-implementation-ready-decision.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。
