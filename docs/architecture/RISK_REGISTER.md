@@ -45,7 +45,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
 | CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 + ADR-0012 `providerContracts[]` strategy | **Low–Medium** — extension strategy defined; catalog JSON gap until Governance-approved Release | Prerequisite before Future impl |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **further mitigated**（ADR-0012）— `providerContracts[]` not in catalog JSON until Release.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **further mitigated**（ADR-0012）— `providerContracts[]` not in catalog JSON until Release. PR-005 **reframed** post-ADR-0013 — G-25 Satisfied; watch Implementation Ready confusion.
 
 ---
 
@@ -54,10 +54,10 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | ID | Risk | Affected Authority | Impact | Likelihood | Mitigation | Remaining Exposure | Provider Impl Impact |
 |----|------|-------------------|--------|------------|------------|-------------------|---------------------|
 | PR-001 | Mock vs Real Provider confusion | Provider / ADR-0010 | High | Medium | Mock default policy + feature flag design | Medium until impl | Blocks safe default path |
-| PR-002 | Premature Real Provider external IO | Provider / NON_GOALS | Critical | Medium | Not Yet Authorized + G-25 Not Satisfied | **High** until Non-Goals Release | Critical |
+| PR-002 | Premature Real Provider external IO | Provider / NON_GOALS | Critical | Medium | ADR-0013 Real Provider prohibition + NON_GOALS Real Provider section | **Medium** — Real Provider still prohibited; G-25 does not authorize Real IO | Critical |
 | PR-003 | Provider boundary overreach（owns Runtime/Retry/Idempotency） | Layer boundaries | High | Medium | ADR-0010 non-ownership table | Low at governance | Major at implementation |
 | PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 + ADR-0012 — no catalog change + bypass prohibition | Low | Critical if bypassed |
-| PR-005 | Non-Goals Release skipped before impl | NON_GOALS / G-25 | Critical | Low | G-25 Not Satisfied — separate Release ADR required | **High** until G-25 Satisfied | Critical |
+| PR-005 | Non-Goals Release mistaken for Implementation Ready | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0013 scope limits + L4 Implementation Ready Not Declared + Not Started | **Medium** until L4 Ready Decision | Critical |
 
 ---
 

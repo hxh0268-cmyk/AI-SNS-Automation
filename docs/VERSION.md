@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.69.0**（Provider Contract Definition Governance）
+**v1.70.0**（Provider Non-Goals Release Decision Governance）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Contract Definition Governance Complete
+**Phase:** Provider Non-Goals Release Decision Governance Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -18,13 +18,17 @@
 
 **Provider Contract Definition:** **Governance Complete**（v1.69.0 — [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](architecture/PROVIDER_CONTRACT_DEFINITION_REVIEW.md)）
 
-**Provider Production Implementation:** **Not Yet Authorized**
+**Provider Non-Goals Release Decision:** **Governance Complete**（v1.70.0 — [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](architecture/PROVIDER_NON_GOALS_RELEASE_REVIEW.md)）
 
-**Level 4 Implementation Ready:** **Not Yet**
+**Provider Production Implementation:** **Not Started**
 
-**Next Phase Candidate:** Provider Non-Goals Release Review
+**Mock Provider Production Implementation:** **Not Started**
 
-**Next Candidate:** v1.70.0（Human Review / Release Decision 後の候補）
+**Level 4 Implementation Ready:** **Not Declared**
+
+**Next Phase Candidate:** Provider Level 4 Implementation Ready Review
+
+**Next Candidate:** v1.71.0（Human Review / Release Decision 後の候補）
 
 ---
 
@@ -32,6 +36,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.70.0** | **ドキュメント** | **✅ 完了** | **Provider Non-Goals Release Decision — ADR-0013 / G-25 Satisfied / Mock partial release only** |
 | **v1.69.0** | **ドキュメント** | **✅ 完了** | **Provider Contract Definition Governance — ADR-0012 / providerContracts[] strategy / P4+G-24 Satisfied** |
 | **v1.68.0** | **ドキュメント** | **✅ 完了** | **Provider Entry Preparation Governance — ADR-0010 / ADR-0011 / PROVIDER_ENTRY_PREPARATION_REVIEW** |
 | **v1.67.0** | **ドキュメント** | **✅ 完了** | **Formal Level 4 Entry Review Decision — Conditionally Ready / Domain-based Incremental Entry / ADR-0009** |
@@ -109,6 +114,47 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.70.0 で追加（Provider Non-Goals Release Decision Governance）
+
+#### Provider Non-Goals Release 正式記録
+
+- **`PROVIDER_NON_GOALS_RELEASE_REVIEW.md`** … NG1–NG6 / G-25 evidence
+- **`ADR-0013-provider-non-goals-release-decision.md`** … Mock broad Non-Goal partial release only
+- **G-25** … **Satisfied**（Provider domain）
+- **G-24 / G-26** … **Satisfied**（maintained）
+- **G-23** … **Not Satisfied**（repository-wide）
+- **Provider Production Implementation** … **Not Started**
+- **Provider Level 4 Implementation Ready** … **Not Declared**
+- **Catalog generator / reports / production code** … No changes
+
+### 品質状況（v1.70.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **812 PASS** |
+| Architecture Documents | **40** 必須文書 |
+| Production code | **unchanged** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.11** — Provider Non-Goals Release Decision Governance Complete |
+| Provider Production Implementation | **Not Started** |
+| Level 4 Implementation Ready | **Not Declared** |
+| npm test | **PASS** |
+| Test 794–812 | Provider Non-Goals Release governance |
+
+### v1.70.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0013 accepted | ✅ |
+| NG1–NG6 Satisfied | ✅ |
+| G-25 Satisfied | ✅ |
+| Real Provider prohibited | ✅ |
+| Provider Production Implementation Not Started | ✅ |
+| Catalog unchanged | ✅ |
+| Test 794–812 | ✅ |
 
 ---
 

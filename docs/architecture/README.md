@@ -6,11 +6,11 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**39 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**40 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1）を固定します。
 
-**Current Maturity:** **Level 3.10 — Provider Contract Definition Governance Complete**（v1.69.0 — Provider Production Implementation **Not Yet Authorized**）
+**Current Maturity:** **Level 3.11 — Provider Non-Goals Release Decision Governance Complete**（v1.70.0 — Provider Production Implementation **Not Started**）
 
-> **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **39**（重複ファイルカウントではない）。
+> **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **40**（重複ファイルカウントではない）。
 
 | # | 領域 | 文書 | v1.49.0 |
 |---|------|------|---------|
@@ -53,11 +53,13 @@ Architecture Documentation = **Architecture Governance** として、**39 必須
 | 37 | Level 4 Entry Review | [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) | v1.67.0 |
 | 38 | Provider Entry Preparation Review | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) | v1.68.0 |
 | 39 | Provider Contract Definition Review | [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md) | v1.69.0 |
+| 40 | Provider Non-Goals Release Review | [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md) | v1.70.0 |
 
 **文書の役割分担:**
 
 | 文書 | 役割 |
 |------|------|
+| [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md) | **Provider Non-Goals Release Review** — NG1–NG6 / G-25 evidence / Mock vs Real boundary（v1.70.0） |
 | [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVIEW.md) | **Provider Contract Definition Review** — P4 / G-24 evidence / `providerContracts[]` strategy（v1.69.0 — **not** Contract SSOT） |
 | [PROVIDER_LAYER_DESIGN.md](./PROVIDER_LAYER_DESIGN.md) | **Provider Contract Authority SSOT** — Input / Output / Error / Capability（Design Only — v1.54.0） |
 | [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md) | **Provider Entry Preparation Review** — P1–P6 / U1–U8 / Gate update / Not Yet Authorized evidence（v1.68.0） |
@@ -99,7 +101,7 @@ Architecture Documentation = **Architecture Governance** として、**39 必須
 
 ---
 
-## 現在フェーズ（v1.69.0 — Provider Contract Definition Governance）
+## 現在フェーズ（v1.70.0 — Provider Non-Goals Release Decision Governance）
 
 | Layer | 状態 |
 |-------|------|
@@ -112,7 +114,8 @@ Architecture Documentation = **Architecture Governance** として、**39 必須
 | **Formal Level 4 Entry Review** | **Complete**（v1.67.0 — Conditionally Ready） |
 | **Provider Entry Preparation** | **Governance Complete**（v1.68.0 — ADR-0010 / ADR-0011） |
 | **Provider Contract Definition** | **Governance Complete**（v1.69.0 — ADR-0012） |
-| **Provider Production Implementation** | **Not Yet Authorized** — G-25 Not Satisfied（Reason: Pending separate Provider Non-Goals Release Decision） |
+| **Provider Non-Goals Release Decision** | **Governance Complete**（v1.70.0 — ADR-0013） |
+| **Provider Production Implementation** | **Not Started** — G-25 Satisfied; L4 Implementation Ready **Not Declared** |
 | Level 4 Implementation Ready | **未到達** |
 | Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 

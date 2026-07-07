@@ -244,7 +244,7 @@ Per [PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.m
 - [ ] Provider does not own Runtime / Scheduler / OAuth / retry coordination / cross-layer idempotency
 - [ ] ADR-0010 + ADR-0011 accepted
 - [ ] G-26 Catalog scope decision Satisfied
-- [ ] G-25 Non-Goals Release **Not Satisfied** — Reason: Pending separate Provider Non-Goals Release Decision
+- [ ] G-25 Non-Goals Release **Not Satisfied** — superseded by v1.70.0 Provider Non-Goals Release Compliance（historical v1.68.0 record）
 - [ ] Provider Production Implementation **Not Yet Authorized**
 - [ ] Provider Level 4 Implementation Ready **not declared**
 - [ ] Quality Pipeline PASS **not** used as sole Gate evidence
@@ -264,7 +264,7 @@ Per [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVI
 - [ ] Catalog generator / reports unchanged
 - [ ] P4 Satisfied
 - [ ] G-24 Satisfied
-- [ ] G-25 Not Satisfied — Reason: Pending separate Provider Non-Goals Release Decision
+- [ ] G-25 Not Satisfied — superseded by v1.70.0 Provider Non-Goals Release Compliance（historical v1.69.0 record）
 - [ ] G-26 Satisfied
 - [ ] Provider Production Implementation **Not Yet Authorized**
 - [ ] Provider Level 4 Implementation Ready **Not Declared**
@@ -272,6 +272,30 @@ Per [PROVIDER_CONTRACT_DEFINITION_REVIEW.md](./PROVIDER_CONTRACT_DEFINITION_REVI
 - [ ] Provider raw response leakage prohibited
 - [ ] Credential / secret / token excluded from Provider Contract
 - [ ] Cross-layer retry ownership ambiguity not prematurely resolved
+- [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+
+---
+
+## Provider Non-Goals Release Compliance
+
+Per [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md) + [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md):
+
+- [ ] ADR-0013 accepted
+- [ ] NG1 Satisfied — P1–P6 / G-24 evidence（v1.69.0）
+- [ ] NG2 Satisfied — ADR-0013 release ADR
+- [ ] NG3 Satisfied — Provider Non-Goals Release Compliance section（本節）
+- [ ] NG4 Satisfied — RISK_REGISTER PR-002 / PR-005 reviewed
+- [ ] NG5 Satisfied — VERSION / CHANGELOG release docs
+- [ ] NG6 Satisfied — Quality Pipeline PASS maintained
+- [ ] G-25 **Satisfied**（Provider domain — Mock broad Non-Goal partial release only）
+- [ ] Real Provider / external IO **remains prohibited**
+- [ ] Mock Provider implementation requires **later Provider Level 4 Implementation Ready Decision**
+- [ ] Provider Production Implementation **Not Started**
+- [ ] Mock Provider Production Implementation **Not Started**
+- [ ] Provider Level 4 Implementation Ready **Not Declared**
+- [ ] Public Contract Catalog generator / reports **unchanged**
+- [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
+- [ ] G-23 repository-wide **Not Satisfied** maintained
 - [ ] Quality Pipeline PASS **not** used as sole Gate evidence
 
 ---

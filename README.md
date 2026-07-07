@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Provider Non-Goals Release Decision Governance（v1.70.0）
+
+**Provider Non-Goals Release Decision Governance** を実施しました。ADR-0013 により Mock Provider broad Non-Goal を **部分的に解除**（L4 gate のみ）。Real Provider external IO は **禁止維持**（**40 必須 Governance 文書** — Catalog / Production code **unchanged**）。
+
+**Current Version: v1.70.0** | **Quality Pipeline: 812 PASS**
+
+Provider Non-Goals Release: **Governance Complete** — G-24 **Satisfied** / G-25 **Satisfied** / G-26 **Satisfied**。G-23 **Not Satisfied**（repository-wide）。Provider Production Implementation **Not Started**。Provider Level 4 Implementation Ready **Not Declared**。
+
+| 項目 | 内容 |
+|------|------|
+| Non-Goals Release Review | [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](docs/architecture/PROVIDER_NON_GOALS_RELEASE_REVIEW.md) |
+| Non-Goals Release ADR | [ADR-0013](docs/adr/ADR-0013-provider-non-goals-release-decision.md) |
+| Current Maturity | **Level 3.11** — Provider Non-Goals Release Decision Governance Complete |
+| Next Phase Candidate | **Provider Level 4 Implementation Ready Review** |
+
 ### Provider Contract Definition Governance（v1.69.0）
 
 **Provider Contract Definition Governance** を実施しました。[PROVIDER_LAYER_DESIGN.md](docs/architecture/PROVIDER_LAYER_DESIGN.md) を Contract Authority として維持し、`providerContracts[]` additive extension strategy を確定（**39 必須 Governance 文書** — Catalog / Production code **unchanged**）。

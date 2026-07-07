@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.8 — Formal Level 4 Entry Review Complete / Conditionally Ready
+Current Maturity: Level 3.11 — Provider Non-Goals Release Decision Governance Complete
 ```
 
 | 観点 | 状態 |
@@ -215,9 +215,13 @@ Current Maturity: Level 3.8 — Formal Level 4 Entry Review Complete / Condition
 | Level 3 Future Design | **Completed**（Core + Cross Layer Design — v1.59 / v1.65） |
 | Level 3.7 Governance Stabilization | **Completed**（v1.66.0） |
 | Level 3.8 Formal Level 4 Entry Review | **Completed**（v1.67.0 — Conditionally Ready） |
+| Level 3.9 Provider Entry Preparation | **Completed**（v1.68.0） |
+| Level 3.10 Provider Contract Definition | **Completed**（v1.69.0） |
+| Level 3.11 Provider Non-Goals Release Decision | **Completed**（v1.70.0） |
 | Final Architecture Review | **Completed**（Decision B remediation） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
-| Level 4 Implementation Ready | **Not reached** |
+| Provider Non-Goals Release Decision | **Complete**（v1.70.0 — ADR-0013） |
+| Level 4 Implementation Ready | **Not reached** / **Not Declared** |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |
 
@@ -234,7 +238,7 @@ Current Maturity: Level 3.8 — Formal Level 4 Entry Review Complete / Condition
 - Core Layer Design Complete（v1.54–v1.59 — Design Only）
 - Cross Layer Design Complete（v1.60–v1.65 — Design Only）
 - Architecture Governance Stabilization（v1.66.0 — Entry Gate / Compliance / Risk / Review sync）
-- Formal Level 4 Entry Review（v1.67.0 — Conditionally Ready / ADR-0009 Entry Strategy）
+- Provider Non-Goals Release Decision（v1.70.0 — ADR-0013 / G-25 Satisfied）
 - Quality Governance（Machine Check vs Governance Check）
 - Architecture Compliance Checklist（運用確認 — v1.66.0 Cross Layer sections）
 - Quality Pipeline 自動検証（Machine Check — governance consistency tests）
@@ -246,7 +250,7 @@ Current Maturity: Level 3.8 — Formal Level 4 Entry Review Complete / Condition
 - Level 4 Implementation Ready **未到達**
 - Future Layer / Interaction contracts **not yet in Public Contract Catalog**（Application Layer catalog only — ADR required for extension）
 - Retry / Recovery / cross-layer idempotency **deferred** — ADR required before implementation
-- Provider / Runtime / Scheduler / SNS API **未実装**
+- Provider / Runtime / Scheduler / SNS API **未実装** — Provider Non-Goals partial release（Mock gate only）; **Production Not Started**
 - Real Metrics / Real Automation **未実装**
 - Production / Operational 条件 **未達**
 - PASS 数増加のみでは Level 4 以上に進めない

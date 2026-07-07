@@ -4,6 +4,32 @@
 
 ---
 
+## v1.70.0 — Provider Non-Goals Release Decision Governance
+
+Provider Non-Goals Release Decision Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。
+
+ADR-0013 により Provider domain G-25 **Satisfied**。Mock Provider broad Non-Goal **partial release only**（L4 gate）。Real Provider external IO **prohibited**。**Provider Production Implementation Not Started**。Provider Level 4 Implementation Ready **Not Declared**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Non-Goals Release Review | [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](architecture/PROVIDER_NON_GOALS_RELEASE_REVIEW.md) |
+| Non-Goals Release ADR | [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md) |
+| G-24 / G-25 / G-26 | Satisfied / Satisfied / Satisfied |
+| G-23 | Not Satisfied（repository-wide） |
+| Current Maturity | **Level 3.11** |
+| Test 794–812 | Provider Non-Goals Release governance |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **812 PASS**（Test 794–812 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.69.0 — Provider Contract Definition Governance
 
 Provider Contract Definition Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。

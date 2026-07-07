@@ -2,15 +2,30 @@
 
 v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。
 
-> **Current Phase（v1.66.0）:** Architecture Governance Stabilization / Level 4 Entry Preparation — **Implementation Ready 未到達**。以下は **引き続き実装禁止** です。以下は Architecture Governance 上、現フェーズでは実装・merge してはなりません。
+> **Current Phase（v1.70.0）:** Provider Non-Goals Release Decision Governance Complete — **Provider Production Implementation Not Started**。以下の **禁止領域は引き続き実装禁止** です。Mock Provider の broad Non-Goal **部分解除** は将来 Provider Level 4 gate のみ — **本 Release では実装着手を許可しない**。
 
 > **境界:** 将来どう実装するかの **設計構想** は [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) を参照してください。Non-Goals = 今すぐ作ってはいけないもの、Future Architecture = 将来 Epic で検討する構想。
+
+> **Evidence:** [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md) + [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md)
 
 ---
 
 ## Provider
 
-外部 LLM / Image / Metrics Provider の **Real 接続** は Non-Goal。Mock / rule-based MVP のみ Completed。
+v1.70.0（[ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md)）により、Provider 節は **Mock Provider** と **Real Provider** を区別する。
+
+### Mock Provider
+
+- Broad Non-Goal から **部分的に解除** — **Provider Level 4 Implementation Ready Decision 前** の将来 gate のみ
+- **Mock Provider Production Implementation Not Started** — 別途 **Provider Level 4 Implementation Ready Decision** が必要
+- Mock default 方針は ADR-0010 を維持
+- **本 Release（v1.70.0）では実装着手を許可しない**
+
+### Real Provider
+
+- **Real Provider external IO**（外部 LLM / Image / Metrics Provider の **実接続**）は **Non-Goal のまま禁止**
+- Feature flag による Real Provider も **禁止**
+- OAuth / SNS API / External API 経由の接続は引き続き禁止
 
 ---
 
