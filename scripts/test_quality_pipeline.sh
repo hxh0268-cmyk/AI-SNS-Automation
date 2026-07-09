@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.74.0 --"
+echo "-- Test 98: VERSION updated to v1.75.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.74.0**（Mock Provider Production Implementation Release）")) {
-  throw new Error("docs/VERSION.md current version must be v1.74.0");
+if (!versionDoc.includes("**v1.75.0**（Mock Provider Catalog Registration Governance Release）")) {
+  throw new Error("docs/VERSION.md current version must be v1.75.0");
 }
-console.log("VERSION v1.74.0 ok");
+console.log("VERSION v1.75.0 ok");
 EOF
-pass "VERSION updated to v1.74.0"
+pass "VERSION updated to v1.75.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.75.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.75.0");
+if (payload.nextVersion !== "v1.76.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.76.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.75.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.75.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.76.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.76.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.75.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.76.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14032,7 +14032,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14390,20 +14390,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.15 --"
-grep -q "Level 3.15" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Mock Provider Production Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "current maturity is level 3.15"
+echo "-- Test 442: current maturity is level 3.16 --"
+grep -q "Level 3.16" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "current maturity is level 3.16"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.15" README.md
+grep -q "Level 3.16" README.md
 grep -q "Provider Level 4 Implementation Ready" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.15" docs/architecture/README.md
+grep -q "Level 3.16" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: architecture maturity model distinguishes provider and repository level 4 readiness --"
@@ -14443,7 +14443,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14509,7 +14509,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14574,7 +14574,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15101,7 +15101,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15212,7 +15212,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15320,7 +15320,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -16007,12 +16007,12 @@ grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
 echo "-- Test 721: architecture maturity model declares provider level 4 implementation ready --"
-grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.15" docs/architecture/README.md
+grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.16" docs/architecture/README.md
 grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.15 — Mock Provider Production Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.16 — Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16120,7 +16120,7 @@ grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
 echo "-- Test 741: architecture readme declares mock provider implementation release --"
-grep -q "Level 3.15 — Mock Provider Production Implementation Release Complete" docs/architecture/README.md
+grep -q "Level 3.16 — Mock Provider Catalog Registration Governance Release Complete" docs/architecture/README.md
 grep -q "Mock Provider Production Implementation" docs/architecture/README.md
 grep -q "Implemented" docs/architecture/README.md
 pass "architecture readme declares mock provider implementation release"
@@ -17076,16 +17076,17 @@ grep -q "Prohibited" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSIO
 grep -q "Real Provider" docs/architecture/NON_GOALS.md
 pass "real provider prohibited maintained"
 
-echo "-- Test 858: architecture documents count 43 --"
-grep -q "43 必須 Governance 文書" docs/architecture/README.md
+echo "-- Test 858: architecture documents count 44 --"
+grep -q "44 必須 Governance 文書" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md" docs/architecture/README.md
-pass "architecture documents count 43"
+grep -q "MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md" docs/architecture/README.md
+pass "architecture documents count 44"
 
-echo "-- Test 859: maturity level 3.15 synchronized --"
-grep -q "Level 3.15" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Level 3.15" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Level 3.15" docs/architecture/README.md
-pass "maturity level 3.15 synchronized"
+echo "-- Test 859: maturity level 3.16 synchronized --"
+grep -q "Level 3.16" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3.16" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.16" docs/architecture/README.md
+pass "maturity level 3.16 synchronized"
 
 echo "-- Test 860: readme changelog version v1.72.0 historical synchronized --"
 grep -q "Provider Public Contract Catalog Extension Release（v1.72.0）" README.md
@@ -17330,7 +17331,7 @@ pass "architecture decisions adr 0016 registered"
 echo "-- Test 890: non goals mock provider section implemented --"
 grep -q "Mock Provider Production Implementation Implemented" docs/architecture/NON_GOALS.md
 grep -q "ADR-0016" docs/architecture/NON_GOALS.md
-grep -q "Deferred" docs/architecture/NON_GOALS.md
+grep -q "Catalog Registration Governance Complete" docs/architecture/NON_GOALS.md
 pass "non goals mock provider section implemented"
 
 echo "-- Test 891: provider layer design catalog example clarified --"
@@ -17680,11 +17681,11 @@ grep -q "mock_provider.js" docs/VERSION.md
 grep -q "Deferred" docs/VERSION.md
 pass "version mock provider implemented documented"
 
-echo "-- Test 913: architecture maturity level 3.15 mock provider implementation --"
-grep -q "Level 3.15" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Mock Provider Production Implementation Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Implemented" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-pass "architecture maturity level 3.15 mock provider implementation"
+echo "-- Test 913: architecture maturity level 3.16 catalog registration governance --"
+grep -q "Level 3.16" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Mock Provider Catalog Registration Governance Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Authorized" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity level 3.16 catalog registration governance"
 
 echo "-- Test 914: readme changelog v1.74.0 mock provider implementation --"
 grep -q "Mock Provider Production Implementation Release（v1.74.0）" README.md
@@ -17757,6 +17758,209 @@ grep -q "v1.74.0" docs/CHANGELOG.md
 grep -q "mock_provider.js" README.md
 grep -q "Implemented" README.md
 pass "v1.74.0 mock provider production implementation documented"
+
+echo "-- Test 918: adr 0017 mock provider catalog registration governance exists --"
+test -f docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "# ADR-0017: Mock Provider Catalog Registration Governance Decision" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Accepted" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "adr 0017 mock provider catalog registration governance exists"
+
+echo "-- Test 919: mock provider catalog registration governance review exists --"
+test -f docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+grep -q "# Mock Provider Catalog Registration Governance Review" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+grep -q "## Final Decision" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "mock provider catalog registration governance review exists"
+
+echo "-- Test 920: registration necessity decision recorded --"
+grep -q "G1. Registration Necessity" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Concrete \`providerContracts\[\]\` entry required" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG1 Registration Necessity" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "registration necessity decision recorded"
+
+echo "-- Test 921: registration scope exact match --"
+grep -q "text-generation-mock-provider" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "text_generation" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "src/lib/mock_provider.js" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "registration scope exact match"
+
+echo "-- Test 922: registrationKind governance decision --"
+grep -q "concrete-mock-provider-implementation" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG4 Registration Kind" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "registrationKind governance decision"
+
+echo "-- Test 923: identity mapping decision --"
+grep -q "G4. Catalog Identity Mapping" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "1:1 identity" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG5 Identity Mapping" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "identity mapping decision"
+
+echo "-- Test 924: validator policy decision --"
+grep -q "G5. Validator Policy" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Whitelist" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "not authorized in v1.75.0" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "validator policy decision"
+
+echo "-- Test 925: schema version unchanged decision --"
+grep -q "public-contract-catalog/1.0" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "unchanged" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG7 Schema Version Impact" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "schema version unchanged decision"
+
+echo "-- Test 926: catalog version unchanged decision --"
+grep -q "catalogVersion" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "G7. Catalog Version Impact" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "catalog version unchanged decision"
+
+echo "-- Test 927: backward compatibility decision --"
+grep -q "G8. Backward Compatibility" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Application \`publicContracts\[\]\`" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG9 Backward Compatibility" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "backward compatibility decision"
+
+echo "-- Test 928: migration not required decision --"
+grep -q "G9. Migration Requirement" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -Fq "migration required? | **No**" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG11 Migration Requirement" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "migration not required decision"
+
+echo "-- Test 929: risk treatment pr 004 005 006 cl 013 --"
+grep -q "PR-004" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "PR-005" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "PR-006" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CL-013" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "ADR-0017" docs/architecture/RISK_REGISTER.md
+pass "risk treatment pr 004 005 006 cl 013"
+
+echo "-- Test 930: forbidden scope preserved --"
+grep -q "Real Provider" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -Fq "**Prohibited**" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Runtime" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG13 Forbidden Scope" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "forbidden scope preserved"
+
+echo "-- Test 931: future implementation authorization state --"
+grep -q "G12. Future Implementation Authorization" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Catalog Registration Implementation Release" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CRG14 Future Implementation Authorization" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "future implementation authorization state"
+
+echo "-- Test 932: governance complete distinct from catalog registered --"
+grep -q "Governance Complete" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Not executed" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Not Started" docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "governance complete distinct from catalog registered"
+
+echo "-- Test 933: provider production ready not declared --"
+grep -Fq "**Not Declared**" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Provider Production Ready" docs/VERSION.md
+pass "provider production ready not declared"
+
+echo "-- Test 934: real provider external io prohibited maintained --"
+grep -q "External IO" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "Real Provider" docs/architecture/NON_GOALS.md
+grep -q "禁止" docs/architecture/NON_GOALS.md
+pass "real provider external io prohibited maintained"
+
+echo "-- Test 935: public contract catalog unchanged post governance --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.providerContracts.length !== 1) {
+  throw new Error("catalog providerContracts count changed");
+}
+if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
+  throw new Error("abstract authority entry changed");
+}
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 1) {
+  throw new Error("provider contract definitions changed");
+}
+console.log("public contract catalog unchanged post governance ok");
+EOF
+pass "public contract catalog unchanged post governance"
+
+echo "-- Test 936: mock provider module unchanged post governance --"
+node --input-type=module <<'EOF'
+import {
+  MOCK_PROVIDER_ID,
+  MOCK_PROVIDER_CAPABILITY,
+  invokeMockProvider,
+} from "./src/lib/mock_provider.js";
+
+if (MOCK_PROVIDER_ID !== "text-generation-mock-provider") {
+  throw new Error("mock provider id changed");
+}
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: { topic: "freeze" } },
+});
+if (!result.ok) {
+  throw new Error("mock provider behavior changed");
+}
+if (MOCK_PROVIDER_CAPABILITY !== "text_generation") {
+  throw new Error("mock provider capability changed");
+}
+console.log("mock provider module unchanged post governance ok");
+EOF
+pass "mock provider module unchanged post governance"
+
+echo "-- Test 937: architecture decisions adr 0017 registered --"
+grep -q "ADR-0017" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "Mock Provider Catalog Registration Governance" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW" docs/architecture/ARCHITECTURE_DECISIONS.md
+pass "architecture decisions adr 0017 registered"
+
+echo "-- Test 938: compliance checklist catalog registration governance section --"
+grep -q "## Mock Provider Catalog Registration Governance Compliance" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "ADR-0017" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "concrete-mock-provider-implementation" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+pass "compliance checklist catalog registration governance section"
+
+echo "-- Test 939: future entry criteria catalog registration authorized synchronized --"
+grep -q "Mock Provider Catalog Registration Governance" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Authorized / Not Started" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "ADR-0017" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria catalog registration authorized synchronized"
+
+echo "-- Test 940: non goals catalog registration governance synchronized --"
+grep -q "Catalog Registration Governance Complete" docs/architecture/NON_GOALS.md
+grep -q "ADR-0017" docs/architecture/NON_GOALS.md
+grep -q "Authorized / Not Started" docs/architecture/NON_GOALS.md
+pass "non goals catalog registration governance synchronized"
+
+echo "-- Test 941: readme changelog v1.75.0 catalog registration governance --"
+grep -q "Mock Provider Catalog Registration Governance Release（v1.75.0）" README.md
+grep -q "## v1.75.0" docs/CHANGELOG.md
+grep -q "ADR-0017" docs/CHANGELOG.md
+pass "readme changelog v1.75.0 catalog registration governance"
+
+echo "-- Test 942: cl 004 cl 005 cl 006 remain deferred post adr 0017 --"
+grep -q "CL-004" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CL-005" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "CL-006" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+grep -q "deferred" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "cl 004 cl 005 cl 006 remain deferred post adr 0017"
+
+echo "-- Test 943: repository wide l4 not declared maintained --"
+grep -q "Repository-wide Level 4 Implementation Ready" docs/VERSION.md
+grep -Fq "**Not Declared**" docs/VERSION.md
+pass "repository wide l4 not declared maintained"
+
+echo "-- Test 944: v1.73 decision b closed at governance level --"
+grep -q "Decision B" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
+grep -q "closed at governance level" docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md
+pass "v1.73 decision b closed at governance level"
+
+echo "-- Test 945: v1.75.0 mock provider catalog registration governance documented --"
+grep -Fq "**945 PASS**" docs/VERSION.md
+grep -q "Test 918–945" docs/VERSION.md
+grep -q "v1.75.0" docs/CHANGELOG.md
+grep -q "ADR-0017" README.md
+grep -q "Authorized" README.md
+pass "v1.75.0 mock provider catalog registration governance documented"
 
 
 echo ""

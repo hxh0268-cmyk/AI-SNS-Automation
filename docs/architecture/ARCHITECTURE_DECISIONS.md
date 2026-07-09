@@ -160,8 +160,9 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0014](../adr/ADR-0014-provider-level-4-implementation-ready-decision.md) — Provider Level 4 Implementation Ready Decision（v1.71.0）
 - [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md) — Provider Public Contract Catalog Extension Release（v1.72.0）
 - [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) — Mock Provider Production Implementation Authorization Decision（v1.73.0）
+- [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) — Mock Provider Catalog Registration Governance Decision（v1.75.0）
 
-### Decision Chain（Provider Domain — v1.68.0–v1.73.0）
+### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
 ```text
 ADR-0010 Provider Entry Preparation
@@ -176,7 +177,10 @@ ADR-0010 Provider Entry Preparation
                   → PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW（evidence）
                     → ADR-0016 Mock Provider Production Implementation Authorization
                       → MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW（evidence）
-                        → Future: Mock Provider Production Implementation Release（code）
+                        → Mock Provider Production Implementation Release（v1.74.0 — code）
+                          → ADR-0017 Mock Provider Catalog Registration Governance
+                            → MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW（evidence）
+                              → Future: Mock Provider Catalog Registration Implementation Release
 ```
 
 ### v1.69.0 Provider Contract Definition Governance
@@ -243,5 +247,17 @@ Full record: [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_P
 | **Review Trigger** | Mock Provider Production Implementation Release（code）/ concrete catalog registration |
 
 Full record: [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md)
+
+### v1.75.0 Mock Provider Catalog Registration Governance
+
+| 項目 | 内容 |
+|------|------|
+| **Decision** | Mock Provider Catalog Registration **Governed** + **Authorized** — concrete registration policy defined |
+| **ADR** | [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) |
+| **Review** | [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) |
+| **Consequences** | ADR-0016 Decision B closed at governance level; validator policy defined; catalog registration **Not Started** |
+| **Review Trigger** | Mock Provider Catalog Registration Implementation Release |
+
+Full record: [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) + [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

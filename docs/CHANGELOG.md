@@ -4,6 +4,37 @@
 
 ---
 
+---
+
+## v1.75.0 — Mock Provider Catalog Registration Governance Release
+
+Mock Provider Catalog Registration Governance Release — ADR-0016 Decision B closure — concrete registration policy defined — validator policy defined — identity mapping defined — catalog registration **Authorized** / **Not Started**。
+
+`public_contract_catalog.js` / `mock_provider.js` は変更なし。Real Provider / external IO **Prohibited** maintained。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | `ADR-0017-mock-provider-catalog-registration-governance.md` |
+| Governance Review | `MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md` |
+| registrationKind（governed） | `concrete-mock-provider-implementation` |
+| Registration scope | `text-generation-mock-provider` / `1.0` / `text_generation` |
+| Mock Provider Catalog Registration Governance | **Complete** |
+| Mock Provider Catalog Registration | **Authorized / Not Started** |
+| Provider Production Ready | **Not Declared** |
+| Current Maturity | **Level 3.16** |
+| Test 918–945 | Mock Provider Catalog Registration Governance |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **945 PASS**（Test 918–945 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.74.0 — Mock Provider Production Implementation Release
 
 Mock Provider Production Implementation Release — minimum authorized `text_generation` query Provider — deterministic in-memory execution — no external IO — catalog registration **Deferred**（Decision B）。

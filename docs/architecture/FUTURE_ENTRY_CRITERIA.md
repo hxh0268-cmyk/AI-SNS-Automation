@@ -19,7 +19,7 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.15 — Mock Provider Production Implementation Release Complete
+Current Maturity: Level 3.16 — Mock Provider Catalog Registration Governance Release Complete
 ```
 
 | 項目 | 状態（v1.72.0） |
@@ -36,6 +36,7 @@ Current Maturity: Level 3.15 — Mock Provider Production Implementation Release
 | Level 3.13 Provider Public Contract Catalog Extension Release | **Completed**（v1.72.0） |
 | Level 3.14 Mock Provider Production Implementation Authorization Governance | **Completed**（v1.73.0） |
 | Level 3.15 Mock Provider Production Implementation Release | **Completed**（v1.74.0） |
+| Level 3.16 Mock Provider Catalog Registration Governance Release | **Completed**（v1.75.0） |
 | Final Architecture Review | **Completed**（Decision B remediation — v1.66.0） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | Provider Entry Preparation | **Governance Complete**（[PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md)） |
@@ -45,7 +46,8 @@ Current Maturity: Level 3.15 — Mock Provider Production Implementation Release
 | **Provider Public Contract Catalog Extension** | **Complete**（[PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) — `providerContracts[]` abstract authority） |
 | **Mock Provider Production Implementation Authorization** | **Granted**（[MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) — v1.73.0 ADR-0016） |
 | **Mock Provider Production Implementation** | **Implemented**（v1.74.0 — `src/lib/mock_provider.js`） |
-| **Mock Provider Catalog Registration** | **Deferred**（Decision B） |
+| **Mock Provider Catalog Registration Governance** | **Complete**（v1.75.0 — [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) — ADR-0017） |
+| **Mock Provider Catalog Registration** | **Authorized / Not Started**（ADR-0017） |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | Provider Production Implementation | **Not Started**（Real Provider scope） |
 | Level 5 Production Ready | **未到達** |
@@ -163,7 +165,9 @@ Future 実装着手 =
 
 **v1.73.0 Mock Provider Production Implementation Authorization Evidence:** [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) + [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md)
 
-**Mock Provider Production Implementation（current）:** **Implemented**（v1.74.0）— catalog concrete registration **Deferred**（Decision B）
+**Mock Provider Production Implementation（current）:** **Implemented**（v1.74.0）
+
+**Mock Provider Catalog Registration Governance（current）:** **Complete**（v1.75.0）— concrete registration **Authorized / Not Started**
 
 **v1.68.0（historical）:** P4 Partially Satisfied — superseded by v1.69.0 Contract Definition Governance.
 
@@ -499,7 +503,8 @@ Level 3 → Level 4 Gate PASS =
 | Provider Public Contract Catalog Extension | ✅ **Complete**（v1.72.0） |
 | Mock Provider Production Implementation Authorization | ✅ **Complete**（v1.73.0） |
 | Mock Provider Production Implementation | ✅ **Implemented**（v1.74.0） |
-| Mock Provider Catalog Registration | ❌ **Deferred**（Decision B） |
+| Mock Provider Catalog Registration Governance | ✅ **Complete**（v1.75.0） |
+| Mock Provider Catalog Registration | ⏳ **Authorized / Not Started**（ADR-0017） |
 | Provider domain U1–U8 | ✅ **Satisfied** |
 | Provider applicability G-07 / G-08 / G-18 | ✅ **Satisfied** |
 | G-24 / G-25 / G-26 | ✅ **Satisfied** |
@@ -509,7 +514,7 @@ Level 3 → Level 4 Gate PASS =
 | Repository-wide Level 4 Implementation Ready | ❌ **Not Declared** |
 | Provider Production Implementation | ❌ **Not Started**（Real Provider scope） |
 | Catalog Extension Release | ✅ **Complete**（v1.72.0 — ADR-0015） |
-| First Target Domain | **Provider Layer** — Mock Provider implemented; catalog concrete registration next gate |
+| First Target Domain | **Provider Layer** — catalog registration governance complete; catalog registration implementation next gate |
 
 Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
 

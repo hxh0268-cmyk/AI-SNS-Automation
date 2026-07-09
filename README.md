@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Mock Provider Catalog Registration Governance Release（v1.75.0）
+
+**Mock Provider Catalog Registration Governance Release** を実施しました。ADR-0017 により concrete `providerContracts[]` registration policy を定義（**44 必須 Governance 文書** — Catalog / mock_provider production **unchanged**）。
+
+**Current Version: v1.75.0** | **Quality Pipeline: 945 PASS**
+
+Mock Provider Catalog Registration Governance: **Complete** — `concrete-mock-provider-implementation` / identity mapping / validator policy defined。Catalog Registration: **Authorized / Not Started**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**。Real Provider **Prohibited**。
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | [ADR-0017](docs/adr/ADR-0017-mock-provider-catalog-registration-governance.md) |
+| Governance Review | [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](docs/architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) |
+| Current Maturity | **Level 3.16** — Mock Provider Catalog Registration Governance Release Complete |
+| Next Phase Candidate | **Mock Provider Catalog Registration Implementation Release** |
+
 ### Mock Provider Production Implementation Release（v1.74.0）
 
 **Mock Provider Production Implementation Release** を実施しました。ADR-0016 認可範囲内で `src/lib/mock_provider.js` を追加（**43 必須 Governance 文書** — Catalog **unchanged**）。

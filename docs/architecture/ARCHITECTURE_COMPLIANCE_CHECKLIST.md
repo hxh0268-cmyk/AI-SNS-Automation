@@ -291,7 +291,8 @@ Per [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.m
 - [ ] Real Provider / external IO **remains prohibited**
 - [ ] Mock Provider implementation requires **later Provider Level 4 Implementation Ready Decision**（**historical — v1.70.0** — superseded by v1.71.0 Declared）
 - [ ] Provider Production Implementation **Not Started**
-- [ ] Mock Provider Production Implementation **Not Started**（**historical — v1.70.0** — superseded by v1.73.0 Authorized / Not Started）
+- [ ] **Mock Provider Production Implementation Implemented**（v1.74.0 — superseded historical Not Started）
+- [ ] **Mock Provider Catalog Registration Authorized / Not Started**（v1.75.0 — ADR-0017）（**historical — v1.70.0** — superseded by v1.73.0 Authorized / Not Started）
 - [ ] Provider Level 4 Implementation Ready **Not Declared**（**historical — v1.70.0** — superseded by v1.71.0）
 - [ ] Public Contract Catalog generator / reports **unchanged**
 - [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
@@ -314,7 +315,8 @@ Per [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_4_IMPLEME
 - [ ] **Provider Level 4 Implementation Ready Declared**（domain-specific）
 - [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
 - [ ] Provider Production Implementation **Not Started**
-- [ ] Mock Provider Production Implementation **Not Started**
+- [ ] **Mock Provider Production Implementation Implemented**（v1.74.0 — superseded historical Not Started）
+- [ ] **Mock Provider Catalog Registration Authorized / Not Started**（v1.75.0 — ADR-0017）
 - [ ] Real Provider / external IO **remains prohibited**
 - [ ] **Catalog Extension Release Required** before Mock Provider Production Implementation（**historical — v1.71.0** — superseded by v1.72.0 Complete）
 - [ ] Catalog generator / reports **unchanged**
@@ -339,7 +341,8 @@ Per [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CON
 - [ ] Provider Level 4 Implementation Ready **Declared** maintained
 - [ ] Repository-wide Level 4 Implementation Ready **Not Declared**
 - [ ] Provider Production Implementation **Not Started**
-- [ ] Mock Provider Production Implementation **Not Started**
+- [ ] **Mock Provider Production Implementation Implemented**（v1.74.0 — superseded historical Not Started）
+- [ ] **Mock Provider Catalog Registration Authorized / Not Started**（v1.75.0 — ADR-0017）
 - [ ] Real Provider / external IO **remains prohibited**
 - [ ] CL-013 mitigated / PR-004 mitigated / PR-005 documented
 - [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
@@ -355,7 +358,7 @@ Per [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PRO
 - [ ] Authorization prerequisites satisfied — G-24 / G-25 / G-26 / Provider L4 Ready / Catalog Extension
 - [ ] G-23 repository-wide **Not Satisfied** maintained
 - [ ] **Mock Provider Production Implementation Authorized** — future separate Implementation Release
-- [ ] **Mock Provider Production Implementation Not Started**
+- [ ] **Mock Provider Production Implementation Implemented** — v1.74.0 `src/lib/mock_provider.js`（**historical — v1.73.0** superseded Authorized / Not Started）
 - [ ] **Provider Production Ready Not Declared**
 - [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
 - [ ] Mock Provider semantic definition documented
@@ -376,6 +379,37 @@ Per [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PRO
 - [ ] CL-004 / CL-005 / CL-006 deferred maintained
 - [ ] Human Review recorded
 - [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+
+---
+
+## Mock Provider Catalog Registration Governance Compliance
+
+Per [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) + [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md):
+
+- [ ] ADR-0017 accepted
+- [ ] Mock Provider Production Implementation **Implemented** maintained（v1.74.0）
+- [ ] Registration necessity decided — concrete entry required
+- [ ] Registration scope defined — `text-generation-mock-provider` / `1.0` / `text_generation`
+- [ ] `registrationKind` governed — `concrete-mock-provider-implementation`
+- [ ] Identity mapping defined — 1:1 providerId, no catalog alias
+- [ ] Validator policy defined — **not implemented** in v1.75.0
+- [ ] Schema version **unchanged** — `public-contract-catalog/1.0`
+- [ ] Catalog version **unchanged** — `1.0`
+- [ ] Backward compatibility defined — Application contracts unchanged
+- [ ] Migration **not required**
+- [ ] **Mock Provider Catalog Registration Governance Complete**
+- [ ] **Mock Provider Catalog Registration Authorized** — future separate Implementation Release
+- [ ] **Mock Provider Catalog Registration Not Started**
+- [ ] **Provider Production Ready Not Declared**
+- [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
+- [ ] Real Provider / external IO **remains prohibited**
+- [ ] `public_contract_catalog.js` **unchanged**
+- [ ] `mock_provider.js` **unchanged**
+- [ ] Application `publicContracts[]` / `compatibilityMatrix` unchanged
+- [ ] PR-004 / PR-005 / PR-006 / CL-013 updated
+- [ ] CL-004 / CL-005 / CL-006 deferred maintained
+- [ ] Human Review recorded
+- [ ] Concrete catalog registration **not executed**
 
 ---
 
