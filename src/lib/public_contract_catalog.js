@@ -419,11 +419,92 @@ export const DEPRECATION_RULES = [
   },
 ];
 
+export const PROVIDER_CONTRACT_AUTHORITY_DOCUMENT =
+  "docs/architecture/PROVIDER_LAYER_DESIGN.md";
+
+export const PROVIDER_FORBIDDEN_REGISTRATION_IDS = [
+  "mock-provider",
+  "real-provider",
+  "sns-provider",
+  "openai-provider",
+  "gemini-provider",
+  "nano-banana-provider",
+  "external-api-provider",
+  "adapter",
+  "adapter-implementation",
+];
+
+export const PROVIDER_FORBIDDEN_ID_PATTERNS = [
+  /^mock-/i,
+  /^real-/i,
+  /mock-provider/i,
+  /real-provider/i,
+  /sns-provider/i,
+  /openai/i,
+  /gemini/i,
+  /nano-banana/i,
+  /external-api/i,
+  /^adapter/i,
+];
+
+export const PROVIDER_SENSITIVE_FIELD_NAMES = [
+  "credential",
+  "secret",
+  "token",
+  "password",
+  "apiKey",
+  "oauth",
+  "accessToken",
+  "refreshToken",
+];
+
+export const PROVIDER_CONTRACT_REQUIRED_FIELDS = [
+  "providerId",
+  "providerVersion",
+  "providerType",
+  "layer",
+  "registrationKind",
+  "status",
+  "authorityDocument",
+  "inputContractRef",
+  "outputContractRef",
+  "errorContractRef",
+  "capabilityDeclaration",
+];
+
+export const PROVIDER_CONTRACT_DEFINITIONS = [
+  {
+    providerId: "provider-abstract-contract-authority",
+    providerVersion: "1.0",
+    providerType: "abstract",
+    layer: "provider",
+    registrationKind: "abstract-contract-authority",
+    status: "design-only",
+    authorityDocument: PROVIDER_CONTRACT_AUTHORITY_DOCUMENT,
+    authoritySections: ["§8", "§9", "§10", "§11", "§12", "§13", "§14"],
+    inputContractRef: "application-public-contract",
+    outputContractRef: "normalized-provider-output",
+    errorContractRef: "provider-error-contract",
+    capabilityDeclaration: "capability-explicit-per-implementation",
+    configurationSchema: "non-secret-only",
+    credentialRequirement: "declaration-only",
+    sideEffectDeclaration: "query-or-command",
+    timeoutPolicyDeclaration: "provider-adapter-owned",
+    retryPolicyDeclaration: "provider-local-only",
+    implementationStatus: "not-started",
+  },
+];
+
 export const EXTENSION_WARNINGS = [
+  {
+    id: "provider-abstract-only",
+    warning:
+      "providerContracts[] registers Provider abstract contract authority only — no Mock/Real/SNS/OpenAI/Gemini/Nano Banana/External API/Adapter implementation entries",
+  },
   {
     id: "provider-not-implemented",
     warning:
-      "Provider and Adapter implementations are not part of v1.48.0; only Public Contract boundaries are cataloged",
+      "Provider and Adapter implementations remain not started; only abstract contract authority is cataloged",
   },
   {
     id: "runtime-not-implemented",
@@ -489,6 +570,7 @@ export function buildPublicContractCatalog(options = {}) {
     catalogVersion: PUBLIC_CONTRACT_CATALOG_VERSION,
     foundations,
     publicContracts: PUBLIC_CONTRACT_DEFINITIONS.map((contract) => ({ ...contract })),
+    providerContracts: PROVIDER_CONTRACT_DEFINITIONS.map((contract) => ({ ...contract })),
     dependencyRules: DEPENDENCY_RULES.map((rule) => ({ ...rule })),
     compatibilityMatrix: buildCompatibilityMatrix(),
     layerRules: LAYER_RULES.map((rule) => ({ ...rule })),
@@ -500,8 +582,107 @@ export function buildPublicContractCatalog(options = {}) {
       "Platform Layer completed at v1.40.0 and must remain independent from Application Layer internals.",
       "Future Provider, Adapter, Runtime, and external SNS integrations must consume Public Contract extractors only and update this catalog before release.",
       "Breaking Public Contract changes require a major version bump and staged deprecation before removal.",
+      "providerContracts[] is additive — Application publicContracts[] and compatibilityMatrix semantics remain unchanged per ADR-0011 and ADR-0012.",
+      "providerContracts[] registers Provider abstract contract authority from PROVIDER_LAYER_DESIGN.md only — concrete Mock/Real Provider implementations require separate Governance Release.",
     ],
   };
+}
+
+/**
+ * @param {unknown} entry
+ * @param {number} index
+ * @returns {string[]}
+ */
+export function collectProviderContractEntryErrors(entry, index) {
+  /** @type {string[]} */
+  const errors = [];
+
+  if (!entry || typeof entry !== "object") {
+    return [`providerContracts[${index}] must be an object`];
+  }
+
+  for (const field of PROVIDER_CONTRACT_REQUIRED_FIELDS) {
+    if (!(field in entry) || entry[field] == null || entry[field] === "") {
+      errors.push(`providerContracts[${index}] missing required field: ${field}`);
+    }
+  }
+
+  const providerId = typeof entry.providerId === "string" ? entry.providerId : "";
+
+  if (PROVIDER_FORBIDDEN_REGISTRATION_IDS.includes(providerId)) {
+    errors.push(`providerContracts[${index}] forbidden providerId: ${providerId}`);
+  }
+
+  for (const pattern of PROVIDER_FORBIDDEN_ID_PATTERNS) {
+    if (providerId && pattern.test(providerId)) {
+      errors.push(
+        `providerContracts[${index}] providerId matches forbidden pattern: ${providerId}`,
+      );
+    }
+  }
+
+  if (
+    entry.registrationKind &&
+    entry.registrationKind !== "abstract-contract-authority"
+  ) {
+    errors.push(
+      `providerContracts[${index}] registrationKind must be abstract-contract-authority`,
+    );
+  }
+
+  if (entry.authorityDocument && entry.authorityDocument !== PROVIDER_CONTRACT_AUTHORITY_DOCUMENT) {
+    errors.push(
+      `providerContracts[${index}] authorityDocument must reference PROVIDER_LAYER_DESIGN.md`,
+    );
+  }
+
+  for (const key of Object.keys(entry)) {
+    if (PROVIDER_SENSITIVE_FIELD_NAMES.includes(key)) {
+      errors.push(`providerContracts[${index}] contains forbidden field: ${key}`);
+    }
+  }
+
+  const serialized = JSON.stringify(entry);
+  for (const forbidden of ["api_key", "client_secret", "bearer_token"]) {
+    if (serialized.toLowerCase().includes(forbidden)) {
+      errors.push(`providerContracts[${index}] contains forbidden sensitive value marker`);
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * @param {unknown} providerContracts
+ * @returns {string[]}
+ */
+export function validateProviderContracts(providerContracts) {
+  /** @type {string[]} */
+  const errors = [];
+
+  if (!Array.isArray(providerContracts)) {
+    return ["providerContracts must be an array"];
+  }
+
+  if (providerContracts.length !== PROVIDER_CONTRACT_DEFINITIONS.length) {
+    errors.push(
+      `providerContracts must include ${PROVIDER_CONTRACT_DEFINITIONS.length} entries`,
+    );
+  }
+
+  for (const [index, entry] of providerContracts.entries()) {
+    errors.push(...collectProviderContractEntryErrors(entry, index));
+  }
+
+  const ids = providerContracts
+    .map((entry) => (entry && typeof entry === "object" ? entry.providerId : null))
+    .filter(Boolean);
+
+  if (new Set(ids).size !== ids.length) {
+    errors.push("providerContracts providerId values must be unique");
+  }
+
+  return errors;
 }
 
 /**
@@ -522,11 +703,16 @@ export function normalizePublicContractCatalog(catalog) {
     includePlatformLayer,
   });
 
+  const providerContracts = Array.isArray(catalog.providerContracts)
+    ? catalog.providerContracts.map((entry) => ({ ...entry }))
+    : normalized.providerContracts;
+
   return {
     ...normalized,
     schema: catalog.schema ?? PUBLIC_CONTRACT_CATALOG_SCHEMA,
     generatedAt: catalog.generatedAt ?? normalized.generatedAt,
     catalogVersion: catalog.catalogVersion ?? PUBLIC_CONTRACT_CATALOG_VERSION,
+    providerContracts,
   };
 }
 
@@ -565,6 +751,7 @@ export function validatePublicContractCatalog(catalog) {
   for (const field of [
     "foundations",
     "publicContracts",
+    "providerContracts",
     "dependencyRules",
     "compatibilityMatrix",
     "layerRules",
@@ -604,6 +791,8 @@ export function validatePublicContractCatalog(catalog) {
     errors.push("compatibilityMatrix entry count mismatch");
   }
 
+  errors.push(...validateProviderContracts(catalog.providerContracts));
+
   return {
     valid: errors.length === 0,
     errors,
@@ -630,6 +819,7 @@ export function renderPublicContractCatalogMarkdown(catalog) {
     `| Catalog Version | ${normalized.catalogVersion} |`,
     `| Foundation Count | ${normalized.foundations.length} |`,
     `| Public Contract Count | ${normalized.publicContracts.length} |`,
+    `| Provider Contract Count | ${normalized.providerContracts.length} |`,
     `| Dependency Rules | ${normalized.dependencyRules.length} |`,
     `| Compatibility Matrix Entries | ${normalized.compatibilityMatrix.length} |`,
     "",
@@ -692,6 +882,22 @@ export function renderPublicContractCatalogMarkdown(catalog) {
     lines.push("");
   }
 
+  lines.push("## Provider Contracts", "");
+
+  for (const contract of normalized.providerContracts) {
+    lines.push(`### ${contract.providerId}`);
+    lines.push("");
+    lines.push(`- Provider Version: \`${contract.providerVersion}\``);
+    lines.push(`- Provider Type: \`${contract.providerType}\``);
+    lines.push(`- Registration Kind: \`${contract.registrationKind}\``);
+    lines.push(`- Authority: \`${contract.authorityDocument}\``);
+    lines.push(`- Input Contract Ref: \`${contract.inputContractRef}\``);
+    lines.push(`- Output Contract Ref: \`${contract.outputContractRef}\``);
+    lines.push(`- Error Contract Ref: \`${contract.errorContractRef}\``);
+    lines.push(`- Implementation Status: \`${contract.implementationStatus}\``);
+    lines.push("");
+  }
+
   lines.push("## Extension Warnings", "");
 
   for (const warning of normalized.extensionWarnings) {
@@ -722,6 +928,7 @@ export function printPublicContractCatalogSummary(catalog) {
     `Catalog Version: ${normalized.catalogVersion}`,
     `Application Foundations: ${applicationCount}`,
     `Public Contracts: ${normalized.publicContracts.length}`,
+    `Provider Contracts: ${normalized.providerContracts.length}`,
     `Dependency Rules: ${normalized.dependencyRules.length}`,
     `Compatibility Matrix Entries: ${normalized.compatibilityMatrix.length}`,
     `Layer Rules: ${normalized.layerRules.length}`,

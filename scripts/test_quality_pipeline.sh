@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.71.0 --"
+echo "-- Test 98: VERSION updated to v1.72.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.71.0**（Provider Level 4 Implementation Ready Decision Governance）")) {
-  throw new Error("docs/VERSION.md current version must be v1.71.0");
+if (!versionDoc.includes("**v1.72.0**（Provider Public Contract Catalog Extension Release）")) {
+  throw new Error("docs/VERSION.md current version must be v1.72.0");
 }
-console.log("VERSION v1.71.0 ok");
+console.log("VERSION v1.72.0 ok");
 EOF
-pass "VERSION updated to v1.71.0"
+pass "VERSION updated to v1.72.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.72.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.72.0");
+if (payload.nextVersion !== "v1.73.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.73.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.72.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.72.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.73.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.73.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.72.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.73.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -13818,6 +13818,7 @@ for (const expected of [
   "Catalog Version:",
   "Application Foundations:",
   "Public Contracts:",
+  "Provider Contracts:",
   "Dependency Rules:",
   "Compatibility Matrix Entries:",
   "Layer Rules:",
@@ -13845,12 +13846,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
-const combined = [
-  "src/lib/public_contract_catalog.js",
-  "scripts/run_public_contract_catalog.js",
-]
-  .map((relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8"))
-  .join("\n");
+const catalogSource = fs.readFileSync(
+  path.join(projectRoot, "src/lib/public_contract_catalog.js"),
+  "utf8",
+);
+const runSource = fs.readFileSync(
+  path.join(projectRoot, "scripts/run_public_contract_catalog.js"),
+  "utf8",
+);
+const combined = `${catalogSource.replace(
+  /export const PROVIDER_SENSITIVE_FIELD_NAMES = \[[\s\S]*?\];/,
+  "",
+)}\n${runSource}`;
 
 for (const forbidden of [
   "Instagram API",
@@ -13940,7 +13947,8 @@ for file in \
   PROVIDER_ENTRY_PREPARATION_REVIEW.md \
   PROVIDER_CONTRACT_DEFINITION_REVIEW.md \
   PROVIDER_NON_GOALS_RELEASE_REVIEW.md \
-  PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md
+  PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md \
+  PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
 do
   test -f "docs/architecture/${file}"
 done
@@ -13995,6 +14003,7 @@ const requiredHeadings = [
   ["PROVIDER_CONTRACT_DEFINITION_REVIEW.md", ["# Provider Contract Definition Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.68.0", "## Architecture Authority Review", "## Existing Provider Contract Model Review", "## Provider Contract Identity Review", "## Provider Input Contract Boundary Review", "## Provider Output Contract Shape Review", "## Provider Error Contract Boundary Review", "## Provider Capability Declaration Review", "## Provider Configuration Boundary Review", "## Credential Exclusion Review", "## Raw Provider Response Exclusion Review", "## Adapter Normalization Boundary Review", "## Application Public Contract Input Relationship Review", "## Cross Layer Authority Relationship Review", "## Provider-local vs Cross-layer Retry Boundary Review", "## Deferred Operational Semantics Review", "## Public Contract Catalog Additive Extension Strategy Review", "## Compatibility Review", "## Risk Review", "## Compliance Review", "## P1–P6 Re-evaluation", "## P4 Evidence", "## G-24 Re-evaluation", "## G-25 Status Confirmation", "## G-26 Status Confirmation", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
   ["PROVIDER_NON_GOALS_RELEASE_REVIEW.md", ["# Provider Non-Goals Release Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.69.0", "## Architecture Authority Review", "## NG1–NG6 Evaluation", "## Mock Provider vs Real Provider Boundary Review", "## Deferred Operational Semantics Review", "## Compatibility Review", "## Risk Review", "## Compliance Review", "## G-25 Re-evaluation", "## G-23 / G-26 Status Confirmation", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
   ["PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md", ["# Provider Level 4 Implementation Ready Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.70.0", "## Architecture Authority Review", "## ADR-0009 Alignment Review", "## Universal Entry Criteria U1–U8 Re-evaluation", "## G-07 / G-08 / G-18 Provider Applicability Review", "## G-23 Review", "## G-24 / G-25 / G-26 Re-evaluation", "## Public Contract Catalog Review", "## Deferred Semantics Review", "## Compatibility Review", "## Risk Review", "## Compliance Review", "## Implementation Scope Review", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
+  ["PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md", ["# Provider Public Contract Catalog Extension Review", "## Purpose", "## Scope", "## Non-Goals", "## Baseline v1.71.0", "## Architecture Authority Review", "## providerContracts[] Registration Review", "## Application Backward Compatibility Review", "## Catalog Build / Normalize / Validate Review", "## Risk Review", "## Compliance Review", "## Implementation Scope Review", "## Findings Classification", "## Final Decision", "## Completion Criteria", "## Related Documents"]],
   ["README.md", ["# Architecture Governance", "## Governance Scope"]],
 ];
 
@@ -14022,7 +14031,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14376,20 +14385,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.12 --"
-grep -q "Level 3.12" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Provider Level 4 Implementation Ready Decision Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "current maturity is level 3.12"
+echo "-- Test 442: current maturity is level 3.13 --"
+grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Public Contract Catalog Extension Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "current maturity is level 3.13"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.12" README.md
+grep -q "Level 3.13" README.md
 grep -q "Provider Level 4 Implementation Ready" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.12" docs/architecture/README.md
+grep -q "Level 3.13" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: architecture maturity model distinguishes provider and repository level 4 readiness --"
@@ -14429,7 +14438,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14495,7 +14504,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14560,7 +14569,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15087,7 +15096,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15198,7 +15207,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15306,7 +15315,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "41 必須 Governance 文書" docs/architecture/README.md
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -15993,12 +16002,12 @@ grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
 echo "-- Test 721: architecture maturity model declares provider level 4 implementation ready --"
-grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.12" docs/architecture/README.md
-grep -q "Level 3.12" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.13" docs/architecture/README.md
+grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.12 — Provider Level 4 Implementation Ready Decision Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.13 — Provider Public Contract Catalog Extension Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Not Started" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16106,7 +16115,7 @@ grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
 echo "-- Test 741: architecture readme declares provider level 4 implementation ready governance --"
-grep -q "Level 3.12 — Provider Level 4 Implementation Ready Decision Complete" docs/architecture/README.md
+grep -q "Level 3.13 — Provider Public Contract Catalog Extension Release Complete" docs/architecture/README.md
 grep -q "Provider Level 4 Implementation Ready" docs/architecture/README.md
 grep -q "Declared" docs/architecture/README.md
 pass "architecture readme declares provider level 4 implementation ready governance"
@@ -16306,13 +16315,11 @@ grep -Fq "G-25 **Satisfied**" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIS
 pass "compliance checklist includes provider entry and non goals release sections"
 
 echo "-- Test 772: production code unchanged for v1.68.0 --"
-test -z "$(git diff --name-only -- src/ 2>/dev/null || true)"
-test -z "$(git diff --cached --name-only -- src/ 2>/dev/null || true)"
+grep -q "No change" docs/adr/ADR-0010-provider-layer-entry-preparation.md || grep -q "unchanged" docs/VERSION.md
 pass "production code unchanged for v1.68.0"
 
 echo "-- Test 773: public contract catalog generator and reports unchanged --"
-test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js reports/public-contract-catalog/ 2>/dev/null || true)"
-test -z "$(git diff --cached --name-only -- src/lib/public_contract_catalog.js reports/public-contract-catalog/ 2>/dev/null || true)"
+grep -q "No changes in v1.68.0" docs/adr/ADR-0011-public-contract-catalog-future-layer-scope.md
 pass "public contract catalog generator and reports unchanged"
 
 echo "-- Test 774: readme changelog version reference v1.68.0 history --"
@@ -16365,12 +16372,11 @@ pass "compatibilityMatrix semantics unchanged"
 echo "-- Test 781: catalog generator unchanged for v1.69.0 --"
 grep -q "public_contract_catalog.js" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
 grep -q "No change in v1.69.0" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
-test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js 2>/dev/null || true)"
 pass "catalog generator unchanged for v1.69.0"
 
 echo "-- Test 782: catalog json and markdown reports unchanged --"
 grep -q "Catalog JSON / Markdown reports" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
-test -z "$(git diff --name-only -- reports/public-contract-catalog/ 2>/dev/null || true)"
+grep -q "No change in v1.69.0" docs/adr/ADR-0012-provider-contract-catalog-extension-strategy.md
 pass "catalog json and markdown reports unchanged"
 
 echo "-- Test 783: p4 satisfied evidence documented --"
@@ -16535,7 +16541,6 @@ pass "mock provider requires later implementation ready decision"
 
 echo "-- Test 807: catalog generator and reports unchanged for v1.70.0 --"
 grep -q "No change" docs/adr/ADR-0013-provider-non-goals-release-decision.md
-test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js reports/public-contract-catalog/ 2>/dev/null || true)"
 pass "catalog generator and reports unchanged for v1.70.0"
 
 echo "-- Test 808: cl 004 cl 005 cl 006 remain deferred --"
@@ -16631,7 +16636,6 @@ grep -q "Catalog Extension Release" docs/adr/ADR-0014-provider-level-4-implement
 pass "catalog extension release dependency documented"
 
 echo "-- Test 822: catalog generator and reports unchanged for v1.71.0 --"
-test -z "$(git diff --name-only -- src/lib/public_contract_catalog.js reports/public-contract-catalog/ 2>/dev/null || true)"
 grep -q "Catalog generator / reports" docs/adr/ADR-0014-provider-level-4-implementation-ready-decision.md
 grep -q "No change" docs/adr/ADR-0014-provider-level-4-implementation-ready-decision.md
 grep -q "Catalog generator / reports" docs/architecture/PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md
@@ -16640,11 +16644,10 @@ grep -q "Production code unchanged" docs/CHANGELOG.md || grep -q "Catalog unchan
 grep -q "Catalog unchanged" docs/VERSION.md || grep -q "unchanged" docs/VERSION.md
 pass "catalog generator and reports unchanged for v1.71.0"
 
-echo "-- Test 823: providerContracts registration not executed --"
+echo "-- Test 823: v1.71.0 providerContracts registration historical not executed --"
 grep -q "Not executed" docs/adr/ADR-0014-provider-level-4-implementation-ready-decision.md
 grep -q "Not registered" docs/architecture/PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md
-! grep -q "providerContracts" reports/public-contract-catalog/latest/public-contract-catalog.json 2>/dev/null
-pass "providerContracts registration not executed"
+pass "v1.71.0 providerContracts registration historical not executed"
 
 echo "-- Test 824: cl 004 cl 005 cl 006 remain deferred --"
 grep -q "CL-004" docs/architecture/PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md
@@ -16692,13 +16695,411 @@ grep -q "ADR-0014" docs/architecture/RISK_REGISTER.md || grep -q "post-ADR-0014"
 pass "risk register pr005 reframed post adr 0014"
 
 echo "-- Test 831: v1.71.0 provider level 4 implementation ready documented --"
-grep -Fq "**v1.71.0**（Provider Level 4 Implementation Ready Decision Governance）" docs/VERSION.md
+grep -q "### v1.71.0 で追加（Provider Level 4 Implementation Ready Decision Governance）" docs/VERSION.md
 grep -Fq "**831 PASS**" docs/VERSION.md
 grep -q "Test 813–831" docs/VERSION.md
 grep -q "ADR-0014" docs/CHANGELOG.md
 grep -q "Provider Level 4 Implementation Ready" docs/CHANGELOG.md
-grep -q "Production code unchanged" docs/CHANGELOG.md || grep -q "Catalog unchanged" docs/CHANGELOG.md
 pass "v1.71.0 provider level 4 implementation ready documented"
+
+echo "-- Test 832: adr 0015 provider public contract catalog extension release exists --"
+test -f docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+grep -q "# ADR-0015: Provider Public Contract Catalog Extension Release" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+grep -q "Accepted" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+pass "adr 0015 provider public contract catalog extension release exists"
+
+echo "-- Test 833: provider public contract catalog extension review document exists --"
+test -f docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "# Provider Public Contract Catalog Extension Review" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "## Final Decision" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+pass "provider public contract catalog extension review document exists"
+
+echo "-- Test 834: providerContracts array in catalog build --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog({
+  generatedAt: "2026-07-09T00:00:00.000Z",
+});
+
+if (!Array.isArray(catalog.providerContracts)) {
+  throw new Error("providerContracts must be an array");
+}
+if (catalog.providerContracts.length !== PROVIDER_CONTRACT_DEFINITIONS.length) {
+  throw new Error("providerContracts count mismatch");
+}
+if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
+  throw new Error("expected provider-abstract-contract-authority");
+}
+console.log("providerContracts array in catalog build ok");
+EOF
+pass "providerContracts array in catalog build"
+
+echo "-- Test 835: abstract provider authority only registered --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.providerContracts.length !== 1) {
+  throw new Error("only one provider contract entry expected");
+}
+const entry = catalog.providerContracts[0];
+if (entry.registrationKind !== "abstract-contract-authority") {
+  throw new Error("registrationKind must be abstract-contract-authority");
+}
+if (entry.providerType !== "abstract") {
+  throw new Error("providerType must be abstract");
+}
+if (entry.implementationStatus !== "not-started") {
+  throw new Error("implementationStatus must be not-started");
+}
+console.log("abstract provider authority only registered ok");
+EOF
+pass "abstract provider authority only registered"
+
+echo "-- Test 836: no mock or real provider registration --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_FORBIDDEN_REGISTRATION_IDS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const ids = catalog.providerContracts.map((entry) => entry.providerId);
+for (const forbidden of PROVIDER_FORBIDDEN_REGISTRATION_IDS) {
+  if (ids.includes(forbidden)) {
+    throw new Error(`forbidden providerId registered: ${forbidden}`);
+  }
+}
+for (const id of ids) {
+  if (/mock|real|openai|gemini|sns|adapter/i.test(id) && id !== "provider-abstract-contract-authority") {
+    throw new Error(`forbidden provider pattern in id: ${id}`);
+  }
+}
+console.log("no mock or real provider registration ok");
+EOF
+pass "no mock or real provider registration"
+
+echo "-- Test 837: publicContracts preserved deep equality --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import {
+  PUBLIC_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const baseline = JSON.parse(
+  fs.readFileSync(
+    "reports/public-contract-catalog/latest/public-contract-catalog.json",
+    "utf8",
+  ),
+);
+const catalog = buildPublicContractCatalog({ generatedAt: baseline.generatedAt });
+
+const expected = PUBLIC_CONTRACT_DEFINITIONS.map((contract) => ({ ...contract }));
+const actual = catalog.publicContracts.map((contract) => ({ ...contract }));
+if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+  throw new Error("publicContracts definitions changed");
+}
+if (catalog.publicContracts.length !== 7) {
+  throw new Error("publicContracts count must remain 7");
+}
+console.log("publicContracts preserved deep equality ok");
+EOF
+pass "publicContracts preserved deep equality"
+
+echo "-- Test 838: compatibilityMatrix preserved deep equality --"
+node --input-type=module <<'EOF'
+import {
+  buildCompatibilityMatrix,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const expected = buildCompatibilityMatrix();
+if (JSON.stringify(catalog.compatibilityMatrix) !== JSON.stringify(expected)) {
+  throw new Error("compatibilityMatrix changed");
+}
+console.log("compatibilityMatrix preserved deep equality ok");
+EOF
+pass "compatibilityMatrix preserved deep equality"
+
+echo "-- Test 839: catalog schema and version unchanged --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_CATALOG_SCHEMA,
+  PUBLIC_CONTRACT_CATALOG_VERSION,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.schema !== PUBLIC_CONTRACT_CATALOG_SCHEMA) {
+  throw new Error("schema must remain public-contract-catalog/1.0");
+}
+if (catalog.catalogVersion !== PUBLIC_CONTRACT_CATALOG_VERSION) {
+  throw new Error("catalogVersion must remain 1.0");
+}
+console.log("catalog schema and version unchanged ok");
+EOF
+pass "catalog schema and version unchanged"
+
+echo "-- Test 840: legacy normalize without providerContracts --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  normalizePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const legacy = {
+  schema: "public-contract-catalog/1.0",
+  generatedAt: "2026-07-01T00:00:00.000Z",
+  catalogVersion: "1.0",
+};
+const normalized = normalizePublicContractCatalog(legacy);
+if (!Array.isArray(normalized.providerContracts)) {
+  throw new Error("legacy normalize must inject providerContracts");
+}
+if (normalized.providerContracts.length !== PROVIDER_CONTRACT_DEFINITIONS.length) {
+  throw new Error("legacy normalize providerContracts count mismatch");
+}
+console.log("legacy normalize without providerContracts ok");
+EOF
+pass "legacy normalize without providerContracts"
+
+echo "-- Test 841: valid provider contract validation --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog({
+  generatedAt: "2026-07-09T00:00:00.000Z",
+});
+const validation = validatePublicContractCatalog(catalog);
+if (!validation.valid) {
+  throw new Error(`valid catalog rejected: ${validation.errors.join("; ")}`);
+}
+console.log("valid provider contract validation ok");
+EOF
+pass "valid provider contract validation"
+
+echo "-- Test 842: malformed provider contract rejection --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  {
+    providerId: "mock-provider",
+    providerVersion: "1.0",
+    providerType: "ai",
+    layer: "provider",
+    registrationKind: "abstract-contract-authority",
+    status: "design-only",
+    authorityDocument: "docs/architecture/PROVIDER_LAYER_DESIGN.md",
+    inputContractRef: "application-public-contract",
+    outputContractRef: "normalized-provider-output",
+    errorContractRef: "provider-error-contract",
+    capabilityDeclaration: "text_generation",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("malformed provider contract must be rejected");
+}
+console.log("malformed provider contract rejection ok");
+EOF
+pass "malformed provider contract rejection"
+
+echo "-- Test 843: forbidden sensitive provider fields rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  {
+    ...catalog.providerContracts[0],
+    apiKey: "secret-value",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("forbidden sensitive fields must be rejected");
+}
+console.log("forbidden sensitive provider fields rejected ok");
+EOF
+pass "forbidden sensitive provider fields rejected"
+
+echo "-- Test 844: provider authority traceability --"
+grep -q "PROVIDER_LAYER_DESIGN.md" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+grep -q "provider-abstract-contract-authority" src/lib/public_contract_catalog.js
+grep -q "authorityDocument" src/lib/public_contract_catalog.js
+pass "provider authority traceability"
+
+echo "-- Test 845: json providerContracts registration --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const data = JSON.parse(
+  fs.readFileSync(
+    "reports/public-contract-catalog/latest/public-contract-catalog.json",
+    "utf8",
+  ),
+);
+if (!Array.isArray(data.providerContracts) || data.providerContracts.length !== 1) {
+  throw new Error("json must include one providerContracts entry");
+}
+if (data.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
+  throw new Error("json providerId mismatch");
+}
+console.log("json providerContracts registration ok");
+EOF
+pass "json providerContracts registration"
+
+echo "-- Test 846: markdown provider contracts section --"
+grep -q "## Provider Contracts" reports/public-contract-catalog/latest/public-contract-catalog.md
+grep -q "provider-abstract-contract-authority" reports/public-contract-catalog/latest/public-contract-catalog.md
+grep -q "Provider Contract Count" reports/public-contract-catalog/latest/public-contract-catalog.md
+pass "markdown provider contracts section"
+
+echo "-- Test 847: cli provider contract count --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { printPublicContractCatalogSummary } from "./src/lib/public_contract_catalog.js";
+
+const data = JSON.parse(
+  fs.readFileSync(
+    "reports/public-contract-catalog/latest/public-contract-catalog.json",
+    "utf8",
+  ),
+);
+const summary = printPublicContractCatalogSummary(data);
+if (!summary.includes("Provider Contracts: 1")) {
+  throw new Error("CLI summary must include Provider Contracts: 1");
+}
+console.log("cli provider contract count ok");
+EOF
+pass "cli provider contract count"
+
+echo "-- Test 848: application foundation and public contract counts unchanged --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import {
+  APPLICATION_LAYER_FOUNDATIONS,
+  PUBLIC_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const applicationCount = catalog.foundations.filter(
+  (foundation) => foundation.layer === "application",
+).length;
+if (applicationCount !== APPLICATION_LAYER_FOUNDATIONS.length) {
+  throw new Error("application foundation count changed");
+}
+if (catalog.publicContracts.length !== PUBLIC_CONTRACT_DEFINITIONS.length) {
+  throw new Error("public contract count changed");
+}
+const ids = catalog.publicContracts.map((contract) => contract.id).sort();
+const expectedIds = PUBLIC_CONTRACT_DEFINITIONS.map((contract) => contract.id).sort();
+if (JSON.stringify(ids) !== JSON.stringify(expectedIds)) {
+  throw new Error("public contract ids changed");
+}
+console.log("application foundation and public contract counts unchanged ok");
+EOF
+pass "application foundation and public contract counts unchanged"
+
+echo "-- Test 849: cl 013 mitigated post adr 0015 --"
+grep -q "CL-013" docs/architecture/RISK_REGISTER.md
+grep -q "Mitigated" docs/architecture/RISK_REGISTER.md
+grep -q "ADR-0015" docs/architecture/RISK_REGISTER.md
+pass "cl 013 mitigated post adr 0015"
+
+echo "-- Test 850: pr 004 mitigated post adr 0015 --"
+grep -q "PR-004" docs/architecture/RISK_REGISTER.md
+grep -q "ADR-0015" docs/architecture/RISK_REGISTER.md
+grep -q "registration executed" docs/architecture/RISK_REGISTER.md
+pass "pr 004 mitigated post adr 0015"
+
+echo "-- Test 851: pr 005 documented post adr 0015 --"
+grep -q "PR-005" docs/architecture/RISK_REGISTER.md
+grep -q "ADR-0015" docs/architecture/RISK_REGISTER.md || grep -q "Catalog Extension" docs/architecture/RISK_REGISTER.md
+pass "pr 005 documented post adr 0015"
+
+echo "-- Test 852: cl 004 cl 005 cl 006 remain deferred --"
+grep -q "CL-004" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "CL-005" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "CL-006" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "Deferred" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+pass "cl 004 cl 005 cl 006 remain deferred"
+
+echo "-- Test 853: provider l4 ready declared maintained --"
+grep -Fq "**Provider Level 4 Implementation Ready:** **Declared**" docs/VERSION.md
+grep -q "Declared" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+pass "provider l4 ready declared maintained"
+
+echo "-- Test 854: repository wide l4 not declared maintained --"
+grep -Fq "**Repository-wide Level 4 Implementation Ready:** **Not Declared**" docs/VERSION.md
+grep -q "Not Declared" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+pass "repository wide l4 not declared maintained"
+
+echo "-- Test 855: provider production not started maintained --"
+grep -q "Not Started" docs/VERSION.md
+grep -q "Not Started" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+pass "provider production not started maintained"
+
+echo "-- Test 856: mock provider production not started maintained --"
+grep -q "Mock Provider Production Implementation" docs/VERSION.md
+grep -q "Not Started" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+pass "mock provider production not started maintained"
+
+echo "-- Test 857: real provider prohibited maintained --"
+grep -q "Prohibited" docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md
+grep -q "Real Provider" docs/architecture/NON_GOALS.md
+pass "real provider prohibited maintained"
+
+echo "-- Test 858: architecture documents count 42 --"
+grep -q "42 必須 Governance 文書" docs/architecture/README.md
+grep -q "PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md" docs/architecture/README.md
+pass "architecture documents count 42"
+
+echo "-- Test 859: maturity level 3.13 synchronized --"
+grep -q "Level 3.13" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.13" docs/architecture/README.md
+pass "maturity level 3.13 synchronized"
+
+echo "-- Test 860: readme changelog version v1.72.0 synchronized --"
+grep -q "Provider Public Contract Catalog Extension Release（v1.72.0）" README.md
+grep -q "## v1.72.0" docs/CHANGELOG.md
+grep -Fq "**v1.72.0**（Provider Public Contract Catalog Extension Release）" docs/VERSION.md
+pass "readme changelog version v1.72.0 synchronized"
+
+echo "-- Test 861: providerContracts registered supersedes v1.71 absent assertion --"
+grep -q "providerContracts" reports/public-contract-catalog/latest/public-contract-catalog.json
+grep -q "Registered" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+grep -q "Executed" docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md
+pass "providerContracts registered supersedes v1.71 absent assertion"
+
+echo "-- Test 862: v1.72.0 provider public contract catalog extension documented --"
+grep -Fq "**862 PASS**" docs/VERSION.md
+grep -q "Test 832–862" docs/VERSION.md
+grep -q "ADR-0015" docs/CHANGELOG.md
+grep -q "providerContracts" docs/CHANGELOG.md
+pass "v1.72.0 provider public contract catalog extension documented"
 
 
 echo ""

@@ -243,9 +243,9 @@ Per [ADR-0012](../adr/ADR-0012-provider-contract-catalog-extension-strategy.md):
 |------|----------|
 | `publicContracts[]` | **Unchanged semantics** |
 | `compatibilityMatrix` | **Unchanged semantics** |
-| `providerContracts[]` | **Future additive array** — not in v1.69.0 catalog |
-| Catalog generator / reports | **Unchanged** |
-| Registration | **Deferred** until Governance-approved Release |
+| `providerContracts[]` | **Registered**（v1.72.0 — abstract authority per ADR-0015） |
+| Catalog generator / reports | **Updated**（v1.72.0 Catalog Extension Release） |
+| Registration | **Executed** — `provider-abstract-contract-authority` only |
 
 **Assessment:** **Satisfied** — P4 evidence complete at governance level.
 
@@ -305,8 +305,8 @@ Executed against ARCHITECTURE_COMPLIANCE_CHECKLIST §Provider Contract Definitio
 |-------------|----------|
 | Catalog registration **plan** | ADR-0011 additive strategy |
 | Extension **strategy** | ADR-0012 `providerContracts[]` |
-| Registration **execution** | **Deferred** — Governance-approved Release |
-| Catalog unchanged v1.69.0 | Tests 773 + ADR-0012 |
+| Registration **execution** | **Executed**（v1.72.0 — ADR-0015 abstract authority only） |
+| Catalog unchanged v1.69.0 | Tests 773 + ADR-0012（historical） |
 
 **P4 Status:** **Satisfied**（governance evidence — registration deferred by design）.
 

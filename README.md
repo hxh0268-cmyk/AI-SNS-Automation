@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Provider Public Contract Catalog Extension Release（v1.72.0）
+
+**Provider Public Contract Catalog Extension Release** を実施しました。ADR-0015 により `providerContracts[]` additive registration を実行（**42 必須 Governance 文書** — Application production code **unchanged**）。
+
+**Current Version: v1.72.0** | **Quality Pipeline: 862 PASS**
+
+Catalog Extension: **Complete** — `provider-abstract-contract-authority` registered / `publicContracts[]` + `compatibilityMatrix` **preserved**。Provider L4 Ready **Declared** maintained。Repository-wide L4 **Not Declared**。Provider / Mock Provider Production **Not Started**。Real Provider **Prohibited**。
+
+| 項目 | 内容 |
+|------|------|
+| Catalog Extension Review | [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](docs/architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) |
+| Catalog Extension ADR | [ADR-0015](docs/adr/ADR-0015-provider-public-contract-catalog-extension-release.md) |
+| Current Maturity | **Level 3.13** — Provider Public Contract Catalog Extension Release Complete |
+| Next Phase Candidate | **Mock Provider Production Implementation Release** |
+
 ### Provider Level 4 Implementation Ready Decision Governance（v1.71.0）
 
 **Provider Level 4 Implementation Ready Decision Governance** を実施しました。ADR-0014 により Provider domain **Level 4 Implementation Ready Declared**（**41 必須 Governance 文書** — Production / Catalog **unchanged**）。

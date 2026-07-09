@@ -43,9 +43,9 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-010 | Quality Pipeline false confidence | Quality Governance | Medium | Medium | QUALITY_GOVERNANCE + Final Architecture Review | Medium | Blocks naive L4 claim |
 | CL-011 | Premature Level 4 Implementation Ready declaration | Maturity Model | Critical | Low | Gate criteria + human review | Low after v1.66.0 | Critical |
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
-| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 + ADR-0012 `providerContracts[]` strategy | **Low–Medium** — extension strategy defined; catalog JSON gap until Governance-approved Release | Prerequisite before Future impl |
+| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 + ADR-0012 + ADR-0015 `providerContracts[]` registration | **Mitigated** — abstract authority in JSON（v1.72.0） | Concrete Provider impl still gated |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **Accepted Deferred Gap** until Catalog Release. PR-005 **reframed** post-ADR-0014 — Provider L4 Ready Declared; watch Production/Catalog skip confusion.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **mitigated** at catalog layer（v1.72.0）. PR-005 **reframed** post-ADR-0014 — Provider L4 Ready Declared; watch Production skip confusion.
 
 ---
 
@@ -56,8 +56,8 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | PR-001 | Mock vs Real Provider confusion | Provider / ADR-0010 | High | Medium | Mock default policy + feature flag design | Medium until impl | Blocks safe default path |
 | PR-002 | Premature Real Provider external IO | Provider / NON_GOALS | Critical | Medium | ADR-0013 Real Provider prohibition + NON_GOALS Real Provider section | **Medium** — Real Provider still prohibited; G-25 does not authorize Real IO | Critical |
 | PR-003 | Provider boundary overreach（owns Runtime/Retry/Idempotency） | Layer boundaries | High | Medium | ADR-0010 non-ownership table | Low at governance | Major at implementation |
-| PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 + ADR-0012 — no catalog change + bypass prohibition | Low | Critical if bypassed |
-| PR-005 | Implementation Ready mistaken for Production Implementation | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0014 scope limits + Catalog Extension gate + Not Started | **Medium** until Catalog Extension + Mock impl Release | Critical |
+| PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 + ADR-0012 + ADR-0015 registration + bypass prohibition | **Low** — catalog registration executed（v1.72.0） | Critical if bypassed |
+| PR-005 | Implementation Ready mistaken for Production Implementation | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0014 scope limits + ADR-0015 Catalog Extension + Not Started | **Medium** until Mock impl Release | Critical |
 
 ---
 

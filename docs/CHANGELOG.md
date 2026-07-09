@@ -4,6 +4,33 @@
 
 ---
 
+## v1.72.0 — Provider Public Contract Catalog Extension Release
+
+Provider Public Contract Catalog Extension Release — additive `providerContracts[]` registration — Application catalog backward compatible — Provider / Mock Provider Production Implementation **Not Started**。
+
+ADR-0015 により `providerContracts[]` に Provider abstract contract authority（`provider-abstract-contract-authority`）を登録。`publicContracts[]` / `compatibilityMatrix` **unchanged**。schema `public-contract-catalog/1.0` / catalogVersion `1.0` **maintained**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Catalog Extension Review | [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) |
+| Catalog Extension ADR | [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md) |
+| providerContracts[] | **Registered**（abstract authority only） |
+| Application catalog | **Backward compatible** |
+| Current Maturity | **Level 3.13** |
+| Test 832–862 | Provider Public Contract Catalog Extension |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **862 PASS**（Test 832–862 含む） |
+| npm test | **PASS** |
+| npm run public-contract:catalog | **PASS** |
+
+---
+
 ## v1.71.0 — Provider Level 4 Implementation Ready Decision Governance
 
 Provider Level 4 Implementation Ready Decision Governance — Design / Documentation / Governance Only — Production code unchanged — Catalog unchanged。

@@ -325,6 +325,28 @@ Per [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_4_IMPLEME
 
 ---
 
+## Provider Public Contract Catalog Extension Compliance
+
+Per [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) + [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md):
+
+- [ ] ADR-0015 accepted
+- [ ] `providerContracts[]` registered — abstract authority only
+- [ ] No Mock Provider / Real Provider / Adapter registration
+- [ ] `publicContracts[]` semantics unchanged
+- [ ] `compatibilityMatrix` semantics unchanged
+- [ ] schema `public-contract-catalog/1.0` / catalogVersion `1.0` unchanged
+- [ ] PROVIDER_LAYER_DESIGN.md authority maintained — no duplicate SSOT
+- [ ] Provider Level 4 Implementation Ready **Declared** maintained
+- [ ] Repository-wide Level 4 Implementation Ready **Not Declared**
+- [ ] Provider Production Implementation **Not Started**
+- [ ] Mock Provider Production Implementation **Not Started**
+- [ ] Real Provider / external IO **remains prohibited**
+- [ ] CL-013 mitigated / PR-004 mitigated / PR-005 documented
+- [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
+- [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+
+---
+
 ## Usage Notes
 
 | タイミング | 使用する節 |
