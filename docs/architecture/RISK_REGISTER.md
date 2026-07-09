@@ -45,7 +45,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
 | CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 + ADR-0012 + ADR-0015 `providerContracts[]` registration | **Mitigated** — abstract authority in JSON（v1.72.0） | Concrete Provider impl still gated |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **mitigated** at catalog layer（v1.72.0）. PR-005 **reframed** post-ADR-0014 — Provider L4 Ready Declared; watch Production skip confusion.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **mitigated** at catalog layer（v1.72.0）. PR-005 **reframed** post-ADR-0016 — Authorized vs Started explicit; watch Production skip confusion. PR-006 **added** post-ADR-0016 — Mock semantics / Application mock conflation.
 
 ---
 
@@ -57,7 +57,8 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | PR-002 | Premature Real Provider external IO | Provider / NON_GOALS | Critical | Medium | ADR-0013 Real Provider prohibition + NON_GOALS Real Provider section | **Medium** — Real Provider still prohibited; G-25 does not authorize Real IO | Critical |
 | PR-003 | Provider boundary overreach（owns Runtime/Retry/Idempotency） | Layer boundaries | High | Medium | ADR-0010 non-ownership table | Low at governance | Major at implementation |
 | PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 + ADR-0012 + ADR-0015 registration + bypass prohibition | **Low** — catalog registration executed（v1.72.0） | Critical if bypassed |
-| PR-005 | Implementation Ready mistaken for Production Implementation | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0014 scope limits + ADR-0015 Catalog Extension + Not Started | **Medium** until Mock impl Release | Critical |
+| PR-005 | Implementation Ready mistaken for Production Implementation | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0014 scope limits + ADR-0015 Catalog Extension + ADR-0016 Authorized vs Started distinction | **Medium** until Mock impl Release complete | Critical |
+| PR-006 | Mock Provider semantic drift / Application mock conflation | Provider / Application Layer | High | Medium | ADR-0016 Mock Provider definition + Application mock distinction + Decision B catalog policy | **Medium** until impl Release | Major |
 
 ---
 
@@ -102,7 +103,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CR / DR 高 Impact | 毎 Foundation 変更 |
 | AR-003 Future 実装圧力 | 毎 Epic 開始前 |
 | CL-001 … CL-013 Cross Layer / L4 Entry | Final Architecture Review + Level 4 Entry Review |
-| PR-001 … PR-005 Provider Entry Preparation | Provider Entry Preparation Review + Provider Production ADR gate |
+| PR-001 … PR-006 Provider Entry Preparation | Provider Entry Preparation Review + Provider Production ADR gate + Mock Authorization Review |
 | Provider Contract Definition | PROVIDER_CONTRACT_DEFINITION_REVIEW + Catalog extension Release gate |
 
 新リスク発見時は本 Register に ID を付与して追記します。

@@ -159,8 +159,9 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0013](../adr/ADR-0013-provider-non-goals-release-decision.md) — Provider Non-Goals Release Decision（v1.70.0）
 - [ADR-0014](../adr/ADR-0014-provider-level-4-implementation-ready-decision.md) — Provider Level 4 Implementation Ready Decision（v1.71.0）
 - [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md) — Provider Public Contract Catalog Extension Release（v1.72.0）
+- [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) — Mock Provider Production Implementation Authorization Decision（v1.73.0）
 
-### Decision Chain（Provider Domain — v1.68.0–v1.72.0）
+### Decision Chain（Provider Domain — v1.68.0–v1.73.0）
 
 ```text
 ADR-0010 Provider Entry Preparation
@@ -173,7 +174,9 @@ ADR-0010 Provider Entry Preparation
               → PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW（evidence）
                 → ADR-0015 Provider Public Contract Catalog Extension Release
                   → PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW（evidence）
-                    → Future: Mock Provider Production Implementation Release
+                    → ADR-0016 Mock Provider Production Implementation Authorization
+                      → MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW（evidence）
+                        → Future: Mock Provider Production Implementation Release（code）
 ```
 
 ### v1.69.0 Provider Contract Definition Governance
@@ -227,5 +230,18 @@ Full record: [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_
 | **Review Trigger** | Mock Provider Production Implementation Release |
 
 Full record: [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) + [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md)
+
+### v1.73.0 Mock Provider Production Implementation Authorization Governance
+
+| 項目 | 内容 |
+|------|------|
+| **Status** | Accepted（v1.73.0） |
+| **Context** | v1.72.0 Catalog Extension Complete; Mock Production Not Authorized; Provider Production Implementation ADR gap |
+| **Decision** | Mock Provider Production Implementation **Authorized** — future separate Implementation Release; **Not Started** |
+| **Alternatives** | Bundle Mock impl / concrete catalog registration now — rejected |
+| **Consequences** | PR-005 reframed; PR-006 added; concrete catalog registration Decision B deferred |
+| **Review Trigger** | Mock Provider Production Implementation Release（code）/ concrete catalog registration |
+
+Full record: [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

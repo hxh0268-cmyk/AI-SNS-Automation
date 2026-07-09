@@ -19,7 +19,7 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Release Complete
+Current Maturity: Level 3.14 — Mock Provider Production Implementation Authorization Governance Release Complete
 ```
 
 | 項目 | 状態（v1.72.0） |
@@ -34,6 +34,7 @@ Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Rele
 | Level 3.11 Provider Non-Goals Release Decision | **Completed**（v1.70.0） |
 | Level 3.12 Provider Level 4 Implementation Ready Decision | **Completed**（v1.71.0） |
 | Level 3.13 Provider Public Contract Catalog Extension Release | **Completed**（v1.72.0） |
+| Level 3.14 Mock Provider Production Implementation Authorization Governance | **Completed**（v1.73.0） |
 | Final Architecture Review | **Completed**（Decision B remediation — v1.66.0） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | Provider Entry Preparation | **Governance Complete**（[PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md)） |
@@ -41,9 +42,10 @@ Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Rele
 | Provider Non-Goals Release Decision | **Complete**（[PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.md)） |
 | **Provider Level 4 Implementation Ready** | **Declared**（[PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md) — **domain-specific only**） |
 | **Provider Public Contract Catalog Extension** | **Complete**（[PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) — `providerContracts[]` abstract authority） |
+| **Mock Provider Production Implementation Authorization** | **Granted**（[MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) — v1.73.0 ADR-0016） |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | Provider Production Implementation | **Not Started** |
-| Mock Provider Production Implementation | **Not Started** |
+| Mock Provider Production Implementation | **Authorized** — **Not Started** |
 | Level 5 Production Ready | **未到達** |
 | Level 6 Operational Excellence | **未到達** |
 
@@ -155,7 +157,11 @@ Future 実装着手 =
 
 **Provider Level 4 Implementation Ready:** **Declared**（domain-specific — v1.71.0 current）— **Not** repository-wide
 
-**Catalog Extension Release:** **Required before Mock Provider Production Implementation**
+**Catalog Extension Release:** **Complete**（v1.72.0 — ADR-0015）
+
+**v1.73.0 Mock Provider Production Implementation Authorization Evidence:** [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) + [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md)
+
+**Mock Provider Production Implementation（current）:** **Authorized** — future separate Implementation Release — **Not Started**
 
 **v1.68.0（historical）:** P4 Partially Satisfied — superseded by v1.69.0 Contract Definition Governance.
 
@@ -480,7 +486,7 @@ Level 3 → Level 4 Gate PASS =
   AND Level 4 Entry Decision = Proceed (human governance artifact)
 ```
 
-| 状態（v1.72.0） | 結果 |
+| 状態（v1.73.0） | 結果 |
 |-----------------|------|
 | Gate definition | ✅ Complete |
 | Level 4 Entry Decision（G-22） | ✅ Conditionally Ready |
@@ -489,6 +495,7 @@ Level 3 → Level 4 Gate PASS =
 | Provider Non-Goals Release Decision | ✅ **Complete**（v1.70.0） |
 | Provider Level 4 Implementation Ready Decision | ✅ **Complete**（v1.71.0） |
 | Provider Public Contract Catalog Extension | ✅ **Complete**（v1.72.0） |
+| Mock Provider Production Implementation Authorization | ✅ **Complete**（v1.73.0） |
 | Provider domain U1–U8 | ✅ **Satisfied** |
 | Provider applicability G-07 / G-08 / G-18 | ✅ **Satisfied** |
 | G-24 / G-25 / G-26 | ✅ **Satisfied** |
@@ -497,9 +504,9 @@ Level 3 → Level 4 Gate PASS =
 | Provider Level 4 Implementation Ready | ✅ **Declared**（domain-specific） |
 | Repository-wide Level 4 Implementation Ready | ❌ **Not Declared** |
 | Provider Production Implementation | ❌ **Not Started** |
-| Mock Provider Production Implementation | ❌ **Not Started** |
+| Mock Provider Production Implementation | ✅ **Authorized** / ❌ **Not Started** |
 | Catalog Extension Release | ✅ **Complete**（v1.72.0 — ADR-0015） |
-| First Target Domain | **Provider Layer** — Catalog Extension complete; Mock Provider Production Implementation next gate |
+| First Target Domain | **Provider Layer** — Authorization complete; Mock Provider Production Implementation（code）next gate |
 
 Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
 

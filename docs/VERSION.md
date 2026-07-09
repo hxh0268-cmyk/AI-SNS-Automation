@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.72.0**（Provider Public Contract Catalog Extension Release）
+**v1.73.0**（Mock Provider Production Implementation Authorization Governance Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Public Contract Catalog Extension Release Complete
+**Phase:** Mock Provider Production Implementation Authorization Governance Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -24,15 +24,17 @@
 
 **Provider Public Contract Catalog Extension:** **Complete**（v1.72.0 — [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](architecture/PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md)）
 
+**Mock Provider Production Implementation Authorization:** **Granted**（v1.73.0 — [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](architecture/MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md)）
+
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
 **Provider Production Implementation:** **Not Started**
 
-**Mock Provider Production Implementation:** **Not Started**
+**Mock Provider Production Implementation:** **Authorized** — **Not Started**
 
-**Next Phase Candidate:** Mock Provider Production Implementation Release（separate Governance）
+**Next Phase Candidate:** Mock Provider Production Implementation Release（code）
 
-**Next Candidate:** v1.73.0（Human Review / Release Decision 後の候補）
+**Next Candidate:** v1.74.0（Implementation Release 後の候補）
 
 ---
 
@@ -40,6 +42,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.73.0** | **ドキュメント** | **✅ 完了** | **Mock Provider Production Implementation Authorization — ADR-0016 / Authorized / Not Started** |
 | **v1.72.0** | **機能追加** | **✅ 完了** | **Provider Public Contract Catalog Extension — ADR-0015 / providerContracts[] abstract authority** |
 | **v1.71.0** | **ドキュメント** | **✅ 完了** | **Provider Level 4 Implementation Ready Decision — ADR-0014 / domain-specific Declared** |
 | **v1.70.0** | **ドキュメント** | **✅ 完了** | **Provider Non-Goals Release Decision — ADR-0013 / G-25 Satisfied / Mock partial release only** |
@@ -120,6 +123,46 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.73.0 で追加（Mock Provider Production Implementation Authorization Governance Release）
+
+#### Mock Provider Production Implementation Authorization 正式記録
+
+- **`MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md`** … authorization boundaries / Final Decision evidence
+- **`ADR-0016-mock-provider-production-implementation-authorization.md`** … explicit Mock Provider Production Implementation Authorization
+- **Mock Provider Production Implementation** … **Authorized** — future separate Implementation Release
+- **Mock Provider Production Implementation** … **Not Started**
+- **Provider Production Ready** … **Not Declared**
+- **Concrete catalog Mock registration** … **Deferred** — Decision B
+- **Catalog generator / Application production code** … **Unchanged**
+
+### 品質状況（v1.73.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **892 PASS** |
+| Architecture Documents | **43** 必須文書 |
+| Application production code | **unchanged** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.14** — Mock Provider Production Implementation Authorization Governance Release Complete |
+| Mock Provider Production Implementation | **Authorized / Not Started** |
+| Provider Production Implementation | **Not Started** |
+| npm test | **PASS** |
+| Test 863–892 | Mock Provider Production Implementation Authorization governance |
+
+### v1.73.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0016 accepted | ✅ |
+| Mock Provider Authorized | ✅ |
+| Mock Provider Not Started | ✅ |
+| Catalog unchanged | ✅ |
+| Production code unchanged | ✅ |
+| **892 PASS** | ✅ |
+| Test 863–892 | ✅ |
 
 ---
 

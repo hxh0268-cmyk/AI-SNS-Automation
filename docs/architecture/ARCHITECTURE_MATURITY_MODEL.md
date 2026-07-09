@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Release Complete
+Current Maturity: Level 3.14 — Mock Provider Production Implementation Authorization Governance Release Complete
 ```
 
 | 観点 | 状態 |
@@ -220,11 +220,13 @@ Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Rele
 | Level 3.11 Provider Non-Goals Release Decision | **Completed**（v1.70.0） |
 | Level 3.12 Provider Level 4 Implementation Ready Decision | **Completed**（v1.71.0） |
 | Level 3.13 Provider Public Contract Catalog Extension Release | **Completed**（v1.72.0） |
+| Level 3.14 Mock Provider Production Implementation Authorization Governance | **Completed**（v1.73.0） |
 | Final Architecture Review | **Completed**（Decision B remediation） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **providerContracts[] Catalog Extension** | **Registered**（v1.72.0 — abstract authority only） |
+| **Mock Provider Production Implementation Authorization** | **Granted**（v1.73.0 — ADR-0016） |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |
 
@@ -242,6 +244,7 @@ Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Rele
 - Cross Layer Design Complete（v1.60–v1.65 — Design Only）
 - Architecture Governance Stabilization（v1.66.0 — Entry Gate / Compliance / Risk / Review sync）
 - Provider Public Contract Catalog Extension Release（v1.72.0 — ADR-0015 / `providerContracts[]` abstract authority）
+- Mock Provider Production Implementation Authorization Governance（v1.73.0 — ADR-0016 / explicit authorization boundaries）
 - Provider Level 4 Implementation Ready Decision（v1.71.0 — ADR-0014 / domain-specific Declared）
 - Quality Governance（Machine Check vs Governance Check）
 - Architecture Compliance Checklist（運用確認 — v1.66.0 Cross Layer sections）
@@ -252,7 +255,8 @@ Current Maturity: Level 3.13 — Provider Public Contract Catalog Extension Rele
 ## Current Limitations
 
 - Level 4 Implementation Ready **Provider domain Declared**; repository-wide **Not Declared**
-- `providerContracts[]` **registered**（abstract authority only — v1.72.0）; concrete Mock/Real Provider **not registered**
+- `providerContracts[]` **registered**（abstract authority only — v1.72.0）; concrete Mock/Real Provider **not registered** — Decision B（v1.73.0）
+- Mock Provider Production Implementation **Authorized / Not Started**（v1.73.0）
 - Retry / Recovery / cross-layer idempotency **deferred** — ADR required before implementation
 - Provider / Runtime / Scheduler / SNS API **未実装** — Provider Non-Goals partial release（Mock gate only）; **Production Not Started**
 - Real Metrics / Real Automation **未実装**

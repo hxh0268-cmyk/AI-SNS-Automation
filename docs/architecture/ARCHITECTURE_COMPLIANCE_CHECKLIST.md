@@ -289,10 +289,10 @@ Per [PROVIDER_NON_GOALS_RELEASE_REVIEW.md](./PROVIDER_NON_GOALS_RELEASE_REVIEW.m
 - [ ] NG6 Satisfied — Quality Pipeline PASS maintained
 - [ ] G-25 **Satisfied**（Provider domain — Mock broad Non-Goal partial release only）
 - [ ] Real Provider / external IO **remains prohibited**
-- [ ] Mock Provider implementation requires **later Provider Level 4 Implementation Ready Decision**
+- [ ] Mock Provider implementation requires **later Provider Level 4 Implementation Ready Decision**（**historical — v1.70.0** — superseded by v1.71.0 Declared）
 - [ ] Provider Production Implementation **Not Started**
-- [ ] Mock Provider Production Implementation **Not Started**
-- [ ] Provider Level 4 Implementation Ready **Not Declared**
+- [ ] Mock Provider Production Implementation **Not Started**（**historical — v1.70.0** — superseded by v1.73.0 Authorized / Not Started）
+- [ ] Provider Level 4 Implementation Ready **Not Declared**（**historical — v1.70.0** — superseded by v1.71.0）
 - [ ] Public Contract Catalog generator / reports **unchanged**
 - [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
 - [ ] G-23 repository-wide **Not Satisfied** maintained
@@ -316,7 +316,7 @@ Per [PROVIDER_LEVEL_4_IMPLEMENTATION_READY_REVIEW.md](./PROVIDER_LEVEL_4_IMPLEME
 - [ ] Provider Production Implementation **Not Started**
 - [ ] Mock Provider Production Implementation **Not Started**
 - [ ] Real Provider / external IO **remains prohibited**
-- [ ] **Catalog Extension Release Required** before Mock Provider Production Implementation
+- [ ] **Catalog Extension Release Required** before Mock Provider Production Implementation（**historical — v1.71.0** — superseded by v1.72.0 Complete）
 - [ ] Catalog generator / reports **unchanged**
 - [ ] `providerContracts[]` registration **not executed**
 - [ ] PROVIDER_LAYER_DESIGN authority maintained — no duplicate SSOT
@@ -343,6 +343,38 @@ Per [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CON
 - [ ] Real Provider / external IO **remains prohibited**
 - [ ] CL-013 mitigated / PR-004 mitigated / PR-005 documented
 - [ ] CL-004 / CL-005 / CL-006 deferred operational semantics remain deferred
+- [ ] Quality Pipeline PASS **not** used as sole Gate evidence
+
+---
+
+## Mock Provider Production Implementation Authorization Compliance
+
+Per [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md):
+
+- [ ] ADR-0016 accepted
+- [ ] Authorization prerequisites satisfied — G-24 / G-25 / G-26 / Provider L4 Ready / Catalog Extension
+- [ ] G-23 repository-wide **Not Satisfied** maintained
+- [ ] **Mock Provider Production Implementation Authorized** — future separate Implementation Release
+- [ ] **Mock Provider Production Implementation Not Started**
+- [ ] **Provider Production Ready Not Declared**
+- [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
+- [ ] Mock Provider semantic definition documented
+- [ ] Production code classification explicit — Provider Layer / deterministic / non-external-IO
+- [ ] Input / output / error boundaries defined — unknown field policy explicit
+- [ ] Initial capability scope minimal — `text_generation` query only
+- [ ] Credentials **prohibited** / side effects in-memory query-only / external IO **prohibited**
+- [ ] Runtime / Scheduler / Adapter implementation **prohibited**
+- [ ] Retry / Recovery / idempotency / duplicate handling engines **not authorized**
+- [ ] Timeout declaration allowed; timeout execution engine **not authorized**
+- [ ] Deterministic behavior policy defined
+- [ ] Failure path policy bounded — `validation_error` / `unsupported_capability` required
+- [ ] Catalog registration **Decision B** — concrete Mock registration deferred
+- [ ] `public_contract_catalog.js` **unchanged**
+- [ ] Application `publicContracts[]` / `compatibilityMatrix` unchanged
+- [ ] PROVIDER_LAYER_DESIGN authority maintained — no duplicate SSOT
+- [ ] PR-005 / PR-006 documented
+- [ ] CL-004 / CL-005 / CL-006 deferred maintained
+- [ ] Human Review recorded
 - [ ] Quality Pipeline PASS **not** used as sole Gate evidence
 
 ---
