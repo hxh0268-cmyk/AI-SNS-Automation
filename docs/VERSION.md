@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.73.0**（Mock Provider Production Implementation Authorization Governance Release）
+**v1.74.0**（Mock Provider Production Implementation Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Mock Provider Production Implementation Authorization Governance Release Complete
+**Phase:** Mock Provider Production Implementation Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -26,15 +26,19 @@
 
 **Mock Provider Production Implementation Authorization:** **Granted**（v1.73.0 — [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](architecture/MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md)）
 
+**Mock Provider Production Implementation:** **Implemented**（v1.74.0 — `src/lib/mock_provider.js`）
+
+**Mock Provider Catalog Registration:** **Deferred**（Decision B — separate future Catalog Governance Release）
+
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
-**Provider Production Implementation:** **Not Started**
+**Provider Production Ready:** **Not Declared**
 
-**Mock Provider Production Implementation:** **Authorized** — **Not Started**
+**Provider Production Implementation:** **Not Started**（Real Provider scope）
 
-**Next Phase Candidate:** Mock Provider Production Implementation Release（code）
+**Next Phase Candidate:** Mock Provider Catalog Registration Governance Release（Decision B）
 
-**Next Candidate:** v1.74.0（Implementation Release 後の候補）
+**Next Candidate:** v1.75.0（Catalog Governance / follow-on 後の候補）
 
 ---
 
@@ -42,6 +46,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.74.0** | **機能追加** | **✅ 完了** | **Mock Provider Production Implementation — text_generation query / deterministic / no external IO** |
 | **v1.73.0** | **ドキュメント** | **✅ 完了** | **Mock Provider Production Implementation Authorization — ADR-0016 / Authorized / Not Started** |
 | **v1.72.0** | **機能追加** | **✅ 完了** | **Provider Public Contract Catalog Extension — ADR-0015 / providerContracts[] abstract authority** |
 | **v1.71.0** | **ドキュメント** | **✅ 完了** | **Provider Level 4 Implementation Ready Decision — ADR-0014 / domain-specific Declared** |
@@ -123,6 +128,46 @@
 | v1.9.3 | 運用品質パッチ | ✅ 完了 | 成功条件と status / exit code の整合 |
 | v1.9.2 | 運用品質パッチ | ✅ 完了 | GHA 環境で .env なし Health Check 通過（Secrets 注入時） |
 | v1.9.1 | 運用品質パッチ | ✅ 完了 | Nightly Apply failure summary heredoc の YAML 修正 |
+
+---
+
+### v1.74.0 で追加（Mock Provider Production Implementation Release）
+
+#### Mock Provider Production Implementation 正式記録
+
+- **`src/lib/mock_provider.js`** … minimum authorized Mock Provider module
+- **Capability** … `text_generation`（query only）
+- **Mock Provider Production Implementation** … **Implemented**
+- **Mock Provider Catalog Registration** … **Deferred**（Decision B）
+- **Provider Production Ready** … **Not Declared**
+- **Real Provider / external IO** … **Prohibited**
+- **`public_contract_catalog.js`** … **Unchanged**
+
+### 品質状況（v1.74.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **917 PASS** |
+| Architecture Documents | **43** 必須文書 |
+| Mock Provider module | **`src/lib/mock_provider.js`** |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.15** — Mock Provider Production Implementation Release Complete |
+| Mock Provider Production Implementation | **Implemented** |
+| Mock Provider Catalog Registration | **Deferred** |
+| npm test | **PASS** |
+| Test 893–917 | Mock Provider Production Implementation |
+
+### v1.74.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0016 scope respected | ✅ |
+| Mock Provider module implemented | ✅ |
+| Deterministic / no external IO | ✅ |
+| Catalog unchanged | ✅ |
+| Concrete catalog registration deferred | ✅ |
+| **917 PASS** | ✅ |
+| Test 893–917 | ✅ |
 
 ---
 

@@ -4,6 +4,33 @@
 
 ---
 
+## v1.74.0 — Mock Provider Production Implementation Release
+
+Mock Provider Production Implementation Release — minimum authorized `text_generation` query Provider — deterministic in-memory execution — no external IO — catalog registration **Deferred**（Decision B）。
+
+`src/lib/mock_provider.js` により Mock Provider Production Implementation を **Implemented**。`providerContracts[]` concrete registration は変更なし。Real Provider / external IO **Prohibited** maintained。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Mock Provider module | `src/lib/mock_provider.js` |
+| Capability | `text_generation`（query only） |
+| Mock Provider Production Implementation | **Implemented** |
+| Mock Provider Catalog Registration | **Deferred** |
+| Provider Production Ready | **Not Declared** |
+| Current Maturity | **Level 3.15** |
+| Test 893–917 | Mock Provider Production Implementation |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **917 PASS**（Test 893–917 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.73.0 — Mock Provider Production Implementation Authorization Governance Release
 
 Mock Provider Production Implementation Authorization Governance Release — explicit authorization boundaries — Production / Catalog code **unchanged** — Mock Provider Production Implementation **Authorized / Not Started**。

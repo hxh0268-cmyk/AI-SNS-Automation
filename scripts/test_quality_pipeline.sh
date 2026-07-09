@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.73.0 --"
+echo "-- Test 98: VERSION updated to v1.74.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.73.0**（Mock Provider Production Implementation Authorization Governance Release）")) {
-  throw new Error("docs/VERSION.md current version must be v1.73.0");
+if (!versionDoc.includes("**v1.74.0**（Mock Provider Production Implementation Release）")) {
+  throw new Error("docs/VERSION.md current version must be v1.74.0");
 }
-console.log("VERSION v1.73.0 ok");
+console.log("VERSION v1.74.0 ok");
 EOF
-pass "VERSION updated to v1.73.0"
+pass "VERSION updated to v1.74.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.74.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.74.0");
+if (payload.nextVersion !== "v1.75.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.75.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.74.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.74.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.75.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.75.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.74.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.75.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14213,12 +14213,16 @@ const forbiddenPatterns = [
   /real_automation/i,
 ];
 
+/** v1.74.0 ADR-0016 authorized Mock Provider production module */
+const authorizedImplementationPaths = new Set(["src/lib/mock_provider.js"]);
+
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
   .filter(
     (relativePath) =>
       (relativePath.startsWith("src/lib/") || relativePath.startsWith("scripts/")) &&
       relativePath.endsWith(".js"),
-  );
+  )
+  .filter((relativePath) => !authorizedImplementationPaths.has(relativePath));
 
 for (const relativePath of candidatePaths) {
   for (const pattern of forbiddenPatterns) {
@@ -14386,20 +14390,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.14 --"
-grep -q "Level 3.14" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Mock Provider Production Implementation Authorization Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "current maturity is level 3.14"
+echo "-- Test 442: current maturity is level 3.15 --"
+grep -q "Level 3.15" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Mock Provider Production Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "current maturity is level 3.15"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.14" README.md
+grep -q "Level 3.15" README.md
 grep -q "Provider Level 4 Implementation Ready" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.14" docs/architecture/README.md
+grep -q "Level 3.15" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: architecture maturity model distinguishes provider and repository level 4 readiness --"
@@ -16003,14 +16007,14 @@ grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
 echo "-- Test 721: architecture maturity model declares provider level 4 implementation ready --"
-grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.14" docs/architecture/README.md
+grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.15" docs/architecture/README.md
 grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.14 — Mock Provider Production Implementation Authorization Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.15 — Mock Provider Production Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Authorized" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
 
 echo "-- Test 723: cross layer design complete requirement in entry gate --"
@@ -16115,11 +16119,11 @@ grep -q "Application Layer Public Contracts only" docs/architecture/FUTURE_ENTRY
 grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
-echo "-- Test 741: architecture readme declares mock provider authorization governance --"
-grep -q "Level 3.14 — Mock Provider Production Implementation Authorization Governance Release Complete" docs/architecture/README.md
-grep -q "Mock Provider Production Implementation Authorization" docs/architecture/README.md
-grep -q "Authorized" docs/architecture/README.md
-pass "architecture readme declares mock provider authorization governance"
+echo "-- Test 741: architecture readme declares mock provider implementation release --"
+grep -q "Level 3.15 — Mock Provider Production Implementation Release Complete" docs/architecture/README.md
+grep -q "Mock Provider Production Implementation" docs/architecture/README.md
+grep -q "Implemented" docs/architecture/README.md
+pass "architecture readme declares mock provider implementation release"
 
 echo "-- Test 742: readme changelog version reference v1.67.0 history --"
 grep -q "Formal Level 4 Entry Review Decision（v1.67.0）" README.md
@@ -17077,11 +17081,11 @@ grep -q "43 必須 Governance 文書" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md" docs/architecture/README.md
 pass "architecture documents count 43"
 
-echo "-- Test 859: maturity level 3.14 synchronized --"
-grep -q "Level 3.14" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Level 3.14" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Level 3.14" docs/architecture/README.md
-pass "maturity level 3.14 synchronized"
+echo "-- Test 859: maturity level 3.15 synchronized --"
+grep -q "Level 3.15" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3.15" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.15" docs/architecture/README.md
+pass "maturity level 3.15 synchronized"
 
 echo "-- Test 860: readme changelog version v1.72.0 historical synchronized --"
 grep -q "Provider Public Contract Catalog Extension Release（v1.72.0）" README.md
@@ -17130,14 +17134,15 @@ echo "-- Test 867: mock provider authorized state explicit --"
 grep -q "Mock Provider Production Implementation" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
 grep -Fq "**Authorized**" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
 grep -Fq "**Authorized**" docs/architecture/MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
-grep -Fq "**Authorized**" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -Fq "**Implemented**" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "mock provider authorized state explicit"
 
-echo "-- Test 868: mock provider not started maintained --"
+echo "-- Test 868: mock provider authorized historical and implemented current --"
+grep -Fq "**Authorized**" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
 grep -Fq "**Not Started**" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
-grep -Fq "**Not Started**" docs/architecture/MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
-grep -Fq "**Not Started**" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "mock provider not started maintained"
+grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Implemented" docs/VERSION.md
+pass "mock provider authorized historical and implemented current"
 
 echo "-- Test 869: provider production ready not declared --"
 grep -q "Provider Production Ready" docs/adr/ADR-0016-mock-provider-production-implementation-authorization.md
@@ -17310,11 +17315,11 @@ grep -q "ADR-0016" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
 grep -q "Decision B" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
 pass "compliance checklist mock provider authorization section"
 
-echo "-- Test 888: future entry criteria mock provider authorized synchronized --"
+echo "-- Test 888: future entry criteria mock provider implemented synchronized --"
 grep -q "Mock Provider Production Implementation Authorization" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -Fq "**Authorized**" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -Fq "**Implemented**" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "ADR-0016" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "future entry criteria mock provider authorized synchronized"
+pass "future entry criteria mock provider implemented synchronized"
 
 echo "-- Test 889: architecture decisions adr 0016 registered --"
 grep -q "ADR-0016" docs/architecture/ARCHITECTURE_DECISIONS.md
@@ -17322,11 +17327,11 @@ grep -q "Mock Provider Production Implementation Authorization" docs/architectur
 grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW" docs/architecture/ARCHITECTURE_DECISIONS.md
 pass "architecture decisions adr 0016 registered"
 
-echo "-- Test 890: non goals mock provider section remediated --"
-grep -q "Mock Provider Production Implementation Authorized" docs/architecture/NON_GOALS.md
+echo "-- Test 890: non goals mock provider section implemented --"
+grep -q "Mock Provider Production Implementation Implemented" docs/architecture/NON_GOALS.md
 grep -q "ADR-0016" docs/architecture/NON_GOALS.md
-grep -q "Not Started" docs/architecture/NON_GOALS.md
-pass "non goals mock provider section remediated"
+grep -q "Deferred" docs/architecture/NON_GOALS.md
+pass "non goals mock provider section implemented"
 
 echo "-- Test 891: provider layer design catalog example clarified --"
 grep -q "conceptual contract identity only" docs/architecture/PROVIDER_LAYER_DESIGN.md
@@ -17341,6 +17346,417 @@ grep -q "Mock Provider Production Implementation Authorization" docs/CHANGELOG.m
 grep -q "Mock Provider Production Implementation Authorization Governance Release（v1.73.0）" README.md
 grep -Fq "**Authorized**" README.md
 pass "v1.73.0 mock provider authorization governance documented"
+
+echo "-- Test 893: mock provider production module exists --"
+test -f src/lib/mock_provider.js
+grep -q "invokeMockProvider" src/lib/mock_provider.js
+grep -q "MOCK_PROVIDER_ID" src/lib/mock_provider.js
+pass "mock provider production module exists"
+
+echo "-- Test 894: mock provider identity stable --"
+node --input-type=module <<'EOF'
+import {
+  MOCK_PROVIDER_ID,
+  MOCK_PROVIDER_VERSION,
+  getMockProviderIdentity,
+} from "./src/lib/mock_provider.js";
+
+const identity = getMockProviderIdentity();
+if (identity.providerId !== MOCK_PROVIDER_ID) {
+  throw new Error("providerId mismatch");
+}
+if (identity.providerVersion !== MOCK_PROVIDER_VERSION) {
+  throw new Error("providerVersion mismatch");
+}
+if (identity.providerId !== "text-generation-mock-provider") {
+  throw new Error("unexpected providerId");
+}
+console.log("mock provider identity stable ok");
+EOF
+pass "mock provider identity stable"
+
+echo "-- Test 895: mock provider capability declaration --"
+node --input-type=module <<'EOF'
+import {
+  MOCK_PROVIDER_CAPABILITY,
+  getMockProviderCapabilities,
+} from "./src/lib/mock_provider.js";
+
+const capabilities = getMockProviderCapabilities();
+if (capabilities.length !== 1) {
+  throw new Error("expected one capability");
+}
+if (capabilities[0] !== MOCK_PROVIDER_CAPABILITY) {
+  throw new Error("capability mismatch");
+}
+if (capabilities[0] !== "text_generation") {
+  throw new Error("expected text_generation capability");
+}
+console.log("mock provider capability declaration ok");
+EOF
+pass "mock provider capability declaration"
+
+echo "-- Test 896: mock provider valid input success --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: {
+    schema: "content-ideas/1.0",
+    payload: { topic: "deterministic-topic" },
+  },
+});
+
+if (!result.ok) {
+  throw new Error("valid input must succeed");
+}
+if (result.capability !== "text_generation") {
+  throw new Error("capability missing in success result");
+}
+if (!result.result || typeof result.result.text !== "string") {
+  throw new Error("normalized payload text missing");
+}
+console.log("mock provider valid input success ok");
+EOF
+pass "mock provider valid input success"
+
+echo "-- Test 897: mock provider deterministic repeat execution --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const request = {
+  capability: "text_generation",
+  applicationContract: {
+    schema: "content-ideas/1.0",
+    payload: { topic: "repeat-topic" },
+  },
+};
+
+const first = invokeMockProvider(request);
+const second = invokeMockProvider(request);
+
+if (!first.ok || !second.ok) {
+  throw new Error("repeat execution must succeed");
+}
+if (JSON.stringify(first) !== JSON.stringify(second)) {
+  throw new Error("repeat execution must be deterministic");
+}
+console.log("mock provider deterministic repeat execution ok");
+EOF
+pass "mock provider deterministic repeat execution"
+
+echo "-- Test 898: mock provider normalized output shape --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+});
+
+for (const field of ["providerId", "providerVersion", "capability", "result"]) {
+  if (!(field in result)) {
+    throw new Error(`missing output field: ${field}`);
+  }
+}
+if (!("text" in result.result) || typeof result.result.text !== "string") {
+  throw new Error("normalized payload text missing");
+}
+console.log("mock provider normalized output shape ok");
+EOF
+pass "mock provider normalized output shape"
+
+echo "-- Test 899: mock provider missing capability validation_error --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+});
+
+if (result.ok) {
+  throw new Error("missing capability must fail");
+}
+if (result.error.kind !== "validation_error") {
+  throw new Error("expected validation_error");
+}
+console.log("mock provider missing capability validation_error ok");
+EOF
+pass "mock provider missing capability validation_error"
+
+echo "-- Test 900: mock provider missing applicationContract validation_error --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("missing applicationContract must be validation_error");
+}
+console.log("mock provider missing applicationContract validation_error ok");
+EOF
+pass "mock provider missing applicationContract validation_error"
+
+echo "-- Test 901: mock provider invalid type validation_error --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: 123,
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("invalid capability type must be validation_error");
+}
+console.log("mock provider invalid type validation_error ok");
+EOF
+pass "mock provider invalid type validation_error"
+
+echo "-- Test 902: mock provider unsupported capability --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "sns_publish",
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+});
+
+if (result.ok || result.error.kind !== "unsupported_capability") {
+  throw new Error("unsupported capability must return unsupported_capability");
+}
+console.log("mock provider unsupported capability ok");
+EOF
+pass "mock provider unsupported capability"
+
+echo "-- Test 903: mock provider unknown field rejection --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+  unexpected: true,
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("unknown field must be validation_error");
+}
+console.log("mock provider unknown field rejection ok");
+EOF
+pass "mock provider unknown field rejection"
+
+echo "-- Test 904: mock provider credential field rejection --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: {
+    schema: "content-ideas/1.0",
+    payload: {},
+    apiKey: "secret",
+  },
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("credential field must be validation_error");
+}
+console.log("mock provider credential field rejection ok");
+EOF
+pass "mock provider credential field rejection"
+
+echo "-- Test 905: mock provider structured validation_error boundary --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider(null);
+if (result.ok) {
+  throw new Error("null request must fail");
+}
+if (!result.error || typeof result.error.message !== "string") {
+  throw new Error("structured error message required");
+}
+if (result.error.kind !== "validation_error") {
+  throw new Error("null request must be validation_error");
+}
+console.log("mock provider structured validation_error boundary ok");
+EOF
+pass "mock provider structured validation_error boundary"
+
+echo "-- Test 906: mock provider no raw exception leakage --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "image_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: {} },
+});
+
+if (!("ok" in result) || !("error" in result)) {
+  throw new Error("result must be structured object");
+}
+if (result.ok) {
+  throw new Error("unsupported capability must not succeed");
+}
+console.log("mock provider no raw exception leakage ok");
+EOF
+pass "mock provider no raw exception leakage"
+
+echo "-- Test 907: mock provider policy declarations --"
+node --input-type=module <<'EOF'
+import {
+  MOCK_PROVIDER_CREDENTIAL_REQUIREMENT,
+  getMockProviderPolicyDeclarations,
+} from "./src/lib/mock_provider.js";
+
+const policies = getMockProviderPolicyDeclarations();
+if (policies.credentialRequirement !== MOCK_PROVIDER_CREDENTIAL_REQUIREMENT) {
+  throw new Error("credential requirement mismatch");
+}
+if (policies.credentialRequirement !== false) {
+  throw new Error("credential requirement must be false");
+}
+if (policies.sideEffectDeclaration !== "query") {
+  throw new Error("side effect must be query");
+}
+if (policies.timeoutPolicyDeclaration.execution !== false) {
+  throw new Error("timeout execution must be false");
+}
+if (policies.retryPolicyDeclaration.execution !== false) {
+  throw new Error("retry execution must be false");
+}
+console.log("mock provider policy declarations ok");
+EOF
+pass "mock provider policy declarations"
+
+echo "-- Test 908: mock provider module has no external io imports --"
+if grep -E 'from ["\x27](node:)?https?|fetch\(|axios|openai|gemini|@google/genai' src/lib/mock_provider.js; then
+  echo "mock provider must not import external io dependencies"
+  exit 1
+fi
+pass "mock provider module has no external io imports"
+
+echo "-- Test 909: mock provider module does not import retry engine --"
+if grep -q "retry.js" src/lib/mock_provider.js; then
+  echo "mock provider must not import retry.js"
+  exit 1
+fi
+pass "mock provider module does not import retry engine"
+
+echo "-- Test 910: public contract catalog unchanged post mock provider impl --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.providerContracts.length !== 1) {
+  throw new Error("catalog providerContracts count changed");
+}
+if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
+  throw new Error("abstract authority entry changed");
+}
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 1) {
+  throw new Error("provider contract definitions changed");
+}
+console.log("public contract catalog unchanged post mock provider impl ok");
+EOF
+pass "public contract catalog unchanged post mock provider impl"
+
+echo "-- Test 911: future entry criteria mock provider implemented --"
+grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Deferred" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "mock_provider.js" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "future entry criteria mock provider implemented"
+
+echo "-- Test 912: version mock provider implemented documented --"
+grep -Fq "**Implemented**" docs/VERSION.md
+grep -q "mock_provider.js" docs/VERSION.md
+grep -q "Deferred" docs/VERSION.md
+pass "version mock provider implemented documented"
+
+echo "-- Test 913: architecture maturity level 3.15 mock provider implementation --"
+grep -q "Level 3.15" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Mock Provider Production Implementation Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Implemented" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity level 3.15 mock provider implementation"
+
+echo "-- Test 914: readme changelog v1.74.0 mock provider implementation --"
+grep -q "Mock Provider Production Implementation Release（v1.74.0）" README.md
+grep -q "## v1.74.0" docs/CHANGELOG.md
+grep -q "mock_provider.js" docs/CHANGELOG.md
+pass "readme changelog v1.74.0 mock provider implementation"
+
+echo "-- Test 915: mock provider success output excludes forbidden state --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: { topic: "safe" } },
+});
+
+const serialized = JSON.stringify(result).toLowerCase();
+for (const forbidden of [
+  "credential",
+  "secret",
+  "token",
+  "retry",
+  "recovery",
+  "idempotency",
+  "adapter",
+  "scheduler",
+  "runtime",
+]) {
+  if (serialized.includes(forbidden)) {
+    throw new Error(`forbidden state leaked: ${forbidden}`);
+  }
+}
+console.log("mock provider success output excludes forbidden state ok");
+EOF
+pass "mock provider success output excludes forbidden state"
+
+echo "-- Test 916: mock provider different contracts produce different output --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const alpha = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: {
+    schema: "content-ideas/1.0",
+    payload: { topic: "alpha-topic" },
+  },
+});
+const beta = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: {
+    schema: "content-ideas/1.0",
+    payload: { topic: "beta-topic" },
+  },
+});
+
+if (!alpha.ok || !beta.ok) {
+  throw new Error("distinct contract requests must succeed");
+}
+if (alpha.result.text === beta.result.text) {
+  throw new Error("different applicationContract values must change output");
+}
+console.log("mock provider different contracts produce different output ok");
+EOF
+pass "mock provider different contracts produce different output"
+
+echo "-- Test 917: v1.74.0 mock provider production implementation documented --"
+grep -Fq "**917 PASS**" docs/VERSION.md
+grep -q "Test 893–917" docs/VERSION.md
+grep -q "v1.74.0" docs/CHANGELOG.md
+grep -q "mock_provider.js" README.md
+grep -q "Implemented" README.md
+pass "v1.74.0 mock provider production implementation documented"
 
 
 echo ""
