@@ -43,9 +43,9 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-010 | Quality Pipeline false confidence | Quality Governance | Medium | Medium | QUALITY_GOVERNANCE + Final Architecture Review | Medium | Blocks naive L4 claim |
 | CL-011 | Premature Level 4 Implementation Ready declaration | Maturity Model | Critical | Low | Gate criteria + human review | Low after v1.66.0 | Critical |
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
-| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | High | ADR-0011 + ADR-0012 + ADR-0015 `providerContracts[]` registration | **Mitigated** — abstract authority in JSON（v1.72.0） | Concrete Provider impl still gated |
+| CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | Medium | ADR-0011 + ADR-0012 + ADR-0015 + ADR-0017 + v1.76.0 concrete mock registration | **Mitigated** — abstract + governed concrete mock in JSON（v1.76.0） | Real Provider impl still gated |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **mitigated** at catalog governance layer（v1.75.0）— concrete JSON traceability pending Implementation Release. PR-005 **reframed** post-ADR-0017 — Governed / Authorized / Registered distinction explicit. PR-006 **reframed** post-ADR-0017 — identity mapping defined at governance level.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **reassessed** post-v1.76.0 — governed concrete Mock Provider traceability **implemented** in catalog JSON; Real Provider traceability still gated. PR-005 **reframed** post-ADR-0017 — Governed / Authorized / Registered distinction explicit; **Registered** achieved for governed mock. PR-006 **reframed** post-ADR-0017 — identity mapping defined at governance level and **bound in catalog**（v1.76.0）.
 
 ---
 

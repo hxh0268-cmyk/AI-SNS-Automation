@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.75.0 --"
+echo "-- Test 98: VERSION updated to v1.76.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.75.0**（Mock Provider Catalog Registration Governance Release）")) {
-  throw new Error("docs/VERSION.md current version must be v1.75.0");
+if (!versionDoc.includes("**v1.76.0**（Mock Provider Catalog Registration Implementation Release）")) {
+  throw new Error("docs/VERSION.md current version must be v1.76.0");
 }
-console.log("VERSION v1.75.0 ok");
+console.log("VERSION v1.76.0 ok");
 EOF
-pass "VERSION updated to v1.75.0"
+pass "VERSION updated to v1.76.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.76.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.76.0");
+if (payload.nextVersion !== "v1.77.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.77.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.76.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.76.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.77.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.77.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.76.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.77.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14390,20 +14390,20 @@ console.log("architecture maturity model required headings exist ok");
 EOF
 pass "architecture maturity model has required headings"
 
-echo "-- Test 442: current maturity is level 3.16 --"
-grep -q "Level 3.16" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "current maturity is level 3.16"
+echo "-- Test 442: current maturity is level 3.17 --"
+grep -q "Level 3.17" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+pass "current maturity is level 3.17"
 
 echo "-- Test 443: README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" README.md
-grep -q "Level 3.16" README.md
+grep -q "Level 3.17" README.md
 grep -q "Provider Level 4 Implementation Ready" README.md
 pass "README references architecture maturity model"
 
 echo "-- Test 444: docs/architecture/README references architecture maturity model --"
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
-grep -q "Level 3.16" docs/architecture/README.md
+grep -q "Level 3.17" docs/architecture/README.md
 pass "docs/architecture/README references architecture maturity model"
 
 echo "-- Test 445: architecture maturity model distinguishes provider and repository level 4 readiness --"
@@ -16007,12 +16007,12 @@ grep -q "Interaction Metadata Model Design" docs/VERSION.md
 pass "readme changelog version reference v1.65.0 history"
 
 echo "-- Test 721: architecture maturity model declares provider level 4 implementation ready --"
-grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.16" docs/architecture/README.md
+grep -q "Provider Level 4 Implementation Ready" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md || grep -q "Level 3.17" docs/architecture/README.md
 grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.16 — Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.17 — Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16120,7 +16120,7 @@ grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
 echo "-- Test 741: architecture readme declares mock provider implementation release --"
-grep -q "Level 3.16 — Mock Provider Catalog Registration Governance Release Complete" docs/architecture/README.md
+grep -q "Level 3.17 — Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/README.md
 grep -q "Mock Provider Production Implementation" docs/architecture/README.md
 grep -q "Implemented" docs/architecture/README.md
 pass "architecture readme declares mock provider implementation release"
@@ -16743,7 +16743,7 @@ console.log("providerContracts array in catalog build ok");
 EOF
 pass "providerContracts array in catalog build"
 
-echo "-- Test 835: abstract provider authority only registered --"
+echo "-- Test 835: canonical provider catalog contains abstract and concrete mock --"
 node --input-type=module <<'EOF'
 import {
   PROVIDER_CONTRACT_DEFINITIONS,
@@ -16751,45 +16751,66 @@ import {
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 1) {
-  throw new Error("only one provider contract entry expected");
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("canonical provider catalog must include exactly two entries");
 }
-const entry = catalog.providerContracts[0];
-if (entry.registrationKind !== "abstract-contract-authority") {
-  throw new Error("registrationKind must be abstract-contract-authority");
+const abstract = catalog.providerContracts.find(
+  (entry) => entry.providerId === "provider-abstract-contract-authority",
+);
+if (!abstract || abstract.registrationKind !== "abstract-contract-authority") {
+  throw new Error("abstract provider authority entry missing or invalid");
 }
-if (entry.providerType !== "abstract") {
-  throw new Error("providerType must be abstract");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
+  throw new Error("provider contract definitions must include abstract and concrete mock");
 }
-if (entry.implementationStatus !== "not-started") {
-  throw new Error("implementationStatus must be not-started");
-}
-console.log("abstract provider authority only registered ok");
+console.log("canonical provider catalog contains abstract and concrete mock ok");
 EOF
-pass "abstract provider authority only registered"
+pass "canonical provider catalog contains abstract and concrete mock"
 
-echo "-- Test 836: no mock or real provider registration --"
+echo "-- Test 836: governed mock provider id allowed forbidden patterns rejected --"
 node --input-type=module <<'EOF'
 import {
+  GOVERNED_MOCK_PROVIDER_ID,
   PROVIDER_FORBIDDEN_REGISTRATION_IDS,
   buildPublicContractCatalog,
+  validatePublicContractCatalog,
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
 const ids = catalog.providerContracts.map((entry) => entry.providerId);
+if (!ids.includes(GOVERNED_MOCK_PROVIDER_ID)) {
+  throw new Error("governed mock provider id must be registered");
+}
 for (const forbidden of PROVIDER_FORBIDDEN_REGISTRATION_IDS) {
   if (ids.includes(forbidden)) {
     throw new Error(`forbidden providerId registered: ${forbidden}`);
   }
 }
 for (const id of ids) {
-  if (/mock|real|openai|gemini|sns|adapter/i.test(id) && id !== "provider-abstract-contract-authority") {
+  if (
+    /mock|real|openai|gemini|sns|adapter/i.test(id) &&
+    id !== "provider-abstract-contract-authority" &&
+    id !== GOVERNED_MOCK_PROVIDER_ID
+  ) {
     throw new Error(`forbidden provider pattern in id: ${id}`);
   }
 }
-console.log("no mock or real provider registration ok");
+const unauthorized = buildPublicContractCatalog();
+unauthorized.providerContracts = [
+  unauthorized.providerContracts[0],
+  {
+    ...unauthorized.providerContracts[1],
+    providerId: "mock-provider-test",
+    registrationKind: "concrete-mock-provider-implementation",
+  },
+];
+const rejected = validatePublicContractCatalog(unauthorized);
+if (rejected.valid) {
+  throw new Error("arbitrary mock provider id must be rejected");
+}
+console.log("governed mock provider id allowed forbidden patterns rejected ok");
 EOF
-pass "no mock or real provider registration"
+pass "governed mock provider id allowed forbidden patterns rejected"
 
 echo "-- Test 837: publicContracts preserved deep equality --"
 node --input-type=module <<'EOF'
@@ -16964,11 +16985,14 @@ const data = JSON.parse(
     "utf8",
   ),
 );
-if (!Array.isArray(data.providerContracts) || data.providerContracts.length !== 1) {
-  throw new Error("json must include one providerContracts entry");
+if (!Array.isArray(data.providerContracts) || data.providerContracts.length !== 2) {
+  throw new Error("json must include two providerContracts entries");
 }
 if (data.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
-  throw new Error("json providerId mismatch");
+  throw new Error("json abstract providerId mismatch");
+}
+if (data.providerContracts[1].providerId !== "text-generation-mock-provider") {
+  throw new Error("json concrete mock providerId mismatch");
 }
 console.log("json providerContracts registration ok");
 EOF
@@ -16992,8 +17016,8 @@ const data = JSON.parse(
   ),
 );
 const summary = printPublicContractCatalogSummary(data);
-if (!summary.includes("Provider Contracts: 1")) {
-  throw new Error("CLI summary must include Provider Contracts: 1");
+if (!summary.includes("Provider Contracts: 2")) {
+  throw new Error("CLI summary must include Provider Contracts: 2");
 }
 console.log("cli provider contract count ok");
 EOF
@@ -17082,11 +17106,11 @@ grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md" docs/a
 grep -q "MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md" docs/architecture/README.md
 pass "architecture documents count 44"
 
-echo "-- Test 859: maturity level 3.16 synchronized --"
-grep -q "Level 3.16" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Level 3.16" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Level 3.16" docs/architecture/README.md
-pass "maturity level 3.16 synchronized"
+echo "-- Test 859: maturity level 3.17 synchronized --"
+grep -q "Level 3.17" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3.17" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.17" docs/architecture/README.md
+pass "maturity level 3.17 synchronized"
 
 echo "-- Test 860: readme changelog version v1.72.0 historical synchronized --"
 grep -q "Provider Public Contract Catalog Extension Release（v1.72.0）" README.md
@@ -17223,26 +17247,30 @@ grep -q "separate future Catalog Governance" docs/adr/ADR-0016-mock-provider-pro
 grep -q "Decision B" docs/architecture/MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
 pass "catalog registration decision b documented"
 
-echo "-- Test 882: no concrete mock provider catalog registration --"
+echo "-- Test 882: concrete mock provider catalog registration present --"
 node --input-type=module <<'EOF'
 import {
+  GOVERNED_MOCK_PROVIDER_ID,
   PROVIDER_CONTRACT_DEFINITIONS,
   buildPublicContractCatalog,
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 1) {
-  throw new Error("only abstract provider contract authority expected");
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("canonical provider catalog must include abstract and concrete mock");
 }
-if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
-  throw new Error("concrete mock provider must not be registered");
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID,
+);
+if (!concrete) {
+  throw new Error("concrete mock provider must be registered");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 1) {
-  throw new Error("provider contract definitions must remain abstract only");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
+  throw new Error("provider contract definitions must include concrete mock");
 }
-console.log("no concrete mock provider catalog registration ok");
+console.log("concrete mock provider catalog registration present ok");
 EOF
-pass "no concrete mock provider catalog registration"
+pass "concrete mock provider catalog registration present"
 
 echo "-- Test 883: catalog schema version unchanged --"
 node --input-type=module <<'EOF'
@@ -17648,26 +17676,30 @@ if grep -q "retry.js" src/lib/mock_provider.js; then
 fi
 pass "mock provider module does not import retry engine"
 
-echo "-- Test 910: public contract catalog unchanged post mock provider impl --"
+echo "-- Test 910: public contract catalog includes governed mock registration post impl --"
 node --input-type=module <<'EOF'
 import {
+  GOVERNED_MOCK_PROVIDER_ID,
   PROVIDER_CONTRACT_DEFINITIONS,
   buildPublicContractCatalog,
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 1) {
-  throw new Error("catalog providerContracts count changed");
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("catalog providerContracts must include abstract and concrete mock");
 }
 if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
-  throw new Error("abstract authority entry changed");
+  throw new Error("abstract authority entry must remain first definition");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 1) {
-  throw new Error("provider contract definitions changed");
+if (!catalog.providerContracts.some((entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID)) {
+  throw new Error("governed mock provider must be registered");
 }
-console.log("public contract catalog unchanged post mock provider impl ok");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
+  throw new Error("provider contract definitions must include concrete mock");
+}
+console.log("public contract catalog includes governed mock registration post impl ok");
 EOF
-pass "public contract catalog unchanged post mock provider impl"
+pass "public contract catalog includes governed mock registration post impl"
 
 echo "-- Test 911: future entry criteria mock provider implemented --"
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
@@ -17681,11 +17713,11 @@ grep -q "mock_provider.js" docs/VERSION.md
 grep -q "Deferred" docs/VERSION.md
 pass "version mock provider implemented documented"
 
-echo "-- Test 913: architecture maturity level 3.16 catalog registration governance --"
-grep -q "Level 3.16" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Mock Provider Catalog Registration Governance Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-grep -q "Authorized" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
-pass "architecture maturity level 3.16 catalog registration governance"
+echo "-- Test 913: architecture maturity level 3.17 catalog registration implementation --"
+grep -q "Level 3.17" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Mock Provider Catalog Registration Implementation Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Registered" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity level 3.17 catalog registration implementation"
 
 echo "-- Test 914: readme changelog v1.74.0 mock provider implementation --"
 grep -q "Mock Provider Production Implementation Release（v1.74.0）" README.md
@@ -17861,26 +17893,29 @@ grep -q "Real Provider" docs/architecture/NON_GOALS.md
 grep -q "禁止" docs/architecture/NON_GOALS.md
 pass "real provider external io prohibited maintained"
 
-echo "-- Test 935: public contract catalog unchanged post governance --"
+echo "-- Test 935: public contract catalog includes concrete mock post governance --"
 node --input-type=module <<'EOF'
 import {
-  PROVIDER_CONTRACT_DEFINITIONS,
+  GOVERNED_MOCK_PROVIDER_ID,
   buildPublicContractCatalog,
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 1) {
-  throw new Error("catalog providerContracts count changed");
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("catalog providerContracts must include abstract and concrete mock");
 }
 if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
-  throw new Error("abstract authority entry changed");
+  throw new Error("abstract authority entry must remain");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 1) {
-  throw new Error("provider contract definitions changed");
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID,
+);
+if (!concrete || concrete.registrationKind !== "concrete-mock-provider-implementation") {
+  throw new Error("concrete mock provider registration missing or invalid");
 }
-console.log("public contract catalog unchanged post governance ok");
+console.log("public contract catalog includes concrete mock post governance ok");
 EOF
-pass "public contract catalog unchanged post governance"
+pass "public contract catalog includes concrete mock post governance"
 
 echo "-- Test 936: mock provider module unchanged post governance --"
 node --input-type=module <<'EOF'
@@ -17919,17 +17954,17 @@ grep -q "ADR-0017" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
 grep -q "concrete-mock-provider-implementation" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
 pass "compliance checklist catalog registration governance section"
 
-echo "-- Test 939: future entry criteria catalog registration authorized synchronized --"
+echo "-- Test 939: future entry criteria catalog registration registered synchronized --"
 grep -q "Mock Provider Catalog Registration Governance" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Authorized / Not Started" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Registered" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "ADR-0017" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-pass "future entry criteria catalog registration authorized synchronized"
+pass "future entry criteria catalog registration registered synchronized"
 
-echo "-- Test 940: non goals catalog registration governance synchronized --"
+echo "-- Test 940: non goals catalog registration implementation synchronized --"
 grep -q "Catalog Registration Governance Complete" docs/architecture/NON_GOALS.md
 grep -q "ADR-0017" docs/architecture/NON_GOALS.md
-grep -q "Authorized / Not Started" docs/architecture/NON_GOALS.md
-pass "non goals catalog registration governance synchronized"
+grep -q "Registered" docs/architecture/NON_GOALS.md
+pass "non goals catalog registration implementation synchronized"
 
 echo "-- Test 941: readme changelog v1.75.0 catalog registration governance --"
 grep -q "Mock Provider Catalog Registration Governance Release（v1.75.0）" README.md
@@ -17961,6 +17996,693 @@ grep -q "v1.75.0" docs/CHANGELOG.md
 grep -q "ADR-0017" README.md
 grep -q "Authorized" README.md
 pass "v1.75.0 mock provider catalog registration governance documented"
+
+echo "-- Test 946: canonical provider catalog contains exactly two entries --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("providerContracts must contain exactly two entries");
+}
+console.log("canonical provider catalog contains exactly two entries ok");
+EOF
+pass "canonical provider catalog contains exactly two entries"
+
+echo "-- Test 947: abstract authority entry remains present --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const abstract = catalog.providerContracts.find(
+  (entry) => entry.providerId === "provider-abstract-contract-authority",
+);
+if (!abstract || abstract.registrationKind !== "abstract-contract-authority") {
+  throw new Error("abstract authority entry missing or invalid");
+}
+console.log("abstract authority entry remains present ok");
+EOF
+pass "abstract authority entry remains present"
+
+echo "-- Test 948: concrete mock provider entry present --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_ID,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID,
+);
+if (!concrete) {
+  throw new Error("concrete mock provider entry missing");
+}
+console.log("concrete mock provider entry present ok");
+EOF
+pass "concrete mock provider entry present"
+
+echo "-- Test 949: exact concrete providerId --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_ID,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.registrationKind === "concrete-mock-provider-implementation",
+);
+if (!concrete || concrete.providerId !== GOVERNED_MOCK_PROVIDER_ID) {
+  throw new Error("concrete providerId mismatch");
+}
+console.log("exact concrete providerId ok");
+EOF
+pass "exact concrete providerId"
+
+echo "-- Test 950: exact concrete providerVersion --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.providerVersion !== "1.0") {
+  throw new Error("concrete providerVersion mismatch");
+}
+console.log("exact concrete providerVersion ok");
+EOF
+pass "exact concrete providerVersion"
+
+echo "-- Test 951: exact concrete providerType --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.providerType !== "mock") {
+  throw new Error("concrete providerType mismatch");
+}
+console.log("exact concrete providerType ok");
+EOF
+pass "exact concrete providerType"
+
+echo "-- Test 952: exact concrete registrationKind --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.registrationKind !== GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND) {
+  throw new Error("concrete registrationKind mismatch");
+}
+console.log("exact concrete registrationKind ok");
+EOF
+pass "exact concrete registrationKind"
+
+echo "-- Test 953: exact concrete implementationModule --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_IMPLEMENTATION_MODULE,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.implementationModule !== GOVERNED_MOCK_PROVIDER_IMPLEMENTATION_MODULE) {
+  throw new Error("concrete implementationModule mismatch");
+}
+console.log("exact concrete implementationModule ok");
+EOF
+pass "exact concrete implementationModule"
+
+echo "-- Test 954: exact concrete capability declaration --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.capabilityDeclaration !== "text_generation") {
+  throw new Error("concrete capabilityDeclaration mismatch");
+}
+console.log("exact concrete capability declaration ok");
+EOF
+pass "exact concrete capability declaration"
+
+echo "-- Test 955: concrete implementationStatus implemented --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === "text-generation-mock-provider",
+);
+if (!concrete || concrete.implementationStatus !== "implemented") {
+  throw new Error("concrete implementationStatus must be implemented");
+}
+console.log("concrete implementationStatus implemented ok");
+EOF
+pass "concrete implementationStatus implemented"
+
+echo "-- Test 956: catalog schema remains public-contract-catalog/1.0 --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_CATALOG_SCHEMA,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.schema !== PUBLIC_CONTRACT_CATALOG_SCHEMA) {
+  throw new Error("catalog schema changed");
+}
+console.log("catalog schema remains public-contract-catalog/1.0 ok");
+EOF
+pass "catalog schema remains public-contract-catalog/1.0"
+
+echo "-- Test 957: catalogVersion remains 1.0 --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_CATALOG_VERSION,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.catalogVersion !== PUBLIC_CONTRACT_CATALOG_VERSION) {
+  throw new Error("catalogVersion changed");
+}
+console.log("catalogVersion remains 1.0 ok");
+EOF
+pass "catalogVersion remains 1.0"
+
+echo "-- Test 958: application publicContracts remain compatible --"
+node --input-type=module <<'EOF'
+import {
+  PUBLIC_CONTRACT_DEFINITIONS,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.publicContracts.length !== PUBLIC_CONTRACT_DEFINITIONS.length) {
+  throw new Error("publicContracts count changed");
+}
+const actual = catalog.publicContracts.map((contract) => ({ ...contract }));
+const expected = PUBLIC_CONTRACT_DEFINITIONS.map((contract) => ({ ...contract }));
+if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+  throw new Error("publicContracts definitions changed");
+}
+console.log("application publicContracts remain compatible ok");
+EOF
+pass "application publicContracts remain compatible"
+
+echo "-- Test 959: compatibilityMatrix remains compatible --"
+node --input-type=module <<'EOF'
+import {
+  buildCompatibilityMatrix,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const expected = buildCompatibilityMatrix();
+if (JSON.stringify(catalog.compatibilityMatrix) !== JSON.stringify(expected)) {
+  throw new Error("compatibilityMatrix changed");
+}
+console.log("compatibilityMatrix remains compatible ok");
+EOF
+pass "compatibilityMatrix remains compatible"
+
+echo "-- Test 960: governed mock provider id passes validation --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog({
+  generatedAt: "2026-07-10T00:00:00.000Z",
+});
+const validation = validatePublicContractCatalog(catalog);
+if (!validation.valid) {
+  throw new Error(`canonical catalog rejected: ${validation.errors.join("; ")}`);
+}
+console.log("governed mock provider id passes validation ok");
+EOF
+pass "governed mock provider id passes validation"
+
+echo "-- Test 961: arbitrary mock provider id remains rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  {
+    ...catalog.providerContracts[1],
+    providerId: "another-mock-provider",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("arbitrary mock provider id must be rejected");
+}
+console.log("arbitrary mock provider id remains rejected ok");
+EOF
+pass "arbitrary mock provider id remains rejected"
+
+echo "-- Test 962: real provider ids remain rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  {
+    ...catalog.providerContracts[1],
+    providerId: "real-openai-provider",
+    providerType: "ai",
+    registrationKind: "concrete-mock-provider-implementation",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("real provider id must be rejected");
+}
+console.log("real provider ids remain rejected ok");
+EOF
+pass "real provider ids remain rejected"
+
+echo "-- Test 963: unauthorized registrationKind remains rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  {
+    ...catalog.providerContracts[1],
+    registrationKind: "real-provider-implementation",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("unauthorized registrationKind must be rejected");
+}
+console.log("unauthorized registrationKind remains rejected ok");
+EOF
+pass "unauthorized registrationKind remains rejected"
+
+echo "-- Test 964: incorrect concrete mock registrationKind rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  {
+    ...catalog.providerContracts[1],
+    registrationKind: "abstract-contract-authority",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("incorrect concrete mock registrationKind must be rejected");
+}
+console.log("incorrect concrete mock registrationKind rejected ok");
+EOF
+pass "incorrect concrete mock registrationKind rejected"
+
+echo "-- Test 965: missing concrete entry fails canonical validation --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [catalog.providerContracts[0]];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("missing concrete entry must fail validation");
+}
+console.log("missing concrete entry fails canonical validation ok");
+EOF
+pass "missing concrete entry fails canonical validation"
+
+echo "-- Test 966: missing abstract entry fails canonical validation --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [catalog.providerContracts[1]];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("missing abstract entry must fail validation");
+}
+console.log("missing abstract entry fails canonical validation ok");
+EOF
+pass "missing abstract entry fails canonical validation"
+
+echo "-- Test 967: unauthorized extra provider entry fails --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  ...catalog.providerContracts,
+  {
+    ...catalog.providerContracts[1],
+    providerId: "extra-provider-entry",
+    registrationKind: "abstract-contract-authority",
+  },
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("unauthorized extra provider entry must fail validation");
+}
+console.log("unauthorized extra provider entry fails ok");
+EOF
+pass "unauthorized extra provider entry fails"
+
+echo "-- Test 968: duplicate provider registration fails --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  catalog.providerContracts[1],
+  catalog.providerContracts[1],
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("duplicate provider registration must fail validation");
+}
+console.log("duplicate provider registration fails ok");
+EOF
+pass "duplicate provider registration fails"
+
+echo "-- Test 969: legacy normalization produces canonical two-entry definitions --"
+node --input-type=module <<'EOF'
+import {
+  PROVIDER_CONTRACT_DEFINITIONS,
+  normalizePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const legacy = {
+  schema: "public-contract-catalog/1.0",
+  generatedAt: "2026-07-10T00:00:00.000Z",
+  catalogVersion: "1.0",
+};
+const normalized = normalizePublicContractCatalog(legacy);
+if (normalized.providerContracts.length !== PROVIDER_CONTRACT_DEFINITIONS.length) {
+  throw new Error("legacy normalization providerContracts count mismatch");
+}
+if (normalized.providerContracts.length !== 2) {
+  throw new Error("legacy normalization must produce two provider entries");
+}
+console.log("legacy normalization produces canonical two-entry definitions ok");
+EOF
+pass "legacy normalization produces canonical two-entry definitions"
+
+echo "-- Test 970: generator produces canonical two-entry catalog --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_ID,
+  PROVIDER_ABSTRACT_AUTHORITY_ID,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const ids = catalog.providerContracts.map((entry) => entry.providerId);
+if (ids.length !== 2) {
+  throw new Error("generator must produce exactly two provider entries");
+}
+if (ids[0] !== PROVIDER_ABSTRACT_AUTHORITY_ID || ids[1] !== GOVERNED_MOCK_PROVIDER_ID) {
+  throw new Error("generator canonical provider ids mismatch");
+}
+console.log("generator produces canonical two-entry catalog ok");
+EOF
+pass "generator produces canonical two-entry catalog"
+
+echo "-- Test 971: compliance validation passes canonical catalog --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalogPipeline,
+} from "./src/lib/public_contract_catalog.js";
+
+const result = buildPublicContractCatalogPipeline(null, {
+  generatedAt: "2026-07-10T00:00:00.000Z",
+});
+if (!result.catalog || result.catalog.providerContracts.length !== 2) {
+  throw new Error("compliance pipeline must produce canonical two-entry catalog");
+}
+console.log("compliance validation passes canonical catalog ok");
+EOF
+pass "compliance validation passes canonical catalog"
+
+echo "-- Test 972: mock_provider.js remains unchanged --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { createHash } from "node:crypto";
+
+const source = fs.readFileSync("src/lib/mock_provider.js", "utf8");
+const hash = createHash("sha256").update(source).digest("hex");
+const expectedMarkers = [
+  'export const MOCK_PROVIDER_ID = "text-generation-mock-provider"',
+  'export const MOCK_PROVIDER_VERSION = "1.0"',
+  'export const MOCK_PROVIDER_CAPABILITY = "text_generation"',
+  "export function invokeMockProvider",
+];
+for (const marker of expectedMarkers) {
+  if (!source.includes(marker)) {
+    throw new Error(`mock_provider.js marker missing: ${marker}`);
+  }
+}
+if (hash.length !== 64) {
+  throw new Error("mock_provider.js hash computation failed");
+}
+console.log("mock_provider.js remains unchanged ok");
+EOF
+pass "mock_provider.js remains unchanged"
+
+echo "-- Test 973: no real provider external io semantics introduced --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const serialized = JSON.stringify(catalog.providerContracts).toLowerCase();
+for (const forbidden of ["openai", "gemini", "sns-provider", "external-api", "bearer_token", "api_key"]) {
+  if (serialized.includes(forbidden)) {
+    throw new Error(`forbidden real provider semantics introduced: ${forbidden}`);
+  }
+}
+console.log("no real provider external io semantics introduced ok");
+EOF
+pass "no real provider external io semantics introduced"
+
+echo "-- Test 974: catalog registered does not imply provider production ready --"
+grep -Fq "**Not Declared**" docs/VERSION.md
+grep -q "Provider Production Ready" docs/VERSION.md
+grep -q "catalog-registered" src/lib/public_contract_catalog.js
+grep -q "Registered" docs/VERSION.md
+pass "catalog registered does not imply provider production ready"
+
+echo "-- Test 975: v1.76.0 mock provider catalog registration implementation documented --"
+grep -Fq "**980 PASS**" docs/VERSION.md
+grep -q "Test 946–980" docs/VERSION.md
+grep -q "v1.76.0" docs/CHANGELOG.md
+grep -q "Registered" README.md
+grep -Fq "**Not Declared**" README.md
+pass "v1.76.0 mock provider catalog registration implementation documented"
+
+echo "-- Test 976: concrete profile per-field mutation rejection --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const base = buildPublicContractCatalog({
+  generatedAt: "2026-07-10T00:00:00.000Z",
+});
+const mutations = [
+  ["providerVersion", "2.0"],
+  ["providerType", "ai"],
+  ["layer", "application"],
+  ["registrationKind", "abstract-contract-authority"],
+  ["status", "production-ready"],
+  ["authorityDocument", "wrong.md"],
+  ["implementationModule", "wrong.js"],
+  ["implementationStatus", "not-started"],
+  ["inputContractRef", "wrong"],
+  ["outputContractRef", "wrong"],
+  ["errorContractRef", "wrong"],
+  ["capabilityDeclaration", "image_generation"],
+];
+
+for (const [field, value] of mutations) {
+  const catalog = structuredClone(base);
+  catalog.providerContracts[1][field] = value;
+  const validation = validatePublicContractCatalog(catalog);
+  if (validation.valid) {
+    throw new Error(`concrete profile mutation must be rejected: ${field}=${value}`);
+  }
+}
+console.log("concrete profile per-field mutation rejection ok");
+EOF
+pass "concrete profile per-field mutation rejection"
+
+echo "-- Test 977: forbidden mock provider id alias rejection --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const base = buildPublicContractCatalog({
+  generatedAt: "2026-07-10T00:00:00.000Z",
+});
+const forbiddenIds = [
+  "Text-Generation-Mock-Provider",
+  "text-generation-mock-provider-test",
+  "prefix-text-generation-mock-provider",
+  "text_generation_mock_provider",
+  "text-generation-mock-provider-v2",
+  "another-mock-provider",
+  "mock-provider",
+  "real-provider",
+  "real-openai-provider",
+];
+
+for (const providerId of forbiddenIds) {
+  const catalog = structuredClone(base);
+  catalog.providerContracts[1].providerId = providerId;
+  const validation = validatePublicContractCatalog(catalog);
+  if (validation.valid) {
+    throw new Error(`forbidden provider id alias must be rejected: ${providerId}`);
+  }
+}
+console.log("forbidden mock provider id alias rejection ok");
+EOF
+pass "forbidden mock provider id alias rejection"
+
+echo "-- Test 978: duplicate abstract provider entry fails --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = [
+  catalog.providerContracts[0],
+  catalog.providerContracts[0],
+  catalog.providerContracts[1],
+];
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("duplicate abstract provider entry must fail validation");
+}
+console.log("duplicate abstract provider entry fails ok");
+EOF
+pass "duplicate abstract provider entry fails"
+
+echo "-- Test 979: abstract authority field preservation --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const abstract = catalog.providerContracts.find(
+  (entry) => entry.providerId === "provider-abstract-contract-authority",
+);
+if (!abstract) {
+  throw new Error("abstract authority entry missing");
+}
+if (abstract.providerType !== "abstract") {
+  throw new Error("abstract providerType must remain abstract");
+}
+if (abstract.implementationStatus !== "not-started") {
+  throw new Error("abstract implementationStatus must remain not-started");
+}
+if (abstract.registrationKind !== "abstract-contract-authority") {
+  throw new Error("abstract registrationKind must remain abstract-contract-authority");
+}
+console.log("abstract authority field preservation ok");
+EOF
+pass "abstract authority field preservation"
+
+echo "-- Test 980: normalization preserves malformed providerContracts then rejects --"
+node --input-type=module <<'EOF'
+import {
+  normalizePublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const legacy = {
+  schema: "public-contract-catalog/1.0",
+  generatedAt: "2026-07-10T00:00:00.000Z",
+  catalogVersion: "1.0",
+  providerContracts: [
+    {
+      providerId: "mock-provider",
+      providerVersion: "1.0",
+      providerType: "mock",
+      layer: "provider",
+      registrationKind: "concrete-mock-provider-implementation",
+      status: "catalog-registered",
+      authorityDocument: "docs/architecture/PROVIDER_LAYER_DESIGN.md",
+      inputContractRef: "application-public-contract",
+      outputContractRef: "normalized-provider-output",
+      errorContractRef: "provider-error-contract",
+      capabilityDeclaration: "text_generation",
+      implementationModule: "src/lib/mock_provider.js",
+      implementationStatus: "implemented",
+    },
+  ],
+};
+const normalized = normalizePublicContractCatalog(legacy);
+if (normalized.providerContracts[0].providerId !== "mock-provider") {
+  throw new Error("normalization must preserve present malformed providerContracts");
+}
+const validation = validatePublicContractCatalog(normalized);
+if (validation.valid) {
+  throw new Error("malformed present providerContracts must fail validation after normalization");
+}
+console.log("normalization preserves malformed providerContracts then rejects ok");
+EOF
+pass "normalization preserves malformed providerContracts then rejects"
 
 
 echo ""

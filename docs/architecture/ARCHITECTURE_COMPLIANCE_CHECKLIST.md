@@ -409,9 +409,33 @@ Per [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CA
 - [ ] PR-004 / PR-005 / PR-006 / CL-013 updated
 - [ ] CL-004 / CL-005 / CL-006 deferred maintained
 - [ ] Human Review recorded
-- [ ] Concrete catalog registration **not executed**
+- [ ] Concrete catalog registration **executed**（v1.76.0）
 
 ---
+
+## Mock Provider Catalog Registration Implementation Compliance
+
+Per [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) G5 + v1.76.0 implementation:
+
+- [ ] `providerContracts[]` canonical count **2**（abstract + concrete mock）
+- [ ] Abstract authority `provider-abstract-contract-authority` preserved
+- [ ] Concrete mock `text-generation-mock-provider` registered
+- [ ] `registrationKind` `concrete-mock-provider-implementation` — governed entry only
+- [ ] `implementationModule` `src/lib/mock_provider.js`
+- [ ] `capabilityDeclaration` `text_generation`
+- [ ] `implementationStatus` `implemented`
+- [ ] Forbidden mock/real patterns maintained for unauthorized IDs
+- [ ] Schema version **unchanged** — `public-contract-catalog/1.0`
+- [ ] Catalog version **unchanged** — `1.0`
+- [ ] Application `publicContracts[]` / `compatibilityMatrix` unchanged
+- [ ] **Mock Provider Catalog Registration Implementation Implemented**
+- [ ] **Mock Provider Catalog Registration Registered**
+- [ ] **Provider Production Ready Not Declared**
+- [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
+- [ ] `mock_provider.js` **unchanged**
+- [ ] PR-004 / PR-005 / PR-006 / CL-013 updated
+- [ ] CL-004 / CL-005 / CL-006 deferred maintained
+- [ ] Human Review recorded
 
 ## Usage Notes
 

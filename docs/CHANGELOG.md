@@ -6,6 +6,36 @@
 
 ---
 
+## v1.76.0 — Mock Provider Catalog Registration Implementation Release
+
+Mock Provider Catalog Registration Implementation Release — ADR-0017 G5 strict minimum — concrete `text-generation-mock-provider` registered in `providerContracts[]` — abstract authority preserved — validator narrow exception only。
+
+`src/lib/mock_provider.js` は変更なし。Real Provider / external IO **Prohibited** maintained。Catalog Registered **does not imply** Provider Production Ready。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Catalog module | `src/lib/public_contract_catalog.js` |
+| Concrete registration | `text-generation-mock-provider` / `1.0` / `mock` / `text_generation` |
+| registrationKind | `concrete-mock-provider-implementation` |
+| implementationModule | `src/lib/mock_provider.js` |
+| Canonical `providerContracts[]` | **2 entries**（abstract + concrete mock） |
+| Mock Provider Catalog Registration Implementation | **Implemented** |
+| Mock Provider Catalog Registration | **Registered** |
+| Provider Production Ready | **Not Declared** |
+| Current Maturity | **Level 3.17** |
+| Test 946–980 | Mock Provider Catalog Registration Implementation |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **980 PASS**（Test 946–980 含む） |
+| npm test | **PASS** |
+
+---
+
 ## v1.75.0 — Mock Provider Catalog Registration Governance Release
 
 Mock Provider Catalog Registration Governance Release — ADR-0016 Decision B closure — concrete registration policy defined — validator policy defined — identity mapping defined — catalog registration **Authorized** / **Not Started**。

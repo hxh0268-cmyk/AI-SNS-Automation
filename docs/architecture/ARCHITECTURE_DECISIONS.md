@@ -180,7 +180,8 @@ ADR-0010 Provider Entry Preparation
                         → Mock Provider Production Implementation Release（v1.74.0 — code）
                           → ADR-0017 Mock Provider Catalog Registration Governance
                             → MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW（evidence）
-                              → Future: Mock Provider Catalog Registration Implementation Release
+                              → v1.76.0 Mock Provider Catalog Registration Implementation
+                              → Future: follow-on Provider Layer work per Architecture Review
 ```
 
 ### v1.69.0 Provider Contract Definition Governance
@@ -259,5 +260,16 @@ Full record: [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](.
 | **Review Trigger** | Mock Provider Catalog Registration Implementation Release |
 
 Full record: [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) + [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md)
+
+### v1.76.0 Mock Provider Catalog Registration Implementation
+
+| Item | Decision |
+|------|----------|
+| **Decision** | Mock Provider Catalog Registration **Implemented** + **Registered** — governed concrete entry in `providerContracts[]` |
+| **ADR** | [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) G5 |
+| **Scope** | `text-generation-mock-provider` only — abstract authority preserved |
+| **Review Trigger** | follow-on Provider Layer work per Architecture Review |
+
+Full record: [CHANGELOG.md](../CHANGELOG.md) §v1.76.0 + `src/lib/public_contract_catalog.js`
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

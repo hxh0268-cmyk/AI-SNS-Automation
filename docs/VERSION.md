@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.75.0**（Mock Provider Catalog Registration Governance Release）
+**v1.76.0**（Mock Provider Catalog Registration Implementation Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Mock Provider Catalog Registration Governance Release Complete
+**Phase:** Mock Provider Catalog Registration Implementation Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -30,7 +30,9 @@
 
 **Mock Provider Catalog Registration Governance:** **Complete**（v1.75.0 — [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](architecture/MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md)）
 
-**Mock Provider Catalog Registration:** **Authorized**（future separate Implementation Release — ADR-0017）
+**Mock Provider Catalog Registration Implementation:** **Implemented**（v1.76.0 — `src/lib/public_contract_catalog.js`）
+
+**Mock Provider Catalog Registration:** **Registered**（ADR-0017 — `text-generation-mock-provider`）
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -38,9 +40,9 @@
 
 **Provider Production Implementation:** **Not Started**（Real Provider scope）
 
-**Next Phase Candidate:** Mock Provider Catalog Registration Implementation Release
+**Next Phase Candidate:** follow-on Provider Layer work per Architecture Review
 
-**Next Candidate:** v1.76.0（Catalog Registration Implementation / follow-on 後の候補）
+**Next Candidate:** v1.77.0（post-implementation follow-on 候補）
 
 ---
 
@@ -143,11 +145,10 @@
 - **`MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md`** … registration policy / validator policy / identity mapping evidence
 - **`ADR-0017-mock-provider-catalog-registration-governance.md`** … concrete registration governance decisions G1–G12
 - **Mock Provider Catalog Registration Governance** … **Complete**
-- **Mock Provider Catalog Registration** … **Authorized** — future separate Implementation Release
-- **Mock Provider Catalog Registration** … **Not Started**
-- **registrationKind** … `concrete-mock-provider-implementation`（governed — not implemented）
+- **Mock Provider Catalog Registration** … **Authorized** — future separate Implementation Release（historical — superseded by v1.76.0 Registered）
+- **registrationKind** … `concrete-mock-provider-implementation`（governed — validator policy defined at governance; implemented v1.76.0）
 - **Provider Production Ready** … **Not Declared**
-- **`public_contract_catalog.js` / `mock_provider.js`** … **Unchanged**
+- **`public_contract_catalog.js` / `mock_provider.js`** … **Unchanged**（v1.75.0）
 
 ### 品質状況（v1.75.0 最新）
 
@@ -171,6 +172,44 @@
 | Concrete catalog registration not executed | ✅ |
 | **945 PASS** | ✅ |
 | Test 918–945 | ✅ |
+
+---
+
+### v1.76.0 で追加（Mock Provider Catalog Registration Implementation Release）
+
+#### Mock Provider Catalog Registration Implementation 正式記録
+
+- **`src/lib/public_contract_catalog.js`** … governed concrete Mock Provider catalog registration
+- **Canonical `providerContracts[]`** … **2 entries**（`provider-abstract-contract-authority` + `text-generation-mock-provider`）
+- **registrationKind** … `concrete-mock-provider-implementation`（governed entry only）
+- **Mock Provider Catalog Registration Implementation** … **Implemented**
+- **Mock Provider Catalog Registration** … **Registered**
+- **Provider Production Ready** … **Not Declared**
+- **`mock_provider.js`** … **Unchanged**
+
+### 品質状況（v1.76.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **980 PASS** |
+| Architecture Documents | **44** 必須文書 |
+| Catalog generator / reports | **updated**（canonical 2-entry provider catalog） |
+| Current Maturity | **Level 3.17** — Mock Provider Catalog Registration Implementation Release Complete |
+| Mock Provider Catalog Registration | **Registered** |
+| npm test | **PASS** |
+| Test 946–980 | Mock Provider Catalog Registration Implementation |
+
+### v1.76.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0017 G5 scope respected | ✅ |
+| Abstract authority preserved | ✅ |
+| Governed concrete mock registered | ✅ |
+| Validator narrow exception only | ✅ |
+| mock_provider.js unchanged | ✅ |
+| **980 PASS** | ✅ |
+| Test 946–980 | ✅ |
 
 ---
 
