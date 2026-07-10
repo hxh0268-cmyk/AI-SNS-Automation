@@ -45,7 +45,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
 | CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | Medium | ADR-0011 + ADR-0012 + ADR-0015 + ADR-0017 + v1.76.0 concrete mock registration | **Mitigated** — abstract + governed concrete mock in JSON（v1.76.0） | Real Provider impl still gated |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **reassessed** post-v1.76.0 — governed concrete Mock Provider traceability **implemented** in catalog JSON; Real Provider traceability still gated. PR-005 **reframed** post-ADR-0017 — Governed / Authorized / Registered distinction explicit; **Registered** achieved for governed mock. PR-006 **reframed** post-ADR-0017 — identity mapping defined at governance level and **bound in catalog**（v1.76.0）.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **reassessed** post-v1.76.0 — governed concrete Mock Provider traceability **implemented** in catalog JSON; Real Provider traceability still gated. PR-005 **reframed** post-ADR-0017/0018 — Governed / Authorized / Registered / Review Entry / Production Ready distinction explicit. PR-006 **synchronized** post-v1.76.0 — catalog registration **complete**; semantic drift risk remains. PPRR-F001 **recorded** post-v1.77.0 entry verification — open finding.
 
 ---
 
@@ -58,7 +58,15 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | PR-003 | Provider boundary overreach（owns Runtime/Retry/Idempotency） | Layer boundaries | High | Medium | ADR-0010 non-ownership table | Low at governance | Major at implementation |
 | PR-004 | Public Contract Catalog bypass | Catalog / Policy | High | Low | ADR-0011 + ADR-0012 + ADR-0015 registration + bypass prohibition | **Low** — catalog registration executed（v1.72.0） | Critical if bypassed |
 | PR-005 | Implementation Ready mistaken for Production Implementation | NON_GOALS / G-25 / Maturity | Critical | Medium | ADR-0014 scope limits + ADR-0015 Catalog Extension + ADR-0016 Authorized vs Started + ADR-0017 Governed vs Registered distinction | **Medium** — governance distinction explicit; watch Registered vs Production Ready confusion | Critical |
-| PR-006 | Mock Provider semantic drift / Application mock conflation | Provider / Application Layer | High | Medium | ADR-0016 Mock Provider definition + ADR-0017 identity mapping + Decision B catalog policy | **Medium** — identity mapping governed; concrete registration pending | Major |
+| PR-006 | Mock Provider semantic drift / Application mock conflation | Provider / Application Layer | High | Medium | ADR-0016 Mock Provider definition + ADR-0017 identity mapping + ADR-0018 review framework + v1.76.0 catalog registration | **Medium** — identity mapping governed and catalog-bound; semantic drift risk at implementation time remains | Major |
+
+---
+
+## Provider Production Readiness Review Risk（v1.77.0）
+
+| ID | Risk | Affected Authority | Impact | Likelihood | Mitigation | Remaining Exposure | Readiness Impact |
+|----|------|-------------------|--------|------------|------------|-------------------|------------------|
+| PPRR-F001 | Abstract authority profile not fully validator-locked | Catalog / Validator | Medium | Low | PPRR-F001 open finding; canonical generator correct | Manual abstract mutation may pass validation | **Blocks** Production Ready until disposition |
 
 ---
 

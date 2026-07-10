@@ -437,6 +437,28 @@ Per [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md)
 - [ ] CL-004 / CL-005 / CL-006 deferred maintained
 - [ ] Human Review recorded
 
+---
+
+## Provider Production Readiness Review Governance Compliance
+
+Per [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) + [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md):
+
+- [ ] ADR-0018 accepted
+- [ ] Review Entry **Authorized**（DECISION A）
+- [ ] Review framework established — evidence model / entry criteria / blocking conditions
+- [ ] State model distinguishes Review Entry / Production Ready / repository-wide L4
+- [ ] Mock Provider ≠ Real Provider boundary documented
+- [ ] PPRR-F001 abstract authority finding recorded — **Open**
+- [ ] Production Readiness Assessment **In Progress** — decision **Not Yet Made**
+- [ ] **Provider Production Ready Not Declared**
+- [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
+- [ ] Real Provider / external IO **remains prohibited**
+- [ ] `mock_provider.js` **unchanged**
+- [ ] `public_contract_catalog.js` **unchanged**
+- [ ] CL-004 / CL-005 / CL-006 deferred maintained
+- [ ] PR-004 / PR-005 / PR-006 / CL-013 synchronized
+- [ ] Human Review recorded
+
 ## Usage Notes
 
 | タイミング | 使用する節 |

@@ -161,6 +161,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0015](../adr/ADR-0015-provider-public-contract-catalog-extension-release.md) — Provider Public Contract Catalog Extension Release（v1.72.0）
 - [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) — Mock Provider Production Implementation Authorization Decision（v1.73.0）
 - [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) — Mock Provider Catalog Registration Governance Decision（v1.75.0）
+- [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md) — Provider Production Readiness Review Governance Decision（v1.77.0）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
@@ -181,7 +182,8 @@ ADR-0010 Provider Entry Preparation
                           → ADR-0017 Mock Provider Catalog Registration Governance
                             → MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW（evidence）
                               → v1.76.0 Mock Provider Catalog Registration Implementation
-                              → Future: follow-on Provider Layer work per Architecture Review
+                              → v1.77.0 Provider Production Readiness Review Governance
+                              → Future: Provider Production Readiness formal assessment
 ```
 
 ### v1.69.0 Provider Contract Definition Governance
@@ -271,5 +273,17 @@ Full record: [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PR
 | **Review Trigger** | follow-on Provider Layer work per Architecture Review |
 
 Full record: [CHANGELOG.md](../CHANGELOG.md) §v1.76.0 + `src/lib/public_contract_catalog.js`
+
+### v1.77.0 Provider Production Readiness Review Governance
+
+| Item | Decision |
+|------|----------|
+| **Decision** | Provider Production Readiness Review Entry **Authorized** — governance framework established |
+| **ADR** | [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md) |
+| **Review** | [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) |
+| **Consequences** | Assessment In Progress; Production Ready **Not Declared**; production code unchanged |
+| **Review Trigger** | Provider Production Readiness formal assessment |
+
+Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) + [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

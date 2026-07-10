@@ -19,7 +19,7 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.17 — Mock Provider Catalog Registration Implementation Release Complete
+Current Maturity: Level 3.18 — Provider Production Readiness Review Governance Release Complete
 ```
 
 | 項目 | 状態（v1.72.0） |
@@ -38,6 +38,7 @@ Current Maturity: Level 3.17 — Mock Provider Catalog Registration Implementati
 | Level 3.15 Mock Provider Production Implementation Release | **Completed**（v1.74.0） |
 | Level 3.16 Mock Provider Catalog Registration Governance Release | **Completed**（v1.75.0） |
 | Level 3.17 Mock Provider Catalog Registration Implementation Release | **Completed**（v1.76.0） |
+| Level 3.18 Provider Production Readiness Review Governance Release | **Completed**（v1.77.0） |
 | Final Architecture Review | **Completed**（Decision B remediation — v1.66.0） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | Provider Entry Preparation | **Governance Complete**（[PROVIDER_ENTRY_PREPARATION_REVIEW.md](./PROVIDER_ENTRY_PREPARATION_REVIEW.md)） |
@@ -50,8 +51,11 @@ Current Maturity: Level 3.17 — Mock Provider Catalog Registration Implementati
 | **Mock Provider Catalog Registration Governance** | **Complete**（v1.75.0 — [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) — ADR-0017） |
 | **Mock Provider Catalog Registration Implementation** | **Implemented**（v1.76.0 — `src/lib/public_contract_catalog.js`） |
 | **Mock Provider Catalog Registration** | **Registered**（ADR-0017 — `text-generation-mock-provider`） |
+| **Provider Production Readiness Review Governance** | **Complete**（v1.77.0 — [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) — ADR-0018） |
+| **Provider Production Readiness Review Entry** | **Authorized**（DECISION A） |
+| **Provider Production Readiness Assessment** | **In Progress** |
+| **Provider Production Ready** | **Not Declared** |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
-| Provider Production Implementation | **Not Started**（Real Provider scope） |
 | Level 5 Production Ready | **未到達** |
 | Level 6 Operational Excellence | **未到達** |
 
@@ -170,6 +174,8 @@ Future 実装着手 =
 **Mock Provider Production Implementation（current）:** **Implemented**（v1.74.0）
 
 **Mock Provider Catalog Registration（current）:** **Registered**（v1.76.0）— concrete `text-generation-mock-provider` in `providerContracts[]`
+
+**Provider Production Readiness Review Entry（current）:** **Authorized**（v1.77.0）— review framework established; assessment **In Progress**; Production Ready **Not Declared**
 
 **v1.68.0（historical）:** P4 Partially Satisfied — superseded by v1.69.0 Contract Definition Governance.
 
@@ -508,6 +514,9 @@ Level 3 → Level 4 Gate PASS =
 | Mock Provider Catalog Registration Governance | ✅ **Complete**（v1.75.0） |
 | Mock Provider Catalog Registration Implementation | ✅ **Implemented**（v1.76.0） |
 | Mock Provider Catalog Registration | ✅ **Registered**（ADR-0017） |
+| Provider Production Readiness Review Governance | ✅ **Complete**（v1.77.0） |
+| Provider Production Readiness Review Entry | ✅ **Authorized**（ADR-0018） |
+| Provider Production Readiness Assessment | ⏳ **In Progress** |
 | Provider domain U1–U8 | ✅ **Satisfied** |
 | Provider applicability G-07 / G-08 / G-18 | ✅ **Satisfied** |
 | G-24 / G-25 / G-26 | ✅ **Satisfied** |
@@ -517,7 +526,7 @@ Level 3 → Level 4 Gate PASS =
 | Repository-wide Level 4 Implementation Ready | ❌ **Not Declared** |
 | Provider Production Implementation | ❌ **Not Started**（Real Provider scope） |
 | Catalog Extension Release | ✅ **Complete**（v1.72.0 — ADR-0015） |
-| First Target Domain | **Provider Layer** — catalog registration **Registered**; follow-on Provider work per Architecture Review |
+| First Target Domain | **Provider Layer** — Production Readiness Review Entry **Authorized**; formal assessment next gate |
 
 Future Entry Criteria は **Level 3 → Level 4 の Gate** である。Architecture Maturity Model は **位置づけ** を、本書は **実装開始条件** を定義する（[ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Relationship 節と整合）。
 
