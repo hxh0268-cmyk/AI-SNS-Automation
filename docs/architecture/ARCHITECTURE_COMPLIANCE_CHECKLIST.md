@@ -484,6 +484,33 @@ Per [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_RE
 - [x] Quality Pipeline **1042 PASS**
 - [ ] Human Review recorded
 
+---
+
+## Provider Expansion Entry Governance Release Compliance（v1.79.0）
+
+Per [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REVIEW.md) + [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md):
+
+- [x] Provider Expansion Entry Governance **Established**
+- [x] Expansion candidate taxonomy defined（Classes 1–5）
+- [x] Entry criteria E1–E25 defined
+- [x] Blocking conditions B1–B25 defined
+- [x] State model extensions defined
+- [x] **Expansion Entry Authorization Not Granted**（per-candidate — future）
+- [x] **Implementation Authorization Not Granted**
+- [x] **Provider Production Ready Not Declared**（global）
+- [x] **Repository-wide Level 4 Not Declared**
+- [x] Bounded Mock Formal Decision **READY** preserved
+- [x] PPRR-F001 bounded closure preserved
+- [x] Real Provider / External IO **prohibited**
+- [x] Automatic SNS publishing **prohibited**
+- [x] `mock_provider.js` **unchanged**
+- [x] `public_contract_catalog.js` **unchanged**（no new provider entries）
+- [x] CL-004 / CL-005 / CL-006 globally **Deferred**
+- [x] PR-004 / PR-005 / PR-006 expansion controls recorded
+- [x] Quality Pipeline **1074 PASS**
+- [x] Release version **v1.79.0** synchronized
+- [ ] Human Review recorded
+
 ## Usage Notes
 
 | タイミング | 使用する節 |

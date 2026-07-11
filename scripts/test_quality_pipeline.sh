@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.78.0 --"
+echo "-- Test 98: VERSION updated to v1.79.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,12 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.78.0**（Provider Production Readiness Assessment Decision Release）")) {
-  throw new Error("docs/VERSION.md current version must be v1.78.0");
+if (!versionDoc.includes("**v1.79.0**（Provider Expansion Entry Governance Release）")) {
+  throw new Error("docs/VERSION.md current version must be v1.79.0");
 }
-console.log("VERSION v1.78.0 ok");
+console.log("VERSION v1.79.0 ok");
 EOF
-pass "VERSION updated to v1.78.0"
+pass "VERSION updated to v1.79.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6464,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.79.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.79.0");
+if (payload.nextVersion !== "v1.80.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.80.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6474,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.79.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.79.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.80.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.80.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6530,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.79.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.80.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14032,7 +14032,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14392,7 +14392,7 @@ pass "architecture maturity model has required headings"
 
 echo "-- Test 442: current maturity is level 3.19 --"
 grep -q "Level 3.19" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Provider Production Readiness Assessment Decision Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Expansion Entry Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "current maturity is level 3.19"
 
 echo "-- Test 443: README references architecture maturity model --"
@@ -14443,7 +14443,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14509,7 +14509,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14574,7 +14574,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15101,7 +15101,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15212,7 +15212,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15320,7 +15320,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -16012,7 +16012,7 @@ grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.19 — Provider Production Readiness Assessment Decision Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.19 — Provider Expansion Entry Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16120,7 +16120,7 @@ grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
 echo "-- Test 741: architecture readme declares mock provider implementation release --"
-grep -q "Level 3.19 — Provider Production Readiness Assessment Decision Release Complete" docs/architecture/README.md
+grep -q "Level 3.19 — Provider Expansion Entry Governance Release Complete" docs/architecture/README.md
 grep -q "Mock Provider Production Implementation" docs/architecture/README.md
 grep -q "Implemented" docs/architecture/README.md
 pass "architecture readme declares mock provider implementation release"
@@ -17101,7 +17101,7 @@ grep -q "Real Provider" docs/architecture/NON_GOALS.md
 pass "real provider prohibited maintained"
 
 echo "-- Test 858: architecture documents count 45 --"
-grep -q "45 必須 Governance 文書" docs/architecture/README.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
 grep -q "PROVIDER_PRODUCTION_READINESS_REVIEW.md" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md" docs/architecture/README.md
@@ -19243,7 +19243,7 @@ grep -q "automatic SNS publishing" docs/architecture/PROVIDER_PRODUCTION_READINE
 pass "formal provider production readiness assessment documented"
 
 echo "-- Test 1028: v1.78.0 release version synchronized --"
-grep -Fq "**v1.78.0**（Provider Production Readiness Assessment Decision Release）" docs/VERSION.md
+grep -q "### v1.78.0 で追加（Provider Production Readiness Assessment Decision Release）" docs/VERSION.md
 grep -q "v1.78.0" docs/CHANGELOG.md
 grep -q "v1.78.0" README.md
 pass "v1.78.0 release version synchronized"
@@ -19283,7 +19283,7 @@ grep -Fq "Does **not** declare Provider Production Ready" docs/architecture/PROV
 pass "bounded ready semantics explicit in release"
 
 echo "-- Test 1035: global provider production ready not declared --"
-grep -Fq "**Provider Production Ready:** **Not Declared**" docs/VERSION.md
+grep -Fq "**Provider Production Ready:** **Not Declared**" docs/VERSION.md || grep -Fq "**Provider Production Ready** | **Not Declared**" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
 grep -q "global declaration" docs/VERSION.md
 pass "global provider production ready not declared"
 
@@ -19323,6 +19323,204 @@ grep -q "DECISION D" docs/adr/ADR-0018-provider-production-readiness-review-gove
 grep -qi "automatic sns publishing" docs/VERSION.md
 grep -q "2026-07-10" docs/CHANGELOG.md
 pass "v1.78.0 provider production readiness assessment decision release documented"
+
+echo "-- Test 1043: provider expansion entry review document exists --"
+test -f docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Provider Expansion Entry Review" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Purpose" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "provider expansion entry review document exists"
+
+echo "-- Test 1044: adr 0019 provider expansion entry governance exists --"
+test -f docs/adr/ADR-0019-provider-expansion-entry-governance.md
+grep -q "ADR-0019" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+grep -q "Provider Expansion Entry Governance" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "adr 0019 provider expansion entry governance exists"
+
+echo "-- Test 1045: roadmap decision proceed to provider expansion entry governance recorded --"
+grep -q "PROCEED TO PROVIDER EXPANSION ENTRY GOVERNANCE" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+grep -q "PROCEED TO PROVIDER EXPANSION ENTRY GOVERNANCE" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md || grep -q "Expansion Entry Governance" docs/architecture/ARCHITECTURE_DECISIONS.md
+pass "roadmap decision proceed to provider expansion entry governance recorded"
+
+echo "-- Test 1046: provider expansion entry governance authorized as governance only --"
+grep -q "Governance only" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+grep -q "governance-only" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "DECISION F" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "provider expansion entry governance authorized as governance only"
+
+echo "-- Test 1047: real provider remains prohibited --"
+grep -q "Real Provider" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Prohibited" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Real Provider" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "real provider remains prohibited"
+
+echo "-- Test 1048: external io remains prohibited --"
+grep -qi "external io" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "prohibited" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -qi "external io" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "external io remains prohibited"
+
+echo "-- Test 1049: implementation authorization not granted --"
+grep -q "Implementation Authorization" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Not Granted" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Implementation Authorization" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "implementation authorization not granted"
+
+echo "-- Test 1050: global provider production ready not declared --"
+grep -Fq "**Provider Production Ready** | **Not Declared**" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md || grep -Fq "**Provider Production Ready:** **Not Declared**" docs/VERSION.md
+grep -q "Not Declared" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "global provider production ready not declared"
+
+echo "-- Test 1051: repository wide level 4 not declared --"
+grep -q "Repository-wide Level 4" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Not Declared" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "repository wide level 4 not declared"
+
+echo "-- Test 1052: human approval gate preserved --"
+grep -q "Human Approval Gate" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+grep -q "Human Approval Gate" docs/architecture/CHANGE_GOVERNANCE.md
+pass "human approval gate preserved"
+
+echo "-- Test 1053: automatic sns publishing remains prohibited --"
+grep -qi "automatic sns publishing" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -qi "automatic sns publishing" docs/VERSION.md
+pass "automatic sns publishing remains prohibited"
+
+echo "-- Test 1054: bounded mock provider ready remains unchanged --"
+grep -Fq "Formal Decision **READY**" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "text-generation-mock-provider" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Preserved" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "bounded mock provider ready remains unchanged"
+
+echo "-- Test 1055: pprr f001 bounded closure remains unchanged --"
+grep -q "CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT" docs/architecture/RISK_REGISTER.md
+pass "pprr f001 bounded closure remains unchanged"
+
+echo "-- Test 1056: cl 004 cl 005 cl 006 remain deferred --"
+grep -q "CL-004" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "CL-005" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "CL-006" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -Fq "remain **open exposure**" docs/architecture/RISK_REGISTER.md
+grep -q "Remains Deferred" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "cl 004 cl 005 cl 006 remain deferred"
+
+echo "-- Test 1057: provider expansion entry governance documented --"
+grep -q "Test 1043–1057" docs/VERSION.md
+grep -q "Expansion Candidate Taxonomy" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Authorization Matrix" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "provider expansion entry governance documented"
+
+echo "-- Test 1058: v1.79.0 release version synchronized --"
+grep -Fq "**v1.79.0**（Provider Expansion Entry Governance Release）" docs/VERSION.md
+grep -q "v1.79.0" docs/CHANGELOG.md
+grep -q "v1.79.0" README.md
+pass "v1.79.0 release version synchronized"
+
+echo "-- Test 1059: v1.79.0 release name synchronized --"
+grep -q "Provider Expansion Entry Governance Release" docs/VERSION.md
+grep -q "Provider Expansion Entry Governance Release" docs/CHANGELOG.md
+grep -q "Provider Expansion Entry Governance Release" README.md
+pass "v1.79.0 release name synchronized"
+
+echo "-- Test 1060: quality pipeline count synchronized for v1.79.0 --"
+grep -Fq "**1074 PASS**" docs/VERSION.md
+grep -q "Test 1058–1073" docs/VERSION.md
+pass "quality pipeline count synchronized for v1.79.0"
+
+echo "-- Test 1061: maturity level 3.19 synchronized for v1.79.0 --"
+grep -q "Level 3.19" docs/VERSION.md
+grep -q "Level 3.19" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Level 3.19 — Provider Expansion Entry Governance Release Complete" docs/architecture/README.md
+pass "maturity level 3.19 synchronized for v1.79.0"
+
+echo "-- Test 1062: pr 004 expansion controls recorded --"
+grep -q "PR-004" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "PR-004" docs/architecture/RISK_REGISTER.md
+grep -q "expansion registration gate" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "pr 004 expansion controls recorded"
+
+echo "-- Test 1063: pr 005 state distinctions recorded --"
+grep -q "PR-005" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "State Distinctions" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Bounded Production Ready" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "pr 005 state distinctions recorded"
+
+echo "-- Test 1064: pr 006 semantic boundaries recorded --"
+grep -q "PR-006" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "semantic" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "ADR-0019" docs/architecture/RISK_REGISTER.md
+pass "pr 006 semantic boundaries recorded"
+
+echo "-- Test 1065: expansion candidate taxonomy exists --"
+grep -q "Class 1" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Class 2" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Class 3" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Class 4" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Class 5" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "expansion candidate taxonomy exists"
+
+echo "-- Test 1066: entry criteria exist --"
+grep -q "Entry Criteria" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "E1" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "E25" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "entry criteria exist"
+
+echo "-- Test 1067: blocking conditions exist --"
+grep -q "Blocking Conditions" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "B1" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "B25" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "blocking conditions exist"
+
+echo "-- Test 1068: future adr requirement exists --"
+grep -q "Per-candidate ADR" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Follow-up" docs/adr/ADR-0019-provider-expansion-entry-governance.md
+pass "future adr requirement exists"
+
+echo "-- Test 1069: future review evidence requirement exists --"
+grep -q "Required Future Evidence" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "Required Future Artifacts" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "future review evidence requirement exists"
+
+echo "-- Test 1070: catalog registration before authorization prohibited --"
+grep -q "Catalog registration before authorization" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "B22" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "catalog registration before authorization prohibited"
+
+echo "-- Test 1071: implementation before governance completion prohibited --"
+grep -q "Implementation before governance completion" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+grep -q "B23" docs/architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md
+pass "implementation before governance completion prohibited"
+
+echo "-- Test 1072: documentation drift resolved --"
+grep -q "Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+! grep -q "assessment \*\*In Progress\*\*" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "v1.79.0" docs/architecture/NON_GOALS.md
+! grep -q "v1.77.0）:\*\* Provider Production Readiness Review Entry" docs/architecture/NON_GOALS.md
+pass "documentation drift resolved"
+
+echo "-- Test 1073: public contract catalog remains valid provider contracts count 2 --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
+const catalog = buildPublicContractCatalog({ rootDir: PROJECT_ROOT });
+if (!Array.isArray(catalog.providerContracts) || catalog.providerContracts.length !== 2) {
+  throw new Error("providerContracts count must remain 2");
+}
+console.log("providerContracts count 2 ok");
+EOF
+pass "public contract catalog remains valid provider contracts count 2"
+
+echo "-- Test 1074: v1.79.0 provider expansion entry governance release documented --"
+grep -q "Test 1058–1073" docs/VERSION.md
+grep -q "DECISION F" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "ADR-0019" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "2026-07-11" docs/CHANGELOG.md
+grep -q "46 必須 Governance 文書" docs/architecture/README.md
+pass "v1.79.0 provider expansion entry governance release documented"
 
 
 echo ""

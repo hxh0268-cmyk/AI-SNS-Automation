@@ -6,6 +6,41 @@
 
 ---
 
+## v1.79.0 — Provider Expansion Entry Governance Release
+
+Provider Expansion Entry Governance Release — ADR-0019 DECISION F — expansion candidate taxonomy / entry criteria E1–E25 / blocking conditions B1–B25 / state model extensions — governance-only。Provider Expansion Entry Authorization **Not Granted**（per-candidate — future）。Implementation Authorization **Not Granted**。
+
+`src/lib/mock_provider.js` / `public_contract_catalog.js` は変更なし。Real Provider / external IO **Prohibited** maintained。Bounded Mock Provider Formal Decision **READY** preserved。Global Provider Production Ready **Not Declared**。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | `ADR-0019-provider-expansion-entry-governance.md` |
+| Review document | `PROVIDER_EXPANSION_ENTRY_REVIEW.md` |
+| Provider Expansion Entry Governance | **Established** |
+| Provider Expansion Entry Authorization | **Not Granted**（per-candidate — future） |
+| Implementation Authorization | **Not Granted** |
+| Bounded Mock Formal Decision READY | **Preserved**（v1.78.0） |
+| PPRR-F001 | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT**（unchanged） |
+| CL-004 / CL-005 / CL-006 | **Remains Deferred** — expansion trigger framework recorded |
+| PR-004 / PR-005 / PR-006 | Expansion controls recorded |
+| Provider Production Ready（global） | **Not Declared** |
+| Repository-wide Level 4 | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1043–1057 | Provider Expansion Entry Governance |
+| Test 1058–1073 | Provider Expansion Entry Governance Release |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1074 PASS** |
+| npm test | **PASS** |
+| Release date | **2026-07-11** |
+
+---
+
 ## v1.78.0 — Provider Production Readiness Assessment Decision Release
 
 Provider Production Readiness Assessment Decision Release — PPRR-F001 full-profile validator remediation — Formal Provider Production Readiness Assessment **READY**（bounded canonical Mock Provider scope）— DECISION D **Accepted** — Provider Production Ready **Not Declared**（global）。

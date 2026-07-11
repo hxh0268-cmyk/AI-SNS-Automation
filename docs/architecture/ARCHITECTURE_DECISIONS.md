@@ -162,6 +162,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0016](../adr/ADR-0016-mock-provider-production-implementation-authorization.md) — Mock Provider Production Implementation Authorization Decision（v1.73.0）
 - [ADR-0017](../adr/ADR-0017-mock-provider-catalog-registration-governance.md) — Mock Provider Catalog Registration Governance Decision（v1.75.0）
 - [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md) — Provider Production Readiness Review Governance Decision（v1.77.0）
+- [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md) — Provider Expansion Entry Governance Decision（v1.79.0）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
@@ -327,5 +328,24 @@ Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_REA
 | **Consequences** | Release candidate prepared; Human Approval Gate preserved |
 
 Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) §Architecture Review Decision — Formal Assessment Acceptance
+
+### Post–DECISION F — Provider Expansion Entry Governance（v1.79.0）
+
+| Item | Decision |
+|------|----------|
+| **Decision** | **DECISION F — ESTABLISH PROVIDER EXPANSION ENTRY GOVERNANCE** |
+| **Release** | v1.79.0 — Provider Expansion Entry Governance Release |
+| **ADR** | [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md) |
+| **Review** | [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REVIEW.md) |
+| **Scope** | Governance-only — expansion taxonomy / entry criteria / blocking conditions |
+| **Expansion Entry Authorization** | **Not Granted**（per-candidate — future） |
+| **Implementation Authorization** | **Not Granted** |
+| **Maturity** | **Level 3.19**（unchanged） |
+| **Bounded Mock Formal Decision READY** | **Preserved**（v1.78.0） |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Expansion framework established; Real Provider / External IO remain prohibited |
+
+Full record: [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REVIEW.md) + [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

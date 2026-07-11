@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.78.0**（Provider Production Readiness Assessment Decision Release）
+**v1.79.0**（Provider Expansion Entry Governance Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Production Readiness Assessment Decision Release Complete
+**Phase:** Provider Expansion Entry Governance Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -44,6 +44,12 @@
 
 **ChatGPT Final Decision Review:** **Accepted**（DECISION D）
 
+**Provider Expansion Entry Governance:** **Established**（v1.79.0 — ADR-0019 / [PROVIDER_EXPANSION_ENTRY_REVIEW.md](architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md)）
+
+**Provider Expansion Entry Authorization:** **Not Granted**（per-candidate — future）
+
+**Implementation Authorization:** **Not Granted**
+
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
 **Provider Production Ready:** **Not Declared**（global declaration — separate authorization not executed）
@@ -56,7 +62,7 @@
 
 **Next Phase Candidate:** Human Review / release authorization per Governance Flow
 
-**Next Candidate:** v1.79.0（post-release follow-on 候補）
+**Next Candidate:** v1.80.0（post-release follow-on 候補）
 
 ---
 
@@ -64,6 +70,7 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.79.0** | **ドキュメント** | **🔄 候補** | **Provider Expansion Entry Governance — ADR-0019 / expansion taxonomy / entry criteria / blocking conditions — governance-only** |
 | **v1.78.0** | **機能追加** | **✅ 完了** | **Provider Production Readiness Assessment Decision — PPRR-F001 remediation / Formal Decision READY / DECISION D Accepted** |
 | **v1.77.0** | **ドキュメント** | **✅ 完了** | **Provider Production Readiness Review Governance — ADR-0018 / Review Entry Authorized** |
 | **v1.76.0** | **機能追加** | **✅ 完了** | **Mock Provider Catalog Registration Implementation — ADR-0017 G5 / Registered** |
@@ -188,6 +195,53 @@
 | Concrete catalog registration not executed | ✅ |
 | **945 PASS** | ✅ |
 | Test 918–945 | ✅ |
+
+---
+
+### v1.79.0 で追加（Provider Expansion Entry Governance Release）
+
+#### Provider Expansion Entry Governance 正式記録
+
+- **`ADR-0019-provider-expansion-entry-governance.md`** … DECISION F — expansion entry framework established
+- **`PROVIDER_EXPANSION_ENTRY_REVIEW.md`** … candidate taxonomy / entry criteria E1–E25 / blocking conditions B1–B25 / authorization matrix
+- **Provider Expansion Entry Governance** … **Established**（governance-only）
+- **Provider Expansion Entry Authorization** … **Not Granted**（per-candidate — future）
+- **Implementation Authorization** … **Not Granted**
+- **Bounded Mock Provider Formal Decision READY** … **Preserved**（v1.78.0 — unchanged）
+- **PPRR-F001** … **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT**（unchanged）
+- **Provider Production Ready** … **Not Declared**（global）
+- **`mock_provider.js`** … **Unchanged**
+- **`public_contract_catalog.js`** … **Unchanged**（no new provider entries）
+
+### 品質状況（v1.79.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1074 PASS** |
+| Architecture Documents | **46** 必須文書 |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.19** — Provider Expansion Entry Governance Release Complete |
+| Provider Expansion Entry Governance | **Established** |
+| npm test | **PASS** |
+| Test 1043–1057 | Provider Expansion Entry Governance |
+| Test 1058–1073 | Provider Expansion Entry Governance Release |
+| Test 1074 | Provider Expansion Entry Governance Release documented |
+
+### v1.79.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0019 scope respected | ✅ |
+| Expansion entry framework established | ✅ |
+| Implementation Authorization not granted | ✅ |
+| Production Ready global not declared | ✅ |
+| Repository-wide L4 not declared | ✅ |
+| mock_provider.js unchanged | ✅ |
+| public_contract_catalog.js unchanged | ✅ |
+| **1074 PASS** | ✅ |
+| Test 1043–1057 | ✅ |
+| Test 1058–1073 | ✅ |
+| Test 1074 | ✅ |
 
 ---
 
