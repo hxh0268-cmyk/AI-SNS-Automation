@@ -43,8 +43,8 @@ Architecture Review Entry Verification は open finding PPRR-F001（abstract aut
 | **`mock_provider.js`** | **No change** |
 | **`public_contract_catalog.js`** | **No change** |
 | **Provider Production Readiness Review Entry** | **Authorized** — this ADR |
-| **Provider Production Readiness Assessment** | **In Progress** — not concluded |
-| **Provider Production Ready** | **Not Declared** |
+| **Provider Production Readiness Assessment** | **Complete** — Formal Decision **READY**（bounded scope） |
+| **Provider Production Ready** | **Not Declared**（global declaration not executed） |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 
 ### Review Entry Authorization
@@ -104,9 +104,9 @@ Ten categories defined in [PROVIDER_PRODUCTION_READINESS_REVIEW.md](../architect
 | Item | Decision |
 |------|----------|
 | Finding | PPRR-F001 — abstract authority not fully profile-locked |
-| Status | **Open Review Finding** |
-| Disposition | **Not decided** — options documented in review artifact |
-| Production fix | **Not authorized** in v1.77.0 |
+| Status | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** |
+| Disposition | **Option 1 — Accepted**（DECISION B/C） |
+| Production fix | **Implemented** post–v1.77.0 — validator remediation only |
 
 ### Deferred Concerns
 
@@ -124,8 +124,8 @@ CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Schedu
 ## Consequences
 
 - Provider Production Readiness Review governance **established**
-- Review entry **authorized**; assessment **in progress**
-- PPRR-F001 recorded as open finding
+- Review entry **authorized**; formal assessment **complete** — **READY**（bounded scope）
+- PPRR-F001 **closed** for bounded Mock Provider assessment
 - PR-006 wording synchronized（registration complete）
 - Production code **unchanged**
 - Future readiness decision requires formal assessment release
@@ -142,13 +142,15 @@ CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Schedu
 | Item | Owner | Release |
 |------|-------|---------|
 | Production Readiness formal assessment | Future Release | post-v1.77.0 Architecture Review |
-| PPRR-F001 disposition | Future Release | separate decision |
-| Provider Production Ready declaration | **Not scheduled** | separate authorization |
+| PPRR-F001 disposition | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** | DECISION B/C — `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` validator（Tests 1001–1012） |
+| Formal Provider Production Readiness Assessment | **Complete** — **READY**（bounded scope） — DECISION D **Accepted** | 2026-07-10 — Tests 1013–1042 |
+| DECISION D | **Accepted** — Formal Assessment **READY**（bounded canonical Mock Provider） |
+| Provider Production Ready declaration | **Not scheduled** | separate global authorization |
 | Real Provider | **Prohibited** | separate authorization |
 
 ## Quality Pipeline
 
-v1.77.0 adds governance evidence tests（Test 981–1000）.
+v1.77.0 adds governance evidence tests（Test 981–1000）. Post-remediation adds Tests 1001–1012. Formal assessment adds Tests 1013–1027（**1027 PASS**）.
 
 ## Related Documents
 

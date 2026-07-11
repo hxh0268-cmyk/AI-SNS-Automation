@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.18 — Provider Production Readiness Review Governance Release Complete
+Current Maturity: Level 3.19 — Provider Production Readiness Assessment Decision Release Complete
 ```
 
 | 観点 | 状態 |
@@ -225,7 +225,8 @@ Current Maturity: Level 3.18 — Provider Production Readiness Review Governance
 | Level 3.16 Mock Provider Catalog Registration Governance Release | **Completed**（v1.75.0） |
 | Level 3.17 Mock Provider Catalog Registration Implementation Release | **Completed**（v1.76.0） |
 | Level 3.18 Provider Production Readiness Review Governance Release | **Completed**（v1.77.0） |
-| Final Architecture Review | **Completed**（Decision B remediation） |
+| Level 3.19 Provider Production Readiness Assessment Decision Release | **Completed**（v1.78.0） |
+| Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
@@ -237,7 +238,8 @@ Current Maturity: Level 3.18 — Provider Production Readiness Review Governance
 | **Mock Provider Catalog Registration** | **Registered**（ADR-0017 — `text-generation-mock-provider`） |
 | **Provider Production Readiness Review Governance** | **Complete**（v1.77.0 — ADR-0018） |
 | **Provider Production Readiness Review Entry** | **Authorized** |
-| **Provider Production Readiness Assessment** | **In Progress** |
+| **Provider Production Readiness Assessment** | **Complete** — Formal Decision **READY**（bounded scope — DECISION D Accepted） |
+| **Provider Production Ready** | **Not Declared**（global） |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |
 

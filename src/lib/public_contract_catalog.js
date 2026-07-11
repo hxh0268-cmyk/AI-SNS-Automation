@@ -433,6 +433,27 @@ export const GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND =
 
 export const GOVERNED_MOCK_PROVIDER_IMPLEMENTATION_MODULE = "src/lib/mock_provider.js";
 
+export const GOVERNED_ABSTRACT_AUTHORITY_SCOPE = {
+  providerId: PROVIDER_ABSTRACT_AUTHORITY_ID,
+  providerVersion: "1.0",
+  providerType: "abstract",
+  layer: "provider",
+  registrationKind: PROVIDER_ABSTRACT_REGISTRATION_KIND,
+  status: "design-only",
+  authorityDocument: PROVIDER_CONTRACT_AUTHORITY_DOCUMENT,
+  authoritySections: ["§8", "§9", "§10", "§11", "§12", "§13", "§14"],
+  inputContractRef: "application-public-contract",
+  outputContractRef: "normalized-provider-output",
+  errorContractRef: "provider-error-contract",
+  capabilityDeclaration: "capability-explicit-per-implementation",
+  configurationSchema: "non-secret-only",
+  credentialRequirement: "declaration-only",
+  sideEffectDeclaration: "query-or-command",
+  timeoutPolicyDeclaration: "provider-adapter-owned",
+  retryPolicyDeclaration: "provider-local-only",
+  implementationStatus: "not-started",
+};
+
 export const GOVERNED_MOCK_PROVIDER_SCOPE = {
   providerId: GOVERNED_MOCK_PROVIDER_ID,
   providerVersion: "1.0",
@@ -500,26 +521,7 @@ export const PROVIDER_CONTRACT_REQUIRED_FIELDS = [
 ];
 
 export const PROVIDER_CONTRACT_DEFINITIONS = [
-  {
-    providerId: PROVIDER_ABSTRACT_AUTHORITY_ID,
-    providerVersion: "1.0",
-    providerType: "abstract",
-    layer: "provider",
-    registrationKind: PROVIDER_ABSTRACT_REGISTRATION_KIND,
-    status: "design-only",
-    authorityDocument: PROVIDER_CONTRACT_AUTHORITY_DOCUMENT,
-    authoritySections: ["§8", "§9", "§10", "§11", "§12", "§13", "§14"],
-    inputContractRef: "application-public-contract",
-    outputContractRef: "normalized-provider-output",
-    errorContractRef: "provider-error-contract",
-    capabilityDeclaration: "capability-explicit-per-implementation",
-    configurationSchema: "non-secret-only",
-    credentialRequirement: "declaration-only",
-    sideEffectDeclaration: "query-or-command",
-    timeoutPolicyDeclaration: "provider-adapter-owned",
-    retryPolicyDeclaration: "provider-local-only",
-    implementationStatus: "not-started",
-  },
+  { ...GOVERNED_ABSTRACT_AUTHORITY_SCOPE },
   {
     providerId: GOVERNED_MOCK_PROVIDER_SCOPE.providerId,
     providerVersion: GOVERNED_MOCK_PROVIDER_SCOPE.providerVersion,
@@ -639,6 +641,57 @@ export function isGovernedMockProviderId(providerId) {
 }
 
 /**
+ * @param {string} providerId
+ * @returns {boolean}
+ */
+export function isGovernedAbstractAuthorityId(providerId) {
+  return providerId === PROVIDER_ABSTRACT_AUTHORITY_ID;
+}
+
+/**
+ * @param {unknown} actual
+ * @param {unknown} expected
+ * @returns {boolean}
+ */
+function governedProviderProfileValuesEqual(actual, expected) {
+  if (Array.isArray(expected)) {
+    return Array.isArray(actual) && JSON.stringify(actual) === JSON.stringify(expected);
+  }
+
+  return actual === expected;
+}
+
+/**
+ * @param {unknown} entry
+ * @param {number} index
+ * @returns {string[]}
+ */
+export function collectGovernedAbstractAuthorityScopeErrors(entry, index) {
+  /** @type {string[]} */
+  const errors = [];
+
+  if (!entry || typeof entry !== "object") {
+    return errors;
+  }
+
+  for (const [field, expected] of Object.entries(GOVERNED_ABSTRACT_AUTHORITY_SCOPE)) {
+    if (!governedProviderProfileValuesEqual(entry[field], expected)) {
+      errors.push(
+        `providerContracts[${index}] governed abstract authority ${field} must be ${JSON.stringify(expected)}`,
+      );
+    }
+  }
+
+  if ("implementationModule" in entry) {
+    errors.push(
+      `providerContracts[${index}] governed abstract authority must not include implementationModule`,
+    );
+  }
+
+  return errors;
+}
+
+/**
  * @param {unknown} entry
  * @param {number} index
  * @returns {string[]}
@@ -712,6 +765,7 @@ export function collectProviderContractEntryErrors(entry, index) {
         `providerContracts[${index}] registrationKind must be ${PROVIDER_ABSTRACT_REGISTRATION_KIND}`,
       );
     }
+    errors.push(...collectGovernedAbstractAuthorityScopeErrors(entry, index));
   } else if (isGovernedMockProviderId(providerId)) {
     if (registrationKind !== GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND) {
       errors.push(

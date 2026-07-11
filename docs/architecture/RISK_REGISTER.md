@@ -45,7 +45,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 | CL-012 | Missing Final Architecture Review evidence | Governance Flow | High | Low | GOVERNANCE_FLOW §Final Architecture Review | Low after v1.66.0 | Blocks Entry |
 | CL-013 | Public Contract traceability gap（Future Layer） | Catalog / Policy | High | Medium | ADR-0011 + ADR-0012 + ADR-0015 + ADR-0017 + v1.76.0 concrete mock registration | **Mitigated** — abstract + governed concrete mock in JSON（v1.76.0） | Real Provider impl still gated |
 
-**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure**. CL-013 **reassessed** post-v1.76.0 — governed concrete Mock Provider traceability **implemented** in catalog JSON; Real Provider traceability still gated. PR-005 **reframed** post-ADR-0017/0018 — Governed / Authorized / Registered / Review Entry / Production Ready distinction explicit. PR-006 **synchronized** post-v1.76.0 — catalog registration **complete**; semantic drift risk remains. PPRR-F001 **recorded** post-v1.77.0 entry verification — open finding.
+**Risk status:** Documented and mitigated at governance level — **not resolved** merely by documentation existence. CL-004, CL-005, CL-006 remain **open exposure** for cross-layer / side-effecting scope — **NOT APPLICABLE** for bounded side-effect-free Mock Provider formal assessment（**READY**）. CL-013 **reassessed** post-v1.76.0 — governed concrete Mock Provider traceability **implemented** in catalog JSON; Real Provider traceability still gated. PR-005 **reframed** post-ADR-0017/0018 — Formal Assessment **READY** ≠ Provider Production Ready **global declaration**. PR-006 **synchronized** post-v1.76.0 — catalog registration **complete**; semantic drift risk remains. PPRR-F001 **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** post–DECISION C — abstract authority full-profile validator implemented; Tests 1001–1012 + formal assessment Tests 1013–1027 PASS.
 
 ---
 
@@ -66,7 +66,7 @@ v1.49.0 時点の **mitigation owner** は以下に限定します。
 
 | ID | Risk | Affected Authority | Impact | Likelihood | Mitigation | Remaining Exposure | Readiness Impact |
 |----|------|-------------------|--------|------------|------------|-------------------|------------------|
-| PPRR-F001 | Abstract authority profile not fully validator-locked | Catalog / Validator | Medium | Low | PPRR-F001 open finding; canonical generator correct | Manual abstract mutation may pass validation | **Blocks** Production Ready until disposition |
+| PPRR-F001 | Abstract authority profile not fully validator-locked | Catalog / Validator | Medium | Low | **CLOSED** — `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` + Tests 1001–1012 + formal assessment | Canonical generator correct; manual abstract mutation rejected | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** — reopen on validator regression |
 
 ---
 

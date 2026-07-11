@@ -448,15 +448,40 @@ Per [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_RE
 - [ ] Review framework established — evidence model / entry criteria / blocking conditions
 - [ ] State model distinguishes Review Entry / Production Ready / repository-wide L4
 - [ ] Mock Provider ≠ Real Provider boundary documented
-- [ ] PPRR-F001 abstract authority finding recorded — **Open**
-- [ ] Production Readiness Assessment **In Progress** — decision **Not Yet Made**
-- [ ] **Provider Production Ready Not Declared**
-- [ ] **Repository-wide Level 4 Implementation Ready Not Declared**
-- [ ] Real Provider / external IO **remains prohibited**
-- [ ] `mock_provider.js` **unchanged**
-- [ ] `public_contract_catalog.js` **unchanged**
-- [ ] CL-004 / CL-005 / CL-006 deferred maintained
-- [ ] PR-004 / PR-005 / PR-006 / CL-013 synchronized
+- [x] PPRR-F001 abstract authority finding — **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT**
+- [x] `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` profile validation implemented
+- [x] CL-004 bounded Mock Provider applicability documented — **NOT APPLICABLE for bounded scope**
+- [x] CL-005 / CL-006 bounded applicability documented — **NOT APPLICABLE for bounded Mock Provider**
+- [x] Production Readiness Assessment **Complete** — Formal Decision **READY**（bounded scope）
+- [x] **Provider Production Ready Not Declared**（global）
+- [x] **Repository-wide Level 4 Implementation Ready Not Declared**
+- [x] Real Provider / external IO **remains prohibited**
+- [x] Automatic SNS publishing **remains prohibited**
+- [x] `mock_provider.js` **unchanged**
+- [x] `public_contract_catalog.js` **validator remediation only**（PPRR-F001）
+- [x] CL-004 / CL-005 / CL-006 deferred maintained
+- [x] PR-004 / PR-005 / PR-006 / CL-013 synchronized
+- [x] Formal assessment D1–D13 recorded
+- [x] DECISION D — Formal Assessment **Accepted**
+- [x] Release version **v1.78.0** synchronized
+- [ ] Human Review recorded
+
+---
+
+## Provider Production Readiness Assessment Decision Release Compliance（v1.78.0）
+
+Per [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) + [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md):
+
+- [x] PPRR-F001 validator remediation implemented
+- [x] Formal Assessment **Complete** — Decision **READY**（bounded scope）
+- [x] DECISION D **Accepted**
+- [x] **Provider Production Ready Not Declared**（global）
+- [x] **Repository-wide Level 4 Not Declared**
+- [x] Real Provider / External IO **prohibited**
+- [x] Automatic SNS publishing **prohibited**
+- [x] `mock_provider.js` **unchanged**
+- [x] CL-004 / CL-005 / CL-006 globally **Deferred** — bounded **NOT APPLICABLE**
+- [x] Quality Pipeline **1042 PASS**
 - [ ] Human Review recorded
 
 ## Usage Notes

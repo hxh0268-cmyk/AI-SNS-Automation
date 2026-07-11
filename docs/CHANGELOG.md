@@ -6,6 +6,38 @@
 
 ---
 
+## v1.78.0 — Provider Production Readiness Assessment Decision Release
+
+Provider Production Readiness Assessment Decision Release — PPRR-F001 full-profile validator remediation — Formal Provider Production Readiness Assessment **READY**（bounded canonical Mock Provider scope）— DECISION D **Accepted** — Provider Production Ready **Not Declared**（global）。
+
+`src/lib/mock_provider.js` は変更なし。`public_contract_catalog.js` は **validator remediation only**（`GOVERNED_ABSTRACT_AUTHORITY_SCOPE`）。Real Provider / external IO **Prohibited** maintained。Formal Decision READY **does not imply** global Provider Production Ready or repository-wide Level 4。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Validator remediation | `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` + `collectGovernedAbstractAuthorityScopeErrors` |
+| PPRR-F001 | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** |
+| Formal Assessment | D1–D13 **SATISFIED** / Formal Decision **READY**（bounded scope） |
+| DECISION D | ChatGPT Final Decision Review **Accepted** |
+| CL-004 / CL-005 / CL-006 | **NOT APPLICABLE** for bounded Mock Provider — remain globally **Deferred** |
+| Provider Production Ready（global） | **Not Declared** |
+| Repository-wide Level 4 | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1001–1012 | PPRR-F001 Full-Profile Validator Remediation |
+| Test 1013–1027 | Formal Provider Production Readiness Assessment Decision |
+| Test 1028–1042 | Release governance coverage |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1042 PASS** |
+| npm test | **PASS** |
+| Release date | **2026-07-10** |
+
+---
+
 ## v1.77.0 — Provider Production Readiness Review Governance Release
 
 Provider Production Readiness Review Governance Release — DECISION A review entry authorized — readiness framework established — evidence model / entry criteria / blocking conditions defined — Production Ready **Not Declared**。

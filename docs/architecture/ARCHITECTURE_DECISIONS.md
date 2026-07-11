@@ -286,4 +286,46 @@ Full record: [CHANGELOG.md](../CHANGELOG.md) §v1.76.0 + `src/lib/public_contrac
 
 Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) + [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md)
 
+### Post–v1.77.0 Assessment Preparation — DECISION B PPRR-F001 Remediation
+
+| Item | Decision |
+|------|----------|
+| **Decision** | **DECISION B — Remediation Required** before Formal Readiness Decision |
+| **Finding** | PPRR-F001 — abstract authority profile validation gap |
+| **Disposition** | **Option 1 — Full-Profile Validator Implementation**（`GOVERNED_ABSTRACT_AUTHORITY_SCOPE`） |
+| **Rejected** | Option 2 alone（documentation ambiguity）; Option 3 alone（risk acceptance） |
+| **Scope** | Validator remediation only — schema/catalogVersion frozen; Mock Provider unchanged |
+| **Consequences** | PPRR-F001 remediated; Formal Readiness Decision resumes after validation |
+
+Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) §Architecture Review Decision — Assessment Preparation
+
+### Post–DECISION C — Formal Provider Production Readiness Assessment
+
+| Item | Decision |
+|------|----------|
+| **Decision** | **DECISION C — PPRR-F001 Remediation Accepted** |
+| **Formal Assessment** | **READY**（bounded canonical Mock Provider scope） |
+| **Assessment date** | 2026-07-10 |
+| **D1–D13** | All **SATISFIED** for bounded scope |
+| **PPRR-F001** | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Bounded Mock Provider meets assessed criteria; Real Provider / External IO remain prohibited |
+
+Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) §Formal Provider Production Readiness Assessment
+
+### Post–DECISION D — Formal Assessment Acceptance（v1.78.0）
+
+| Item | Decision |
+|------|----------|
+| **Decision** | **DECISION D — FORMAL PROVIDER PRODUCTION READINESS ASSESSMENT ACCEPTED** |
+| **Release** | v1.78.0 — Provider Production Readiness Assessment Decision Release |
+| **Formal Decision** | **READY**（bounded canonical Mock Provider scope） |
+| **Maturity** | **Level 3.19** |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Release candidate prepared; Human Approval Gate preserved |
+
+Full record: [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) §Architecture Review Decision — Formal Assessment Acceptance
+
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。
