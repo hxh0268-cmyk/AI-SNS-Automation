@@ -1170,6 +1170,21 @@ Latest Current Step
 release-plan
 ```
 
+### Image Generation Mock Provider Expansion Entry Decision Governance Release（v1.80.0）
+
+**Image Generation Mock Provider Expansion Entry Decision Governance Release** を実施しました。ADR-0020 / DECISION G により `image-generation-mock-provider` の bounded Provider Expansion Entry Authorization を記録（**47 必須 Governance 文書** — production code **unchanged**）。
+
+**Current Version: v1.80.0** | **Quality Pipeline: 1114 PASS**
+
+`image-generation-mock-provider` Expansion Entry: **Authorized**（bounded）。Implementation Authorization **Not Granted**。Catalog registration **Not Authorized**。Bounded text Mock Formal Decision **READY** preserved。Provider Production Ready **Not Declared**（global）。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。
+
+| 項目 | 内容 |
+|------|------|
+| Review document | [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md) |
+| Governance ADR | [ADR-0020](docs/adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md) |
+| Current Maturity | **Level 3.19** — Image Generation Mock Provider Expansion Entry Decision Governance Release Complete |
+| Next Phase Candidate | **Image Generation Mock Provider Implementation Authorization** |
+
 ### Provider Expansion Entry Governance Release（v1.79.0）
 
 **Provider Expansion Entry Governance Release** を実施しました。ADR-0019 により Provider expansion entry framework を確立（**46 必須 Governance 文書** — production code **unchanged**）。

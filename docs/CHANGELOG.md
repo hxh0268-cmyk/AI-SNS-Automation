@@ -6,6 +6,42 @@
 
 ---
 
+## v1.80.0 — Image Generation Mock Provider Expansion Entry Decision Governance Release
+
+Image Generation Mock Provider Expansion Entry Decision Governance Release — ADR-0020 DECISION G — bounded Provider Expansion Entry Authorization for `image-generation-mock-provider` — E1–E25 / B1–B25 disposition — PR-006 identity distinction — governance-only。Implementation Authorization **Not Granted**。Catalog registration **Not Authorized**。
+
+`src/lib/mock_provider.js` / `src/lib/image_generation.js` / `public_contract_catalog.js` は変更なし。Real Provider / external IO **Prohibited** maintained。Bounded text Mock Formal Decision **READY** preserved。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | `ADR-0020-image-generation-mock-provider-expansion-entry-decision.md` |
+| Review document | `IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md` |
+| DECISION G | **Grant Bounded Provider Expansion Entry Authorization** |
+| Candidate | `image-generation-mock-provider`（Class 1） |
+| Expansion Entry Authorization | **Granted**（bounded） |
+| Implementation Authorization | **Not Granted** |
+| Catalog registration | **Not Authorized** |
+| Provider Contracts | **2**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+| CL-004 / CL-005 / CL-006 | **Remains Deferred** globally |
+| Provider Production Ready（global） | **Not Declared** |
+| Repository-wide Level 4 | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1075–1094 | Image Generation Mock Provider Expansion Entry Decision Governance |
+| Test 1095–1113 | Image Generation Mock Provider Expansion Entry Decision Governance Release |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1114 PASS** |
+| npm test | **PASS** |
+| Release date | **2026-07-11** |
+
+---
+
 ## v1.79.0 — Provider Expansion Entry Governance Release
 
 Provider Expansion Entry Governance Release — ADR-0019 DECISION F — expansion candidate taxonomy / entry criteria E1–E25 / blocking conditions B1–B25 / state model extensions — governance-only。Provider Expansion Entry Authorization **Not Granted**（per-candidate — future）。Implementation Authorization **Not Granted**。

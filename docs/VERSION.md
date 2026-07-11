@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.79.0**（Provider Expansion Entry Governance Release）
+**v1.80.0**（Image Generation Mock Provider Expansion Entry Decision Governance Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Provider Expansion Entry Governance Release Complete
+**Phase:** Image Generation Mock Provider Expansion Entry Decision Governance Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -46,7 +46,7 @@
 
 **Provider Expansion Entry Governance:** **Established**（v1.79.0 — ADR-0019 / [PROVIDER_EXPANSION_ENTRY_REVIEW.md](architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md)）
 
-**Provider Expansion Entry Authorization:** **Not Granted**（per-candidate — future）
+**image-generation-mock-provider Expansion Entry:** **Authorized**（bounded — v1.80.0 — ADR-0020 / [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](architecture/IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md)）
 
 **Implementation Authorization:** **Not Granted**
 
@@ -62,7 +62,7 @@
 
 **Next Phase Candidate:** Human Review / release authorization per Governance Flow
 
-**Next Candidate:** v1.80.0（post-release follow-on 候補）
+**Next Candidate:** v1.81.0（post-release follow-on 候補）
 
 ---
 
@@ -70,7 +70,8 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.79.0** | **ドキュメント** | **🔄 候補** | **Provider Expansion Entry Governance — ADR-0019 / expansion taxonomy / entry criteria / blocking conditions — governance-only** |
+| **v1.80.0** | **ドキュメント** | **🔄 候補** | **Image Generation Mock Provider Expansion Entry Decision — ADR-0020 DECISION G / bounded Expansion Entry Authorized** |
+| **v1.79.0** | **ドキュメント** | **✅ 完了** | **Provider Expansion Entry Governance — ADR-0019 / expansion taxonomy / entry criteria / blocking conditions — governance-only** |
 | **v1.78.0** | **機能追加** | **✅ 完了** | **Provider Production Readiness Assessment Decision — PPRR-F001 remediation / Formal Decision READY / DECISION D Accepted** |
 | **v1.77.0** | **ドキュメント** | **✅ 完了** | **Provider Production Readiness Review Governance — ADR-0018 / Review Entry Authorized** |
 | **v1.76.0** | **機能追加** | **✅ 完了** | **Mock Provider Catalog Registration Implementation — ADR-0017 G5 / Registered** |
@@ -195,6 +196,54 @@
 | Concrete catalog registration not executed | ✅ |
 | **945 PASS** | ✅ |
 | Test 918–945 | ✅ |
+
+---
+
+### v1.80.0 で追加（Image Generation Mock Provider Expansion Entry Decision Governance Release）
+
+#### Image Generation Mock Provider Expansion Entry Decision 正式記録
+
+- **`ADR-0020-image-generation-mock-provider-expansion-entry-decision.md`** … DECISION G — bounded Expansion Entry Authorization
+- **`IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md`** … E1–E25 / B1–B25 / PR-006 identity distinction
+- **image-generation-mock-provider Expansion Entry** … **Authorized**（bounded）
+- **Implementation Authorization** … **Not Granted**
+- **Catalog registration** … **Not Authorized**
+- **Bounded text mock Formal Decision READY** … **Preserved**
+- **`mock_provider.js`** … **Unchanged**
+- **`image_generation.js`** … **Unchanged**
+- **`public_contract_catalog.js`** … **Unchanged**
+
+### 品質状況（v1.80.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1114 PASS** |
+| Architecture Documents | **47** 必須文書 |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.19** — Image Generation Mock Provider Expansion Entry Decision Governance Release Complete |
+| image-generation-mock-provider Expansion Entry | **Authorized**（bounded） |
+| npm test | **PASS** |
+| Test 1075–1094 | Image Generation Mock Provider Expansion Entry Decision Governance |
+| Test 1095–1113 | Image Generation Mock Provider Expansion Entry Decision Governance Release |
+| Test 1114 | Image Generation Mock Provider Expansion Entry Decision Governance Release documented |
+
+### v1.80.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0020 scope respected | ✅ |
+| DECISION G recorded | ✅ |
+| Expansion Entry Authorized bounded | ✅ |
+| Implementation Authorization not granted | ✅ |
+| Production Ready global not declared | ✅ |
+| Repository-wide L4 not declared | ✅ |
+| mock_provider.js unchanged | ✅ |
+| image_generation.js unchanged | ✅ |
+| public_contract_catalog.js unchanged | ✅ |
+| **1114 PASS** | ✅ |
+| Test 1075–1094 | ✅ |
+| Test 1095–1113 | ✅ |
+| Test 1114 | ✅ |
 
 ---
 
