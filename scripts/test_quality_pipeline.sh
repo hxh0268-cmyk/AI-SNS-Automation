@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.81.0 --"
+echo "-- Test 98: VERSION updated to v1.82.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4040,12 +4040,27 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const versionDoc = fs.readFileSync(path.join(PROJECT_ROOT, "docs/VERSION.md"), "utf8");
-if (!versionDoc.includes("**v1.81.0**（Image Generation Mock Provider Implementation Authorization Governance Release）")) {
-  throw new Error("docs/VERSION.md current version must be v1.81.0");
+const currentSection = versionDoc.split("## バージョン履歴")[0];
+
+if (
+  !currentSection.includes(
+    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
+  )
+) {
+  throw new Error("docs/VERSION.md current version must be v1.82.0");
 }
-console.log("VERSION v1.81.0 ok");
+
+if (
+  currentSection.includes(
+    "**v1.81.0**（Image Generation Mock Provider Implementation Authorization Governance Release）",
+  )
+) {
+  throw new Error("docs/VERSION.md current version must not remain v1.81.0");
+}
+
+console.log("VERSION v1.82.0 ok");
 EOF
-pass "VERSION updated to v1.81.0"
+pass "VERSION updated to v1.82.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6464,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.82.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.82.0");
+if (payload.nextVersion !== "v1.83.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.83.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6474,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.82.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.82.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.83.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.83.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6530,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.82.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.83.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14214,7 +14229,10 @@ const forbiddenPatterns = [
 ];
 
 /** v1.74.0 ADR-0016 authorized Mock Provider production module */
-const authorizedImplementationPaths = new Set(["src/lib/mock_provider.js"]);
+const authorizedImplementationPaths = new Set([
+  "src/lib/mock_provider.js",
+  "src/lib/image_generation_mock_provider.js",
+]);
 
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
   .filter(
@@ -19801,11 +19819,11 @@ grep -q "Implementation Authorization" docs/architecture/IMAGE_GENERATION_MOCK_P
 grep -q "Granted" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
 pass "bounded implementation authorization granted"
 
-echo "-- Test 1121: implementation not completed --"
-grep -q "Not Started" docs/adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md
-grep -q "Not Started" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
-! test -f src/lib/image_generation_mock_provider.js
-pass "implementation not completed"
+echo "-- Test 1121: image generation mock provider implementation completed --"
+test -f src/lib/image_generation_mock_provider.js
+grep -q "invoke" src/lib/image_generation_mock_provider.js
+grep -q "image-generation-mock-provider" src/lib/image_generation_mock_provider.js
+pass "image generation mock provider implementation completed"
 
 echo "-- Test 1122: provider not catalog registered --"
 grep -q "Catalog registration" docs/adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md
@@ -19930,11 +19948,25 @@ echo "-- Test 1141: governance evidence complete distinction --"
 grep -q "Governance evidence complete" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md || grep -q "governance evidence complete" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md
 pass "governance evidence complete distinction"
 
-echo "-- Test 1142: v1.81.0 release version synchronized --"
-grep -Fq "**v1.81.0**（Image Generation Mock Provider Implementation Authorization Governance Release）" docs/VERSION.md
-grep -q "v1.81.0" docs/CHANGELOG.md
-grep -q "v1.81.0" README.md
-pass "v1.81.0 release version synchronized"
+echo "-- Test 1142: v1.82.0 release version synchronized --"
+grep -q "### v1.82.0 で追加（Image Generation Mock Provider Implementation Release）" docs/VERSION.md
+grep -q "v1.82.0" docs/CHANGELOG.md
+grep -q "v1.82.0" README.md
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const currentSection = versionDoc.split("## バージョン履歴")[0];
+if (
+  !currentSection.includes(
+    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
+  )
+) {
+  throw new Error("current VERSION section must declare v1.82.0");
+}
+console.log("v1.82.0 current version section ok");
+EOF
+pass "v1.82.0 release version synchronized"
 
 echo "-- Test 1143: decision h recorded in architecture decisions --"
 grep -q "DECISION H" docs/architecture/ARCHITECTURE_DECISIONS.md
@@ -19942,20 +19974,1165 @@ grep -q "ADR-0021" docs/architecture/ARCHITECTURE_DECISIONS.md
 grep -q "IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW" docs/architecture/README.md
 pass "decision h recorded in architecture decisions"
 
-echo "-- Test 1144: implementation authorization granted in version metadata --"
-grep -q "Implementation Authorization" docs/VERSION.md
-grep -q "Granted" docs/VERSION.md
-grep -q "Not Started" docs/VERSION.md
-pass "implementation authorization granted in version metadata"
+echo "-- Test 1144: image generation mock provider implementation implemented in current version metadata --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const currentSection = versionDoc.split("## バージョン履歴")[0];
+
+for (const marker of [
+  "Implementation Authorization",
+  "Granted",
+  "**Implementation execution:** **Implemented**",
+  "**image-generation-mock-provider Implementation:** **Implemented**",
+]) {
+  if (!currentSection.includes(marker)) {
+    throw new Error(`current VERSION section missing marker: ${marker}`);
+  }
+}
+
+if (currentSection.includes("**Implementation execution:** **Not Started**")) {
+  throw new Error("current VERSION section must not declare implementation Not Started");
+}
+
+console.log("current version implementation metadata ok");
+EOF
+pass "image generation mock provider implementation implemented in current version metadata"
 
 echo "-- Test 1145: v1.81.0 image generation mock provider implementation authorization governance release documented --"
 grep -q "Test 1115–1134" docs/VERSION.md
 grep -q "Test 1135–1144" docs/VERSION.md
 grep -q "Test 1145" docs/VERSION.md
-grep -Fq "**1145 PASS**" docs/VERSION.md
+grep -A6 "### 品質状況（v1.81.0 最新）" docs/VERSION.md | grep -Fq "**1145 PASS**"
+grep -A20 "### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）" docs/VERSION.md | grep -q "Implementation execution"
+grep -A20 "### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）" docs/VERSION.md | grep -q "Not Started"
 grep -q "48 必須 Governance 文書" docs/architecture/README.md
 grep -q "IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW" docs/architecture/README.md
 pass "v1.81.0 image generation mock provider implementation authorization governance release documented"
+
+echo "-- Test 1146: image generation mock provider module exists --"
+test -f src/lib/image_generation_mock_provider.js
+grep -q "export function invoke" src/lib/image_generation_mock_provider.js
+pass "image generation mock provider module exists"
+
+echo "-- Test 1147: image generation mock provider exact export surface --"
+node --input-type=module <<'EOF'
+import * as module from "./src/lib/image_generation_mock_provider.js";
+
+const exportNames = Object.keys(module).sort();
+const expected = ["capability", "invoke", "policy", "providerId", "providerVersion"];
+if (JSON.stringify(exportNames) !== JSON.stringify(expected)) {
+  throw new Error(`unexpected export surface: ${exportNames.join(", ")}`);
+}
+console.log("image generation mock provider exact export surface ok");
+EOF
+pass "image generation mock provider exact export surface"
+
+echo "-- Test 1148: image generation mock provider providerId --"
+node --input-type=module <<'EOF'
+import { providerId } from "./src/lib/image_generation_mock_provider.js";
+if (providerId !== "image-generation-mock-provider") {
+  throw new Error("providerId mismatch");
+}
+console.log("image generation mock provider providerId ok");
+EOF
+pass "image generation mock provider providerId"
+
+echo "-- Test 1149: image generation mock provider providerVersion --"
+node --input-type=module <<'EOF'
+import { providerVersion } from "./src/lib/image_generation_mock_provider.js";
+if (providerVersion !== "1.0.0") {
+  throw new Error("providerVersion mismatch");
+}
+console.log("image generation mock provider providerVersion ok");
+EOF
+pass "image generation mock provider providerVersion"
+
+echo "-- Test 1150: image generation mock provider capability --"
+node --input-type=module <<'EOF'
+import { capability } from "./src/lib/image_generation_mock_provider.js";
+if (capability !== "image_generation") {
+  throw new Error("capability mismatch");
+}
+console.log("image generation mock provider capability ok");
+EOF
+pass "image generation mock provider capability"
+
+echo "-- Test 1151: image generation mock provider policy --"
+node --input-type=module <<'EOF'
+import { policy } from "./src/lib/image_generation_mock_provider.js";
+
+const expected = {
+  executionMode: "mock",
+  networkAccess: false,
+  filesystemAccess: false,
+  credentialAccess: false,
+  secretAccess: false,
+  runtimeIntegration: false,
+  workflowIntegration: false,
+  eventIntegration: false,
+  schedulerIntegration: false,
+  automationIntegration: false,
+  publishingIntegration: false,
+  humanApprovalGateBypass: false,
+};
+
+if (JSON.stringify(policy) !== JSON.stringify(expected)) {
+  throw new Error("policy mismatch");
+}
+console.log("image generation mock provider policy ok");
+EOF
+pass "image generation mock provider policy"
+
+echo "-- Test 1152: image generation mock provider valid success --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: {
+    schema: "image-generation/1.0",
+    payload: { topic: "deterministic-topic" },
+  },
+});
+
+if (!result.ok) {
+  throw new Error("valid input must succeed");
+}
+if (typeof result.result.metadata !== "string") {
+  throw new Error("metadata must be string");
+}
+console.log("image generation mock provider valid success ok");
+EOF
+pass "image generation mock provider valid success"
+
+echo "-- Test 1153: image generation mock provider deterministic repeat execution --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const request = {
+  capability: "image_generation",
+  applicationContract: {
+    schema: "image-generation/1.0",
+    payload: { topic: "repeat-topic" },
+  },
+};
+
+const first = invoke(request);
+const second = invoke(request);
+
+if (!first.ok || !second.ok) {
+  throw new Error("repeat execution must succeed");
+}
+if (JSON.stringify(first) !== JSON.stringify(second)) {
+  throw new Error("repeat execution must be deterministic");
+}
+console.log("image generation mock provider deterministic repeat execution ok");
+EOF
+pass "image generation mock provider deterministic repeat execution"
+
+echo "-- Test 1154: image generation mock provider equivalent same-order input stability --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const first = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: { topic: "same" } },
+});
+const second = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: { topic: "same" } },
+});
+
+if (!first.ok || !second.ok) {
+  throw new Error("equivalent input must succeed");
+}
+if (first.result.metadata !== second.result.metadata) {
+  throw new Error("equivalent same-order input must produce identical metadata");
+}
+console.log("image generation mock provider equivalent same-order input stability ok");
+EOF
+pass "image generation mock provider equivalent same-order input stability"
+
+echo "-- Test 1155: image generation mock provider selected key-order fixture without canonicalization --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const first = invoke({
+  capability: "image_generation",
+  applicationContract: { alpha: 1, beta: 2 },
+});
+const second = invoke({
+  capability: "image_generation",
+  applicationContract: { beta: 2, alpha: 1 },
+});
+
+if (!first.ok || !second.ok) {
+  throw new Error("selected fixture must succeed");
+}
+if (first.result.metadata === second.result.metadata) {
+  throw new Error("selected fixture must not canonicalize key order");
+}
+console.log("image generation mock provider selected key-order fixture without canonicalization ok");
+EOF
+pass "image generation mock provider selected key-order fixture without canonicalization"
+
+echo "-- Test 1156: image generation mock provider different input distinction --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const first = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: { topic: "alpha" } },
+});
+const second = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: { topic: "beta" } },
+});
+
+if (!first.ok || !second.ok) {
+  throw new Error("distinct input must succeed");
+}
+if (first.result.metadata === second.result.metadata) {
+  throw new Error("different input must produce different metadata");
+}
+console.log("image generation mock provider different input distinction ok");
+EOF
+pass "image generation mock provider different input distinction"
+
+echo "-- Test 1157: image generation mock provider normalized success envelope --"
+node --input-type=module <<'EOF'
+import { invoke, providerId, providerVersion, capability } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+
+for (const field of ["ok", "providerId", "providerVersion", "capability", "result"]) {
+  if (!(field in result)) {
+    throw new Error(`missing success field: ${field}`);
+  }
+}
+if (result.providerId !== providerId) {
+  throw new Error("providerId mismatch in success envelope");
+}
+if (result.providerVersion !== providerVersion) {
+  throw new Error("providerVersion mismatch in success envelope");
+}
+if (result.capability !== capability) {
+  throw new Error("capability mismatch in success envelope");
+}
+if (!("metadata" in result.result) || typeof result.result.metadata !== "string") {
+  throw new Error("metadata missing in success envelope");
+}
+console.log("image generation mock provider normalized success envelope ok");
+EOF
+pass "image generation mock provider normalized success envelope"
+
+echo "-- Test 1158: image generation mock provider normalized error envelope --"
+node --input-type=module <<'EOF'
+import { invoke, providerId, providerVersion } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke(null);
+
+for (const field of ["ok", "providerId", "providerVersion", "error"]) {
+  if (!(field in result)) {
+    throw new Error(`missing error field: ${field}`);
+  }
+}
+if (result.providerId !== providerId || result.providerVersion !== providerVersion) {
+  throw new Error("identity mismatch in error envelope");
+}
+if (!result.error || typeof result.error.kind !== "string" || typeof result.error.message !== "string") {
+  throw new Error("structured error required");
+}
+console.log("image generation mock provider normalized error envelope ok");
+EOF
+pass "image generation mock provider normalized error envelope"
+
+echo "-- Test 1159: image generation mock provider non-object null and array request rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+for (const request of [123, null, []]) {
+  const result = invoke(request);
+  if (result.ok || result.error.kind !== "validation_error") {
+    throw new Error("non-object request must be validation_error");
+  }
+}
+console.log("image generation mock provider non-object null and array request rejection ok");
+EOF
+pass "image generation mock provider non-object null and array request rejection"
+
+echo "-- Test 1160: image generation mock provider capability validation errors --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const missing = invoke({
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+if (missing.ok || missing.error.message !== "missing required field: capability") {
+  throw new Error("missing capability must fail with exact message");
+}
+
+const invalidType = invoke({
+  capability: 123,
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+if (invalidType.ok || invalidType.error.message !== "invalid field type: capability") {
+  throw new Error("invalid capability type must fail with exact message");
+}
+
+const empty = invoke({
+  capability: "",
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+if (empty.ok || empty.error.kind !== "unsupported_capability") {
+  throw new Error("empty capability must be unsupported_capability");
+}
+
+const unsupported = invoke({
+  capability: "text_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+if (unsupported.ok || unsupported.error.kind !== "unsupported_capability") {
+  throw new Error("unsupported capability must fail");
+}
+console.log("image generation mock provider capability validation errors ok");
+EOF
+pass "image generation mock provider capability validation errors"
+
+echo "-- Test 1161: image generation mock provider applicationContract validation errors --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const missing = invoke({ capability: "image_generation" });
+if (missing.ok || missing.error.message !== "missing required field: applicationContract") {
+  throw new Error("missing applicationContract must fail");
+}
+
+const nullContract = invoke({
+  capability: "image_generation",
+  applicationContract: null,
+});
+if (nullContract.ok || nullContract.error.message !== "invalid field type: applicationContract") {
+  throw new Error("null applicationContract must fail");
+}
+
+const arrayContract = invoke({
+  capability: "image_generation",
+  applicationContract: [],
+});
+if (arrayContract.ok || arrayContract.error.message !== "invalid field type: applicationContract") {
+  throw new Error("array applicationContract must fail");
+}
+console.log("image generation mock provider applicationContract validation errors ok");
+EOF
+pass "image generation mock provider applicationContract validation errors"
+
+echo "-- Test 1162: image generation mock provider unknown top-level field rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+  unexpected: true,
+});
+
+if (result.ok || result.error.message !== "unknown field: unexpected") {
+  throw new Error("unknown top-level field must fail");
+}
+console.log("image generation mock provider unknown top-level field rejection ok");
+EOF
+pass "image generation mock provider unknown top-level field rejection"
+
+echo "-- Test 1163: image generation mock provider forbidden credential secret runtime scheduler adapter --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const cases = [
+  { credential: "x" },
+  { secret: "x" },
+  { runtime: { enabled: true } },
+  { scheduler: { enabled: true } },
+  { adapter: { enabled: true } },
+];
+
+for (const payload of cases) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", payload },
+  });
+  if (result.ok || result.error.kind !== "validation_error" || !result.error.message.startsWith("forbidden field:")) {
+    throw new Error(`forbidden field must fail: ${JSON.stringify(payload)}`);
+  }
+}
+console.log("image generation mock provider forbidden credential secret runtime scheduler adapter ok");
+EOF
+pass "image generation mock provider forbidden credential secret runtime scheduler adapter"
+
+echo "-- Test 1164: image generation mock provider forbidden workflow event automation publishing --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const cases = [
+  { workflow: { enabled: true } },
+  { event: { enabled: true } },
+  { automation: { enabled: true } },
+  { publishing: { enabled: true } },
+];
+
+for (const payload of cases) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", payload },
+  });
+  if (result.ok || result.error.kind !== "validation_error" || !result.error.message.startsWith("forbidden field:")) {
+    throw new Error(`forbidden field must fail: ${JSON.stringify(payload)}`);
+  }
+}
+console.log("image generation mock provider forbidden workflow event automation publishing ok");
+EOF
+pass "image generation mock provider forbidden workflow event automation publishing"
+
+echo "-- Test 1165: image generation mock provider object shape rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const symbolContract = {};
+Object.defineProperty(symbolContract, Symbol("secret"), {
+  value: 1,
+  enumerable: true,
+});
+let result = invoke({
+  capability: "image_generation",
+  applicationContract: symbolContract,
+});
+if (result.ok || !result.error.message.includes("non-serializable property:")) {
+  throw new Error("symbol object property must fail");
+}
+
+const hiddenContract = { schema: "image-generation/1.0" };
+Object.defineProperty(hiddenContract, "hidden", { value: 1, enumerable: false });
+result = invoke({
+  capability: "image_generation",
+  applicationContract: hiddenContract,
+});
+if (result.ok || !result.error.message.includes("non-serializable property:")) {
+  throw new Error("non-enumerable object property must fail");
+}
+
+const getterContract = { schema: "image-generation/1.0" };
+Object.defineProperty(getterContract, "payload", {
+  enumerable: true,
+  get() {
+    throw new Error("MUST_NOT_EXECUTE");
+  },
+});
+result = invoke({
+  capability: "image_generation",
+  applicationContract: getterContract,
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.payload") {
+  throw new Error("getter object property must fail without invocation");
+}
+if (JSON.stringify(result).includes("MUST_NOT_EXECUTE")) {
+  throw new Error("getter must not be invoked");
+}
+
+const setterContract = { schema: "image-generation/1.0" };
+Object.defineProperty(setterContract, "mode", {
+  enumerable: true,
+  set() {},
+});
+result = invoke({
+  capability: "image_generation",
+  applicationContract: setterContract,
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.mode") {
+  throw new Error("setter object property must fail");
+}
+
+const toJsonContract = {
+  schema: "image-generation/1.0",
+  toJSON() {
+    return {};
+  },
+};
+result = invoke({
+  capability: "image_generation",
+  applicationContract: toJsonContract,
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.toJSON") {
+  throw new Error("own toJSON function must fail");
+}
+console.log("image generation mock provider object shape rejection ok");
+EOF
+pass "image generation mock provider object shape rejection"
+
+echo "-- Test 1166: image generation mock provider unsupported scalar rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const cases = [
+  { payload: undefined },
+  { payload: () => {} },
+  { payload: 1n },
+  { payload: new Date() },
+];
+
+for (const contract of cases) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", ...contract },
+  });
+  if (result.ok || result.error.kind !== "validation_error") {
+    throw new Error(`unsupported scalar must fail: ${JSON.stringify(contract)}`);
+  }
+}
+console.log("image generation mock provider unsupported scalar rejection ok");
+EOF
+pass "image generation mock provider unsupported scalar rejection"
+
+echo "-- Test 1167: image generation mock provider unsupported collection and prototype rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+for (const payload of [new Map(), new Set()]) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", payload },
+  });
+  if (result.ok || result.error.kind !== "validation_error") {
+    throw new Error("map/set must fail");
+  }
+}
+
+class Example {}
+const classResult = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: new Example() },
+});
+if (classResult.ok || classResult.error.kind !== "validation_error") {
+  throw new Error("class instance must fail");
+}
+
+const customPrototype = Object.create({ inherited: true });
+customPrototype.schema = "image-generation/1.0";
+const prototypeResult = invoke({
+  capability: "image_generation",
+  applicationContract: customPrototype,
+});
+if (prototypeResult.ok || prototypeResult.error.kind !== "validation_error") {
+  throw new Error("custom prototype must fail");
+}
+console.log("image generation mock provider unsupported collection and prototype rejection ok");
+EOF
+pass "image generation mock provider unsupported collection and prototype rejection"
+
+echo "-- Test 1168: image generation mock provider non-finite number rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+for (const payload of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", payload },
+  });
+  if (result.ok || !result.error.message.startsWith("non-serializable value:")) {
+    throw new Error("non-finite number must fail");
+  }
+}
+console.log("image generation mock provider non-finite number rejection ok");
+EOF
+pass "image generation mock provider non-finite number rejection"
+
+echo "-- Test 1169: image generation mock provider circular object rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const circular = { schema: "image-generation/1.0" };
+circular.self = circular;
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: circular,
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("circular object must fail");
+}
+if (
+  !result.error.message.startsWith("non-serializable property:") &&
+  !result.error.message.startsWith("non-serializable value:")
+) {
+  throw new Error(`unexpected circular object message: ${result.error.message}`);
+}
+console.log("image generation mock provider circular object rejection ok");
+EOF
+pass "image generation mock provider circular object rejection"
+
+echo "-- Test 1170: image generation mock provider valid dense and empty arrays --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const dense = invoke({
+  capability: "image_generation",
+  applicationContract: {
+    schema: "image-generation/1.0",
+    items: ["a", "b"],
+    nested: [{ schema: "a" }, ["x", "y"]],
+  },
+});
+if (!dense.ok) {
+  throw new Error("dense array must succeed");
+}
+
+const empty = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: [] },
+});
+if (!empty.ok) {
+  throw new Error("empty array must succeed");
+}
+console.log("image generation mock provider valid dense and empty arrays ok");
+EOF
+pass "image generation mock provider valid dense and empty arrays"
+
+echo "-- Test 1171: image generation mock provider sparse array rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const sparse = [];
+sparse[0] = "a";
+sparse[2] = "b";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: sparse },
+});
+
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items[1]") {
+  throw new Error("sparse array must fail");
+}
+console.log("image generation mock provider sparse array rejection ok");
+EOF
+pass "image generation mock provider sparse array rejection"
+
+echo "-- Test 1172: image generation mock provider array symbol and custom key rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const symbolArray = ["ok"];
+Object.defineProperty(symbolArray, Symbol("secret"), {
+  value: 1,
+  enumerable: true,
+});
+let result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: symbolArray },
+});
+if (result.ok || !result.error.message.includes("non-serializable property:")) {
+  throw new Error("symbol array property must fail");
+}
+
+const customArray = ["ok"];
+customArray.foo = "bar";
+result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: customArray },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items.foo") {
+  throw new Error("custom array property must fail");
+}
+console.log("image generation mock provider array symbol and custom key rejection ok");
+EOF
+pass "image generation mock provider array symbol and custom key rejection"
+
+echo "-- Test 1173: image generation mock provider array index shape rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const nonEnumerable = ["x"];
+Object.defineProperty(nonEnumerable, "0", {
+  value: "x",
+  enumerable: false,
+});
+let result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: nonEnumerable },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items[0]") {
+  throw new Error("non-enumerable array index must fail");
+}
+
+const customHidden = ["x"];
+Object.defineProperty(customHidden, "meta", {
+  value: 1,
+  enumerable: false,
+});
+result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: customHidden },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items.meta") {
+  throw new Error("custom non-enumerable array property must fail");
+}
+
+const getterArray = [];
+Object.defineProperty(getterArray, "0", {
+  enumerable: true,
+  get() {
+    throw new Error("MUST_NOT_EXECUTE");
+  },
+});
+result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: getterArray },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items[0]") {
+  throw new Error("getter array index must fail without invocation");
+}
+if (JSON.stringify(result).includes("MUST_NOT_EXECUTE")) {
+  throw new Error("getter array index must not be invoked");
+}
+
+const setterArray = [];
+Object.defineProperty(setterArray, "0", {
+  enumerable: true,
+  set() {},
+});
+result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: setterArray },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items[0]") {
+  throw new Error("setter array index must fail");
+}
+
+const functionArray = [() => {}];
+result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: functionArray },
+});
+if (result.ok || result.error.message !== "non-serializable property: applicationContract.items[0]") {
+  throw new Error("function-valued array element must fail");
+}
+console.log("image generation mock provider array index shape rejection ok");
+EOF
+pass "image generation mock provider array index shape rejection"
+
+echo "-- Test 1174: image generation mock provider forbidden field inside array object --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: {
+    schema: "image-generation/1.0",
+    items: [{ credential: "secret" }],
+  },
+});
+
+if (result.ok || result.error.message !== "forbidden field: applicationContract.items[0].credential") {
+  throw new Error("forbidden field inside array object must fail");
+}
+console.log("image generation mock provider forbidden field inside array object ok");
+EOF
+pass "image generation mock provider forbidden field inside array object"
+
+echo "-- Test 1175: image generation mock provider circular array rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const circular = [];
+circular[0] = circular;
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items: circular },
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("circular array must fail");
+}
+if (
+  !result.error.message.startsWith("non-serializable property:") &&
+  !result.error.message.startsWith("non-serializable value:")
+) {
+  throw new Error(`unexpected circular array message: ${result.error.message}`);
+}
+console.log("image generation mock provider circular array rejection ok");
+EOF
+pass "image generation mock provider circular array rejection"
+
+echo "-- Test 1176: image generation mock provider input url and path echo allowed --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: {
+    prompt: "https://example.com/photo",
+    path: "/tmp/input.txt",
+  },
+});
+
+if (!result.ok) {
+  throw new Error("input url/path echo must succeed");
+}
+if (!result.result.metadata.includes("https://example.com/photo")) {
+  throw new Error("metadata must echo input url");
+}
+if (!result.result.metadata.includes("/tmp/input.txt")) {
+  throw new Error("metadata must echo input path");
+}
+console.log("image generation mock provider input url and path echo allowed ok");
+EOF
+pass "image generation mock provider input url and path echo allowed"
+
+echo "-- Test 1177: image generation mock provider result contains only metadata --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: {} },
+});
+
+if (!result.ok) {
+  throw new Error("success required");
+}
+if (JSON.stringify(Object.keys(result.result).sort()) !== JSON.stringify(["metadata"])) {
+  throw new Error("result must contain only metadata");
+}
+console.log("image generation mock provider result contains only metadata ok");
+EOF
+pass "image generation mock provider result contains only metadata"
+
+echo "-- Test 1178: image generation mock provider catch normalization source policy --"
+if grep -q "error.message" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not reference error.message"
+  exit 1
+fi
+if grep -q "error instanceof Error" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not reference error instanceof Error"
+  exit 1
+fi
+if ! grep -q "unexpected provider failure" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must include fixed catch message"
+  exit 1
+fi
+if ! grep -q "} catch {" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must use binding-less catch"
+  exit 1
+fi
+pass "image generation mock provider catch normalization source policy"
+
+echo "-- Test 1179: image generation mock provider forbidden imports --"
+if grep -E 'from ["\x27](node:)?https?|fetch\(|axios|openai|gemini|@google/genai' src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not import external io dependencies"
+  exit 1
+fi
+if grep -q "image_generation.js" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not import image_generation.js"
+  exit 1
+fi
+if grep -q "mock_provider.js" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not import mock_provider.js"
+  exit 1
+fi
+if grep -q "retry.js" src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not import retry.js"
+  exit 1
+fi
+if grep -E 'from ["\x27]node:fs|from ["\x27]node:path' src/lib/image_generation_mock_provider.js; then
+  echo "image generation mock provider must not import filesystem modules"
+  exit 1
+fi
+pass "image generation mock provider forbidden imports"
+
+echo "-- Test 1180: authorizedImplementationPaths includes image generation mock provider --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const source = fs.readFileSync("scripts/test_quality_pipeline.sh", "utf8");
+if (!source.includes('"src/lib/image_generation_mock_provider.js"')) {
+  throw new Error("authorizedImplementationPaths must include image generation mock provider");
+}
+console.log("authorizedImplementationPaths includes image generation mock provider ok");
+EOF
+pass "authorizedImplementationPaths includes image generation mock provider"
+
+echo "-- Test 1181: mock_provider.js remains unchanged --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+import { createHash } from "node:crypto";
+
+const source = fs.readFileSync("src/lib/mock_provider.js", "utf8");
+const expectedMarkers = [
+  'export const MOCK_PROVIDER_ID = "text-generation-mock-provider"',
+  'export const MOCK_PROVIDER_VERSION = "1.0"',
+  'export const MOCK_PROVIDER_CAPABILITY = "text_generation"',
+  "export function invokeMockProvider",
+];
+for (const marker of expectedMarkers) {
+  if (!source.includes(marker)) {
+    throw new Error(`mock_provider.js marker missing: ${marker}`);
+  }
+}
+if (createHash("sha256").update(source).digest("hex").length !== 64) {
+  throw new Error("mock_provider.js hash computation failed");
+}
+console.log("mock_provider.js remains unchanged ok");
+EOF
+pass "mock_provider.js remains unchanged"
+
+echo "-- Test 1182: image_generation.js remains unchanged --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const source = fs.readFileSync("src/lib/image_generation.js", "utf8");
+const expectedMarkers = [
+  'export const IMAGE_GENERATION_SCHEMA = "image-generation/1.0"',
+  "export function buildImageGeneration",
+  "export function extractImageGenerationPublicContract",
+];
+for (const marker of expectedMarkers) {
+  if (!source.includes(marker)) {
+    throw new Error(`image_generation.js marker missing: ${marker}`);
+  }
+}
+console.log("image_generation.js remains unchanged ok");
+EOF
+pass "image_generation.js remains unchanged"
+
+echo "-- Test 1183: public contract catalog unchanged for image generation mock provider implementation --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.catalogVersion !== "1.0") {
+  throw new Error("catalogVersion must remain 1.0");
+}
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("providerContracts must remain 2");
+}
+if (
+  catalog.providerContracts.some(
+    (entry) => entry.providerId === "image-generation-mock-provider",
+  )
+) {
+  throw new Error("image-generation-mock-provider must not be catalog registered");
+}
+console.log("public contract catalog unchanged for image generation mock provider implementation ok");
+EOF
+pass "public contract catalog unchanged for image generation mock provider implementation"
+
+echo "-- Test 1184: architecture maturity level 3.19 unchanged post image generation mock provider implementation --"
+grep -q "Level 3.19" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity level 3.19 unchanged post image generation mock provider implementation"
+
+echo "-- Test 1185: human approval gate regression preserved post image generation mock provider implementation --"
+grep -q "Human Approval Gate" docs/adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md
+grep -q "Human Approval Gate" README.md
+grep -q "humanApprovalGateBypass: false" src/lib/image_generation_mock_provider.js
+pass "human approval gate regression preserved post image generation mock provider implementation"
+
+echo "-- Test 1186: text mock provider regression preserved post image generation mock provider implementation --"
+node --input-type=module <<'EOF'
+import { invokeMockProvider } from "./src/lib/mock_provider.js";
+
+const result = invokeMockProvider({
+  capability: "text_generation",
+  applicationContract: { schema: "content-ideas/1.0", payload: { topic: "regression" } },
+});
+
+if (!result.ok || result.capability !== "text_generation") {
+  throw new Error("text mock provider regression failed");
+}
+console.log("text mock provider regression preserved post image generation mock provider implementation ok");
+EOF
+pass "text mock provider regression preserved post image generation mock provider implementation"
+
+echo "-- Test 1187: v1.82.0 image generation mock provider implementation documented in repository evidence --"
+test -f src/lib/image_generation_mock_provider.js
+grep -q "image_generation_mock_provider.js" scripts/test_quality_pipeline.sh
+pass "v1.82.0 image generation mock provider implementation documented in repository evidence"
+
+echo "-- Test 1188: image generation mock provider array length writable false accepted --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const items = [1, 2];
+Object.defineProperty(items, "length", {
+  value: 2,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+
+const lengthDescriptor = Object.getOwnPropertyDescriptor(items, "length");
+if (lengthDescriptor.writable !== false) {
+  throw new Error("fixture must use writable false length");
+}
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", items },
+});
+
+if (!result.ok) {
+  throw new Error(`writable false length must be accepted: ${result.error?.message}`);
+}
+console.log("image generation mock provider array length writable false accepted ok");
+EOF
+pass "image generation mock provider array length writable false accepted"
+
+echo "-- Test 1189: image generation mock provider forbidden token password apiKey oauth accessToken refreshToken --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const cases = [
+  { token: "x" },
+  { password: "x" },
+  { apiKey: "x" },
+  { oauth: { enabled: true } },
+  { accessToken: "x" },
+  { refreshToken: "x" },
+];
+
+for (const payload of cases) {
+  const result = invoke({
+    capability: "image_generation",
+    applicationContract: { schema: "image-generation/1.0", payload },
+  });
+  if (result.ok || result.error.kind !== "validation_error" || !result.error.message.startsWith("forbidden field:")) {
+    throw new Error(`forbidden field must fail: ${JSON.stringify(payload)}`);
+  }
+}
+console.log("image generation mock provider forbidden token password apiKey oauth accessToken refreshToken ok");
+EOF
+pass "image generation mock provider forbidden token password apiKey oauth accessToken refreshToken"
+
+echo "-- Test 1190: image generation mock provider symbol scalar rejection --"
+node --input-type=module <<'EOF'
+import { invoke } from "./src/lib/image_generation_mock_provider.js";
+
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: {
+    schema: "image-generation/1.0",
+    payload: Symbol("scalar"),
+  },
+});
+
+if (result.ok || result.error.kind !== "validation_error") {
+  throw new Error("symbol scalar must fail");
+}
+if (!result.error.message.startsWith("non-serializable value:")) {
+  throw new Error(`unexpected symbol scalar message: ${result.error.message}`);
+}
+console.log("image generation mock provider symbol scalar rejection ok");
+EOF
+pass "image generation mock provider symbol scalar rejection"
+
+echo "-- Test 1191: v1.82.0 current version metadata in VERSION.md --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const currentSection = versionDoc.split("## バージョン履歴")[0];
+
+for (const marker of [
+  "**Implementation execution:** **Implemented**",
+  "**Catalog Registered:** **NO**",
+  "**Review Entry Authorized:** **NO**",
+  "**Formally Assessed:** **NO**",
+  "**Bounded Production Ready:** **NO**",
+  "**Global Provider Production Ready:** **NO**",
+  "Provider Contracts **2**",
+  "catalogVersion **1.0**",
+  "**Architecture Maturity:** **Level 3.19**",
+  "image-generation-mock-provider",
+  "providerVersion **1.0.0**",
+  "capability **`image_generation`**",
+]) {
+  if (!currentSection.includes(marker)) {
+    throw new Error(`current VERSION section missing marker: ${marker}`);
+  }
+}
+
+console.log("v1.82.0 current version metadata ok");
+EOF
+pass "v1.82.0 current version metadata in VERSION.md"
+
+echo "-- Test 1192: v1.82.0 CHANGELOG entry documented --"
+grep -q "## v1.82.0 — Image Generation Mock Provider Implementation Release" docs/CHANGELOG.md
+grep -q "src/lib/image_generation_mock_provider.js" docs/CHANGELOG.md
+grep -q "image-generation-mock-provider" docs/CHANGELOG.md
+grep -q "image_generation" docs/CHANGELOG.md
+grep -q "Catalog registration" docs/CHANGELOG.md
+grep -q "Deferred" docs/CHANGELOG.md
+grep -q "Production Readiness Review" docs/CHANGELOG.md
+pass "v1.82.0 CHANGELOG entry documented"
+
+echo "-- Test 1193: v1.82.0 README current release section documented --"
+grep -Fq "### Image Generation Mock Provider Implementation Release（v1.82.0）" README.md
+grep -Fq "**Current Version: v1.82.0**" README.md
+grep -Fq "Human Approval Gate" README.md
+grep -Fq "Catalog registration: **Not Performed**" README.md
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const readme = fs.readFileSync("README.md", "utf8");
+const start = readme.indexOf("### Image Generation Mock Provider Implementation Release（v1.82.0）");
+const end = readme.indexOf("### Image Generation Mock Provider Implementation Authorization Governance Release（v1.81.0）");
+if (start < 0 || end < 0 || end <= start) {
+  throw new Error("README v1.82.0 section boundaries not found");
+}
+
+const section = readme.slice(start, end);
+if (!section.includes("**Current Version: v1.82.0**")) {
+  throw new Error("README v1.82.0 section must declare current version");
+}
+if (section.includes("Catalog Registered") || section.includes("catalog registered")) {
+  throw new Error("README v1.82.0 section must not claim catalog registered");
+}
+if (
+  section.includes("Production Ready") &&
+  !section.includes("Not Declared") &&
+  !section.includes("Not Performed")
+) {
+  throw new Error("README v1.82.0 section must not claim production ready");
+}
+console.log("README v1.82.0 section ok");
+EOF
+pass "v1.82.0 README current release section documented"
+
+echo "-- Test 1194: v1.82.0 ARCHITECTURE_COMPLIANCE_CHECKLIST implementation release compliance --"
+grep -q "## Image Generation Mock Provider Implementation Release Compliance（v1.82.0）" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Image Generation Mock Provider Implementation Implemented" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "src/lib/image_generation_mock_provider.js" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "authorizedImplementationPaths" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Catalog Registered NO" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Review Entry Authorized NO" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Formally Assessed NO" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Bounded Production Ready NO" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -A20 "## Image Generation Mock Provider Implementation Authorization Release Compliance（v1.81.0）" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md | grep -q "Implementation execution Not Started"
+grep -A20 "## Image Generation Mock Provider Implementation Authorization Release Compliance（v1.81.0）" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md | grep -q "authorizedImplementationPaths"
+pass "v1.82.0 ARCHITECTURE_COMPLIANCE_CHECKLIST implementation release compliance"
+
+echo "-- Test 1195: v1.82.0 image generation mock provider implementation release documented --"
+grep -q "Test 1121 / 1146–1195" docs/VERSION.md
+grep -A12 "### 品質状況（v1.82.0 最新）" docs/VERSION.md | grep -Fq "**1195 PASS**"
+grep -A12 "### 品質状況（v1.82.0 最新）" docs/VERSION.md | grep -q "Level 3.19"
+grep -q "image_generation_mock_provider.js" README.md
+grep -q "Implemented" README.md
+pass "v1.82.0 image generation mock provider implementation release documented"
 
 
 echo ""

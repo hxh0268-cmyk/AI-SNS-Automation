@@ -6,6 +6,46 @@
 
 ---
 
+## v1.82.0 — Image Generation Mock Provider Implementation Release
+
+Image Generation Mock Provider Implementation Release — bounded deterministic local in-memory `image_generation` Provider — `src/lib/image_generation_mock_provider.js` — descriptor-based object and array validation — dense canonical Array policy — forbidden-field validation — circular-reference handling — Strategy A determinism — normalized success/error envelopes — Human Approval Gate preserved。Catalog registration **Deferred**。Production Readiness Review **Deferred**。
+
+`src/lib/mock_provider.js` / `src/lib/image_generation.js` / `public_contract_catalog.js` は変更なし。`authorizedImplementationPaths` は `src/lib/image_generation_mock_provider.js` のみ追加。Real Provider / external IO **Prohibited** maintained。Bounded text Mock Formal Decision **READY** preserved。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Image Generation Mock Provider module | `src/lib/image_generation_mock_provider.js` |
+| providerId | `image-generation-mock-provider` |
+| providerVersion | `1.0.0` |
+| Capability | `image_generation` |
+| Image Generation Mock Provider Implementation | **Implemented** |
+| Determinism | Strategy A — `JSON.stringify(applicationContract)` after validation |
+| Validation | envelope / own-property descriptor shape / forbidden-field / serializable-data |
+| Array policy | dense canonical Array invariant |
+| Human Approval Gate | **Preserved**（`humanApprovalGateBypass: false`） |
+| Catalog Registered | **NO** |
+| Catalog registration | **Deferred** |
+| Production Readiness Review | **Deferred** |
+| Provider Contracts | **2**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+| CL-004 / CL-005 / CL-006 | **Remains Deferred** globally |
+| Provider Production Ready（global） | **Not Declared** |
+| Repository-wide Level 4 | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1121 / 1146–1195 | Image Generation Mock Provider Implementation |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1195 PASS** |
+| npm test | **PASS** |
+| Public Contract Catalog | **PASS** |
+
+---
+
 ## v1.81.0 — Image Generation Mock Provider Implementation Authorization Governance Release
 
 Image Generation Mock Provider Implementation Authorization Governance Release — ADR-0021 DECISION H — bounded Provider Implementation Authorization for `image-generation-mock-provider` — E1–E25 / B1–B25 disposition — PR-006 identity distinction — input / output / failure semantics — governance-only。Implementation execution **Not Started**。Catalog registration **Not Authorized**。

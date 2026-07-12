@@ -566,6 +566,43 @@ Per [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IM
 - [x] Architecture Maturity **Level 3.19**
 - [ ] Human Review recorded
 
+---
+
+## Image Generation Mock Provider Implementation Release Compliance（v1.82.0）
+
+Per ADR-0021 bounded Implementation Authorization scope（supersedes v1.81.0 **Implementation execution Not Started** and **authorizedImplementationPaths unchanged** for current repository state only — v1.81.0 historical release facts preserved above）:
+
+- [x] DECISION H — bounded Implementation Authorization **Granted** for `image-generation-mock-provider`（v1.81.0）
+- [x] **Image Generation Mock Provider Implementation Implemented**（`src/lib/image_generation_mock_provider.js`）
+- [x] providerId `image-generation-mock-provider` / providerVersion `1.0.0` / capability `image_generation`
+- [x] **authorizedImplementationPaths** expanded only with `src/lib/image_generation_mock_provider.js`
+- [x] Implementation boundary preserved — deterministic / local / in-memory / no external IO
+- [x] **No Runtime integration**
+- [x] **No Workflow integration**
+- [x] **No Event integration**
+- [x] **No Scheduler integration**
+- [x] **No Automation integration**
+- [x] **No publishing integration**
+- [x] **Human Approval Gate preserved**（`humanApprovalGateBypass: false`）
+- [x] **Catalog Registered NO** — `image-generation-mock-provider` not in `providerContracts[]`
+- [x] **Review Entry Authorized NO**
+- [x] **Formally Assessed NO**
+- [x] **Bounded Production Ready NO**
+- [x] **Global Provider Production Ready Not Declared**
+- [x] **Provider Production Ready Not Declared**（global）
+- [x] **Repository-wide Level 4 Not Declared**
+- [x] Bounded text mock Formal Decision **READY** preserved
+- [x] Real Provider / External IO **prohibited**
+- [x] Automatic SNS publishing **prohibited**
+- [x] `mock_provider.js` **unchanged**
+- [x] `image_generation.js` **unchanged**
+- [x] `public_contract_catalog.js` **unchanged**（Provider Contracts **2** / catalogVersion **1.0**）
+- [x] CL-004 / CL-005 / CL-006 globally **Deferred**
+- [x] Architecture Maturity **Level 3.19**（unchanged）
+- [x] Quality Pipeline **1195 PASS**
+- [x] Release version **v1.82.0** synchronized
+- [ ] Human Review recorded
+
 ## Usage Notes
 
 | タイミング | 使用する節 |
