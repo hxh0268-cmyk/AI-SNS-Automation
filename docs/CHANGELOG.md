@@ -6,6 +6,42 @@
 
 ---
 
+## v1.81.0 — Image Generation Mock Provider Implementation Authorization Governance Release
+
+Image Generation Mock Provider Implementation Authorization Governance Release — ADR-0021 DECISION H — bounded Provider Implementation Authorization for `image-generation-mock-provider` — E1–E25 / B1–B25 disposition — PR-006 identity distinction — input / output / failure semantics — governance-only。Implementation execution **Not Started**。Catalog registration **Not Authorized**。
+
+`src/lib/mock_provider.js` / `src/lib/image_generation.js` / `public_contract_catalog.js` / `authorizedImplementationPaths` は変更なし。Real Provider / external IO **Prohibited** maintained。Bounded text Mock Formal Decision **READY** preserved。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | `ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md` |
+| Review document | `IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md` |
+| DECISION H | **Grant Bounded Implementation Authorization** |
+| Candidate | `image-generation-mock-provider`（Class 1 — mock） |
+| Implementation Authorization | **Granted**（bounded） |
+| Implementation execution | **Not Started** |
+| Catalog registration | **Not Authorized** |
+| Provider Contracts | **2**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+| CL-004 / CL-005 / CL-006 | **Remains Deferred** globally |
+| Provider Production Ready（global） | **Not Declared** |
+| Repository-wide Level 4 | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1115–1134 | Image Generation Mock Provider Implementation Authorization Governance |
+| Test 1135–1144 | Image Generation Mock Provider Implementation Authorization Governance Release |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1145 PASS** |
+| npm test | **PASS** |
+| Release date | **2026-07-11** |
+
+---
+
 ## v1.80.0 — Image Generation Mock Provider Expansion Entry Decision Governance Release
 
 Image Generation Mock Provider Expansion Entry Decision Governance Release — ADR-0020 DECISION G — bounded Provider Expansion Entry Authorization for `image-generation-mock-provider` — E1–E25 / B1–B25 disposition — PR-006 identity distinction — governance-only。Implementation Authorization **Not Granted**。Catalog registration **Not Authorized**。

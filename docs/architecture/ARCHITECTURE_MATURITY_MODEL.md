@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.19 — Image Generation Mock Provider Expansion Entry Decision Governance Release Complete
+Current Maturity: Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete
 ```
 
 | 観点 | 状態 |
@@ -228,6 +228,7 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Expansion Entry 
 | Level 3.19 Provider Production Readiness Assessment Decision Release | **Completed**（v1.78.0） |
 | Level 3.19 Provider Expansion Entry Governance Release | **Completed**（v1.79.0） |
 | Level 3.19 Image Generation Mock Provider Expansion Entry Decision Release | **Completed**（v1.80.0） |
+| Level 3.19 Image Generation Mock Provider Implementation Authorization Release | **Completed**（v1.81.0） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
@@ -243,7 +244,8 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Expansion Entry 
 | **Provider Production Readiness Assessment** | **Complete** — Formal Decision **READY**（bounded scope — DECISION D Accepted） |
 | **Provider Expansion Entry Governance** | **Established**（v1.79.0 — ADR-0019） |
 | **Provider Expansion Entry Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.80.0 ADR-0020） |
-| **Implementation Authorization** | **Not Granted** |
+| **Implementation Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.81.0 ADR-0021） |
+| **Implementation execution** | **Not Started** |
 | **Provider Production Ready** | **Not Declared**（global） |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |
@@ -279,7 +281,7 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Expansion Entry 
 - Mock Provider Catalog Registration **Registered**（v1.76.0）
 - Provider Production Readiness Assessment **Complete** — Formal Decision **READY**（v1.78.0 — bounded scope）
 - Provider Expansion Entry Governance **Established**（v1.79.0 — ADR-0019）
-- `image-generation-mock-provider` Expansion Entry **Authorized**（bounded — v1.80.0 — ADR-0020）; Implementation Authorization **Not Granted**
+- `image-generation-mock-provider` Expansion Entry **Authorized**（bounded — v1.80.0 — ADR-0020）; Implementation Authorization **Granted**（bounded — v1.81.0 — ADR-0021）; implementation execution **Not Started**
 - Retry / Recovery / cross-layer idempotency **deferred** — ADR required before implementation
 - Provider / Runtime / Scheduler / SNS API **未実装** — Provider Non-Goals partial release（Mock gate only）; **Production Not Started**
 - Real Metrics / Real Automation **未実装**

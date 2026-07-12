@@ -538,6 +538,34 @@ Per [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](./IMAGE_GENERATIO
 - [x] Architecture Maturity **Level 3.19**
 - [ ] Human Review recorded
 
+---
+
+## Image Generation Mock Provider Implementation Authorization Release Compliance（v1.81.0）
+
+Per [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md):
+
+- [x] DECISION H — bounded Implementation Authorization **Granted** for `image-generation-mock-provider`
+- [x] Candidate class Class 1 documented
+- [x] Entry criteria E1–E25 disposition recorded
+- [x] Blocking conditions B1–B25 disposition recorded
+- [x] PR-006 identity distinction recorded（`image_generation.js` ≠ provider）
+- [x] Input / output / failure semantics documented
+- [x] **Implementation execution Not Started**
+- [x] **Catalog registration Not Authorized**
+- [x] **Provider Production Ready Not Declared**（global）
+- [x] **Repository-wide Level 4 Not Declared**
+- [x] Bounded text mock Formal Decision **READY** preserved
+- [x] Real Provider / External IO **prohibited**
+- [x] Automatic SNS publishing **prohibited**
+- [x] `mock_provider.js` **unchanged**
+- [x] `image_generation.js` **unchanged**
+- [x] `public_contract_catalog.js` **unchanged**（Provider Contracts **2**）
+- [x] `authorizedImplementationPaths` **unchanged**
+- [x] CL-004 / CL-005 / CL-006 globally **Deferred**
+- [x] PR-004 / PR-005 / PR-006 candidate notes recorded
+- [x] Architecture Maturity **Level 3.19**
+- [ ] Human Review recorded
+
 ## Usage Notes
 
 | タイミング | 使用する節 |

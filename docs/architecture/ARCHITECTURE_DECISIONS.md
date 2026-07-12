@@ -164,6 +164,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md) — Provider Production Readiness Review Governance Decision（v1.77.0）
 - [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md) — Provider Expansion Entry Governance Decision（v1.79.0）
 - [ADR-0020](../adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md) — Image Generation Mock Provider Expansion Entry Decision（v1.80.0）
+- [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md) — Image Generation Mock Provider Implementation Authorization Decision（v1.81.0）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
@@ -368,5 +369,25 @@ Full record: [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REV
 | **Consequences** | Per-candidate entry authorized; implementation / catalog / IO remain prohibited |
 
 Full record: [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md) + [ADR-0020](../adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md)
+
+### Post–DECISION H — Image Generation Mock Provider Implementation Authorization（v1.81.0）
+
+| Item | Decision |
+|------|----------|
+| **Decision** | **DECISION H — GRANT BOUNDED IMPLEMENTATION AUTHORIZATION** |
+| **Release** | v1.81.0 — Image Generation Mock Provider Implementation Authorization Governance Release |
+| **ADR** | [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md) |
+| **Review** | [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) |
+| **Candidate** | `image-generation-mock-provider`（Class 1 — mock） |
+| **Implementation Authorization** | **Granted**（bounded — per-candidate only） |
+| **Implementation execution** | **Not Started** |
+| **Catalog registration** | **Not Authorized** |
+| **Maturity** | **Level 3.19**（unchanged） |
+| **Bounded text mock READY** | **Preserved** |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Future implementation authorized; catalog / IO / integration remain prohibited |
+
+Full record: [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

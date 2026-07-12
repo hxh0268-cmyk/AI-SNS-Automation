@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.80.0**（Image Generation Mock Provider Expansion Entry Decision Governance Release）
+**v1.81.0**（Image Generation Mock Provider Implementation Authorization Governance Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Image Generation Mock Provider Expansion Entry Decision Governance Release Complete
+**Phase:** Image Generation Mock Provider Implementation Authorization Governance Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -48,7 +48,11 @@
 
 **image-generation-mock-provider Expansion Entry:** **Authorized**（bounded — v1.80.0 — ADR-0020 / [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](architecture/IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md)）
 
-**Implementation Authorization:** **Not Granted**
+**image-generation-mock-provider Implementation Authorization:** **Granted**（bounded — v1.81.0 — ADR-0021 / [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](architecture/IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md)）
+
+**Implementation Authorization:** **Granted**（bounded — `image-generation-mock-provider` only）
+
+**Implementation execution:** **Not Started**
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -62,7 +66,7 @@
 
 **Next Phase Candidate:** Human Review / release authorization per Governance Flow
 
-**Next Candidate:** v1.81.0（post-release follow-on 候補）
+**Next Candidate:** v1.82.0（post-release follow-on 候補）
 
 ---
 
@@ -70,7 +74,8 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.80.0** | **ドキュメント** | **🔄 候補** | **Image Generation Mock Provider Expansion Entry Decision — ADR-0020 DECISION G / bounded Expansion Entry Authorized** |
+| **v1.81.0** | **ドキュメント** | **🔄 候補** | **Image Generation Mock Provider Implementation Authorization — ADR-0021 DECISION H / bounded Implementation Authorization Granted** |
+| **v1.80.0** | **ドキュメント** | **✅ 完了** | **Image Generation Mock Provider Expansion Entry Decision — ADR-0020 DECISION G / bounded Expansion Entry Authorized** |
 | **v1.79.0** | **ドキュメント** | **✅ 完了** | **Provider Expansion Entry Governance — ADR-0019 / expansion taxonomy / entry criteria / blocking conditions — governance-only** |
 | **v1.78.0** | **機能追加** | **✅ 完了** | **Provider Production Readiness Assessment Decision — PPRR-F001 remediation / Formal Decision READY / DECISION D Accepted** |
 | **v1.77.0** | **ドキュメント** | **✅ 完了** | **Provider Production Readiness Review Governance — ADR-0018 / Review Entry Authorized** |
@@ -196,6 +201,58 @@
 | Concrete catalog registration not executed | ✅ |
 | **945 PASS** | ✅ |
 | Test 918–945 | ✅ |
+
+---
+
+### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）
+
+#### Image Generation Mock Provider Implementation Authorization 正式記録
+
+- **`ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md`** … DECISION H — bounded Implementation Authorization Granted
+- **`IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md`** … E1–E25 / B1–B25 / PR-006 identity distinction / input-output-failure semantics
+- **image-generation-mock-provider Implementation Authorization** … **Granted**（bounded）
+- **Implementation execution** … **Not Started**
+- **Catalog registration** … **Not Authorized**
+- **Bounded text mock Formal Decision READY** … **Preserved**
+- **`mock_provider.js`** … **Unchanged**
+- **`image_generation.js`** … **Unchanged**
+- **`public_contract_catalog.js`** … **Unchanged**
+- **`authorizedImplementationPaths`** … **Unchanged**
+
+### 品質状況（v1.81.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1145 PASS** |
+| Architecture Documents | **48** 必須文書 |
+| Catalog generator / reports | **unchanged** |
+| Current Maturity | **Level 3.19** — Image Generation Mock Provider Implementation Authorization Governance Release Complete |
+| image-generation-mock-provider Implementation Authorization | **Granted**（bounded） |
+| Implementation execution | **Not Started** |
+| npm test | **PASS** |
+| Test 1115–1134 | Image Generation Mock Provider Implementation Authorization Governance |
+| Test 1135–1144 | Image Generation Mock Provider Implementation Authorization Governance Release |
+| Test 1145 | Image Generation Mock Provider Implementation Authorization Governance Release documented |
+
+### v1.81.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0021 scope respected | ✅ |
+| DECISION H recorded | ✅ |
+| Implementation Authorization granted bounded | ✅ |
+| Implementation execution not started | ✅ |
+| Catalog registration not authorized | ✅ |
+| Production Ready global not declared | ✅ |
+| Repository-wide L4 not declared | ✅ |
+| mock_provider.js unchanged | ✅ |
+| image_generation.js unchanged | ✅ |
+| public_contract_catalog.js unchanged | ✅ |
+| authorizedImplementationPaths unchanged | ✅ |
+| **1145 PASS** | ✅ |
+| Test 1115–1134 | ✅ |
+| Test 1135–1144 | ✅ |
+| Test 1145 | ✅ |
 
 ---
 
