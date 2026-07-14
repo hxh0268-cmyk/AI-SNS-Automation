@@ -6,9 +6,9 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 ## Governance Scope
 
-Architecture Documentation = **Architecture Governance** として、**48 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1 + v1.71.0 Provider Level 4 Implementation Ready Review 1 + v1.72.0 Provider Public Contract Catalog Extension Review 1 + v1.73.0 Mock Provider Production Implementation Authorization Review 1 + v1.75.0 Mock Provider Catalog Registration Governance Review 1 + v1.77.0 Provider Production Readiness Review 1 + v1.79.0 Provider Expansion Entry Review 1 + v1.80.0 Image Generation Mock Provider Expansion Entry Review 1 + v1.81.0 Image Generation Mock Provider Implementation Authorization Review 1）を固定します。
+Architecture Documentation = **Architecture Governance** として、**49 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1 + v1.71.0 Provider Level 4 Implementation Ready Review 1 + v1.72.0 Provider Public Contract Catalog Extension Review 1 + v1.73.0 Mock Provider Production Implementation Authorization Review 1 + v1.75.0 Mock Provider Catalog Registration Governance Review 1 + v1.77.0 Provider Production Readiness Review 1 + v1.79.0 Provider Expansion Entry Review 1 + v1.80.0 Image Generation Mock Provider Expansion Entry Review 1 + v1.81.0 Image Generation Mock Provider Implementation Authorization Review 1 + v1.83.0 Image Generation Mock Provider Catalog Registration Governance Review 1）を固定します。
 
-**Current Maturity:** **Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete**（v1.81.0 — `image-generation-mock-provider` Implementation Authorization **Granted** bounded / Implementation execution **Not Started** / Provider Production Ready **Not Declared**）
+**Current Maturity:** **Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete**（v1.83.0 — `image-generation-mock-provider` Catalog Registration Governance **Complete** / Catalog Registration **Authorized / Not Started** / Catalog Registered **NO** / Provider Production Ready **Not Declared**）
 
 > **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **41**（重複ファイルカウントではない）。
 
@@ -62,11 +62,13 @@ Architecture Documentation = **Architecture Governance** として、**48 必須
 | 46 | Provider Expansion Entry Review | [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REVIEW.md) | v1.79.0 |
 | 47 | Image Generation Mock Provider Expansion Entry Review | [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md) | v1.80.0 |
 | 48 | Image Generation Mock Provider Implementation Authorization Review | [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) | v1.81.0 |
+| 49 | Image Generation Mock Provider Catalog Registration Governance Review | [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) | v1.83.0 |
 
 **文書の役割分担:**
 
 | 文書 | 役割 |
 |------|------|
+| [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) | **Image Catalog Registration Governance Review** — registration policy / closed-world multi-mock validator policy / identity mapping（v1.83.0） |
 | [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) | **Image Generation Mock Provider Implementation Authorization Review** — per-candidate DECISION H / E1–E25 / B1–B25 / Implementation Authorization **Granted** bounded（v1.81.0） |
 | [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md) | **Image Generation Mock Provider Expansion Entry Review** — per-candidate DECISION G / E1–E25 / B1–B25 / Expansion Entry **Authorized** bounded（v1.80.0） |
 | [PROVIDER_EXPANSION_ENTRY_REVIEW.md](./PROVIDER_EXPANSION_ENTRY_REVIEW.md) | **Provider Expansion Entry Review** — expansion taxonomy / entry criteria / blocking conditions（v1.79.0） |
@@ -117,7 +119,7 @@ Architecture Documentation = **Architecture Governance** として、**48 必須
 
 ---
 
-## 現在フェーズ（v1.81.0 — Image Generation Mock Provider Implementation Authorization Governance Release）
+## 現在フェーズ（v1.83.0 — Image Generation Mock Provider Catalog Registration Governance Release）
 
 | Layer | 状態 |
 |-------|------|
@@ -145,8 +147,10 @@ Architecture Documentation = **Architecture Governance** として、**48 必須
 | **ChatGPT Final Decision Review** | **Accepted**（DECISION D） |
 | **Provider Expansion Entry Governance** | **Established**（v1.79.0 — ADR-0019） |
 | **image-generation-mock-provider Expansion Entry** | **Authorized**（bounded — v1.80.0 — ADR-0020 / DECISION G） |
-| **image-generation-mock-provider Implementation Authorization** | **Granted**（bounded — v1.81.0 — ADR-0021 / DECISION H） |
-| **Implementation execution** | **Not Started** |
+| **image-generation-mock-provider Implementation** | **Implemented**（v1.82.0 — `src/lib/image_generation_mock_provider.js`） |
+| **image-generation-mock-provider Catalog Registration Governance** | **Complete**（v1.83.0 — ADR-0022） |
+| **image-generation-mock-provider Catalog Registration** | **Authorized / Not Started** |
+| **Catalog Registered（image provider）** | **NO** |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **Provider Production Ready** | **Not Declared**（global） |
 | **Provider Production Implementation** | **Not Started**（Real Provider scope） |

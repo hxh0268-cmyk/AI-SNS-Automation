@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete
+Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete
 ```
 
 | 観点 | 状態 |
@@ -229,6 +229,8 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Implementation A
 | Level 3.19 Provider Expansion Entry Governance Release | **Completed**（v1.79.0） |
 | Level 3.19 Image Generation Mock Provider Expansion Entry Decision Release | **Completed**（v1.80.0） |
 | Level 3.19 Image Generation Mock Provider Implementation Authorization Release | **Completed**（v1.81.0） |
+| Level 3.19 Image Generation Mock Provider Implementation Release | **Completed**（v1.82.0） |
+| Level 3.19 Image Generation Mock Provider Catalog Registration Governance Release | **Completed**（v1.83.0） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
@@ -245,7 +247,10 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Implementation A
 | **Provider Expansion Entry Governance** | **Established**（v1.79.0 — ADR-0019） |
 | **Provider Expansion Entry Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.80.0 ADR-0020） |
 | **Implementation Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.81.0 ADR-0021） |
-| **Implementation execution** | **Not Started** |
+| **Implementation execution** | **Implemented**（v1.82.0 — `src/lib/image_generation_mock_provider.js`） |
+| **Image Catalog Registration Governance** | **Complete**（v1.83.0 — ADR-0022） |
+| **Image Catalog Registration** | **Authorized / Not Started** |
+| **Catalog Registered（image provider）** | **NO** |
 | **Provider Production Ready** | **Not Declared**（global） |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |

@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.82.0 --"
+echo "-- Test 98: VERSION updated to v1.83.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
+    "**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.82.0");
+  throw new Error("docs/VERSION.md current version must be v1.83.0");
 }
 
 if (
   currentSection.includes(
-    "**v1.81.0**（Image Generation Mock Provider Implementation Authorization Governance Release）",
+    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.81.0");
+  throw new Error("docs/VERSION.md current version must not remain v1.82.0");
 }
 
-console.log("VERSION v1.82.0 ok");
+console.log("VERSION v1.83.0 ok");
 EOF
-pass "VERSION updated to v1.82.0"
+pass "VERSION updated to v1.83.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6479,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.83.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.83.0");
+if (payload.nextVersion !== "v1.84.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.84.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6489,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.83.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.83.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.84.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.84.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6545,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.83.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.84.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14047,7 +14047,7 @@ grep -q "Architecture Governance" docs/architecture/README.md
 grep -q "Official Docs First" docs/architecture/README.md
 grep -q "Governance First" docs/architecture/README.md
 grep -q "正式基準書" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 grep -q "QUALITY_GOVERNANCE.md" docs/architecture/README.md
 grep -q "ARCHITECTURE_MATURITY_MODEL.md" docs/architecture/README.md
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
@@ -14410,7 +14410,7 @@ pass "architecture maturity model has required headings"
 
 echo "-- Test 442: current maturity is level 3.19 --"
 grep -q "Level 3.19" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Image Generation Mock Provider Implementation Authorization Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "current maturity is level 3.19"
 
 echo "-- Test 443: README references architecture maturity model --"
@@ -14461,7 +14461,7 @@ pass "future entry criteria document exists"
 echo "-- Test 450: docs/architecture/README references future entry criteria --"
 grep -q "FUTURE_ENTRY_CRITERIA.md" docs/architecture/README.md
 grep -q "Future Entry Gate" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future entry criteria"
 
 echo "-- Test 451: README references future entry criteria --"
@@ -14527,7 +14527,7 @@ pass "governance flow document exists"
 echo "-- Test 462: docs/architecture/README references governance flow --"
 grep -q "GOVERNANCE_FLOW.md" docs/architecture/README.md
 grep -q "Governance Process" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references governance flow"
 
 echo "-- Test 463: README references v1.51.0 governance flow foundation --"
@@ -14592,7 +14592,7 @@ pass "future layer boundaries document exists"
 echo "-- Test 472: docs/architecture/README references future layer boundaries --"
 grep -q "FUTURE_LAYER_BOUNDARIES.md" docs/architecture/README.md
 grep -q "Future Layer Boundaries" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "docs/architecture/README references future layer boundaries"
 
 echo "-- Test 473: README references v1.52.0 future layer boundary design --"
@@ -15119,7 +15119,7 @@ pass "completion criteria section exists"
 echo "-- Test 559: architecture README references automation layer design --"
 grep -q "AUTOMATION_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Automation Layer Design" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "architecture README references automation layer design"
 
 echo "-- Test 560: readme changelog version reference v1.57.0 history --"
@@ -15230,7 +15230,7 @@ grep -q "WORKFLOW_LAYER_DESIGN.md" README.md
 grep -q "Workflow Layer Design（v1.58.0）" README.md
 grep -q "WORKFLOW_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Workflow Layer Design" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "readme and architecture index reference workflow layer design"
 
 echo "-- Test 580: readme changelog version reference v1.58.0 history --"
@@ -15338,7 +15338,7 @@ pass "provider direct call is forbidden"
 echo "-- Test 599: event layer is linked from architecture readme --"
 grep -q "EVENT_LAYER_DESIGN.md" docs/architecture/README.md
 grep -q "Event Layer Design" docs/architecture/README.md
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 pass "event layer is linked from architecture readme"
 
 echo "-- Test 600: readme changelog version reference v1.59.0 history --"
@@ -16030,7 +16030,7 @@ grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16137,11 +16137,11 @@ grep -q "Application Layer Public Contracts only" docs/architecture/FUTURE_ENTRY
 grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
-echo "-- Test 741: architecture readme declares mock provider implementation release --"
-grep -q "Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete" docs/architecture/README.md
-grep -q "Mock Provider Production Implementation" docs/architecture/README.md
-grep -q "Implemented" docs/architecture/README.md
-pass "architecture readme declares mock provider implementation release"
+echo "-- Test 741: architecture readme declares image catalog registration governance release --"
+grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/README.md
+grep -q "Catalog Registration Governance" docs/architecture/README.md
+grep -q "Authorized / Not Started" docs/architecture/README.md
+pass "architecture readme declares image catalog registration governance release"
 
 echo "-- Test 742: readme changelog version reference v1.67.0 history --"
 grep -q "Formal Level 4 Entry Review Decision（v1.67.0）" README.md
@@ -17119,7 +17119,7 @@ grep -q "Real Provider" docs/architecture/NON_GOALS.md
 pass "real provider prohibited maintained"
 
 echo "-- Test 858: architecture documents count 45 --"
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 grep -q "PROVIDER_PRODUCTION_READINESS_REVIEW.md" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md" docs/architecture/README.md
 grep -q "MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md" docs/architecture/README.md
@@ -19753,7 +19753,7 @@ pass "real provider prohibited"
 echo "-- Test 1110: level 3.19 preserved --"
 grep -q "Level 3.19" docs/adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md
 grep -q "Level 3.19" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md
-grep -q "Level 3.19 — Image Generation Mock Provider Implementation Authorization Governance Release Complete" docs/architecture/README.md
+grep -q "Level 3.19" docs/architecture/README.md
 pass "level 3.19 preserved"
 
 echo "-- Test 1111: bounded text mock provider ready preserved --"
@@ -19952,20 +19952,7 @@ echo "-- Test 1142: v1.82.0 release version synchronized --"
 grep -q "### v1.82.0 で追加（Image Generation Mock Provider Implementation Release）" docs/VERSION.md
 grep -q "v1.82.0" docs/CHANGELOG.md
 grep -q "v1.82.0" README.md
-node --input-type=module <<'EOF'
-import fs from "node:fs";
-
-const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
-const currentSection = versionDoc.split("## バージョン履歴")[0];
-if (
-  !currentSection.includes(
-    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
-  )
-) {
-  throw new Error("current VERSION section must declare v1.82.0");
-}
-console.log("v1.82.0 current version section ok");
-EOF
+grep -A12 "### 品質状況（v1.82.0 最新）" docs/VERSION.md | grep -Fq "**1195 PASS**"
 pass "v1.82.0 release version synchronized"
 
 echo "-- Test 1143: decision h recorded in architecture decisions --"
@@ -20007,7 +19994,7 @@ grep -q "Test 1145" docs/VERSION.md
 grep -A6 "### 品質状況（v1.81.0 最新）" docs/VERSION.md | grep -Fq "**1145 PASS**"
 grep -A20 "### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）" docs/VERSION.md | grep -q "Implementation execution"
 grep -A20 "### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）" docs/VERSION.md | grep -q "Not Started"
-grep -q "48 必須 Governance 文書" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
 grep -q "IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW" docs/architecture/README.md
 pass "v1.81.0 image generation mock provider implementation authorization governance release documented"
 
@@ -21040,15 +21027,21 @@ console.log("image generation mock provider symbol scalar rejection ok");
 EOF
 pass "image generation mock provider symbol scalar rejection"
 
-echo "-- Test 1191: v1.82.0 current version metadata in VERSION.md --"
+echo "-- Test 1191: v1.83.0 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
 const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
 const currentSection = versionDoc.split("## バージョン履歴")[0];
 
+if (!currentSection.includes("**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）")) {
+  throw new Error("current VERSION section must declare v1.83.0");
+}
+
 for (const marker of [
   "**Implementation execution:** **Implemented**",
+  "**image-generation-mock-provider Catalog Registration Governance:** **Complete**",
+  "**image-generation-mock-provider Catalog Registration:** **Authorized / Not Started**",
   "**Catalog Registered:** **NO**",
   "**Review Entry Authorized:** **NO**",
   "**Formally Assessed:** **NO**",
@@ -21066,9 +21059,9 @@ for (const marker of [
   }
 }
 
-console.log("v1.82.0 current version metadata ok");
+console.log("v1.83.0 current version metadata ok");
 EOF
-pass "v1.82.0 current version metadata in VERSION.md"
+pass "v1.83.0 current version metadata in VERSION.md"
 
 echo "-- Test 1192: v1.82.0 CHANGELOG entry documented --"
 grep -q "## v1.82.0 — Image Generation Mock Provider Implementation Release" docs/CHANGELOG.md
@@ -21133,6 +21126,275 @@ grep -A12 "### 品質状況（v1.82.0 最新）" docs/VERSION.md | grep -q "Leve
 grep -q "image_generation_mock_provider.js" README.md
 grep -q "Implemented" README.md
 pass "v1.82.0 image generation mock provider implementation release documented"
+
+echo "-- Test 1196: adr 0022 image generation mock provider catalog registration governance exists --"
+test -f docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "# ADR-0022: Image Generation Mock Provider Catalog Registration Governance Decision" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Accepted" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "adr 0022 image generation mock provider catalog registration governance exists"
+
+echo "-- Test 1197: image catalog registration governance review exists --"
+test -f docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+grep -q "# Image Generation Mock Provider Catalog Registration Governance Review" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+grep -q "## Final Decision" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "image catalog registration governance review exists"
+
+echo "-- Test 1198: registration necessity decision recorded for image provider --"
+grep -q "G1. Registration Necessity" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Concrete \`providerContracts\[\]\` entry required" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG1 Registration Necessity" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "registration necessity decision recorded for image provider"
+
+echo "-- Test 1199: registration scope exact match image provider --"
+grep -q "image-generation-mock-provider" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "image_generation" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "src/lib/image_generation_mock_provider.js" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q '"1.0.0"' docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "registration scope exact match image provider"
+
+echo "-- Test 1200: registrationKind governance decision image provider --"
+grep -q "concrete-mock-provider-implementation" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG4 Registration Kind" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "registrationKind governance decision image provider"
+
+echo "-- Test 1201: identity mapping decision image provider --"
+grep -q "G4. Catalog Identity Mapping" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "1:1 identity" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG5 Identity Mapping" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "identity mapping decision image provider"
+
+echo "-- Test 1202: closed world multi mock validator policy decision --"
+grep -q "G5. Validator Policy" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "closed-world" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "text-generation-mock-provider" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG6 Closed-World Multi-Mock Validator Policy" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "closed world multi mock validator policy decision"
+
+echo "-- Test 1203: broad generic mock acceptance prohibited --"
+grep -q "no broad" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Broad mock whitelist" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "broad generic mock acceptance prohibited"
+
+echo "-- Test 1204: providerVersion 1.0.0 fidelity documented --"
+grep -q "1.0.0" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "must not" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "normalized to text mock" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "providerVersion 1.0.0 fidelity documented"
+
+echo "-- Test 1205: schema version unchanged decision image provider --"
+grep -q "public-contract-catalog/1.0" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "G6. Schema Version Impact" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "schema version unchanged decision image provider"
+
+echo "-- Test 1206: catalog version unchanged decision image provider --"
+grep -q "catalogVersion" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "G7. Catalog Version Impact" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "catalog version unchanged decision image provider"
+
+echo "-- Test 1207: backward compatibility decision image provider --"
+grep -q "G8. Backward Compatibility" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Application \`publicContracts\[\]\`" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG9 Backward Compatibility" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "backward compatibility decision image provider"
+
+echo "-- Test 1208: migration not required decision image provider --"
+grep -q "G9. Migration Requirement" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -Fq "migration required? | **No**" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "migration not required decision image provider"
+
+echo "-- Test 1209: risk treatment pr 004 005 006 cl 013 image provider --"
+grep -q "PR-004" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "PR-005" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "PR-006" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CL-013" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "ADR-0022" docs/architecture/RISK_REGISTER.md
+pass "risk treatment pr 004 005 006 cl 013 image provider"
+
+echo "-- Test 1210: forbidden scope preserved image provider --"
+grep -q "Real Provider" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -Fq "**Prohibited**" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Human Approval Gate bypass" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG13 Forbidden Scope" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "forbidden scope preserved image provider"
+
+echo "-- Test 1211: future v1.84.0 implementation authorization state --"
+grep -q "G12. Future Implementation Authorization" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "v1.84.0" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "CRG14 Future Implementation Authorization" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "future v1.84.0 implementation authorization state"
+
+echo "-- Test 1212: governance complete distinct from catalog registered image provider --"
+grep -q "Governance Complete" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Not executed" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Not Started" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+grep -q "Catalog Registered" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -Fq "**NO**" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md
+pass "governance complete distinct from catalog registered image provider"
+
+echo "-- Test 1213: production readiness states remain no image provider --"
+grep -q "Review Entry Authorization" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Not Authorized" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "Review Entry Authorized" docs/VERSION.md
+grep -Fq "**Review Entry Authorized:** **NO**" docs/VERSION.md
+pass "production readiness states remain no image provider"
+
+echo "-- Test 1214: provider contracts remains two post image catalog governance --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.providerContracts.length !== 2) {
+  throw new Error("providerContracts must remain 2");
+}
+if (
+  catalog.providerContracts.some(
+    (entry) => entry.providerId === "image-generation-mock-provider",
+  )
+) {
+  throw new Error("image-generation-mock-provider must not be registered");
+}
+console.log("provider contracts remains two post image catalog governance ok");
+EOF
+pass "provider contracts remains two post image catalog governance"
+
+echo "-- Test 1215: catalogVersion remains 1.0 post image catalog governance --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (catalog.catalogVersion !== "1.0") {
+  throw new Error("catalogVersion must remain 1.0");
+}
+console.log("catalogVersion remains 1.0 post image catalog governance ok");
+EOF
+pass "catalogVersion remains 1.0 post image catalog governance"
+
+echo "-- Test 1216: abstract authority entry unchanged post image catalog governance --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const abstract = catalog.providerContracts.find(
+  (entry) => entry.providerId === "provider-abstract-contract-authority",
+);
+if (!abstract || abstract.registrationKind !== "abstract-contract-authority") {
+  throw new Error("abstract authority entry missing or invalid");
+}
+console.log("abstract authority entry unchanged post image catalog governance ok");
+EOF
+pass "abstract authority entry unchanged post image catalog governance"
+
+echo "-- Test 1217: text mock entry unchanged post image catalog governance --"
+node --input-type=module <<'EOF'
+import {
+  GOVERNED_MOCK_PROVIDER_ID,
+  buildPublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const concrete = catalog.providerContracts.find(
+  (entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID,
+);
+if (!concrete || concrete.providerVersion !== "1.0" || concrete.capabilityDeclaration !== "text_generation") {
+  throw new Error("text mock entry changed");
+}
+console.log("text mock entry unchanged post image catalog governance ok");
+EOF
+pass "text mock entry unchanged post image catalog governance"
+
+echo "-- Test 1218: publicContracts unchanged post image catalog governance --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (!Array.isArray(catalog.publicContracts) || catalog.publicContracts.length !== 7) {
+  throw new Error("publicContracts must remain unchanged");
+}
+console.log("publicContracts unchanged post image catalog governance ok");
+EOF
+pass "publicContracts unchanged post image catalog governance"
+
+echo "-- Test 1219: compatibilityMatrix unchanged post image catalog governance --"
+node --input-type=module <<'EOF'
+import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+if (!Array.isArray(catalog.compatibilityMatrix) || catalog.compatibilityMatrix.length !== 5) {
+  throw new Error("compatibilityMatrix must remain unchanged");
+}
+console.log("compatibilityMatrix unchanged post image catalog governance ok");
+EOF
+pass "compatibilityMatrix unchanged post image catalog governance"
+
+echo "-- Test 1220: human approval gate preserved post image catalog governance --"
+grep -q "Human Approval Gate" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "humanApprovalGateBypass: false" src/lib/image_generation_mock_provider.js
+pass "human approval gate preserved post image catalog governance"
+
+echo "-- Test 1221: image mock provider module unchanged post catalog governance --"
+node --input-type=module <<'EOF'
+import { providerId, providerVersion, capability, invoke } from "./src/lib/image_generation_mock_provider.js";
+
+if (providerId !== "image-generation-mock-provider") {
+  throw new Error("image provider id changed");
+}
+if (providerVersion !== "1.0.0") {
+  throw new Error("image provider version changed");
+}
+if (capability !== "image_generation") {
+  throw new Error("image provider capability changed");
+}
+const result = invoke({
+  capability: "image_generation",
+  applicationContract: { schema: "image-generation/1.0", payload: { topic: "governance-freeze" } },
+});
+if (!result.ok) {
+  throw new Error("image provider behavior changed");
+}
+console.log("image mock provider module unchanged post catalog governance ok");
+EOF
+pass "image mock provider module unchanged post catalog governance"
+
+echo "-- Test 1222: architecture decisions adr 0022 registered --"
+grep -q "ADR-0022" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "Catalog Registration Governance" docs/architecture/ARCHITECTURE_DECISIONS.md
+grep -q "IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW" docs/architecture/ARCHITECTURE_DECISIONS.md
+pass "architecture decisions adr 0022 registered"
+
+echo "-- Test 1223: compliance checklist image catalog registration governance section --"
+grep -q "## Image Generation Mock Provider Catalog Registration Governance Release Compliance（v1.83.0）" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "ADR-0022" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+grep -q "Closed-world multi-mock validator policy defined" docs/architecture/ARCHITECTURE_COMPLIANCE_CHECKLIST.md
+pass "compliance checklist image catalog registration governance section"
+
+echo "-- Test 1224: architecture maturity level 3.19 sub release image catalog governance --"
+grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -q "Image Generation Mock Provider Catalog Registration Governance Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+pass "architecture maturity level 3.19 sub release image catalog governance"
+
+echo "-- Test 1225: relationship adr 0017 adr 0021 documented --"
+grep -q "ADR-0017" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "ADR-0021" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "relationship adr 0017 adr 0021 documented"
+
+echo "-- Test 1226: future count transition 2 to 3 governed only --"
+grep -q "PROVIDER_CONTRACT_DEFINITIONS.length" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -Fq "**3**" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "count = 2" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+grep -q "v1.84.0" docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md
+pass "future count transition 2 to 3 governed only"
+
+echo "-- Test 1227: v1.83.0 image catalog registration governance documented --"
+grep -Fq "**1227 PASS**" docs/VERSION.md
+grep -q "IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW" docs/architecture/README.md
+grep -q "49 必須 Governance 文書" docs/architecture/README.md
+grep -q "Test 1196–1227" docs/VERSION.md
+grep -q "v1.83.0" docs/CHANGELOG.md
+grep -q "ADR-0022" docs/CHANGELOG.md
+grep -Fq "### Image Generation Mock Provider Catalog Registration Governance Release（v1.83.0）" README.md
+grep -Fq "**Current Version: v1.83.0**" README.md
+grep -q "Authorized" README.md
+pass "v1.83.0 image catalog registration governance documented"
 
 
 echo ""

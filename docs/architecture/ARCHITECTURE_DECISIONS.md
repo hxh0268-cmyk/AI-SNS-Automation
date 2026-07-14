@@ -164,6 +164,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0018](../adr/ADR-0018-provider-production-readiness-review-governance.md) — Provider Production Readiness Review Governance Decision（v1.77.0）
 - [ADR-0019](../adr/ADR-0019-provider-expansion-entry-governance.md) — Provider Expansion Entry Governance Decision（v1.79.0）
 - [ADR-0020](../adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md) — Image Generation Mock Provider Expansion Entry Decision（v1.80.0）
+- [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — Image Generation Mock Provider Catalog Registration Governance Decision（v1.83.0）
 - [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md) — Image Generation Mock Provider Implementation Authorization Decision（v1.81.0）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
@@ -389,5 +390,25 @@ Full record: [IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md](./IMAGE_
 | **Consequences** | Future implementation authorized; catalog / IO / integration remain prohibited |
 
 Full record: [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) + [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md)
+
+### Post–ADR-0022 — Image Generation Mock Provider Catalog Registration Governance（v1.83.0）
+
+| Item | Decision |
+|------|----------|
+| **Release** | v1.83.0 — Image Generation Mock Provider Catalog Registration Governance Release |
+| **ADR** | [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) |
+| **Review** | [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) |
+| **Candidate** | `image-generation-mock-provider` / `1.0.0` / `image_generation` |
+| **Catalog Registration Governance** | **Complete** |
+| **Catalog Registration** | **Authorized / Not Started** |
+| **Catalog Registered** | **NO** |
+| **Closed-world multi-mock validator** | **Governed** — not implemented |
+| **Maturity** | **Level 3.19**（unchanged — sub-release label） |
+| **Bounded text mock READY** | **Preserved** |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Registration policy defined; v1.84.0 implementation authorized; catalog / IO / Production Ready remain prohibited |
+
+Full record: [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) + [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md)
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

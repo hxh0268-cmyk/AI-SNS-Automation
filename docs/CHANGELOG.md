@@ -6,6 +6,42 @@
 
 ---
 
+---
+
+## v1.83.0 — Image Generation Mock Provider Catalog Registration Governance Release
+
+Image Generation Mock Provider Catalog Registration Governance Release — ADR-0021 catalog deferral closure — ADR-0017 pattern applied — concrete registration policy defined for `image-generation-mock-provider` — closed-world multi-mock validator policy defined — identity mapping defined — catalog registration **Authorized / Not Started**。
+
+`public_contract_catalog.js` / `image_generation_mock_provider.js` / `mock_provider.js` は変更なし。Real Provider / external IO **Prohibited** maintained。Catalog Registered **does not imply** Provider Production Ready。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | `ADR-0022-image-generation-mock-provider-catalog-registration-governance.md` |
+| Governance Review | `IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md` |
+| registrationKind（governed） | `concrete-mock-provider-implementation` |
+| Registration scope | `image-generation-mock-provider` / `1.0.0` / `image_generation` |
+| `providerVersion` fidelity | `1.0.0` intentional — not normalized to text mock `"1.0"` |
+| Image Catalog Registration Governance | **Complete** |
+| Image Catalog Registration | **Authorized / Not Started** |
+| Catalog Registered | **NO** |
+| Provider Contracts | **2**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+| Provider Production Ready | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1196–1227 | Image Generation Mock Provider Catalog Registration Governance |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1227 PASS** |
+| npm test | **PASS** |
+| Public Contract Catalog | **PASS** |
+
+---
+
 ## v1.82.0 — Image Generation Mock Provider Implementation Release
 
 Image Generation Mock Provider Implementation Release — bounded deterministic local in-memory `image_generation` Provider — `src/lib/image_generation_mock_provider.js` — descriptor-based object and array validation — dense canonical Array policy — forbidden-field validation — circular-reference handling — Strategy A determinism — normalized success/error envelopes — Human Approval Gate preserved。Catalog registration **Deferred**。Production Readiness Review **Deferred**。

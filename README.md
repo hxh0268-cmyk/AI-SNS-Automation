@@ -1170,6 +1170,22 @@ Latest Current Step
 release-plan
 ```
 
+### Image Generation Mock Provider Catalog Registration Governance Release（v1.83.0）
+
+**Image Generation Mock Provider Catalog Registration Governance Release** を実施しました。ADR-0022 により `image-generation-mock-provider` の bounded Catalog Registration policy を記録（**49 必須 Governance 文書** — Catalog **unchanged**）。
+
+**Current Version: v1.83.0** | **Quality Pipeline: 1227 PASS**
+
+`image-generation-mock-provider` Catalog Registration Governance: **Complete**。Catalog Registration: **Authorized / Not Started**。Catalog Registered: **NO**。Provider Contracts: **2**。catalogVersion: **1.0**。Human Approval Gate **Preserved**。Production Readiness Review: **Not Performed**（deferred）。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。
+
+| 項目 | 内容 |
+|------|------|
+| Governance ADR | [ADR-0022](docs/adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) |
+| Review document | [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) |
+| Governed scope | `image-generation-mock-provider` / `1.0.0` / `image_generation` / `src/lib/image_generation_mock_provider.js` |
+| Current Maturity | **Level 3.19** — Image Generation Mock Provider Catalog Registration Governance Release Complete |
+| Next Phase Candidate | **v1.84.0 Image Generation Mock Provider Catalog Registration Implementation** |
+
 ### Image Generation Mock Provider Implementation Release（v1.82.0）
 
 **Image Generation Mock Provider Implementation Release** を実施しました。ADR-0021 認可範囲内で `src/lib/image_generation_mock_provider.js` を追加（**48 必須 Governance 文書** — Catalog **unchanged**）。
