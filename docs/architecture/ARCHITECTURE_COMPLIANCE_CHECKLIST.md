@@ -642,6 +642,38 @@ Per [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](.
 - [x] Release version **v1.83.0** synchronized
 - [ ] Human Review recorded
 
+## Image Generation Mock Provider Catalog Registration Implementation Release Compliance（v1.84.0）
+
+Per [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) G12:
+
+- [x] ADR-0022 G12 bounded scope respected
+- [x] Image Generation Mock Provider Implementation **Implemented** maintained（v1.82.0）
+- [x] `image-generation-mock-provider` registered in `providerContracts[]`
+- [x] `providerVersion: 1.0.0` fidelity preserved — not normalized to text mock `"1.0"`
+- [x] Closed-world two-ID validator **implemented**
+- [x] Canonical `providerContracts[]` count **3**
+- [x] Abstract authority entry preserved
+- [x] Text mock entry preserved
+- [x] **Image Catalog Registration Governance Complete**
+- [x] **Image Catalog Registration Registered**
+- [x] **Catalog Registered YES**
+- [x] **Review Entry Authorized NO**
+- [x] **Formally Assessed NO**
+- [x] **Bounded Production Ready NO**
+- [x] **Global Provider Production Ready Not Declared**
+- [x] **Provider Production Ready Not Declared**
+- [x] **Repository-wide Level 4 Not Declared**
+- [x] Real Provider / external IO **remains prohibited**
+- [x] Human Approval Gate **preserved**
+- [x] `image_generation_mock_provider.js` **unchanged**
+- [x] `mock_provider.js` **unchanged**
+- [x] Application `publicContracts[]` / `compatibilityMatrix` unchanged
+- [x] Bounded text mock Formal Decision **READY** preserved
+- [x] Architecture Maturity **Level 3.19**（sub-release label only）
+- [x] Quality Pipeline **1232 PASS**
+- [x] Release version **v1.84.0** synchronized
+- [ ] Human Review recorded
+
 ## Usage Notes
 
 | タイミング | 使用する節 |

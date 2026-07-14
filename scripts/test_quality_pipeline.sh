@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.83.0 --"
+echo "-- Test 98: VERSION updated to v1.84.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）",
+    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.83.0");
+  throw new Error("docs/VERSION.md current version must be v1.84.0");
 }
 
 if (
   currentSection.includes(
-    "**v1.82.0**（Image Generation Mock Provider Implementation Release）",
+    "**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.82.0");
+  throw new Error("docs/VERSION.md current version must not remain v1.83.0");
 }
 
-console.log("VERSION v1.83.0 ok");
+console.log("VERSION v1.84.0 ok");
 EOF
-pass "VERSION updated to v1.83.0"
+pass "VERSION updated to v1.84.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6479,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.84.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.84.0");
+if (payload.nextVersion !== "v1.85.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.85.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6489,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.84.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.84.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.85.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.85.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6545,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.84.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.85.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14410,7 +14410,7 @@ pass "architecture maturity model has required headings"
 
 echo "-- Test 442: current maturity is level 3.19 --"
 grep -q "Level 3.19" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "current maturity is level 3.19"
 
 echo "-- Test 443: README references architecture maturity model --"
@@ -16030,7 +16030,7 @@ grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16137,11 +16137,11 @@ grep -q "Application Layer Public Contracts only" docs/architecture/FUTURE_ENTRY
 grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
-echo "-- Test 741: architecture readme declares image catalog registration governance release --"
-grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/README.md
-grep -q "Catalog Registration Governance" docs/architecture/README.md
-grep -q "Authorized / Not Started" docs/architecture/README.md
-pass "architecture readme declares image catalog registration governance release"
+echo "-- Test 741: architecture readme declares image catalog registration implementation release --"
+grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/README.md
+grep -q "Catalog Registration" docs/architecture/README.md
+grep -q "Registered" docs/architecture/README.md
+pass "architecture readme declares image catalog registration implementation release"
 
 echo "-- Test 742: readme changelog version reference v1.67.0 history --"
 grep -q "Formal Level 4 Entry Review Decision（v1.67.0）" README.md
@@ -16769,8 +16769,8 @@ import {
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("canonical provider catalog must include exactly two entries");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("canonical provider catalog must include exactly three entries");
 }
 const abstract = catalog.providerContracts.find(
   (entry) => entry.providerId === "provider-abstract-contract-authority",
@@ -16778,8 +16778,8 @@ const abstract = catalog.providerContracts.find(
 if (!abstract || abstract.registrationKind !== "abstract-contract-authority") {
   throw new Error("abstract provider authority entry missing or invalid");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
-  throw new Error("provider contract definitions must include abstract and concrete mock");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 3) {
+  throw new Error("provider contract definitions must include abstract and concrete mock providers");
 }
 console.log("canonical provider catalog contains abstract and concrete mock ok");
 EOF
@@ -16808,7 +16808,8 @@ for (const id of ids) {
   if (
     /mock|real|openai|gemini|sns|adapter/i.test(id) &&
     id !== "provider-abstract-contract-authority" &&
-    id !== GOVERNED_MOCK_PROVIDER_ID
+    id !== GOVERNED_MOCK_PROVIDER_ID &&
+    id !== "image-generation-mock-provider"
   ) {
     throw new Error(`forbidden provider pattern in id: ${id}`);
   }
@@ -17003,14 +17004,17 @@ const data = JSON.parse(
     "utf8",
   ),
 );
-if (!Array.isArray(data.providerContracts) || data.providerContracts.length !== 2) {
-  throw new Error("json must include two providerContracts entries");
+if (!Array.isArray(data.providerContracts) || data.providerContracts.length !== 3) {
+  throw new Error("json must include three providerContracts entries");
 }
 if (data.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
   throw new Error("json abstract providerId mismatch");
 }
 if (data.providerContracts[1].providerId !== "text-generation-mock-provider") {
   throw new Error("json concrete mock providerId mismatch");
+}
+if (data.providerContracts[2].providerId !== "image-generation-mock-provider") {
+  throw new Error("json image mock providerId mismatch");
 }
 console.log("json providerContracts registration ok");
 EOF
@@ -17034,8 +17038,8 @@ const data = JSON.parse(
   ),
 );
 const summary = printPublicContractCatalogSummary(data);
-if (!summary.includes("Provider Contracts: 2")) {
-  throw new Error("CLI summary must include Provider Contracts: 2");
+if (!summary.includes("Provider Contracts: 3")) {
+  throw new Error("CLI summary must include Provider Contracts: 3");
 }
 console.log("cli provider contract count ok");
 EOF
@@ -17275,8 +17279,8 @@ import {
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("canonical provider catalog must include abstract and concrete mock");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("canonical provider catalog must include abstract and concrete mock providers");
 }
 const concrete = catalog.providerContracts.find(
   (entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID,
@@ -17284,8 +17288,8 @@ const concrete = catalog.providerContracts.find(
 if (!concrete) {
   throw new Error("concrete mock provider must be registered");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
-  throw new Error("provider contract definitions must include concrete mock");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 3) {
+  throw new Error("provider contract definitions must include concrete mock providers");
 }
 console.log("concrete mock provider catalog registration present ok");
 EOF
@@ -17704,8 +17708,8 @@ import {
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("catalog providerContracts must include abstract and concrete mock");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("catalog providerContracts must include abstract and concrete mock providers");
 }
 if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
   throw new Error("abstract authority entry must remain first definition");
@@ -17713,8 +17717,8 @@ if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-auth
 if (!catalog.providerContracts.some((entry) => entry.providerId === GOVERNED_MOCK_PROVIDER_ID)) {
   throw new Error("governed mock provider must be registered");
 }
-if (PROVIDER_CONTRACT_DEFINITIONS.length !== 2) {
-  throw new Error("provider contract definitions must include concrete mock");
+if (PROVIDER_CONTRACT_DEFINITIONS.length !== 3) {
+  throw new Error("provider contract definitions must include concrete mock providers");
 }
 console.log("public contract catalog includes governed mock registration post impl ok");
 EOF
@@ -17920,8 +17924,8 @@ import {
 } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("catalog providerContracts must include abstract and concrete mock");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("catalog providerContracts must include abstract and concrete mock providers");
 }
 if (catalog.providerContracts[0].providerId !== "provider-abstract-contract-authority") {
   throw new Error("abstract authority entry must remain");
@@ -18016,17 +18020,17 @@ grep -q "ADR-0017" README.md
 grep -q "Authorized" README.md
 pass "v1.75.0 mock provider catalog registration governance documented"
 
-echo "-- Test 946: canonical provider catalog contains exactly two entries --"
+echo "-- Test 946: canonical provider catalog contains exactly three entries --"
 node --input-type=module <<'EOF'
 import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts must contain exactly two entries");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("providerContracts must contain exactly three entries");
 }
-console.log("canonical provider catalog contains exactly two entries ok");
+console.log("canonical provider catalog contains exactly three entries ok");
 EOF
-pass "canonical provider catalog contains exactly two entries"
+pass "canonical provider catalog contains exactly three entries"
 
 echo "-- Test 947: abstract authority entry remains present --"
 node --input-type=module <<'EOF'
@@ -18432,7 +18436,7 @@ console.log("duplicate provider registration fails ok");
 EOF
 pass "duplicate provider registration fails"
 
-echo "-- Test 969: legacy normalization produces canonical two-entry definitions --"
+echo "-- Test 969: legacy normalization produces canonical three-entry definitions --"
 node --input-type=module <<'EOF'
 import {
   PROVIDER_CONTRACT_DEFINITIONS,
@@ -18448,14 +18452,14 @@ const normalized = normalizePublicContractCatalog(legacy);
 if (normalized.providerContracts.length !== PROVIDER_CONTRACT_DEFINITIONS.length) {
   throw new Error("legacy normalization providerContracts count mismatch");
 }
-if (normalized.providerContracts.length !== 2) {
-  throw new Error("legacy normalization must produce two provider entries");
+if (normalized.providerContracts.length !== 3) {
+  throw new Error("legacy normalization must produce three provider entries");
 }
-console.log("legacy normalization produces canonical two-entry definitions ok");
+console.log("legacy normalization produces canonical three-entry definitions ok");
 EOF
-pass "legacy normalization produces canonical two-entry definitions"
+pass "legacy normalization produces canonical three-entry definitions"
 
-echo "-- Test 970: generator produces canonical two-entry catalog --"
+echo "-- Test 970: generator produces canonical three-entry catalog --"
 node --input-type=module <<'EOF'
 import {
   GOVERNED_MOCK_PROVIDER_ID,
@@ -18465,15 +18469,19 @@ import {
 
 const catalog = buildPublicContractCatalog();
 const ids = catalog.providerContracts.map((entry) => entry.providerId);
-if (ids.length !== 2) {
-  throw new Error("generator must produce exactly two provider entries");
+if (ids.length !== 3) {
+  throw new Error("generator must produce exactly three provider entries");
 }
-if (ids[0] !== PROVIDER_ABSTRACT_AUTHORITY_ID || ids[1] !== GOVERNED_MOCK_PROVIDER_ID) {
+if (
+  ids[0] !== PROVIDER_ABSTRACT_AUTHORITY_ID ||
+  ids[1] !== GOVERNED_MOCK_PROVIDER_ID ||
+  ids[2] !== "image-generation-mock-provider"
+) {
   throw new Error("generator canonical provider ids mismatch");
 }
-console.log("generator produces canonical two-entry catalog ok");
+console.log("generator produces canonical three-entry catalog ok");
 EOF
-pass "generator produces canonical two-entry catalog"
+pass "generator produces canonical three-entry catalog"
 
 echo "-- Test 971: compliance validation passes canonical catalog --"
 node --input-type=module <<'EOF'
@@ -18484,8 +18492,8 @@ import {
 const result = buildPublicContractCatalogPipeline(null, {
   generatedAt: "2026-07-10T00:00:00.000Z",
 });
-if (!result.catalog || result.catalog.providerContracts.length !== 2) {
-  throw new Error("compliance pipeline must produce canonical two-entry catalog");
+if (!result.catalog || result.catalog.providerContracts.length !== 3) {
+  throw new Error("compliance pipeline must produce canonical three-entry catalog");
 }
 console.log("compliance validation passes canonical catalog ok");
 EOF
@@ -19056,17 +19064,17 @@ console.log("concrete mock provider full profile validation remains intact ok");
 EOF
 pass "concrete mock provider full profile validation remains intact"
 
-echo "-- Test 1008: canonical two entry provider catalog remains valid --"
+echo "-- Test 1008: canonical three entry provider catalog remains valid --"
 node --input-type=module <<'EOF'
 import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
 
 const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts must contain exactly two entries");
+if (catalog.providerContracts.length !== 3) {
+  throw new Error("providerContracts must contain exactly three entries");
 }
-console.log("canonical two entry provider catalog remains valid ok");
+console.log("canonical three entry provider catalog remains valid ok");
 EOF
-pass "canonical two entry provider catalog remains valid"
+pass "canonical three entry provider catalog remains valid"
 
 echo "-- Test 1009: unauthorized extra provider entries remain rejected --"
 node --input-type=module <<'EOF'
@@ -19516,7 +19524,7 @@ grep -q "v1.79.0" docs/architecture/NON_GOALS.md
 ! grep -q "v1.77.0）:\*\* Provider Production Readiness Review Entry" docs/architecture/NON_GOALS.md
 pass "documentation drift resolved"
 
-echo "-- Test 1073: public contract catalog remains valid provider contracts count 2 --"
+echo "-- Test 1073: public contract catalog remains valid provider contracts count 3 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -19525,12 +19533,12 @@ import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const catalog = buildPublicContractCatalog({ rootDir: PROJECT_ROOT });
-if (!Array.isArray(catalog.providerContracts) || catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts count must remain 2");
+if (!Array.isArray(catalog.providerContracts) || catalog.providerContracts.length !== 3) {
+  throw new Error("providerContracts count must remain 3");
 }
-console.log("providerContracts count 2 ok");
+console.log("providerContracts count 3 ok");
 EOF
-pass "public contract catalog remains valid provider contracts count 2"
+pass "public contract catalog remains valid provider contracts count 3"
 
 echo "-- Test 1074: v1.79.0 provider expansion entry governance release documented --"
 grep -q "Test 1058–1073" docs/VERSION.md
@@ -19655,7 +19663,7 @@ grep -q "Not authorized" docs/adr/ADR-0020-image-generation-mock-provider-expans
 grep -q "Catalog registration" docs/architecture/IMAGE_GENERATION_MOCK_PROVIDER_EXPANSION_ENTRY_REVIEW.md
 pass "catalog registration not authorized"
 
-echo "-- Test 1096: provider contracts remain 2 --"
+echo "-- Test 1096: provider contracts remain 3 --"
 grep -q "Provider Contracts" docs/adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md
 grep -Fq "**2**" docs/adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md
 node --input-type=module <<'EOF'
@@ -19666,12 +19674,12 @@ import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const catalog = buildPublicContractCatalog({ rootDir: PROJECT_ROOT });
-if (!Array.isArray(catalog.providerContracts) || catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts count must remain 2");
+if (!Array.isArray(catalog.providerContracts) || catalog.providerContracts.length !== 3) {
+  throw new Error("providerContracts count must remain 3");
 }
-console.log("providerContracts count 2 ok");
+console.log("providerContracts count 3 ok");
 EOF
-pass "provider contracts remain 2"
+pass "provider contracts remain 3"
 
 echo "-- Test 1097: catalog version remains 1.0 --"
 grep -q "catalogVersion" docs/adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md
@@ -20899,22 +20907,57 @@ pass "image_generation.js remains unchanged"
 
 echo "-- Test 1183: public contract catalog unchanged for image generation mock provider implementation --"
 node --input-type=module <<'EOF'
-import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+import fs from "node:fs";
 
-const catalog = buildPublicContractCatalog();
-if (catalog.catalogVersion !== "1.0") {
-  throw new Error("catalogVersion must remain 1.0");
+function extractVersionHistorySection(versionDoc, startMarker, endMarker) {
+  const historyHeading = "## バージョン履歴";
+  const historyStart = versionDoc.indexOf(historyHeading);
+  if (historyStart < 0) {
+    throw new Error(`missing history heading: ${historyHeading}`);
+  }
+  const historyDoc = versionDoc.slice(historyStart);
+  const startIndex = historyDoc.indexOf(startMarker);
+  if (startIndex < 0) {
+    throw new Error(`missing start marker: ${startMarker}`);
+  }
+  const endIndex = historyDoc.indexOf(endMarker, startIndex + startMarker.length);
+  if (endIndex < 0) {
+    throw new Error(`missing end marker: ${endMarker}`);
+  }
+  if (endIndex <= startIndex) {
+    throw new Error("invalid section order: end marker precedes start marker");
+  }
+  return historyDoc.slice(startIndex, endIndex);
 }
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts must remain 2");
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const section = extractVersionHistorySection(
+  versionDoc,
+  "### v1.82.0 で追加（Image Generation Mock Provider Implementation Release）",
+  "### v1.81.0 で追加（Image Generation Mock Provider Implementation Authorization Governance Release）",
+);
+
+for (const marker of [
+  "**1195 PASS**",
+  "Provider Contracts **2**",
+  "Catalog Registered",
+  "**NO**",
+  "`public_contract_catalog.js`",
+  "**Unchanged**",
+  "Catalog registration deferred",
+]) {
+  if (!section.includes(marker)) {
+    throw new Error(`missing marker in v1.82.0 historical section: ${marker}`);
+  }
 }
-if (
-  catalog.providerContracts.some(
-    (entry) => entry.providerId === "image-generation-mock-provider",
-  )
-) {
-  throw new Error("image-generation-mock-provider must not be catalog registered");
+
+if (section.includes("### v1.83.0 で追加")) {
+  throw new Error("v1.82.0 historical section must not include v1.83.0 markers");
 }
+if (section.includes("**1227 PASS**")) {
+  throw new Error("v1.82.0 historical section must not include v1.83.0 quality markers");
+}
+
 console.log("public contract catalog unchanged for image generation mock provider implementation ok");
 EOF
 pass "public contract catalog unchanged for image generation mock provider implementation"
@@ -21027,41 +21070,74 @@ console.log("image generation mock provider symbol scalar rejection ok");
 EOF
 pass "image generation mock provider symbol scalar rejection"
 
-echo "-- Test 1191: v1.83.0 current version metadata in VERSION.md --"
+echo "-- Test 1191: v1.83.0 historical version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
-const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
-const currentSection = versionDoc.split("## バージョン履歴")[0];
-
-if (!currentSection.includes("**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）")) {
-  throw new Error("current VERSION section must declare v1.83.0");
+function extractVersionHistorySection(versionDoc, startMarker, endMarker) {
+  const historyHeading = "## バージョン履歴";
+  const historyStart = versionDoc.indexOf(historyHeading);
+  if (historyStart < 0) {
+    throw new Error(`missing history heading: ${historyHeading}`);
+  }
+  const historyDoc = versionDoc.slice(historyStart);
+  const startIndex = historyDoc.indexOf(startMarker);
+  if (startIndex < 0) {
+    throw new Error(`missing start marker: ${startMarker}`);
+  }
+  const endIndex = historyDoc.indexOf(endMarker, startIndex + startMarker.length);
+  if (endIndex < 0) {
+    throw new Error(`missing end marker: ${endMarker}`);
+  }
+  if (endIndex <= startIndex) {
+    throw new Error("invalid section order: end marker precedes start marker");
+  }
+  return historyDoc.slice(startIndex, endIndex);
 }
 
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const section = extractVersionHistorySection(
+  versionDoc,
+  "### v1.83.0 で追加（Image Generation Mock Provider Catalog Registration Governance Release）",
+  "### v1.82.0 で追加（Image Generation Mock Provider Implementation Release）",
+);
+
 for (const marker of [
-  "**Implementation execution:** **Implemented**",
-  "**image-generation-mock-provider Catalog Registration Governance:** **Complete**",
-  "**image-generation-mock-provider Catalog Registration:** **Authorized / Not Started**",
-  "**Catalog Registered:** **NO**",
-  "**Review Entry Authorized:** **NO**",
-  "**Formally Assessed:** **NO**",
-  "**Bounded Production Ready:** **NO**",
-  "**Global Provider Production Ready:** **NO**",
+  "Image Catalog Registration Governance",
+  "**Complete**",
+  "Image Catalog Registration",
+  "**Authorized / Not Started**",
+  "Catalog Registered",
+  "**NO**",
   "Provider Contracts **2**",
   "catalogVersion **1.0**",
-  "**Architecture Maturity:** **Level 3.19**",
-  "image-generation-mock-provider",
-  "providerVersion **1.0.0**",
-  "capability **`image_generation`**",
+  "image-generation-mock-provider Implementation",
+  "**Implemented**",
+  "Review Entry Authorized",
+  "**NO**",
+  "Formally Assessed",
+  "**NO**",
+  "Bounded Production Ready",
+  "**NO**",
+  "Global Provider Production Ready",
+  "**Not Declared**",
+  "providerVersion: 1.0.0",
 ]) {
-  if (!currentSection.includes(marker)) {
-    throw new Error(`current VERSION section missing marker: ${marker}`);
+  if (!section.includes(marker)) {
+    throw new Error(`missing marker in v1.83.0 historical section: ${marker}`);
   }
 }
 
-console.log("v1.83.0 current version metadata ok");
+if (section.includes("### v1.82.0 で追加")) {
+  throw new Error("v1.83.0 historical section must not include v1.82.0 release block");
+}
+if (section.includes("**Catalog Registered:** **YES**")) {
+  throw new Error("v1.83.0 historical section must not claim catalog registered yes");
+}
+
+console.log("v1.83.0 historical version metadata ok");
 EOF
-pass "v1.83.0 current version metadata in VERSION.md"
+pass "v1.83.0 historical version metadata in VERSION.md"
 
 echo "-- Test 1192: v1.82.0 CHANGELOG entry documented --"
 grep -q "## v1.82.0 — Image Generation Mock Provider Implementation Release" docs/CHANGELOG.md
@@ -21240,19 +21316,61 @@ pass "production readiness states remain no image provider"
 
 echo "-- Test 1214: provider contracts remains two post image catalog governance --"
 node --input-type=module <<'EOF'
-import { buildPublicContractCatalog } from "./src/lib/public_contract_catalog.js";
+import fs from "node:fs";
 
-const catalog = buildPublicContractCatalog();
-if (catalog.providerContracts.length !== 2) {
-  throw new Error("providerContracts must remain 2");
+function extractVersionHistorySection(versionDoc, startMarker, endMarker) {
+  const historyHeading = "## バージョン履歴";
+  const historyStart = versionDoc.indexOf(historyHeading);
+  if (historyStart < 0) {
+    throw new Error(`missing history heading: ${historyHeading}`);
+  }
+  const historyDoc = versionDoc.slice(historyStart);
+  const startIndex = historyDoc.indexOf(startMarker);
+  if (startIndex < 0) {
+    throw new Error(`missing start marker: ${startMarker}`);
+  }
+  const endIndex = historyDoc.indexOf(endMarker, startIndex + startMarker.length);
+  if (endIndex < 0) {
+    throw new Error(`missing end marker: ${endMarker}`);
+  }
+  if (endIndex <= startIndex) {
+    throw new Error("invalid section order: end marker precedes start marker");
+  }
+  return historyDoc.slice(startIndex, endIndex);
 }
-if (
-  catalog.providerContracts.some(
-    (entry) => entry.providerId === "image-generation-mock-provider",
-  )
-) {
-  throw new Error("image-generation-mock-provider must not be registered");
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const section = extractVersionHistorySection(
+  versionDoc,
+  "### v1.83.0 で追加（Image Generation Mock Provider Catalog Registration Governance Release）",
+  "### v1.82.0 で追加（Image Generation Mock Provider Implementation Release）",
+);
+
+for (const marker of [
+  "**1227 PASS**",
+  "Provider Contracts **2**",
+  "Catalog Registered",
+  "**NO**",
+  "Image Catalog Registration",
+  "**Authorized / Not Started**",
+  "`public_contract_catalog.js`",
+  "**Unchanged**",
+  "Image Catalog Registration Governance",
+  "**Complete**",
+  "Catalog registration authorized but not executed",
+]) {
+  if (!section.includes(marker)) {
+    throw new Error(`missing marker in v1.83.0 historical section: ${marker}`);
+  }
 }
+
+if (section.includes("### v1.82.0 で追加")) {
+  throw new Error("v1.83.0 historical section must not include v1.82.0 release block");
+}
+if (section.includes("**1195 PASS**")) {
+  throw new Error("v1.83.0 historical section must not include v1.82.0 quality markers");
+}
+
 console.log("provider contracts remains two post image catalog governance ok");
 EOF
 pass "provider contracts remains two post image catalog governance"
@@ -21368,7 +21486,8 @@ grep -q "Closed-world multi-mock validator policy defined" docs/architecture/ARC
 pass "compliance checklist image catalog registration governance section"
 
 echo "-- Test 1224: architecture maturity level 3.19 sub release image catalog governance --"
-grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -Fq "Image Generation Mock Provider Catalog Registration Governance Release | **Completed**（v1.83.0）" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
+grep -Fq "Image Generation Mock Provider Catalog Registration Implementation Release | **Completed**（v1.84.0）" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
 grep -q "Image Generation Mock Provider Catalog Registration Governance Release" docs/architecture/ARCHITECTURE_MATURITY_MODEL.md
 pass "architecture maturity level 3.19 sub release image catalog governance"
 
@@ -21395,6 +21514,157 @@ grep -Fq "### Image Generation Mock Provider Catalog Registration Governance Rel
 grep -Fq "**Current Version: v1.83.0**" README.md
 grep -q "Authorized" README.md
 pass "v1.83.0 image catalog registration governance documented"
+
+echo "-- Test 1228: image concrete mock provider governed profile exact match --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const image = catalog.providerContracts.find(
+  (entry) => entry.providerId === "image-generation-mock-provider",
+);
+if (!image) {
+  throw new Error("image-generation-mock-provider entry missing");
+}
+const expected = {
+  providerId: "image-generation-mock-provider",
+  providerVersion: "1.0.0",
+  providerType: "mock",
+  layer: "provider",
+  registrationKind: "concrete-mock-provider-implementation",
+  status: "catalog-registered",
+  authorityDocument: "docs/architecture/PROVIDER_LAYER_DESIGN.md",
+  inputContractRef: "application-public-contract",
+  outputContractRef: "normalized-provider-output",
+  errorContractRef: "provider-error-contract",
+  capabilityDeclaration: "image_generation",
+  implementationModule: "src/lib/image_generation_mock_provider.js",
+  implementationStatus: "implemented",
+};
+for (const [field, value] of Object.entries(expected)) {
+  if (image[field] !== value) {
+    throw new Error(`image governed profile mismatch for ${field}: ${image[field]}`);
+  }
+}
+const validation = validatePublicContractCatalog(catalog);
+if (!validation.valid) {
+  throw new Error(`canonical catalog rejected: ${validation.errors.join("; ")}`);
+}
+console.log("image concrete mock provider governed profile exact match ok");
+EOF
+pass "image concrete mock provider governed profile exact match"
+
+echo "-- Test 1229: missing image canonical entry fails validation --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+catalog.providerContracts = catalog.providerContracts.filter(
+  (entry) => entry.providerId !== "image-generation-mock-provider",
+);
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("missing image canonical entry must fail validation");
+}
+if (
+  !validation.errors.some((error) =>
+    error.includes("missing canonical entry: image-generation-mock-provider"),
+  )
+) {
+  throw new Error(`expected missing canonical image error: ${validation.errors.join("; ")}`);
+}
+console.log("missing image canonical entry fails validation ok");
+EOF
+pass "missing image canonical entry fails validation"
+
+echo "-- Test 1230: image concrete profile mutation rejected --"
+node --input-type=module <<'EOF'
+import {
+  buildPublicContractCatalog,
+  validatePublicContractCatalog,
+} from "./src/lib/public_contract_catalog.js";
+
+const catalog = buildPublicContractCatalog();
+const imageIndex = catalog.providerContracts.findIndex(
+  (entry) => entry.providerId === "image-generation-mock-provider",
+);
+catalog.providerContracts[imageIndex] = {
+  ...catalog.providerContracts[imageIndex],
+  providerVersion: "1.0",
+};
+const validation = validatePublicContractCatalog(catalog);
+if (validation.valid) {
+  throw new Error("image profile mutation must fail validation");
+}
+if (
+  !validation.errors.some((error) =>
+    error.includes("governed concrete Mock Provider providerVersion must be"),
+  )
+) {
+  throw new Error(`expected image providerVersion mismatch error: ${validation.errors.join("; ")}`);
+}
+console.log("image concrete profile mutation rejected ok");
+EOF
+pass "image concrete profile mutation rejected"
+
+echo "-- Test 1231: v1.84.0 catalog registration implementation release documented --"
+grep -Fq "**1232 PASS**" docs/VERSION.md
+grep -q "Test 1228–1232" docs/VERSION.md
+grep -q "v1.84.0" docs/CHANGELOG.md
+grep -q "ADR-0022" docs/CHANGELOG.md
+grep -Fq "### Image Generation Mock Provider Catalog Registration Implementation Release（v1.84.0）" README.md
+grep -Fq "**Current Version: v1.84.0**" README.md
+grep -q "Registered" README.md
+pass "v1.84.0 catalog registration implementation release documented"
+
+echo "-- Test 1232: v1.84.0 current version metadata in VERSION.md --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
+const currentSection = versionDoc.split("## バージョン履歴")[0];
+
+if (
+  !currentSection.includes(
+    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
+  )
+) {
+  throw new Error("current VERSION section must declare v1.84.0");
+}
+
+for (const marker of [
+  "**Implementation execution:** **Implemented**",
+  "**image-generation-mock-provider Catalog Registration Governance:** **Complete**",
+  "**image-generation-mock-provider Catalog Registration:** **Registered**",
+  "**Catalog Registered:** **YES**",
+  "**Review Entry Authorized:** **NO**",
+  "**Formally Assessed:** **NO**",
+  "**Bounded Production Ready:** **NO**",
+  "**Global Provider Production Ready:** **NO**",
+  "Provider Contracts **3**",
+  "catalogVersion **1.0**",
+  "**Architecture Maturity:** **Level 3.19**",
+  "providerVersion **1.0.0**",
+  "capability **`image_generation`**",
+]) {
+  if (!currentSection.includes(marker)) {
+    throw new Error(`current VERSION section missing marker: ${marker}`);
+  }
+}
+
+if (currentSection.includes("**Catalog Registered:** **NO**")) {
+  throw new Error("current VERSION section must not declare catalog registered no");
+}
+
+console.log("v1.84.0 current version metadata ok");
+EOF
+pass "v1.84.0 current version metadata in VERSION.md"
 
 
 echo ""

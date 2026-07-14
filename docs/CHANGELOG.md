@@ -8,6 +8,41 @@
 
 ---
 
+## v1.84.0 — Image Generation Mock Provider Catalog Registration Implementation Release
+
+Image Generation Mock Provider Catalog Registration Implementation Release — ADR-0022 G12 strict minimum — concrete `image-generation-mock-provider` registered in `providerContracts[]` — closed-world two-ID validator implemented — abstract authority and text mock entry preserved — `providerVersion: 1.0.0` fidelity preserved。
+
+`src/lib/image_generation_mock_provider.js` / `src/lib/mock_provider.js` は変更なし。Real Provider / external IO **Prohibited** maintained。Catalog Registered **does not imply** Provider Production Ready。
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Catalog module | `src/lib/public_contract_catalog.js` |
+| Concrete registration | `image-generation-mock-provider` / `1.0.0` / `mock` / `image_generation` |
+| registrationKind | `concrete-mock-provider-implementation` |
+| implementationModule | `src/lib/image_generation_mock_provider.js` |
+| Canonical `providerContracts[]` | **3 entries**（abstract + text mock + image mock） |
+| Closed-world validator | two governed concrete mock IDs only |
+| Image Catalog Registration Implementation | **Implemented** |
+| Image Catalog Registration | **Registered** |
+| Catalog Registered | **YES** |
+| Provider Contracts | **3** |
+| catalogVersion | **1.0**（unchanged） |
+| Provider Production Ready | **Not Declared** |
+| Current Maturity | **Level 3.19** |
+| Test 1228–1232 | Image Generation Mock Provider Catalog Registration Implementation |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1232 PASS** |
+| npm test | **PASS** |
+| Public Contract Catalog | **PASS** |
+
+---
+
 ## v1.83.0 — Image Generation Mock Provider Catalog Registration Governance Release
 
 Image Generation Mock Provider Catalog Registration Governance Release — ADR-0021 catalog deferral closure — ADR-0017 pattern applied — concrete registration policy defined for `image-generation-mock-provider` — closed-world multi-mock validator policy defined — identity mapping defined — catalog registration **Authorized / Not Started**。

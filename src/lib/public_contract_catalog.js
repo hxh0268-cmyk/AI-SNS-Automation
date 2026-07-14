@@ -433,6 +433,27 @@ export const GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND =
 
 export const GOVERNED_MOCK_PROVIDER_IMPLEMENTATION_MODULE = "src/lib/mock_provider.js";
 
+const GOVERNED_IMAGE_MOCK_PROVIDER_ID = "image-generation-mock-provider";
+
+const GOVERNED_IMAGE_MOCK_PROVIDER_IMPLEMENTATION_MODULE =
+  "src/lib/image_generation_mock_provider.js";
+
+const GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE = {
+  providerId: GOVERNED_IMAGE_MOCK_PROVIDER_ID,
+  providerVersion: "1.0.0",
+  providerType: "mock",
+  layer: "provider",
+  registrationKind: GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND,
+  status: "catalog-registered",
+  authorityDocument: PROVIDER_CONTRACT_AUTHORITY_DOCUMENT,
+  inputContractRef: "application-public-contract",
+  outputContractRef: "normalized-provider-output",
+  errorContractRef: "provider-error-contract",
+  capabilityDeclaration: "image_generation",
+  implementationModule: GOVERNED_IMAGE_MOCK_PROVIDER_IMPLEMENTATION_MODULE,
+  implementationStatus: "implemented",
+};
+
 export const GOVERNED_ABSTRACT_AUTHORITY_SCOPE = {
   providerId: PROVIDER_ABSTRACT_AUTHORITY_ID,
   providerVersion: "1.0",
@@ -469,6 +490,11 @@ export const GOVERNED_MOCK_PROVIDER_SCOPE = {
   implementationModule: GOVERNED_MOCK_PROVIDER_IMPLEMENTATION_MODULE,
   implementationStatus: "implemented",
 };
+
+const GOVERNED_CONCRETE_MOCK_PROVIDER_SCOPES = Object.freeze({
+  [GOVERNED_MOCK_PROVIDER_ID]: GOVERNED_MOCK_PROVIDER_SCOPE,
+  [GOVERNED_IMAGE_MOCK_PROVIDER_ID]: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE,
+});
 
 export const PROVIDER_FORBIDDEN_REGISTRATION_IDS = [
   "mock-provider",
@@ -537,13 +563,28 @@ export const PROVIDER_CONTRACT_DEFINITIONS = [
     implementationModule: GOVERNED_MOCK_PROVIDER_SCOPE.implementationModule,
     implementationStatus: GOVERNED_MOCK_PROVIDER_SCOPE.implementationStatus,
   },
+  {
+    providerId: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.providerId,
+    providerVersion: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.providerVersion,
+    providerType: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.providerType,
+    layer: "provider",
+    registrationKind: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.registrationKind,
+    status: "catalog-registered",
+    authorityDocument: PROVIDER_CONTRACT_AUTHORITY_DOCUMENT,
+    inputContractRef: "application-public-contract",
+    outputContractRef: "normalized-provider-output",
+    errorContractRef: "provider-error-contract",
+    capabilityDeclaration: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.capabilityDeclaration,
+    implementationModule: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.implementationModule,
+    implementationStatus: GOVERNED_IMAGE_MOCK_PROVIDER_SCOPE.implementationStatus,
+  },
 ];
 
 export const EXTENSION_WARNINGS = [
   {
     id: "provider-mock-catalog-registered",
     warning:
-      "providerContracts[] registers Provider abstract contract authority and governed concrete Mock Provider implementation only — no Real/SNS/OpenAI/Gemini/Nano Banana/External API/Adapter implementation entries",
+      "providerContracts[] registers Provider abstract contract authority and governed concrete Mock Provider implementations only — no Real/SNS/OpenAI/Gemini/Nano Banana/External API/Adapter implementation entries",
   },
   {
     id: "provider-real-not-implemented",
@@ -627,7 +668,7 @@ export function buildPublicContractCatalog(options = {}) {
       "Future Provider, Adapter, Runtime, and external SNS integrations must consume Public Contract extractors only and update this catalog before release.",
       "Breaking Public Contract changes require a major version bump and staged deprecation before removal.",
       "providerContracts[] is additive — Application publicContracts[] and compatibilityMatrix semantics remain unchanged per ADR-0011 and ADR-0012.",
-      "providerContracts[] registers Provider abstract contract authority and governed concrete Mock Provider implementation from PROVIDER_LAYER_DESIGN.md — Real Provider implementations remain prohibited.",
+      "providerContracts[] registers Provider abstract contract authority and governed concrete Mock Provider implementations from PROVIDER_LAYER_DESIGN.md — Real Provider implementations remain prohibited.",
     ],
   };
 }
@@ -637,7 +678,7 @@ export function buildPublicContractCatalog(options = {}) {
  * @returns {boolean}
  */
 export function isGovernedMockProviderId(providerId) {
-  return providerId === GOVERNED_MOCK_PROVIDER_ID;
+  return Object.hasOwn(GOVERNED_CONCRETE_MOCK_PROVIDER_SCOPES, providerId);
 }
 
 /**
@@ -704,10 +745,22 @@ export function collectGovernedConcreteMockProviderScopeErrors(entry, index) {
     return errors;
   }
 
-  for (const [field, expected] of Object.entries(GOVERNED_MOCK_PROVIDER_SCOPE)) {
-    if (entry[field] !== expected) {
+  const providerId = typeof entry.providerId === "string" ? entry.providerId : "";
+  const scope = Object.hasOwn(GOVERNED_CONCRETE_MOCK_PROVIDER_SCOPES, providerId)
+    ? GOVERNED_CONCRETE_MOCK_PROVIDER_SCOPES[providerId]
+    : null;
+
+  if (!scope) {
+    errors.push(
+      `providerContracts[${index}] governed concrete Mock Provider scope unresolved for providerId: ${providerId}`,
+    );
+    return errors;
+  }
+
+  for (const [field, expected] of Object.entries(scope)) {
+    if (!governedProviderProfileValuesEqual(entry[field], expected)) {
       errors.push(
-        `providerContracts[${index}] governed concrete Mock Provider ${field} must be ${expected}`,
+        `providerContracts[${index}] governed concrete Mock Provider ${field} must be ${JSON.stringify(expected)}`,
       );
     }
   }
@@ -775,7 +828,7 @@ export function collectProviderContractEntryErrors(entry, index) {
     errors.push(...collectGovernedConcreteMockProviderScopeErrors(entry, index));
   } else if (registrationKind === GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND) {
     errors.push(
-      `providerContracts[${index}] registrationKind ${GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND} is only allowed for ${GOVERNED_MOCK_PROVIDER_ID}`,
+      `providerContracts[${index}] registrationKind ${GOVERNED_MOCK_PROVIDER_REGISTRATION_KIND} is only allowed for ${Object.keys(GOVERNED_CONCRETE_MOCK_PROVIDER_SCOPES).join(", ")}`,
     );
   } else if (registrationKind && registrationKind !== PROVIDER_ABSTRACT_REGISTRATION_KIND) {
     errors.push(

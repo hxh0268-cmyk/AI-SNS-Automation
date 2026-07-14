@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registration Governance Release Complete
+Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registration Implementation Release Complete
 ```
 
 | 観点 | 状態 |
@@ -231,6 +231,7 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registra
 | Level 3.19 Image Generation Mock Provider Implementation Authorization Release | **Completed**（v1.81.0） |
 | Level 3.19 Image Generation Mock Provider Implementation Release | **Completed**（v1.82.0） |
 | Level 3.19 Image Generation Mock Provider Catalog Registration Governance Release | **Completed**（v1.83.0） |
+| Level 3.19 Image Generation Mock Provider Catalog Registration Implementation Release | **Completed**（v1.84.0） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
@@ -249,8 +250,8 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registra
 | **Implementation Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.81.0 ADR-0021） |
 | **Implementation execution** | **Implemented**（v1.82.0 — `src/lib/image_generation_mock_provider.js`） |
 | **Image Catalog Registration Governance** | **Complete**（v1.83.0 — ADR-0022） |
-| **Image Catalog Registration** | **Authorized / Not Started** |
-| **Catalog Registered（image provider）** | **NO** |
+| **Image Catalog Registration** | **Registered**（v1.84.0 — ADR-0022 G12） |
+| **Catalog Registered（image provider）** | **YES** |
 | **Provider Production Ready** | **Not Declared**（global） |
 | Level 5 Production Ready | **Not reached** |
 | Level 6 Operational Excellence | **Not reached** |
@@ -282,16 +283,26 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registra
 ## Current Limitations
 
 - Level 4 Implementation Ready **Provider domain Declared**; repository-wide **Not Declared**
-- `providerContracts[]` **registered**（abstract authority + governed concrete Mock Provider — v1.76.0）; Real Provider **not registered**
-- Mock Provider Catalog Registration **Registered**（v1.76.0）
-- Provider Production Readiness Assessment **Complete** — Formal Decision **READY**（v1.78.0 — bounded scope）
+- `providerContracts[]` **registered**（abstract authority + text-generation-mock-provider — v1.76.0 + image-generation-mock-provider — v1.84.0）; Real Provider **not registered**
+- Mock Provider Catalog Registration **Registered**（text — v1.76.0; image — v1.84.0）
+- Provider Production Readiness Assessment **Complete** — Formal Decision **READY**（v1.78.0 — bounded text mock scope only）
 - Provider Expansion Entry Governance **Established**（v1.79.0 — ADR-0019）
-- `image-generation-mock-provider` Expansion Entry **Authorized**（bounded — v1.80.0 — ADR-0020）; Implementation Authorization **Granted**（bounded — v1.81.0 — ADR-0021）; implementation execution **Not Started**
+- `image-generation-mock-provider` Expansion Entry **Authorized**（bounded — v1.80.0 — ADR-0020）; Implementation Authorization **Granted**（bounded — v1.81.0 — ADR-0021）; Implementation **Implemented**（v1.82.0）; Catalog Registration Governance **Complete**（v1.83.0）; Catalog Registration **Registered**（v1.84.0）
+- Architecture Maturity numeric level remains **Level 3.19**（sub-release label only）
+- **Review Entry Authorized:** **NO**（image provider）
+- **Formally Assessed:** **NO**（image provider）
+- **Bounded Production Ready:** **NO**
+- **Global Provider Production Ready:** **Not Declared**
+- Catalog Registered **does not imply** Provider Production Ready
+- Human Approval Gate remains **mandatory**（`humanApprovalGateBypass: false`）
+- Real Provider / external IO **prohibited**
+- Automatic SNS publishing **prohibited**
 - Retry / Recovery / cross-layer idempotency **deferred** — ADR required before implementation
-- Provider / Runtime / Scheduler / SNS API **未実装** — Provider Non-Goals partial release（Mock gate only）; **Production Not Started**
+- Provider / Runtime / Scheduler / SNS API **未実装** — Provider Non-Goals partial release（Mock gate only）; **Production Not Started**（Real Provider scope）
 - Real Metrics / Real Automation **未実装**
 - Production / Operational 条件 **未達**
 - PASS 数増加のみでは Level 4 以上に進めない
+- Further advancement requires a separate authorized phase — not automatically granted by catalog registration
 
 ---
 

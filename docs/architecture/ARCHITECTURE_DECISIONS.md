@@ -411,4 +411,23 @@ Full record: [IMAGE_GENERATION_MOCK_PROVIDER_IMPLEMENTATION_AUTHORIZATION_REVIEW
 
 Full record: [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) + [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md)
 
+### Post–ADR-0022 — Image Generation Mock Provider Catalog Registration Implementation（v1.84.0）
+
+| Item | Decision |
+|------|----------|
+| **Release** | v1.84.0 — Image Generation Mock Provider Catalog Registration Implementation Release |
+| **ADR** | [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) |
+| **Candidate** | `image-generation-mock-provider` / `1.0.0` / `image_generation` |
+| **Catalog Registration Governance** | **Complete** |
+| **Catalog Registration** | **Registered** |
+| **Catalog Registered** | **YES** |
+| **Closed-world two-ID validator** | **Implemented** |
+| **Maturity** | **Level 3.19**（unchanged — sub-release label） |
+| **Bounded text mock READY** | **Preserved** |
+| **Provider Production Ready（global）** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Consequences** | Image provider catalog JSON traceability implemented; provider modules / IO / Production Ready remain prohibited |
+
+Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — G12 implementation in `src/lib/public_contract_catalog.js`
+
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。

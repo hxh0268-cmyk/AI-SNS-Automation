@@ -2,13 +2,13 @@
 
 ## 現在のバージョン
 
-**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）
+**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Image Generation Mock Provider Catalog Registration Governance Release Complete
+**Phase:** Image Generation Mock Provider Catalog Registration Implementation Release Complete
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -54,7 +54,7 @@
 
 **image-generation-mock-provider Catalog Registration Governance:** **Complete**（v1.83.0 — [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](architecture/IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md)）
 
-**image-generation-mock-provider Catalog Registration:** **Authorized / Not Started**（ADR-0022）
+**image-generation-mock-provider Catalog Registration:** **Registered**（ADR-0022 — v1.84.0）
 
 **Provider Identity:** `image-generation-mock-provider` / providerVersion **1.0.0** / capability **`image_generation`**
 
@@ -62,7 +62,7 @@
 
 **Implementation execution:** **Implemented**
 
-**Catalog Registered:** **NO**（`image-generation-mock-provider` not in `providerContracts[]`）
+**Catalog Registered:** **YES**（`image-generation-mock-provider` in `providerContracts[]`）
 
 **Review Entry Authorized:** **NO**
 
@@ -72,7 +72,7 @@
 
 **Global Provider Production Ready:** **NO**
 
-**Public Contract Catalog:** **PASS** — catalogVersion **1.0** — Provider Contracts **2**（unchanged）
+**Public Contract Catalog:** **PASS** — catalogVersion **1.0** — Provider Contracts **3**
 
 **Architecture Maturity:** **Level 3.19**（unchanged）
 
@@ -88,7 +88,7 @@
 
 **Human Approval Gate:** **Preserved**（`humanApprovalGateBypass: false`）
 
-**Next Phase Candidate:** Human Review / **v1.84.0 Image Generation Mock Provider Catalog Registration Implementation** per Governance Flow
+**Next Phase Candidate:** Human Review / **v1.85.0** per Governance Flow
 
 ---
 
@@ -96,7 +96,8 @@
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.83.0** | **ドキュメント** | **🔄 候補** | **Image Generation Mock Provider Catalog Registration Governance — ADR-0022 / bounded registration policy / closed-world multi-mock validator policy** |
+| **v1.84.0** | **機能追加** | **✅ 完了** | **Image Generation Mock Provider Catalog Registration — ADR-0022 G12 — `image-generation-mock-provider` registered in `providerContracts[]`** |
+| **v1.83.0** | **ドキュメント** | **✅ 完了** | **Image Generation Mock Provider Catalog Registration Governance — ADR-0022 / bounded registration policy / closed-world multi-mock validator policy** |
 | **v1.82.0** | **機能追加** | **✅ 完了** | **Image Generation Mock Provider Implementation — `image_generation` / deterministic / in-memory / no external IO** |
 | **v1.81.0** | **ドキュメント** | **✅ 完了** | **Image Generation Mock Provider Implementation Authorization — ADR-0021 DECISION H / bounded Implementation Authorization Granted** |
 | **v1.80.0** | **ドキュメント** | **✅ 完了** | **Image Generation Mock Provider Expansion Entry Decision — ADR-0020 DECISION G / bounded Expansion Entry Authorized** |
@@ -225,6 +226,64 @@
 | Concrete catalog registration not executed | ✅ |
 | **945 PASS** | ✅ |
 | Test 918–945 | ✅ |
+
+---
+
+---
+
+### v1.84.0 で追加（Image Generation Mock Provider Catalog Registration Implementation Release）
+
+#### Image Generation Mock Provider Catalog Registration Implementation 正式記録
+
+- **`src/lib/public_contract_catalog.js`** … governed image Mock Provider catalog registration per ADR-0022 G12
+- **Canonical `providerContracts[]`** … **3 entries**（`provider-abstract-contract-authority` + `text-generation-mock-provider` + `image-generation-mock-provider`）
+- **registrationKind** … `concrete-mock-provider-implementation`（two governed concrete mock entries only）
+- **`providerVersion: 1.0.0`** … intentional implementation fidelity — **not** normalized to text mock `"1.0"`
+- **Closed-world two-ID validator** … `text-generation-mock-provider` + `image-generation-mock-provider` only
+- **Image Catalog Registration Implementation** … **Implemented**
+- **Image Catalog Registration** … **Registered**
+- **Catalog Registered** … **YES**
+- **Review Entry Authorized** … **NO**
+- **Formally Assessed** … **NO**
+- **Bounded Production Ready** … **NO**
+- **Global Provider Production Ready** … **Not Declared**
+- **`image_generation_mock_provider.js`** … **Unchanged**
+- **`mock_provider.js`** … **Unchanged**
+- **Application `publicContracts[]` / `compatibilityMatrix`** … **Unchanged**
+
+### 品質状況（v1.84.0 最新）
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1232 PASS** |
+| Architecture Documents | **49** 必須文書 |
+| Catalog generator / reports | **updated**（canonical 3-entry provider catalog） |
+| Current Maturity | **Level 3.19** — Image Generation Mock Provider Catalog Registration Implementation Release Complete |
+| image-generation-mock-provider Implementation | **Implemented** |
+| Image Catalog Registration Governance | **Complete** |
+| Image Catalog Registration | **Registered** |
+| Catalog Registered | **YES** |
+| npm test | **PASS** |
+| Public Contract Catalog | **PASS** |
+| Test 1228–1232 | Image Generation Mock Provider Catalog Registration Implementation |
+
+### v1.84.0 完成判定
+
+| 項目 | 状態 |
+|------|------|
+| ADR-0022 G12 bounded scope respected | ✅ |
+| Closed-world two-ID validator implemented | ✅ |
+| Image governed profile exact match | ✅ |
+| `providerVersion: 1.0.0` fidelity preserved | ✅ |
+| Abstract authority preserved | ✅ |
+| Text mock entry preserved | ✅ |
+| Application contracts unchanged | ✅ |
+| compatibilityMatrix unchanged | ✅ |
+| Provider modules unchanged | ✅ |
+| Production Readiness states unchanged | ✅ |
+| Human Approval Gate preserved | ✅ |
+| **1232 PASS** | ✅ |
+| Test 1228–1232 | ✅ |
 
 ---
 
