@@ -40,9 +40,9 @@
 
 **PPRR-F001 Remediation:** **Complete**（DECISION B/C — `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` validator）
 
-**Provider Production Readiness Assessment:** **Complete** — Formal Decision **READY**（bounded canonical Mock Provider scope）
+**Provider Production Readiness Assessment:** **Complete** — Assessment Decision **READY**（bounded canonical Mock Provider scope）
 
-**ChatGPT Final Decision Review:** **Accepted**（DECISION D）
+**Assessment Acceptance:** **Accepted**（DECISION D）
 
 **Provider Expansion Entry Governance:** **Established**（v1.79.0 — ADR-0019 / [PROVIDER_EXPANSION_ENTRY_REVIEW.md](architecture/PROVIDER_EXPANSION_ENTRY_REVIEW.md)）
 

@@ -22,14 +22,36 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 ---
 
-## Current Baseline
+## Current Repository Baseline
 
 | Item | Value |
 |------|-------|
+| **Version** | **v1.84.0** |
+| **Commit** | `26b57d7db6cab74f8f642bc22ad466c2c339811f` |
+| **Release State** | Image Generation Mock Provider Catalog Registration Implementation complete |
+| **Provider Contracts** | **3** |
+| **Catalog Version** | `1.0` |
+| **Text Generation Mock Provider** | **Implemented / Registered** |
+| **Image Generation Mock Provider** | **Implemented / Registered** |
+| **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
+| **Bounded Production Ready Declaration** | **Not yet recorded in repository SSOT** — separate declaration finalization required |
+| **Global Provider Production Ready** | **Not Declared** |
+| **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
+| **Real Provider / External IO** | **Prohibited / Not Started** |
+| **Automatic SNS Publishing** | **Prohibited** |
+
+The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
+
+## Historical Review Entry Baseline
+
+The formal Provider Production Readiness Review entered governance using the following v1.76.0 baseline. These values are retained as historical review-entry evidence and must not be interpreted as the current repository state.
+
+| Item | Historical Value |
+|------|------------------|
 | **Version** | v1.76.0 |
 | **Commit** | `ff3391721608063f0e381eb8c93677dd1997a2cc` |
 | **Quality Pipeline** | **980 PASS** |
-| **Current Maturity** | **Level 3.17** — Mock Provider Catalog Registration Implementation Release Complete |
+| **Architecture Maturity** | **Level 3.17** — Mock Provider Catalog Registration Implementation Release Complete |
 | **Mock Provider Production Implementation** | **Implemented**（v1.74.0） |
 | **Mock Provider Catalog Registration** | **Registered**（v1.76.0） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |
@@ -94,24 +116,71 @@ Review entry は governance framework の確立と evidence collection の開始
 
 | State | Meaning |
 |-------|---------|
-| **Governed** | Policy / scope / criteria documented in ADR or review artifact |
-| **Authorized** | Future work explicitly permitted by governance decision |
-| **Implemented** | Production module exists within authorized scope |
-| **Registered** | Catalog JSON traceability exists for governed identity |
-| **Review Entry Authorized** | Formal readiness review may begin — framework established |
-| **Production Readiness Assessed** | Evidence mapped and criteria evaluated — decision recorded |
-| **Production Ready** | Formal declaration that Provider domain meets production boundary — **Not Declared** |
+| **Governed** | Policy, scope, criteria, and authority are documented in an ADR or formal review artifact |
+| **Authorized** | Work within an explicitly defined boundary is permitted by a governance decision |
+| **Implemented** | A production module exists within its authorized implementation boundary |
+| **Registered** | Governed identity and traceability exist in canonical catalog JSON |
+| **Review Entry Authorized** | Formal Production Readiness evidence collection and assessment may begin |
+| **Production Readiness Assessed** | Evidence has been mapped, criteria evaluated, and a formal assessment decision recorded |
+| **Production Ready** | A separate declaration has been issued after an eligible assessment decision and explicit declaration authorization |
 
-**Distinctions (mandatory):**
+`Production Ready` is a declaration state. It is not created automatically by implementation, registration, review entry, assessment completion, or a `READY` assessment decision.
+
+## Assessment Decision Model
+
+A completed Production Readiness assessment records exactly one decision from the following vocabulary:
+
+| Decision | Meaning |
+|----------|---------|
+| **READY** | The assessed scope satisfies all applicable readiness criteria and is eligible for a separate declaration review |
+| **READY WITH CONDITIONS** | The assessed scope is eligible only while explicit, enforceable conditions remain satisfied |
+| **DEFERRED** | Evidence or remediation is insufficient to proceed to declaration review |
+| **NOT READY** | Material non-conformance prevents declaration eligibility |
+
+Assessment decisions are evidence conclusions. They are not lifecycle states and are not Production Ready declarations.
+
+```text
+Production Readiness Assessed
+≠ Assessment Decision
+≠ Production Ready Declaration
+```
+
+## Declaration Scope Model
+
+A Production Ready declaration requires all of the following:
+
+1. A completed formal Production Readiness assessment
+2. An assessment decision eligible for declaration
+3. Separate declaration authorization
+4. An explicitly identified declaration subject and scope
+5. Synchronized repository authority, version, risk, maturity, compliance, and quality evidence
+
+A Production Ready declaration uses one of the following scopes:
+
+| Declaration Scope | Meaning |
+|-------------------|---------|
+| **Bounded Production Ready** | Production Ready is declared only for an explicitly named Provider identity, capability, implementation, execution model, exclusions, and reopening conditions |
+| **Global Production Ready** | Production Ready is declared for the complete governed Provider domain covered by the declaration authority |
+
+A bounded declaration does not authorize scope expansion. Anything outside the declared boundary remains governed by its prior state.
+
+`Repository-wide Level 4 Implementation Ready` is a separate architecture-maturity declaration and is not a Production Ready declaration scope.
+
+## Mandatory State and Scope Distinctions
 
 ```text
 Governed ≠ Authorized
 Authorized ≠ Implemented
 Implemented ≠ Registered
-Registered ≠ Production Ready
-Review Entry Authorized ≠ Production Ready
-Provider Production Ready ≠ repository-wide Level 4
+Registered ≠ Review Entry Authorized
+Review Entry Authorized ≠ Production Readiness Assessed
+Production Readiness Assessed ≠ Assessment Decision
+Assessment Decision ≠ Production Ready Declaration
+Bounded Production Ready ≠ Global Production Ready
+Bounded Production Ready ≠ Authorization for Scope Expansion
+Provider Production Ready ≠ Repository-wide Level 4
 Mock Provider ≠ Real Provider
+Catalog Registered ≠ Production Ready
 ```
 
 ---
@@ -271,7 +340,8 @@ ChatGPT Final Decision Review（post–Formal Assessment）により、bounded c
 | Formal Decision | **READY**（bounded canonical Mock Provider scope） |
 | D1–D13 | All **SATISFIED** for bounded scope |
 | PPRR-F001 | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** |
-| Provider Production Ready（global） | **Not Declared** |
+| Bounded Production Ready | **Not Declared at assessment time** — separate declaration authorization required |
+| Global Production Ready | **Not Declared** |
 | Repository-wide Level 4 | **Not Declared** |
 | Real Provider / External IO | **Prohibited** |
 | Automatic SNS publishing | **Prohibited** |
@@ -356,7 +426,7 @@ ChatGPT Final Decision Review（post–Formal Assessment）により、bounded c
 
 **Explicit non-claims:**
 
-- Does **not** declare Provider Production Ready（global / separate authorization）
+- Does **not** itself declare Bounded Production Ready or Global Production Ready; both require separate declaration authorization
 - Does **not** declare repository-wide Level 4
 - Does **not** authorize Real Provider / External IO / credentials
 - Does **not** authorize automatic SNS publishing
@@ -418,7 +488,7 @@ Formal review completion requires:
 - [x] All blockers classified（review entry vs assessment vs declaration）
 - [x] All open findings assigned disposition（PPRR-F001 — closed for bounded assessment）
 - [x] Risks synchronized in `RISK_REGISTER.md`
-- [x] No premature Production Ready **global declaration**
+- [x] No premature Bounded Production Ready or Global Production Ready declaration
 - [x] Quality Pipeline passing at assessment baseline（**1027 PASS**）
 - [x] Formal assessment decision recorded — **READY**（bounded scope）
 
@@ -433,12 +503,15 @@ Formal review completion requires:
 | **Evidence Collection** | **Complete** |
 | **PPRR-F001** | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** |
 | **Production Readiness Assessment** | **Complete** — 2026-07-10 |
-| **Production Readiness Formal Decision** | **READY**（bounded canonical Mock Provider scope only） |
-| **ChatGPT Final Decision Review** | **Accepted**（DECISION D） |
-| **Provider Production Ready** | **Not Declared**（separate global declaration authorization not executed） |
+| **Assessment Decision** | **READY**（bounded canonical Mock Provider assessment scope only） |
+| **Assessment Acceptance** | **Accepted**（DECISION D） |
+| **Declaration Eligibility** | **Eligible for separate bounded declaration review** |
+| **Bounded Production Ready** | **Not yet recorded in repository SSOT** — declaration finalization pending |
+| **Global Production Ready** | **Not Declared** |
 | **Repository-wide Level 4** | **Not Declared** |
 | **Real Provider / External IO** | **Prohibited / Not Started** |
 | **Automatic SNS Publishing** | **Prohibited** |
+| **CL-004 / CL-005 / CL-006** | **Deferred** — remain blockers outside the bounded side-effect-free Mock Provider scope |
 
 ---
 

@@ -43,8 +43,9 @@ Architecture Review Entry Verification は open finding PPRR-F001（abstract aut
 | **`mock_provider.js`** | **No change** |
 | **`public_contract_catalog.js`** | **No change** |
 | **Provider Production Readiness Review Entry** | **Authorized** — this ADR |
-| **Provider Production Readiness Assessment** | **Complete** — Formal Decision **READY**（bounded scope） |
-| **Provider Production Ready** | **Not Declared**（global declaration not executed） |
+| **Provider Production Readiness Assessment** | **Complete** — Assessment Decision **READY**（bounded scope） |
+| **Bounded Production Ready** | **Not Declared by this ADR** — separate declaration authorization and repository finalization required |
+| **Global Production Ready** | **Not Declared** |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 
 ### Review Entry Authorization
@@ -59,7 +60,8 @@ Review entry authorizes:
 
 Review entry **does not** authorize:
 
-- Provider Production Ready declaration
+- Bounded Production Ready declaration
+- Global Production Ready declaration
 - Real Provider implementation
 - External IO
 - Production code changes without separate authorization
@@ -70,13 +72,49 @@ Review entry **does not** authorize:
 
 **Out of scope:** Real Provider, External IO, credentials, Runtime, Scheduler, Adapter, retry/recovery/idempotency implementation, repository-wide L4 declaration.
 
-### State Distinctions
+### State, Assessment, and Declaration Distinctions
+
+The lifecycle state, assessment decision, and declaration scope are separate governance dimensions.
+
+| Dimension | Vocabulary |
+|-----------|------------|
+| **Lifecycle State** | Governed → Authorized → Implemented → Registered → Review Entry Authorized → Production Readiness Assessed → Production Ready |
+| **Assessment Decision** | READY / READY WITH CONDITIONS / DEFERRED / NOT READY |
+| **Declaration Scope** | Bounded Production Ready / Global Production Ready |
 
 ```text
-Governed ≠ Authorized ≠ Implemented ≠ Registered ≠ Review Entry Authorized ≠ Production Ready
-Provider Production Ready ≠ repository-wide Level 4
+Governed ≠ Authorized
+Authorized ≠ Implemented
+Implemented ≠ Registered
+Registered ≠ Review Entry Authorized
+Review Entry Authorized ≠ Production Readiness Assessed
+Production Readiness Assessed ≠ Assessment Decision
+Assessment Decision ≠ Production Ready Declaration
+Bounded Production Ready ≠ Global Production Ready
+Bounded Production Ready ≠ Authorization for Scope Expansion
+Provider Production Ready ≠ Repository-wide Level 4
 Mock Provider ≠ Real Provider
+Catalog Registered ≠ Production Ready
 ```
+
+### Declaration Scope Governance
+
+A Production Ready declaration is not an automatic consequence of a `READY` assessment decision.
+
+A declaration requires:
+
+1. a completed formal Production Readiness assessment;
+2. an assessment decision eligible for declaration;
+3. separate declaration authorization;
+4. an explicitly identified subject and scope;
+5. synchronized repository authority, version, risk, maturity, compliance, and quality evidence.
+
+| Declaration Scope | Governance meaning |
+|-------------------|--------------------|
+| **Bounded Production Ready** | Declaration applies only to an explicitly identified Provider identity, capability, implementation, execution model, exclusions, and reopening conditions |
+| **Global Production Ready** | Declaration applies to the complete governed Provider domain covered by the declaration authority |
+
+A bounded declaration does not authorize Real Provider behavior, External IO, automatic SNS publishing, deferred CL-004 / CL-005 / CL-006 semantics, or any other scope not explicitly included in the declaration.
 
 ### Evidence Model
 
@@ -84,11 +122,11 @@ Ten categories defined in [PROVIDER_PRODUCTION_READINESS_REVIEW.md](../architect
 
 ### Blocking Conditions
 
-| Condition | Blocks review entry | Blocks Production Ready |
-|-----------|--------------------|-------------------------|
-| PPRR-F001 abstract profile gap | No | Yes until disposition |
-| CL-004 / CL-005 / CL-006 | No | Yes |
-| Real Provider / External IO | No（out of Mock scope） | Yes |
+| Condition | Blocks review entry | Blocks bounded declaration | Blocks global declaration |
+|-----------|--------------------|----------------------------|---------------------------|
+| PPRR-F001 abstract profile gap | No | Yes until disposition | Yes until disposition |
+| CL-004 / CL-005 / CL-006 | No | No for explicitly bounded side-effect-free Mock Provider scope; remain deferred | Yes where the global scope includes affected operational semantics |
+| Real Provider / External IO | No（out of Mock scope） | No when explicitly excluded from the bounded declaration | Yes unless separately authorized, implemented, assessed, and declared |
 
 ### Decision Vocabulary
 
@@ -110,7 +148,7 @@ Ten categories defined in [PROVIDER_PRODUCTION_READINESS_REVIEW.md](../architect
 
 ### Deferred Concerns
 
-CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Scheduler, Adapter — **intentionally deferred**; documented in review artifact; block Production Ready declaration where applicable.
+CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Scheduler, and Adapter remain **intentionally deferred**. They do not block a declaration whose explicit bounded scope excludes them and whose side-effect-free Mock Provider applicability has been formally assessed. They continue to block any declaration scope in which they become applicable.
 
 ## Alternatives Considered
 
@@ -124,11 +162,13 @@ CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Schedu
 ## Consequences
 
 - Provider Production Readiness Review governance **established**
-- Review entry **authorized**; formal assessment **complete** — **READY**（bounded scope）
+- Review entry **authorized**
+- Formal assessment **complete** — Assessment Decision **READY**（bounded scope）
 - PPRR-F001 **closed** for bounded Mock Provider assessment
 - PR-006 wording synchronized（registration complete）
 - Production code **unchanged**
-- Future readiness decision requires formal assessment release
+- Assessment Decision **READY** establishes declaration eligibility only
+- Bounded or Global Production Ready requires separate declaration authorization and synchronized repository finalization
 
 ## Compliance
 
@@ -143,10 +183,53 @@ CL-004, CL-005, CL-006, Real Provider, External IO, credentials, Runtime, Schedu
 |------|-------|---------|
 | Production Readiness formal assessment | Future Release | post-v1.77.0 Architecture Review |
 | PPRR-F001 disposition | **CLOSED AS REMEDIATED FOR THE BOUNDED MOCK PROVIDER ASSESSMENT** | DECISION B/C — `GOVERNED_ABSTRACT_AUTHORITY_SCOPE` validator（Tests 1001–1012） |
-| Formal Provider Production Readiness Assessment | **Complete** — **READY**（bounded scope） — DECISION D **Accepted** | 2026-07-10 — Tests 1013–1042 |
+| Formal Provider Production Readiness Assessment | **Complete** — Assessment Decision **READY**（bounded scope） — DECISION D **Accepted** | 2026-07-10 — Tests 1013–1042 |
 | DECISION D | **Accepted** — Formal Assessment **READY**（bounded canonical Mock Provider） |
-| Provider Production Ready declaration | **Not scheduled** | separate global authorization |
+| Bounded Production Ready declaration | **Documentation finalization pending** | separate declaration authorization + synchronized SSOT |
+| Global Production Ready declaration | **Not scheduled** | separate global authorization |
 | Real Provider | **Prohibited** | separate authorization |
+
+## v1.85 SSOT Alignment Clarification
+
+This clarification does not retroactively change the v1.77.0 governance decision or the later Formal Assessment result.
+
+It formally separates three concepts that were previously present but not modeled as independent governance dimensions:
+
+1. **Lifecycle State**
+2. **Assessment Decision**
+3. **Declaration Scope**
+
+The authoritative interpretation is:
+
+```text
+Production Readiness Assessed
+≠ Assessment Decision
+≠ Production Ready Declaration
+```
+
+A `READY` assessment decision makes an explicitly assessed scope eligible for a separate declaration review. It does not itself declare that scope Production Ready.
+
+Production Ready declarations use one of two scopes:
+
+- **Bounded Production Ready**
+- **Global Production Ready**
+
+At the v1.84.0 repository baseline:
+
+| Item | Status |
+|------|--------|
+| **Formal Assessment** | **Complete** |
+| **Assessment Decision** | **READY**（bounded canonical Mock Provider scope） |
+| **Bounded Production Ready** | **Not yet recorded in repository SSOT** |
+| **Global Production Ready** | **Not Declared** |
+| **Repository-wide Level 4** | **Not Declared** |
+| **Real Provider / External IO** | **Prohibited / Not Started** |
+| **Automatic SNS Publishing** | **Prohibited** |
+| **CL-004 / CL-005 / CL-006** | **Deferred** outside the assessed bounded side-effect-free Mock Provider scope |
+
+The declaration state may change only through a separately authorized declaration review and synchronized documentation finalization.
+
+---
 
 ## Quality Pipeline
 

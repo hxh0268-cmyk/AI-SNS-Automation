@@ -60,7 +60,7 @@ Current Maturity: Level 3.19 — Image Generation Mock Provider Catalog Registra
 | **Mock Provider Catalog Registration** | **Registered**（ADR-0017 — `text-generation-mock-provider`） |
 | **Provider Production Readiness Review Governance** | **Complete**（v1.77.0 — [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) — ADR-0018） |
 | **Provider Production Readiness Review Entry** | **Authorized**（DECISION A） |
-| **Provider Production Readiness Assessment** | **Complete** — Formal Decision **READY**（v1.78.0 — bounded scope） |
+| **Provider Production Readiness Assessment** | **Complete** — Assessment Decision **READY**（v1.78.0 — bounded scope） |
 | **Provider Expansion Entry Governance** | **Established**（v1.79.0 — ADR-0019） |
 | **Provider Expansion Entry Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.80.0 ADR-0020） |
 | **Implementation Authorization** | **Granted**（bounded — `image-generation-mock-provider` — v1.81.0 ADR-0021） |
@@ -188,7 +188,7 @@ Future 実装着手 =
 
 **Mock Provider Catalog Registration（current）:** **Registered**（v1.76.0）— concrete `text-generation-mock-provider` in `providerContracts[]`
 
-**Provider Production Readiness Assessment（current）:** **Complete** — Formal Decision **READY**（v1.78.0 — bounded canonical Mock Provider scope）
+**Provider Production Readiness Assessment（current）:** **Complete** — Assessment Decision **READY**（v1.78.0 — bounded canonical Mock Provider scope）
 
 **Provider Expansion Entry Authorization（current）:** **Granted**（bounded — `image-generation-mock-provider` — v1.80.0 ADR-0020）— Implementation Authorization **Granted**（bounded — v1.81.0 ADR-0021）— Implementation **Implemented**（v1.82.0）— Image Catalog Registration Governance **Complete**（v1.83.0 ADR-0022）— Catalog Registration **Registered**（v1.84.0）
 
@@ -531,7 +531,7 @@ Level 3 → Level 4 Gate PASS =
 | Mock Provider Catalog Registration | ✅ **Registered**（ADR-0017） |
 | Provider Production Readiness Review Governance | ✅ **Complete**（v1.77.0） |
 | Provider Production Readiness Review Entry | ✅ **Authorized**（ADR-0018） |
-| Provider Production Readiness Assessment | ✅ **Complete** — Formal Decision **READY**（v1.78.0 — bounded scope） |
+| Provider Production Readiness Assessment | ✅ **Complete** — Assessment Decision **READY**（v1.78.0 — bounded scope） |
 | Provider Expansion Entry Governance | ✅ **Established**（v1.79.0 — ADR-0019） |
 | Provider Expansion Entry Authorization | ✅ **Granted**（bounded — `image-generation-mock-provider` — v1.80.0） |
 | Implementation Authorization | ✅ **Granted**（bounded — `image-generation-mock-provider` — v1.81.0） |
