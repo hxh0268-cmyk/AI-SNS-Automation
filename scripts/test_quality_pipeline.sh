@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.84.0 --"
+echo "-- Test 98: VERSION updated to v1.85.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
+    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.84.0");
+  throw new Error("docs/VERSION.md current version must be v1.85.0");
 }
 
 if (
   currentSection.includes(
-    "**v1.83.0**（Image Generation Mock Provider Catalog Registration Governance Release）",
+    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.83.0");
+  throw new Error("docs/VERSION.md current version must not remain v1.84.0");
 }
 
-console.log("VERSION v1.84.0 ok");
+console.log("VERSION v1.85.0 ok");
 EOF
-pass "VERSION updated to v1.84.0"
+pass "VERSION updated to v1.85.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6479,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.85.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.85.0");
+if (payload.nextVersion !== "v1.86.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.86.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6489,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.85.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.85.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.86.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.86.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6545,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.85.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.86.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -14410,7 +14410,8 @@ pass "architecture maturity model has required headings"
 
 echo "-- Test 442: current maturity is level 3.19 --"
 grep -q "Level 3.19" docs/architecture/FUTURE_ENTRY_CRITERIA.md
-grep -q "Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Production Readiness SSOT Alignment Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -Fq "Image Generation Mock Provider Catalog Registration Implementation Release | **Completed**（v1.84.0）" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "current maturity is level 3.19"
 
 echo "-- Test 443: README references architecture maturity model --"
@@ -16030,7 +16031,7 @@ grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.19 — Provider Production Readiness SSOT Alignment Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -16138,7 +16139,8 @@ grep -q "Catalog Scope" docs/architecture/PUBLIC_CONTRACT_POLICY.md
 pass "public contract catalog scope documented"
 
 echo "-- Test 741: architecture readme declares image catalog registration implementation release --"
-grep -q "Level 3.19 — Image Generation Mock Provider Catalog Registration Implementation Release Complete" docs/architecture/README.md
+grep -q "Level 3.19" docs/architecture/README.md
+grep -q "Provider Production Readiness SSOT Alignment Complete" docs/architecture/README.md
 grep -q "Catalog Registration" docs/architecture/README.md
 grep -q "Registered" docs/architecture/README.md
 pass "architecture readme declares image catalog registration implementation release"
@@ -18756,11 +18758,59 @@ grep -q "Mock Provider" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.m
 grep -q "Real Provider" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
 pass "mock provider distinct from real provider"
 
-echo "-- Test 988: review entry distinct from production ready --"
-grep -q "Review Entry Authorized ≠ Production Ready" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
-grep -q "Review Entry ≠ Production Ready" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md || grep -q "Review Entry Authorized ≠ Production Ready" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
-grep -q "Review Entry Authorized ≠ Production Readiness Assessed" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
-pass "review entry distinct from production ready"
+echo "-- Test 988: review entry distinct from production readiness assessed and production ready --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const doc = fs.readFileSync(
+  "docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md",
+  "utf8",
+);
+
+// Canonical Provider Production Readiness three-state chain
+// (PPRR Critical distinction / State Model; whitespace-tolerant):
+// Review Entry Authorized ≠ Production Readiness Assessed ≠ Production Ready
+const threeStateChain =
+  /Review Entry Authorized\s*≠\s*Production Readiness Assessed\s*≠\s*Production Ready/;
+if (!threeStateChain.test(doc)) {
+  throw new Error(
+    "PPRR must preserve canonical chain: Review Entry Authorized ≠ Production Readiness Assessed ≠ Production Ready",
+  );
+}
+
+// Pairwise boundary that must remain explicit (must not collapse Review Entry
+// into Production Ready by omitting the assessment intermediate).
+if (!doc.includes("Review Entry Authorized ≠ Production Readiness Assessed")) {
+  throw new Error(
+    "PPRR missing required distinction: Review Entry Authorized ≠ Production Readiness Assessed",
+  );
+}
+
+// Second inequality boundary must remain in the three-state chain
+// (Production Readiness Assessed ≠ Production Ready as ordered segment).
+if (
+  !/Production Readiness Assessed\s*≠\s*Production Ready/.test(doc)
+) {
+  throw new Error(
+    "PPRR missing required distinction segment: Production Readiness Assessed ≠ Production Ready",
+  );
+}
+
+for (const label of [
+  "Review Entry Authorized",
+  "Production Readiness Assessed",
+  "Production Ready",
+]) {
+  if (!doc.includes(label)) {
+    throw new Error(`PPRR missing required state label: ${label}`);
+  }
+}
+
+console.log(
+  "review entry ≠ production readiness assessed ≠ production ready ok",
+);
+EOF
+pass "review entry distinct from production readiness assessed and production ready"
 
 echo "-- Test 989: state model completeness --"
 grep -q "Governed" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
@@ -19253,11 +19303,88 @@ grep -Fq "| **DEFERRED** |" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVI
 grep -Fq "| **NOT READY** |" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
 pass "four candidate comparison includes all candidates"
 
-echo "-- Test 1026: provider production ready distinct from repository wide readiness --"
-grep -Fq "**Provider Production Ready** | **Not Declared**" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
-grep -Fq "Formal Assessment **READY**" docs/architecture/RISK_REGISTER.md
-grep -q "separate authorization not executed" docs/VERSION.md
-pass "provider production ready distinct from repository wide readiness"
+echo "-- Test 1026: provider production ready distinct from assessment ready and repository wide readiness --"
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const pprr = fs.readFileSync(
+  "docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md",
+  "utf8",
+);
+const risk = fs.readFileSync("docs/architecture/RISK_REGISTER.md", "utf8");
+const version = fs.readFileSync("docs/VERSION.md", "utf8");
+
+// Provider Production Ready remains undeclared (declaration ≠ assessment READY).
+if (!pprr.includes("**Provider Production Ready** | **Not Declared**")) {
+  throw new Error(
+    "PPRR must keep **Provider Production Ready** | **Not Declared**",
+  );
+}
+
+// Provider Production Ready ≠ repository-wide Level 4.
+if (
+  !/Provider Production Ready\s*≠\s*Repository-wide Level 4/.test(pprr)
+) {
+  throw new Error(
+    "PPRR must preserve Provider Production Ready ≠ Repository-wide Level 4",
+  );
+}
+
+// Scope enforcement to the Risk status narrative (not any READY elsewhere).
+const riskStatusMatch = risk.match(/\*\*Risk status:\*\*[^\n]*/);
+if (!riskStatusMatch) {
+  throw new Error("RISK_REGISTER.md missing **Risk status:** paragraph");
+}
+const riskStatus = riskStatusMatch[0];
+
+// Formal assessment performed (concept; allow JP punctuation / casing).
+if (!/formal\s+assessment/i.test(riskStatus)) {
+  throw new Error(
+    "Risk status must reference formal assessment (assessment performed)",
+  );
+}
+
+// Assessment Decision vocabulary with READY (not a Production Ready declaration).
+if (!/Assessment Decision\s+\*\*READY\*\*/.test(riskStatus)) {
+  throw new Error(
+    "Risk status must include Assessment Decision **READY** as assessment vocabulary",
+  );
+}
+
+// Canonical separation chain inside Risk status (PR-005 reframing):
+// Production Readiness Assessed ≠ Assessment Decision READY ≠ … ≠
+// Bounded Production Ready ≠ Global Production Ready
+const assessmentDeclarationChain =
+  /Production Readiness Assessed\s*≠\s*Assessment Decision\s+\*\*READY\*\*[\s\S]*?≠\s*Bounded Production Ready\s*≠\s*Global Production Ready/;
+if (!assessmentDeclarationChain.test(riskStatus)) {
+  throw new Error(
+    "Risk status must preserve Assessment Decision READY distinct from Bounded/Global Production Ready",
+  );
+}
+
+// Must not collapse READY into a Production Ready declaration claim.
+if (
+  /Assessment Decision\s+\*\*READY\*\*[^\n]*?\b(declares?|declared)\b[^\n]*?\bProduction Ready\b/i.test(
+    riskStatus,
+  )
+) {
+  throw new Error(
+    "Risk status must not treat Assessment Decision READY as Production Ready declaration",
+  );
+}
+
+// Global authorization remains separate (VERSION current-state evidence).
+if (!version.includes("separate authorization not executed")) {
+  throw new Error(
+    "docs/VERSION.md must retain separate authorization not executed for Provider Production Ready",
+  );
+}
+
+console.log(
+  "assessment READY ≠ Production Ready declaration; Provider Production Ready ≠ repository-wide L4 ok",
+);
+EOF
+pass "provider production ready distinct from assessment ready and repository wide readiness"
 
 echo "-- Test 1027: formal provider production readiness assessment documented --"
 grep -q "Test 1013–1027" docs/VERSION.md
@@ -19303,9 +19430,133 @@ grep -q "DECISION D" docs/VERSION.md
 pass "decision d acceptance present"
 
 echo "-- Test 1034: bounded ready semantics explicit in release --"
-grep -q "bounded canonical Mock Provider" docs/VERSION.md
-grep -q "text-generation-mock-provider" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
-grep -Fq "Does **not** declare Provider Production Ready" docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md
+node --input-type=module <<'EOF'
+import fs from "node:fs";
+
+const version = fs.readFileSync("docs/VERSION.md", "utf8");
+const pprr = fs.readFileSync(
+  "docs/architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md",
+  "utf8",
+);
+
+if (!version.includes("bounded canonical Mock Provider")) {
+  throw new Error(
+    "docs/VERSION.md must retain bounded canonical Mock Provider scope",
+  );
+}
+
+if (!pprr.includes("text-generation-mock-provider")) {
+  throw new Error(
+    "PPRR must retain text-generation-mock-provider as bounded assessment subject",
+  );
+}
+
+// Scope to Formal Decision → Explicit non-claims (not any Not Declared elsewhere).
+const formalDecisionMatch = pprr.match(
+  /### Formal Decision[\s\S]*?(?=\n## |\n---\n)/,
+);
+if (!formalDecisionMatch) {
+  throw new Error("PPRR missing scoped ### Formal Decision section");
+}
+const formalDecision = formalDecisionMatch[0];
+
+const nonClaimsMatch = formalDecision.match(
+  /\*\*Explicit non-claims:\*\*[\s\S]*?(?=\n\*\*[A-Z]|\n## |\n---\n|$)/,
+);
+if (!nonClaimsMatch) {
+  throw new Error(
+    "Formal Decision missing scoped **Explicit non-claims:** block",
+  );
+}
+const nonClaims = nonClaimsMatch[0];
+
+// Assessment / Formal Decision does not itself declare Bounded Production Ready.
+if (
+  !/Does\s+\*\*not\*\*\s+itself\s+declare[\s\S]*?Bounded Production Ready/i.test(
+    nonClaims,
+  )
+) {
+  throw new Error(
+    "Explicit non-claims must state assessment/decision does not itself declare Bounded Production Ready",
+  );
+}
+
+// Same section must not itself declare Global Production Ready
+// (canonical PPRR wording) or Global Provider Production Ready.
+if (
+  !/Does\s+\*\*not\*\*\s+itself\s+declare[\s\S]*?(?:Global Provider Production Ready|Global Production Ready)/i.test(
+    nonClaims,
+  )
+) {
+  throw new Error(
+    "Explicit non-claims must state assessment/decision does not itself declare Global Production Ready",
+  );
+}
+
+// Bounded and Global must remain separately named in the non-claims sentence.
+if (
+  !/Bounded Production Ready/.test(nonClaims) ||
+  !/(?:Global Provider Production Ready|Global Production Ready)/.test(
+    nonClaims,
+  )
+) {
+  throw new Error(
+    "Explicit non-claims must name Bounded and Global declaration scopes separately",
+  );
+}
+
+// Reject collapse into a single generic Production Ready-only non-claim.
+if (
+  /Does\s+\*\*not\*\*\s+(?:itself\s+)?declare\s+Provider Production Ready(?!\s+or)/i.test(
+    nonClaims,
+  ) &&
+  !/Bounded Production Ready/.test(nonClaims)
+) {
+  throw new Error(
+    "Explicit non-claims must not collapse Bounded/Global into generic Provider Production Ready only",
+  );
+}
+
+// Formal Decision READY must remain assessment vocabulary, not a declaration.
+if (!/\*\*Decision:\*\*\s+\*\*READY\*\*/.test(formalDecision)) {
+  throw new Error("Formal Decision must record Decision READY");
+}
+
+if (
+  /\*\*Decision:\*\*\s+\*\*READY\*\*[\s\S]{0,400}\b(declares?|declared)\b[\s\S]{0,120}\b(?:Bounded |Global )?(?:Provider )?Production Ready\b/i.test(
+    formalDecision,
+  )
+) {
+  throw new Error(
+    "Formal Decision must not treat Assessment Decision READY as Production Ready declaration",
+  );
+}
+
+// Current declaration-state markers remain separate (baseline table).
+if (
+  !/\|\s*\*\*Bounded Production Ready Declaration\*\*\s*\|\s*\*\*NO\*\*/.test(
+    pprr,
+  )
+) {
+  throw new Error(
+    "PPRR baseline must keep Bounded Production Ready Declaration = NO",
+  );
+}
+
+if (
+  !/\|\s*\*\*Global Provider Production Ready\*\*\s*\|\s*\*\*Not Declared\*\*/.test(
+    pprr,
+  )
+) {
+  throw new Error(
+    "PPRR baseline must keep Global Provider Production Ready = Not Declared",
+  );
+}
+
+console.log(
+  "bounded/global non-declaration scoped to Formal Decision explicit non-claims ok",
+);
+EOF
 pass "bounded ready semantics explicit in release"
 
 echo "-- Test 1035: global provider production ready not declared --"
@@ -21623,7 +21874,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.84.0 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.85.0 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21632,10 +21883,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
+    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.84.0");
+  throw new Error("current VERSION section must declare v1.85.0");
 }
 
 for (const marker of [
@@ -21646,12 +21897,14 @@ for (const marker of [
   "**Review Entry Authorized:** **NO**",
   "**Formally Assessed:** **NO**",
   "**Bounded Production Ready:** **NO**",
-  "**Global Provider Production Ready:** **NO**",
+  "**Global Provider Production Ready:** **Not Declared**",
   "Provider Contracts **3**",
   "catalogVersion **1.0**",
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
+  "Not Independently Established",
+  "**v1.86.0** Planning / **Not Declared**",
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
@@ -21662,9 +21915,9 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
   throw new Error("current VERSION section must not declare catalog registered no");
 }
 
-console.log("v1.84.0 current version metadata ok");
+console.log("v1.85.0 current version metadata ok");
 EOF
-pass "v1.84.0 current version metadata in VERSION.md"
+pass "v1.85.0 current version metadata in VERSION.md"
 
 
 echo ""

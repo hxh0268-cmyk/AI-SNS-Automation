@@ -2,7 +2,7 @@
 
 v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。
 
-> **Current Phase（v1.84.0）:** `image-generation-mock-provider` Implementation **Implemented** — Image Catalog Registration Governance **Complete** — Catalog Registration **Registered** — Catalog Registered **YES** — bounded text Mock Formal Decision **READY** preserved — Production Ready **Not Declared**（global）。Real Provider / external IO は **禁止維持**。
+> **Current Phase（v1.85.0）:** Provider Production Readiness SSOT Alignment **Complete** — `image-generation-mock-provider` Catalog Registration **Registered**（v1.84.0 lineage）— Catalog Registered **YES** — bounded text Mock Formal Decision **READY** preserved — Production Ready **Not Declared**（global）。Real Provider / external IO は **禁止維持**。Pending Release **v1.86.0** Planning / **Not Declared**。
 
 > **境界:** 将来どう実装するかの **設計構想** は [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) を参照してください。Non-Goals = 今すぐ作ってはいけないもの、Future Architecture = 将来 Epic で検討する構想。
 

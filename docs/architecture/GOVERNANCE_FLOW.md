@@ -6,6 +6,68 @@ Architecture Governance を **静的文書群** から **運用可能な Governa
 
 ---
 
+## Authority Boundary
+
+本書は **Governance Process / Transition Rule Document** である。
+
+Current Version **value** の権威ではない。Current Baseline Record の権威でもない。
+
+```text
+Repository Baseline Inventory Authority
+        ↓
+Current Baseline Record
+        ↓
+Authorized Governance Transitions（本書が定義する実行順序・ゲート）
+        ↓
+Synchronization Matrix
+        ↓
+Required Derived Targets
+        ↓
+Validation / Evidence（Quality Pipeline / Git / reports）
+```
+
+権威関係は [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) および [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) に従う。
+
+| Role | Status under this document |
+|------|----------------------------|
+| Governance Process / Transition Rule Document | **Yes** — lifecycle, gates, review order, release sequencing |
+| Current Version **value** authority | **No** — sole operational authority is the **Current Baseline Record** |
+| Current Baseline Record | **Not this document** |
+| Repository Baseline Inventory Authority | **Not this document** — see [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) |
+| Versioning rules authority | **No** — see [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) |
+| Required Derived Target for current-baseline values | **No** — [docs/VERSION.md](../VERSION.md) and other derived surfaces remain subordinate to the Record |
+
+```text
+Schema Definition / Inventory Model
+≠ Current Recorded Values（Current Baseline Record）
+≠ Pending / Planning Release Values
+≠ Derived Evidence（VERSION display, docs, reports）
+≠ Git Evidence（commit / tag / remote refs）
+≠ Quality Enforcement
+```
+
+Mandatory rules:
+
+1. Current Baseline Record values may change only during an **explicitly authorized** population or release phase.
+2. Planning or candidate values are **not** recorded baseline values. Planning Release ≠ Current Release.
+3. Editing this Governance Flow document does **not** populate or update the Current Baseline Record.
+4. Editing [docs/VERSION.md](../VERSION.md) or other derived documents does **not** populate the Current Baseline Record and does **not** declare a release.
+5. Required Derived Targets synchronize **from** the Current Baseline Record only after the appropriate authorization boundary（Synchronization Matrix / authorized sync phase）.
+6. Derived targets, Git state, tests, reports, and release history **must not** reverse-sync or override the Current Baseline Record.
+7. Quality Pipeline is **enforcement and verification**, not authority. PASS count alone does not authorize Record population or release declaration.
+8. Git commits and tags are **evidence and release identity surfaces**, not substitutes for the Current Baseline Record.
+9. Migration 7（GOVERNANCE_FLOW Authority Correction）does **not** populate the Current Baseline Record, does **not** declare `v1.86.0`, and does **not** execute repository-wide synchronization.
+
+```text
+Current Baseline Record
+        ↓
+Required Derived Targets
+
+Reverse synchronization: Prohibited
+```
+
+---
+
 ## Purpose
 
 - Architecture を **どの順番・どの基準・どのレビュー** で進めるかを定義する
@@ -36,6 +98,10 @@ Architecture Governance を **静的文書群** から **運用可能な Governa
 - Quality Pipeline **PASS 数だけで** Governance Process 完了とみなさない
 - **Level 4 Implementation Ready** 到達を意味しない
 - git commit / tag / push の **自動化** を定義しない（Human Approval Gate 維持）
+- Current Version **value** / Current Baseline Record を **決定・記録しない**（Authority Boundary 参照）
+- Migration 7 による本書更新は **`v1.86.0` 宣言ではない**
+- Repository-wide Baseline Synchronization を **実行しない**（別認可フェーズ）
+- Derived Target / Git / Quality / Release History からの **reverse synchronization を許可しない**
 
 ---
 
@@ -213,9 +279,18 @@ Architecture 変更後、以下を **整合更新**:
 | [docs/architecture/README.md](./README.md) | 文書数・インデックス・読了順序 |
 | [README.md](../../README.md) | バージョンセクション・Governance 入口 |
 | [docs/CHANGELOG.md](../CHANGELOG.md) | バージョンエントリ・設計判断 |
-| [docs/VERSION.md](../VERSION.md) | Current Version・Quality Pipeline PASS 数・完成判定 |
+| [docs/VERSION.md](../VERSION.md) | Required Derived Target — Current Version **display**・Quality Pipeline PASS 数・完成判定（Current Version **value** authority ではない） |
 
-doc-only release でも VERSION / CHANGELOG 整合は **必須**。
+doc-only release でも VERSION / CHANGELOG 整合は **必須**（認可済み Current Baseline Record からの derived synchronization 後、または明示的に認可された release phase 内）。
+
+```text
+Current Baseline Record（認可済み値）
+        ↓
+docs/VERSION.md（Derived display / summary / history）
+```
+
+Documentation Update だけでは Current Baseline Record は更新されない。
+Planning / candidate 表記の文書編集は Recorded baseline ではない。
 
 ---
 
@@ -267,19 +342,38 @@ Provider / Runtime / Scheduler / OAuth / SNS API / …
 Release は以下の **順序** で実施（Human Approval Gate）:
 
 ```text
-1. Quality Pipeline 全 PASS（Machine Check）
-2. Documentation updated（architecture / README / CHANGELOG / VERSION）
-3. VERSION updated（Current Version・PASS 数・完成判定）
-4. CHANGELOG updated（設計判断・非実装明記）
-5. README updated（Governance 入口・成熟度）
-6. git status clean
-7. commit（明示的依頼時のみ）
-8. tag（明示的依頼時のみ）
-9. push（明示的依頼時のみ）
-10. Post Release Review
+1. Quality Pipeline 全 PASS（Machine Check — enforcement / verification）
+2. Current Baseline Record population / update authorized（explicit phase）
+3. Documentation updated（architecture / README / CHANGELOG / VERSION as Required Derived Targets）
+4. VERSION derived display synchronized from Current Baseline Record（PASS 数・完成判定含む）
+5. CHANGELOG updated（設計判断・非実装明記）
+6. README updated（Governance 入口・成熟度）
+7. git status clean（Working Tree evidence — not Record authority）
+8. commit（明示的依頼時のみ — Git evidence）
+9. tag（明示的依頼時のみ — Git evidence / release identity surface）
+10. push（明示的依頼時のみ — remote evidence）
+11. Post Release Review
+```
+
+**Critical distinctions:**
+
+```text
+Planning Release
+≠ Current Release（Recorded）
+
+Documentation Update
+≠ Current Baseline Record population
+
+Quality Pipeline PASS
+≠ Record authority / release declaration
+
+Git commit / tag / push
+≠ Current Baseline Record substitute
 ```
 
 PASS 数更新だけでは Release 完了と **みなさない**（[QUALITY_GOVERNANCE.md](./QUALITY_GOVERNANCE.md)）。
+Current Baseline Record 未認可のまま derived VERSION 表示だけを上げることは **禁止**。
+Release History を編集しても Current Baseline Record は上書きされない。
 
 ---
 
@@ -291,8 +385,10 @@ PASS 数更新だけでは Release 完了と **みなさない**（[QUALITY_GOVE
 | Governance Check | Compliance Checklist + Mandatory Policy Review |
 | 本書の検証 | Test 461–470（v1.51.0） |
 | PASS 数 | **470 PASS** = Machine Check 件数（≠ Governance 完了の十分条件） |
+| Authority role | Quality Pipeline = **enforcement / verification only** — not Current Baseline Record authority |
 
 Governance Flow 変更時は Quality Pipeline テスト追加を **Documentation Update Flow** の一部とする。
+Quality 結果は Evidence であり、Record 値を決定しない。
 
 ---
 

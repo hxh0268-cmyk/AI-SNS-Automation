@@ -26,19 +26,25 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 | Item | Value |
 |------|-------|
-| **Version** | **v1.84.0** |
-| **Commit** | `26b57d7db6cab74f8f642bc22ad466c2c339811f` |
-| **Release State** | Image Generation Mock Provider Catalog Registration Implementation complete |
+| **Version** | **v1.85.0** |
+| **Commit** | `0301d1a571997e3236952b3fbb2c593718e1f164` |
+| **Tag** | `v1.85.0` |
+| **Branch** | `main` |
+| **Release / Push Status** | **Completed** / **Completed** |
+| **Remote Synchronization / Divergence** | **Synchronized** / `0 0` |
+| **Release State** | Provider Production Readiness SSOT Alignment complete（prior Image Catalog Registration **Registered** lineage preserved） |
 | **Provider Contracts** | **3** |
 | **Catalog Version** | `1.0` |
 | **Text Generation Mock Provider** | **Implemented / Registered** |
 | **Image Generation Mock Provider** | **Implemented / Registered** |
+| **Quality Pipeline（current evidence）** | Planning working-tree validation **1232 PASS**（Quality Enforcement Correction measured）. Measured v1.85.0 released Quality: **Not Independently Established**. Historical `1232 PASS` under v1.84.0-framed docs remains historical only; planning PASS ≠ v1.85.0 released Quality proof. |
 | **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
-| **Bounded Production Ready Declaration** | **Not yet recorded in repository SSOT** — separate declaration finalization required |
+| **Bounded Production Ready Declaration** | **NO** |
 | **Global Provider Production Ready** | **Not Declared** |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **Real Provider / External IO** | **Prohibited / Not Started** |
 | **Automatic SNS Publishing** | **Prohibited** |
+| **Pending Release** | **v1.86.0** Planning / **Not Declared** |
 
 The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
 

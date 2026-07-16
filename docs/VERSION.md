@@ -1,14 +1,73 @@
 # バージョン情報
 
+## Authority Boundary
+
+本書（[docs/VERSION.md](./VERSION.md)）は **Required Derived Target** である。
+
+Current Version **value** の権威ではない。
+
+```text
+Repository Baseline Inventory Authority
+        ↓
+Current Baseline Record
+        ↓
+Synchronization Matrix
+        ↓
+Required Derived Targets（本書を含む）
+```
+
+権威関係は [ADR-0023](adr/ADR-0023-repository-baseline-inventory-authority.md)、[BASELINE_SYNCHRONIZATION.md](architecture/BASELINE_SYNCHRONIZATION.md)、[VERSIONING_POLICY.md](architecture/VERSIONING_POLICY.md) に従う。
+
+| Role | Status under this document |
+|------|----------------------------|
+| Required Derived Target | **Yes** — Current Version **display**, Current Release **summary**, Release **History** |
+| Current Version **value** authority | **No** — sole operational authority is the **Current Baseline Record** |
+| Versioning rules authority | **No** — see [VERSIONING_POLICY.md](architecture/VERSIONING_POLICY.md)（Rule Document） |
+| Current Baseline Record | **Not this document** |
+
+```text
+Authoritative Current Version value（Current Baseline Record）
+≠ Derived Current Version display（本書「現在のバージョン」）
+≠ Historical Release entries（本書「バージョン履歴」）
+≠ Pending Release value
+≠ Git evidence
+```
+
+同期方向:
+
+```text
+Current Baseline Record
+        ↓
+docs/VERSION.md
+```
+
+**Reverse Synchronization is Prohibited.**
+本書は Current Baseline Record を更新・推測・再構成・上書きしてはならない。
+
+Git tag / commit / working tree は validation **evidence** であり、Record の代替ではない。
+Release History は historical record surface であり、Current Baseline Record を自動決定しない。
+Pending Release value は recorded Current Version value ではない。
+
+本書の Migration 6（Derived Target Declaration）および Repository-wide Baseline Synchronization は:
+
+- Current Baseline Record の値を本書へ **one-way** 表示同期する（Reverse Synchronization Prohibited）
+- `v1.86.0` を宣言しない（Planning / Pending / Not Declared のみ）
+- Quality / Git を Current Version value authority にしない
+
+以下「現在のバージョン」に表示される値は **Derived Current Version display** である。
+表示値を Record へ reverse-sync してはならない。
+
+---
+
 ## 現在のバージョン
 
-**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）
+**v1.85.0**（Provider Production Readiness SSOT Alignment）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Image Generation Mock Provider Catalog Registration Implementation Release Complete
+**Phase:** Provider Production Readiness SSOT Alignment Release Complete（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -70,11 +129,23 @@
 
 **Bounded Production Ready:** **NO**
 
-**Global Provider Production Ready:** **NO**
+**Global Provider Production Ready:** **Not Declared**
 
-**Public Contract Catalog:** **PASS** — catalogVersion **1.0** — Provider Contracts **3**
+**Public Contract Catalog:** **PASS** — catalogVersion **1.0** — Provider Contracts **3** — publicContracts **7** — Total Foundations **12**（Application **7** + Platform **5**）— Application Foundations **7** — dependencyRules **6** — compatibilityMatrix **5** — layerRules **6** — versionRules **3** — deprecationRules **4** — validate **valid**
 
 **Architecture Maturity:** **Level 3.19**（unchanged）
+
+**Repository Baseline Commit:** `0301d1a571997e3236952b3fbb2c593718e1f164`
+
+**Repository Baseline Tag:** `v1.85.0`
+
+**Branch:** `main`
+
+**Release Status / Push Status:** **Completed** / **Completed**
+
+**Remote Synchronization / Divergence:** **Synchronized** / `0 0`
+
+**Quality Pipeline（current display）:** Current planning-worktree validation **1232 PASS**（Quality Enforcement Correction measured after Test 988 / 1026 / 1034 remediation）. Measured v1.85.0 released Quality: **Not Independently Established**. Historical / derived `1232 PASS` under v1.84.0-framed sections remains historical only and is **not** the authoritative v1.85.0 released Quality result. Planning-worktree PASS ≠ historical v1.85.0 released Quality proof.
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -88,14 +159,17 @@
 
 **Human Approval Gate:** **Preserved**（`humanApprovalGateBypass: false`）
 
-**Next Phase Candidate:** Human Review / **v1.85.0** per Governance Flow
+**Next Phase Candidate:** **v1.86.0** Planning / **Not Declared**（Repository Baseline Inventory Authority governance — not a release declaration）
 
 ---
 
 ## バージョン履歴
 
+> **Historical Release entries** — 本節は Release History（historical record surface）である。Current Baseline Record でも Current Version value authority でもない。履歴行を根拠に Record を上書きしてはならない（Reverse Synchronization Prohibited）。
+
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
+| **v1.85.0** | **ドキュメント** | **✅ 完了** | **Provider Production Readiness SSOT Alignment — Assessment ≠ Declaration / Review Entry ≠ Production Ready terminology alignment** |
 | **v1.84.0** | **機能追加** | **✅ 完了** | **Image Generation Mock Provider Catalog Registration — ADR-0022 G12 — `image-generation-mock-provider` registered in `providerContracts[]`** |
 | **v1.83.0** | **ドキュメント** | **✅ 完了** | **Image Generation Mock Provider Catalog Registration Governance — ADR-0022 / bounded registration policy / closed-world multi-mock validator policy** |
 | **v1.82.0** | **機能追加** | **✅ 完了** | **Image Generation Mock Provider Implementation — `image_generation` / deterministic / in-memory / no external IO** |
