@@ -51,7 +51,7 @@ Pending Release value は recorded Current Version value ではない。
 本書の Migration 6（Derived Target Declaration）および Repository-wide Baseline Synchronization は:
 
 - Current Baseline Record の値を本書へ **one-way** 表示同期する（Reverse Synchronization Prohibited）
-- Current Version display を Record の released `v1.86.0` に合わせる（Pending corrective `v1.86.1` は Not Declared）
+- Current Version display を Record の released `v1.86.1` に合わせる（Pending corrective `v1.86.2` は Not Declared）
 - Quality / Git を Current Version value authority にしない
 
 以下「現在のバージョン」に表示される値は **Derived Current Version display** である。
@@ -61,13 +61,13 @@ Pending Release value は recorded Current Version value ではない。
 
 ## 現在のバージョン
 
-**v1.86.0**（Repository Baseline Inventory Authority）
+**v1.86.1**（Repository Baseline Identity Reconciliation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Repository Baseline Inventory Authority Release Complete（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— corrective **v1.86.1** Identity Reconciliation Independent Review **Complete** — Decision **A. GO** — current phase **Commit Preparation** — Release **Not Declared**
+**Phase:** Repository Baseline Identity Reconciliation Release Complete（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— corrective **v1.86.2** released-state reconciliation — current phase **Implementation** — Release **Not Declared**
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -135,9 +135,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Architecture Maturity:** **Level 3.19**（unchanged）
 
-**Repository Baseline Commit:** `57b3182ea2fb51f4f3441f9c1013543276cb757f`
+**Repository Baseline Commit:** `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`
 
-**Repository Baseline Tag:** `v1.86.0`
+**Repository Baseline Tag:** `v1.86.1`
 
 **Branch:** `main`
 
@@ -145,7 +145,7 @@ Pending Release value は recorded Current Version value ではない。
 
 **Remote Synchronization / Divergence:** **Synchronized** / `0 0`
 
-**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.0`）
+**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.1`）
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -159,9 +159,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Human Approval Gate:** **Preserved**（`humanApprovalGateBypass: false`）
 
-**Pending Corrective Release:** **v1.86.1** Repository Baseline Identity Reconciliation — **Commit Preparation** / **Not Declared**（Independent Review **Complete** — Decision **A. GO**; Commit / Tag / Push **Pending**; not a release declaration）
+**Pending Corrective Release:** **v1.86.2** v1.86.1 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**; not a release declaration）
 
-**Next Phase Candidate:** Commit Execution for **v1.86.1** — only after Commit Preparation approval（**v1.87.0** Production Readiness Assessment **not started**）
+**Next Phase Candidate:** Commit Execution for **v1.86.2** — only after Implementation approval（**v1.87.0** Production Readiness Assessment **not started**）
 
 ---
 
@@ -171,7 +171,8 @@ Pending Release value は recorded Current Version value ではない。
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.86.1** | **ドキュメント** | **🔄 Commit Preparation / Not Declared** | **Repository Baseline Identity Reconciliation — Independent Review Complete — A. GO; Commit / Tag / Push Pending** |
+| **v1.86.2** | **ドキュメント** | **🔄 Implementation / Not Declared** | **v1.86.1 released-state reconciliation — Record → Derived → Quality; Commit / Tag / Push Pending** |
+| **v1.86.1** | **ドキュメント** | **✅ 完了** | **Repository Baseline Identity Reconciliation — commit `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c` / tag `v1.86.1` / Commit·Tag·Push Complete / 1232 PASS** |
 | **v1.86.0** | **ドキュメント** | **✅ 完了** | **Repository Baseline Inventory Authority — ADR-0023 / Current Baseline Record / Synchronization Matrix SM-001–SM-025 / Quality Enforcement Correction 1232 PASS** |
 | **v1.85.0** | **ドキュメント** | **✅ 完了** | **Provider Production Readiness SSOT Alignment — Assessment ≠ Declaration / Review Entry ≠ Production Ready terminology alignment** |
 | **v1.84.0** | **機能追加** | **✅ 完了** | **Image Generation Mock Provider Catalog Registration — ADR-0022 G12 — `image-generation-mock-provider` registered in `providerContracts[]`** |

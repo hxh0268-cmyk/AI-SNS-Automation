@@ -303,92 +303,93 @@ checks. They are not independent Current Baseline Authorities.
 #### 6.2.2 Current Recorded Values
 
 **Current Baseline Record Population is complete** for the released baseline
-`v1.86.0`. Values below are the authorized recorded baseline for the Git-released
-identity. They are **not** `v1.86.1` release values.
+`v1.86.1`. Values below are the authorized recorded baseline for the Git-released
+identity. They are **not** `v1.86.2` release values.
 
 | Inventory Field | Current Recorded Value | Status |
 | --------------- | ---------------------- | ------ |
-| Current Version | `v1.86.0` | **Recorded** |
-| Current Release | Repository Baseline Inventory Authority（commit subject: `docs(governance): establish repository baseline inventory authority`） | **Recorded** |
-| Current Commit | `57b3182ea2fb51f4f3441f9c1013543276cb757f` | **Recorded** — validated by Git tag/HEAD/`origin/main` evidence |
-| Current Tag | `v1.86.0`（lightweight tag → commit） | **Recorded** |
+| Current Version | `v1.86.1` | **Recorded** |
+| Current Release | Repository Baseline Identity Reconciliation（commit subject: `docs(governance): reconcile v1.86.0 baseline identity`） | **Recorded** |
+| Current Commit | `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c` | **Recorded** — validated by Git tag/HEAD/`origin/main` evidence |
+| Current Tag | `v1.86.1`（lightweight tag → commit） | **Recorded** |
 | Current Branch | `main` | **Recorded** |
-| Release Status | **Completed**（released baseline `v1.86.0`） | **Recorded** |
-| Push Status | **Completed**（`origin/main` and tag `v1.86.0` verified at recorded commit） | **Recorded** |
+| Release Status | **Completed**（released baseline `v1.86.1`） | **Recorded** |
+| Push Status | **Completed**（`origin/main` and tag `v1.86.1` verified at recorded commit） | **Recorded** |
 | Remote Synchronization State | **Synchronized**（`origin/main...main` divergence `0 0` at released baseline） | **Recorded** |
-| Working Tree State | **Clean** at released baseline `v1.86.0`（identity-reconciliation planning edits for Pending Release `v1.86.1` are out-of-band until that corrective release is committed） | **Recorded** |
+| Working Tree State | **Clean** at released baseline `v1.86.1`（released-state reconciliation planning edits for Pending Release `v1.86.2` are out-of-band until that corrective release is committed） | **Recorded** |
 | Divergence State | `0 0`（ahead/behind vs `origin/main` at released baseline） | **Recorded** |
-| Current Repository Baseline | `v1.86.0` @ `57b3182ea2fb51f4f3441f9c1013543276cb757f` | **Recorded** |
-| Current Governance Phase | **v1.86.1 Commit Preparation**（Identity Reconciliation Independent Review **Complete** — Decision **A. GO**; not a v1.86.1 release declaration; v1.87.0 Production Readiness Assessment **not started**） | **Recorded** |
-| Next Authorized Phase | **Next Phase Candidate:** Commit Execution for `v1.86.1` — only after Commit Preparation approval（Commit / Tag / Push **Pending**; Release **Not Declared**; Image Review Entry / Formal Assessment / Production Ready unchanged） | **Recorded** |
+| Current Repository Baseline | `v1.86.1` @ `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c` | **Recorded** |
+| Current Governance Phase | **v1.86.2 Implementation**（v1.86.1 released-state reconciliation; not a v1.86.2 release declaration; v1.87.0 Production Readiness Assessment **not started**） | **Recorded** |
+| Next Authorized Phase | **Next Phase Candidate:** Commit Execution for `v1.86.2` — only after Implementation approval（Commit / Tag / Push **Pending**; Release **Not Declared**; Image Review Entry / Formal Assessment / Production Ready unchanged） | **Recorded** |
 | Assessment State | **Complete** — Assessment Decision **READY**（bounded canonical Mock Provider scope — v1.78.0 lineage preserved）; Image Provider Review Entry **NO** / Formally Assessed **NO** | **Recorded** |
 | Declaration State | Bounded Production Ready **NO** / Global Provider Production Ready **Not Declared** | **Recorded** |
 | Architecture Maturity State | **Level 3.19** | **Recorded** |
-| Quality Pipeline Baseline | **1232 PASS**（Quality Enforcement Correction lineage preserved under released `v1.86.0`; identity-reconciliation worktree must continue to satisfy Tests 98 / 1232 family against Record `v1.86.0`） | **Recorded** |
+| Quality Pipeline Baseline | **1232 PASS**（Quality Enforcement Correction lineage preserved under released `v1.86.1`; released-state reconciliation worktree must continue to satisfy Tests 98 / 1232 family against Record `v1.86.1`） | **Recorded** |
 | Public Contract Catalog Baseline | catalogVersion `1.0`; Provider Contracts `3`; publicContracts `7`; **Total Foundations** `catalog.foundations.length` = `12`（Application Layer `7` + Platform Layer `5`）; **Application Foundations**（CLI label / `layer === "application"`）= `7`; dependencyRules `6`; compatibilityMatrix `5`; layerRules `6`; versionRules `3`; deprecationRules `4`; validate = **valid** | **Recorded**（schema-proven; CLI Application Foundations ≠ Total Foundations） |
-| Required Consistency Checks | Defined by Synchronization Matrix（§8）; identity reconciliation sync **complete**; Independent Review **Complete** — Decision **A. GO**; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated**; Commit Preparation in progress | **Recorded** |
+| Required Consistency Checks | Defined by Synchronization Matrix（§8）; identity reconciliation **Released**（`v1.86.1`）; Independent Review **Complete** — Decision **A. GO**; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated**; released-state reconciliation **Implementation** in progress | **Recorded** |
 | Generated Files Policy | Manual sync prohibited; regenerate via authoritative process | **Recorded** |
-| Derived Documents | Enumerated in §8.2; Required Derived Target current-state identity/governance displays must synchronize to Record `v1.86.0`（Pending Release `v1.86.1` remains Not Declared） | **Recorded** |
-| Historical Records | VERSION history / CHANGELOG historical sections / completed ADR evidence（including completed prior baseline `v1.85.0` @ `0301d1a…`） | **Recorded** |
+| Derived Documents | Enumerated in §8.2; Required Derived Target current-state identity/governance displays must synchronize to Record `v1.86.1`（Pending Release `v1.86.2` remains Not Declared） | **Recorded** |
+| Historical Records | VERSION history / CHANGELOG historical sections / completed ADR evidence（including completed prior baseline `v1.86.0` @ `57b3182…`） | **Recorded** |
 
 **Population markers:**
 
 | Marker | Value |
 | ------ | ----- |
-| Current Baseline Record population state | **Complete**（released baseline `v1.86.0`） |
-| Repository-wide derived synchronization state | **Complete**（Required Derived Target current-state displays synchronized to Record `v1.86.0`; Independent Review **Complete** — Decision **A. GO**） |
-| Quality Enforcement Correction state | **Complete** under released `v1.86.0`（Tests 988 / 1026 / 1034 remediated; **1232 PASS**; D-006 **Remediated**）; identity Tests 98 / 1232 updated under D-008 |
+| Current Baseline Record population state | **Complete**（released baseline `v1.86.1`） |
+| Repository-wide derived synchronization state | **Complete**（Required Derived Target current-state displays synchronized to Record `v1.86.1`） |
+| Quality Enforcement Correction state | **Complete** under released `v1.86.1` lineage（Tests 988 / 1026 / 1034 remediated; **1232 PASS**; D-006 **Remediated**）; identity Tests 98 / 1232 assert Record `v1.86.1` |
 | Independent Review（v1.86.1 Identity Reconciliation） | **Complete** — Decision **A. GO** |
-| Current Phase（corrective） | **v1.86.1 Commit Preparation** |
+| Current Phase（corrective） | **v1.86.2 Implementation** |
 | v1.86.0 Release declaration | **Released / Completed**（Git tag `v1.86.0` @ `57b3182…`; Commit / Tag / Push **Complete**） |
-| v1.86.1 Corrective release declaration | **Not Declared**（Commit / Tag / Push **Pending**） |
+| v1.86.1 Corrective release declaration | **Released / Completed**（Git tag `v1.86.1` @ `a47e892…`; Commit / Tag / Push **Complete**） |
+| v1.86.2 Corrective release declaration | **Not Declared**（Commit / Tag / Push **Pending**） |
 | Reverse synchronization | **Prohibited** |
 
-**Current Version is `v1.86.0`.** Pending corrective release is **`v1.86.1`** only.
-Record population for released `v1.86.0` does **not** declare `v1.86.1` and does **not**
-set Current Version to `v1.86.1`.
+**Current Version is `v1.86.1`.** Pending corrective release is **`v1.86.2`** only.
+Record population for released `v1.86.1` does **not** declare `v1.86.2` and does **not**
+set Current Version to `v1.86.2`.
 
 ```
 Schema Definition
-≠ Current Recorded Values（this table — v1.86.0）
-≠ Pending Release Values（§6.2.3 — v1.86.1 planning）
-≠ Derived Evidence（§6.2.4 — may temporarily lag during authorized sync; current `v1.86.0` sync complete）
+≠ Current Recorded Values（this table — v1.86.1）
+≠ Pending Release Values（§6.2.3 — v1.86.2 planning）
+≠ Derived Evidence（§6.2.4 — may temporarily lag during authorized sync; current `v1.86.1` sync complete）
 ```
 
-#### 6.2.3 Pending Release Values（v1.86.1 planning）
+#### 6.2.3 Pending Release Values（v1.86.2 planning）
 
 | Item | Value |
 | ---- | ----- |
-| Planning Release ID | `v1.86.1` |
-| Purpose | Repository Baseline Identity Reconciliation |
-| Status | **Commit Preparation**（Independent Review **Complete** — Decision **A. GO**） |
+| Planning Release ID | `v1.86.2` |
+| Purpose | v1.86.1 released-state reconciliation |
+| Status | **Implementation** / **Not Declared** |
 | Release Declaration | **Not Declared** / **No Release Declaration** |
 | Commit | **Pending** |
 | Tag | **Pending** |
 | Push | **Pending** |
-| Current Version | **Must not** be `v1.86.1` while Pending（Current Version remains `v1.86.0`） |
-| Record population as v1.86.1 | **Prohibited** until separately authorized corrective release population |
-| Scope of planning work | Record → Derived → Quality identity sync to Git-released `v1.86.0`; append historical `v1.86.0` surfaces; no Image Assessment; no Production Ready; no catalog/provider changes |
+| Current Version | **Must not** be `v1.86.2` while Pending（Current Version remains `v1.86.1`） |
+| Record population as v1.86.2 | **Prohibited** until separately authorized corrective release population |
+| Scope of planning work | Record → Derived → Quality identity sync to Git-released `v1.86.1`; append historical `v1.86.1` surfaces; no Image Assessment; no Production Ready; no catalog/provider changes |
 | Future roadmap（inactive） | `v1.87.0` Production Readiness Assessment — **not started** / **not authorized** in this phase |
-| Next after Commit Preparation | Commit Execution（only after Commit Preparation approval）— then Tag / Push authorization separately |
+| Next after Implementation | Commit Execution（only after Implementation approval）— then Tag / Push authorization separately |
 
 #### 6.2.4 Derived Evidence（not Record; not reverse-authoritative）
 
 The following observations are **evidence only**. They must not overwrite the
 Current Baseline Record by reverse synchronization. Derived Targets may
 temporarily lag during an authorized synchronization window. For the current
-released baseline `v1.86.0`, Required Derived Target identity synchronization is
-**complete**（Independent Review **Complete** — Decision **A. GO**）. Pending
-Release `v1.86.1` remains **Not Declared** until Commit / Tag / Push.
+released baseline `v1.86.1`, Required Derived Target identity synchronization is
+**complete**. Pending Release `v1.86.2` remains **Not Declared** until
+Commit / Tag / Push.
 
 | Evidence Class | Observed Evidence（read-only） | Treatment |
 | -------------- | ------------------------------ | --------- |
-| Git release identity | Tag `v1.86.0` / HEAD / `origin/main` = `57b3182ea2fb51f4f3441f9c1013543276cb757f`; parent `0301d1a…`（`v1.85.0`）; divergence `0 0`; tag type `commit`（lightweight） | **Validation evidence** — authorizes Record values in §6.2.2; not a substitute for the Record |
-| Prior released baseline | Tag `v1.85.0` = `0301d1a571997e3236952b3fbb2c593718e1f164` | **Historical** — preserved; not Current Version |
-| Working tree evidence | Clean at released `v1.86.0`; identity-reconciliation edits appear only in the Pending `v1.86.1` workstream | Planning edits ≠ Record authority; Released Working Tree State remains **Clean** |
-| Derived VERSION / README / PPRR | May lag Record until Derived sync; after sync must display Current Version `v1.86.0` and Pending `v1.86.1` | Synchronize Record → Derived only |
+| Git release identity | Tag `v1.86.1` / HEAD / `origin/main` = `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`; parent `57b3182…`（`v1.86.0`）; divergence `0 0`; tag type `commit`（lightweight） | **Validation evidence** — authorizes Record values in §6.2.2; not a substitute for the Record |
+| Prior released baseline | Tag `v1.86.0` = `57b3182ea2fb51f4f3441f9c1013543276cb757f` | **Historical** — preserved; not Current Version |
+| Working tree evidence | Clean at released `v1.86.1`; released-state reconciliation edits appear only in the Pending `v1.86.2` workstream | Planning edits ≠ Record authority; Released Working Tree State remains **Clean** |
+| Derived VERSION / README / PPRR | May lag Record until Derived sync; after sync must display Current Version `v1.86.1` and Pending `v1.86.2` | Synchronize Record → Derived only |
 | Catalog probe evidence | catalogVersion `1.0`; providerContracts `3`; publicContracts `7`; Total Foundations `12`; Application Foundations `7`; validate = valid | Unchanged catalog baseline |
-| Quality evidence | Pipeline family **1232 PASS** under released `v1.86.0` Quality Enforcement Correction lineage | Enforcement must assert Record-aligned `v1.86.0` identity |
+| Quality evidence | Pipeline family **1232 PASS** under released `v1.86.1` Quality Enforcement Correction lineage | Enforcement must assert Record-aligned `v1.86.1` identity |
 | package.json | No `version` field | Not Applicable as SemVer release SSOT |
 
 Populating or changing Record field values remains subject to the authority
@@ -556,31 +557,31 @@ These rules bind every Matrix row:
 
 ### 8.1 Instantiated Synchronization Matrix
 
-**Instantiation status:** **Complete**（Matrix Instantiation completed under ADR-0023; operational under released `v1.86.0`）
+**Instantiation status:** **Complete**（Matrix Instantiation completed under ADR-0023; operational under released `v1.86.1`）
 
-**Release declaration:** **v1.86.0 Released**; Pending corrective **v1.86.1** **Not Declared**
+**Release declaration:** **v1.86.1 Released**; Pending corrective **v1.86.2** **Not Declared**
 
 **Authoritative source column:** always the Current Baseline Record field named
-in §5 / §6.2. Values in §6.2.2 are **Recorded** for released baseline `v1.86.0`.
+in §5 / §6.2. Values in §6.2.2 are **Recorded** for released baseline `v1.86.1`.
 Required Derived Targets synchronize one-way Record → Derived under corrective
-Pending Release `v1.86.1`. Matrix rows still define the sync relationship.
+Pending Release `v1.86.2`. Matrix rows still define the sync relationship.
 
 | Matrix ID | Field / Baseline Datum | Authoritative Source | Required Derived Target | Synchronization Direction | Update Trigger | Verification / Enforcement | Failure Classification | Current State | Migration Step | Reverse Sync |
 | --------- | ---------------------- | -------------------- | ----------------------- | ------------------------- | -------------- | -------------------------- | ---------------------- | ------------- | -------------- | ------------ |
-| SM-001 | Current Version | Current Baseline Record → Current Version | [docs/VERSION.md](../VERSION.md) `## 現在のバージョン` | Record → Derived | Formal Record population / authorized baseline change | Compare VERSION current header to Record; Quality Tests 98 / 1232 family | Derived Target Stale | **Aligned**（display `v1.86.0`; Pending `v1.86.1`） | 6, 10, v1.86.1 | **Prohibited** |
-| SM-002 | Current Release | Current Baseline Record → Current Release | [docs/VERSION.md](../VERSION.md) current-phase / release summary | Record → Derived | Formal Record population | Compare release designation text to Record | Derived Target Stale | **Aligned**（Repository Baseline Inventory Authority） | 6, 10, v1.86.1 | **Prohibited** |
-| SM-003 | Current Version（user-facing） | Current Baseline Record → Current Version | [README.md](../../README.md) top current-release section `Current Version:` | Record → Derived | Formal Record population / release sync | Grep/assert README current section vs Record | Derived Target Stale | **Aligned**（top `v1.86.0`; nested historical ≤ v1.85.0 preserved） | 10, v1.86.1 | **Prohibited** |
-| SM-004 | Quality Pipeline Baseline（PASS display） | Current Baseline Record → Quality Pipeline Baseline | [README.md](../../README.md) current-release Quality Pipeline line | Record → Derived | Quality baseline authorization | Compare PASS count display to Record | Derived Target Stale / Evidence Mismatch | **Aligned**（current Quality **1232 PASS**; historical PASS claims under ≤ v1.85.0 / v1.84.0 preserved） | 10, 11, v1.86.1 | **Prohibited** |
-| SM-005 | Current Version value authority claim | Current Baseline Record（authority hierarchy） | [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) Current Version SSOT sentence | Record/Authority → Derived Rules doc | ADR-0023 Acceptance + SSOT | Policy must state VERSION is Derived; Record is value SSOT | Derived Target Contradictory / Circular Authority Dependency | **Aligned**（Migration 5 Authority Boundary; current notes reframed for released `v1.86.0`） | 5, v1.86.1 | **Prohibited** |
-| SM-006 | Current Version locus in release flow | Current Baseline Record + ADR-0023 hierarchy | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) VERSION update / Current Version references | Record → Derived | ADR-0023 Acceptance + SSOT | Flow must not treat VERSION as sole value authority | Derived Target Contradictory | **Aligned**（Migration 7 Authority Boundary; current notes reframed for released `v1.86.0`） | 7, v1.86.1 | **Prohibited** |
-| SM-007 | ADR-0023 registry presence | ADR-0023 Accepted status（governance register derivation） | [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) Accepted Decisions register | ADR/SSOT → Derived register | ADR Acceptance | Register must link ADR-0023 | Derived Target Missing | **Aligned**（Migration 8 registration; Post–ADR-0023 progress reflects released `v1.86.0` + Pending `v1.86.1`） | 8, v1.86.1 | **Prohibited** |
-| SM-008 | Current Repository Baseline（version@commit） | Current Baseline Record → Current Repository Baseline | [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) `## Current Repository Baseline` | Record → Derived | Formal Record population | Table Version/Commit match Record | Derived Target Stale | **Aligned**（`v1.86.0` @ `57b3182…`） | 10, v1.86.1 | **Prohibited** |
-| SM-009 | Architecture Maturity State | Current Baseline Record → Architecture Maturity State | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Current Maturity | Record → Derived | Maturity/lifecycle authorization | Compare maturity marker to Record | Derived Target Stale | **Aligned**（Level 3.19 current marker; frame `v1.86.0`） | 10, v1.86.1 | **Prohibited** |
-| SM-010 | Architecture Maturity / current release frame | Current Baseline Record → Architecture Maturity State + Current Version | [docs/architecture/README.md](./README.md) Current Maturity line | Record → Derived | Formal Record population | Maturity line cites authorized Current Version frame | Derived Target Stale | **Aligned**（v1.86.0 / Level 3.19; ADR-0023 pointer present） | 10, v1.86.1 | **Prohibited** |
-| SM-011 | Current Governance Phase banner | Current Baseline Record → Current Governance Phase | [NON_GOALS.md](./NON_GOALS.md) Current Phase banner | Record → Derived | Formal Record / phase authorization | Banner matches Record phase | Derived Target Stale | **Aligned**（released `v1.86.0`; corrective `v1.86.1`; prohibitions preserved） | 10, v1.86.1 | **Prohibited** |
-| SM-012 | Catalog Registration / maturity chain | Current Baseline Record → related governance fields | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Current Maturity Position / registration chain | Record → Derived | Formal Record population | FEC current markers match Record | Derived Target Stale | **Aligned**（Level 3.19 / v1.86.0 framing; deferred/prohibited preserved） | 10, v1.86.1 | **Prohibited** |
+| SM-001 | Current Version | Current Baseline Record → Current Version | [docs/VERSION.md](../VERSION.md) `## 現在のバージョン` | Record → Derived | Formal Record population / authorized baseline change | Compare VERSION current header to Record; Quality Tests 98 / 1232 family | Derived Target Stale | **Aligned**（display `v1.86.1`; Pending `v1.86.2`） | 6, 10, v1.86.2 | **Prohibited** |
+| SM-002 | Current Release | Current Baseline Record → Current Release | [docs/VERSION.md](../VERSION.md) current-phase / release summary | Record → Derived | Formal Record population | Compare release designation text to Record | Derived Target Stale | **Aligned**（Repository Baseline Identity Reconciliation） | 6, 10, v1.86.2 | **Prohibited** |
+| SM-003 | Current Version（user-facing） | Current Baseline Record → Current Version | [README.md](../../README.md) top current-release section `Current Version:` | Record → Derived | Formal Record population / release sync | Grep/assert README current section vs Record | Derived Target Stale | **Aligned**（top `v1.86.1`; nested historical ≤ v1.86.0 preserved） | 10, v1.86.2 | **Prohibited** |
+| SM-004 | Quality Pipeline Baseline（PASS display） | Current Baseline Record → Quality Pipeline Baseline | [README.md](../../README.md) current-release Quality Pipeline line | Record → Derived | Quality baseline authorization | Compare PASS count display to Record | Derived Target Stale / Evidence Mismatch | **Aligned**（current Quality **1232 PASS**; historical PASS claims under ≤ v1.86.0 / v1.85.0 preserved） | 10, 11, v1.86.2 | **Prohibited** |
+| SM-005 | Current Version value authority claim | Current Baseline Record（authority hierarchy） | [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) Current Version SSOT sentence | Record/Authority → Derived Rules doc | ADR-0023 Acceptance + SSOT | Policy must state VERSION is Derived; Record is value SSOT | Derived Target Contradictory / Circular Authority Dependency | **Aligned**（Migration 5 Authority Boundary; current notes reframed for released `v1.86.1`） | 5, v1.86.2 | **Prohibited** |
+| SM-006 | Current Version locus in release flow | Current Baseline Record + ADR-0023 hierarchy | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) VERSION update / Current Version references | Record → Derived | ADR-0023 Acceptance + SSOT | Flow must not treat VERSION as sole value authority | Derived Target Contradictory | **Aligned**（Migration 7 Authority Boundary; current notes reframed for released `v1.86.1`） | 7, v1.86.2 | **Prohibited** |
+| SM-007 | ADR-0023 registry presence | ADR-0023 Accepted status（governance register derivation） | [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) Accepted Decisions register | ADR/SSOT → Derived register | ADR Acceptance | Register must link ADR-0023 | Derived Target Missing | **Aligned**（Migration 8 registration; Post–ADR-0023 progress reflects released `v1.86.1` + Pending `v1.86.2`） | 8, v1.86.2 | **Prohibited** |
+| SM-008 | Current Repository Baseline（version@commit） | Current Baseline Record → Current Repository Baseline | [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) `## Current Repository Baseline` | Record → Derived | Formal Record population | Table Version/Commit match Record | Derived Target Stale | **Aligned**（`v1.86.1` @ `a47e892…`） | 10, v1.86.2 | **Prohibited** |
+| SM-009 | Architecture Maturity State | Current Baseline Record → Architecture Maturity State | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Current Maturity | Record → Derived | Maturity/lifecycle authorization | Compare maturity marker to Record | Derived Target Stale | **Aligned**（Level 3.19 current marker; frame `v1.86.1`） | 10, v1.86.2 | **Prohibited** |
+| SM-010 | Architecture Maturity / current release frame | Current Baseline Record → Architecture Maturity State + Current Version | [docs/architecture/README.md](./README.md) Current Maturity line | Record → Derived | Formal Record population | Maturity line cites authorized Current Version frame | Derived Target Stale | **Aligned**（v1.86.1 / Level 3.19; ADR-0023 pointer present） | 10, v1.86.2 | **Prohibited** |
+| SM-011 | Current Governance Phase banner | Current Baseline Record → Current Governance Phase | [NON_GOALS.md](./NON_GOALS.md) Current Phase banner | Record → Derived | Formal Record / phase authorization | Banner matches Record phase | Derived Target Stale | **Aligned**（released `v1.86.1`; corrective `v1.86.2`; prohibitions preserved） | 10, v1.86.2 | **Prohibited** |
+| SM-012 | Catalog Registration / maturity chain | Current Baseline Record → related governance fields | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Current Maturity Position / registration chain | Record → Derived | Formal Record population | FEC current markers match Record | Derived Target Stale | **Aligned**（Level 3.19 / v1.86.1 framing; deferred/prohibited preserved） | 10, v1.86.2 | **Prohibited** |
 | SM-013 | Risk reassessment markers tied to baseline | Current Baseline Record（where risk status cites current baseline） | [RISK_REGISTER.md](./RISK_REGISTER.md) CL-013 / PR status narrative | Record → Derived（optional unless Record requires） | Risk owner update after baseline change | Risk text must not invent competing Current Version authority | Non-Blocking Informational Drift | **Unchanged / Historical**（event-dated facts left as Historical; no competing Current Version authority） | 10 | **Prohibited** |
-| SM-014 | Current Version enforcement | Current Baseline Record → Current Version | `scripts/test_quality_pipeline.sh` Tests 98 / 1231 / 1232 | Record → Enforcement | After Record population + derived VERSION/README sync | Tests assert Record-aligned current version | Derived Target Stale / Evidence Mismatch | **Aligned**（Model A — SM-014 identity scope = Tests 98 / 1231 / 1232 only: Tests 98 / 1232 assert `v1.86.0` + Pending `v1.86.1`; Test 1231 remains historical v1.84.0 documentation lock. Tests 988 / 1026 / 1034 unchanged outside SM-014 identity scope） | 11, v1.86.1 | **Prohibited** |
+| SM-014 | Current Version enforcement | Current Baseline Record → Current Version | `scripts/test_quality_pipeline.sh` Tests 98 / 1231 / 1232 | Record → Enforcement | After Record population + derived VERSION/README sync | Tests assert Record-aligned current version | Derived Target Stale / Evidence Mismatch | **Aligned**（Model A — SM-014 identity scope = Tests 98 / 1231 / 1232 only: Tests 98 / 1232 assert `v1.86.1` + Pending `v1.86.2`; Test 1231 remains historical v1.84.0 documentation lock. Tests 988 / 1026 / 1034 unchanged outside SM-014 identity scope） | 11, v1.86.2 | **Prohibited** |
 | SM-015 | Public Contract Catalog Baseline | Current Baseline Record → Public Contract Catalog Baseline | Catalog generation evidence via `npm run public-contract:catalog` / in-process validate | Record → Evidence/Enforcement | Catalog or Record catalog-baseline change | `validatePublicContractCatalog` PASS; CLI Application Foundations `7` and Total Foundations `12` both match schema | Evidence Mismatch | **Aligned**（Total Foundations `12` = app`7`+platform`5`; Application Foundations `7`） — **Verified Unchanged** | 10, 11 | **Prohibited** |
 | SM-016 | Provider Contracts Count | Current Baseline Record → Public Contract Catalog Baseline | [docs/VERSION.md](../VERSION.md) Provider Contracts display; architecture status tables | Record → Derived | Catalog/Record authorization | Displayed count = Record | Derived Target Stale | **Aligned**（Provider Contracts `3`） — **Verified Unchanged** | 6, 10 | **Prohibited** |
 | SM-017 | Catalog Version | Current Baseline Record → Public Contract Catalog Baseline | VERSION / architecture catalogVersion displays | Record → Derived | Catalog schema policy | Displayed catalogVersion = Record | Derived Target Stale | **Aligned**（catalogVersion `1.0`） — **Verified Unchanged** | 6, 10 | **Prohibited** |
@@ -588,10 +589,10 @@ Pending Release `v1.86.1`. Matrix rows still define the sync relationship.
 | SM-019 | Repository-wide Level 4 Implementation Ready | Current Baseline Record → related governance/declaration fields | VERSION / FEC / maturity Not Declared markers | Record → Derived | Separate L4 authorization | Remain Not Declared unless authorized | Release Declaration Mismatch | **Aligned** on **Not Declared** — **Verified Unchanged** | — | **Prohibited** |
 | SM-020 | Deferred Constraints（CL-004/005/006） | Current Baseline Record / Risk & Non-Goal governance | RISK_REGISTER / NON_GOALS / FEC deferred markers | Record → Derived | ADR before constraint release | Remain Deferred | Non-Blocking Informational Drift if wording-only | **Aligned**（Deferred preserved） — **Verified Unchanged** | — | **Prohibited** |
 | SM-021 | Prohibited Capabilities（Real Provider / External IO / SNS publish） | Current Baseline Record / NON_GOALS authority | NON_GOALS / architecture prohibited capability statements | Record → Derived | Separate authorization to lift prohibition | Remain Prohibited | Derived Target Contradictory if lifted without ADR | **Aligned**（Prohibited preserved） — **Verified Unchanged** | — | **Prohibited** |
-| SM-022 | Current Commit / Tag / Branch / Divergence / Push | Current Baseline Record → Release Identity/State | PPRR Current Repository Baseline commit; future VERSION metadata if Record requires | Record → Derived | Formal Record population | Derived commit/tag match Record; Git evidence validates | Evidence Mismatch / Derived Target Stale | **Aligned**（VERSION + PPRR `57b3182…` / tag `v1.86.0` / Completed / `0 0`） | 10, v1.86.1 | **Prohibited** |
-| SM-023 | Working Tree / Staged / Authorized change set | Current Baseline Record → Working Tree State + governance phase | Release readiness / phase docs if Record requires working-tree disclosure | Record → Derived | Phase boundary changes | Do not treat untracked planning files as Record authority | Non-Blocking Informational Drift | **Aligned**（Released Working Tree **Clean**; Pending `v1.86.1` edits ≠ Record authority） | v1.86.1 | **Prohibited** |
+| SM-022 | Current Commit / Tag / Branch / Divergence / Push | Current Baseline Record → Release Identity/State | PPRR Current Repository Baseline commit; future VERSION metadata if Record requires | Record → Derived | Formal Record population | Derived commit/tag match Record; Git evidence validates | Evidence Mismatch / Derived Target Stale | **Aligned**（VERSION + PPRR `a47e892…` / tag `v1.86.1` / Completed / `0 0`） | 10, v1.86.2 | **Prohibited** |
+| SM-023 | Working Tree / Staged / Authorized change set | Current Baseline Record → Working Tree State + governance phase | Release readiness / phase docs if Record requires working-tree disclosure | Record → Derived | Phase boundary changes | Do not treat untracked planning files as Record authority | Non-Blocking Informational Drift | **Aligned**（Released Working Tree **Clean**; Pending `v1.86.2` edits ≠ Record authority） | v1.86.2 | **Prohibited** |
 | SM-024 | ADR-0023 operational pointer | ADR-0023 + this SSOT | [docs/architecture/README.md](./README.md) governance inventory / entry links（optional） | Authority → Optional Derived | Architecture index update | Link presence does not create second authority | Non-Blocking Informational Drift | **Aligned**（BASELINE_SYNCHRONIZATION + ADR-0023 linked） | 10 | **Prohibited** |
-| SM-025 | Historical Release History | Historical Records（not Current Baseline Record） | VERSION `## バージョン履歴` / CHANGELOG historical sections / nested README historical Current Version lines | **No current-baseline sync** | Historical release closure only | Historical rows ≤ `v1.85.0` unchanged; append `v1.86.0` historical / `v1.86.1` Unreleased only | Unauthorized Reverse Synchronization if used to overwrite Record | **Historical Preserved**（≤ v1.85.0 unchanged; append-only for v1.86.0 / v1.86.1） | v1.86.1 | **Prohibited** |
+| SM-025 | Historical Release History | Historical Records（not Current Baseline Record） | VERSION `## バージョン履歴` / CHANGELOG historical sections / nested README historical Current Version lines | **No current-baseline sync** | Historical release closure only | Historical rows ≤ `v1.86.0` unchanged; append `v1.86.1` historical / `v1.86.2` Unreleased only | Unauthorized Reverse Synchronization if used to overwrite Record | **Historical Preserved**（≤ v1.86.0 unchanged; append-only for v1.86.1 / v1.86.2） | v1.86.2 | **Prohibited** |
 
 **Matrix entry count:** 25
 
@@ -640,19 +641,19 @@ Pending Release `v1.86.1`. Matrix rows still define the sync relationship.
 | Release Declaration Mismatch | Docs declare release/readiness not authorized by Record/ADR | **Yes** | Remove unauthorized declaration | **Yes** |
 | Non-Blocking Informational Drift | Wording/historical/event-dated drift without competing authority | **No** | Optional cleanup in sync phase | **No** |
 
-Known drifts（historical remediations through released `v1.86.0`, plus corrective
-identity reconciliation under Pending `v1.86.1`）:
+Known drifts（historical remediations through released `v1.86.1`, plus corrective
+released-state reconciliation under Pending `v1.86.2`）:
 
 | ID | Location | Classification |
 | -- | -------- | -------------- |
 | D-001 | `VERSIONING_POLICY.md` Current Version value authority | **Remediated**（Migration 5 Authority Boundary）— **Historical** |
-| D-002 | `docs/VERSION.md` current header / Next Phase | **Remediated historically** to `v1.85.0` framing; **superseded** by D-008 identity reconciliation to Record `v1.86.0` |
+| D-002 | `docs/VERSION.md` current header / Next Phase | **Remediated historically** to `v1.85.0` framing; **superseded** by D-008 identity reconciliation to Record `v1.86.0` / `v1.86.1` |
 | D-003 | `GOVERNANCE_FLOW.md` VERSION as Current Version locus | **Remediated**（Migration 7 Authority Boundary）— **Historical** |
 | D-004 | `ARCHITECTURE_DECISIONS.md` ADR-0023 registry | **Remediated**（Migration 8 registration）— **Historical** |
 | D-005 | README / architecture README / NON_GOALS / PPRR current-state framing | **Remediated historically** to `v1.85.0`; **superseded** by D-008 |
-| D-006 | Quality enforcement Tests 988 / 1026 / 1034（canonical three-state / assessment≠declaration / bounded≠global non-claims） | **Remediated** under released `v1.86.0` — Quality Pipeline **1232 PASS** |
-| D-007 | Authoritative Record values | **Remediated** — Record populated for released baselines; Independent Review Complete — A. GO for `v1.86.0` |
-| D-008 | Git-released `v1.86.0` @ `57b3182…` vs Record/Derived still asserting `v1.85.0` / `v1.86.0` Planning / Commit·Tag·Push Pending | **Remediated** under **v1.86.1** Identity Reconciliation（Record → Derived → Quality; Pending `v1.86.1` Not Declared） |
+| D-006 | Quality enforcement Tests 988 / 1026 / 1034（canonical three-state / assessment≠declaration / bounded≠global non-claims） | **Remediated** under released `v1.86.0` lineage — Quality Pipeline **1232 PASS** |
+| D-007 | Authoritative Record values | **Remediated** — Record populated for released baselines; Independent Review Complete — A. GO for `v1.86.0` / `v1.86.1` |
+| D-008 | Git-released `v1.86.0` @ `57b3182…` vs Record/Derived still asserting `v1.85.0` / `v1.86.0` Planning / Commit·Tag·Push Pending | **Remediated** under **released `v1.86.1`** Identity Reconciliation（Record → Derived → Quality; Commit / Tag / Push **Complete**; Pending corrective now `v1.86.2`） |
 
 ---
 
@@ -925,13 +926,13 @@ Complete when:
 **Historical phase criteria**（initial population for released baseline `v1.85.0`
 during ADR-0023 planning）remain historical evidence only.
 
-**Current Record complete-when**（§6.2.2 released `v1.86.0`）:
+**Current Record complete-when**（§6.2.2 released `v1.86.1`）:
 
 * Every required Inventory Field in §6.2.2 has an authorized **Recorded** value
-  for released baseline `v1.86.0`.
-* Current Version is **`v1.86.0`**（not `v1.86.1` while Pending）.
-* Pending Release Values are `v1.86.1` **Not Declared**.
-* Git evidence validates Current Commit `57b3182…` / Tag `v1.86.0` / Branch /
+  for released baseline `v1.86.1`.
+* Current Version is **`v1.86.1`**（not `v1.86.2` while Pending）.
+* Pending Release Values are `v1.86.2` **Not Declared**.
+* Git evidence validates Current Commit `a47e892…` / Tag `v1.86.1` / Branch /
   Divergence `0 0` / Push Completed.
 * Released Working Tree State is **Clean**.
 * Quality Pipeline Baseline records **1232 PASS**.
@@ -942,35 +943,36 @@ during ADR-0023 planning）remain historical evidence only.
 **Historical implementation success criteria**（sync to Record `v1.85.0` during
 ADR-0023 planning）remain historical evidence only.
 
-**Current identity-reconciliation success criteria**（Pending `v1.86.1`）:
+**Current released-state reconciliation success criteria**（Pending `v1.86.2`）:
 
-* Required Derived Target **current-state** displays match Record `v1.86.0`.
-* Historical Records（VERSION history rows ≤ `v1.85.0`, nested README historical
-  sections, event-dated risk facts）remain unchanged; append-only for `v1.86.0`
-  historical / `v1.86.1` Unreleased.
-* Pending Release remains `v1.86.1` **Not Declared**.
+* Required Derived Target **current-state** displays match Record `v1.86.1`.
+* Historical Records（VERSION history rows ≤ `v1.86.0`, nested README historical
+  sections, event-dated risk facts）remain unchanged; append-only for `v1.86.1`
+  historical / `v1.86.2` Unreleased.
+* Pending Release remains `v1.86.2` **Not Declared**.
 * Image Review Entry / Formally Assessed remain **NO**; Production Ready remains
   **Not Declared**; CL-004/005/006 Deferred; Real Provider / External IO / SNS
   prohibited.
 * Reverse synchronization remains **Prohibited**.
-* D-008 identity drift is remediated; Quality Tests 98 / 1232 assert `v1.86.0`.
-* Tag `v1.86.0` is not modified, deleted, or recreated.
+* D-008 identity drift is remediated under released `v1.86.1`; Quality Tests 98 /
+  1232 assert `v1.86.1`.
+* Tag `v1.86.1` is not modified, deleted, or recreated.
 
-**Governance completion** for corrective `v1.86.1` requires Independent Review
-approval. Until then:
+**Governance completion** for corrective `v1.86.2` requires Implementation
+approval then Commit Execution authorization. Until then:
 
 ```text
-Identity reconciliation implementation applied
-≠ v1.86.1 release declared
-≠ Commit / tag / push for v1.86.1 authorized
+Released-state reconciliation implementation applied
+≠ v1.86.2 release declared
+≠ Commit / tag / push for v1.86.2 authorized
 ```
 
-Status marker: **v1.86.1 Commit Preparation**（Independent Review Complete — A. GO）.
+Status marker: **v1.86.2 Implementation** / **Not Declared**.
 
 ### 15.5 Quality Enforcement Correction Phase
 
 **Implementation success criteria**（applied when Quality Pipeline fully passes
-against the approved readiness semantics under released `v1.86.0`）:
+against the approved readiness semantics under released `v1.86.1`）:
 
 * Test 988 enforces
   `Review Entry Authorized ≠ Production Readiness Assessed ≠ Production Ready`.
@@ -980,12 +982,12 @@ against the approved readiness semantics under released `v1.86.0`）:
   Production Ready declaration scopes separately.
 * Full Quality Pipeline exit `0` with PASS count recorded（**1232 PASS**）.
 * D-006 marked **Remediated**.
-* Identity Tests 98 / 1232 assert Current Version `v1.86.0` and Pending
-  `v1.86.1`（D-008）.
+* Identity Tests 98 / 1232 assert Current Version `v1.86.1` and Pending
+  `v1.86.2`（released-state reconciliation）.
 * Bounded Production Ready remains **NO**; Global Provider Production Ready
   remains **Not Declared**.
 * Historical Records remain unchanged by Quality remediation.
-* No modification of tag `v1.86.0`; no `v1.86.1` commit / tag / push in this
+* No modification of tag `v1.86.1`; no `v1.86.2` commit / tag / push in this
   implementation phase.
 
 ## 16. Current Phase Boundary
@@ -997,40 +999,42 @@ Model, Current Baseline Record, and Synchronization Matrix.
 **Synchronization Matrix Instantiation is complete**（§8.1）.
 
 **Current Baseline Record Population is complete** for released baseline
-`v1.86.0`（§6.2.2）— Git identity `57b3182…` / tag `v1.86.0` / Commit·Tag·Push
+`v1.86.1`（§6.2.2）— Git identity `a47e892…` / tag `v1.86.1` / Commit·Tag·Push
 **Complete**.
 
-**v1.86.1 Repository Baseline Identity Reconciliation — Independent Review
-Complete — Decision A. GO.** Required Derived Targets and Quality enforcement
-are synchronized to Record `v1.86.0`（Record → Derived → Quality）. Current phase
-is **Commit Preparation**. Pending Release `v1.86.1` is **Not Declared**.
+**v1.86.1 Repository Baseline Identity Reconciliation is Released.** Required
+Derived Targets and Quality enforcement are synchronized to Record `v1.86.1`
+（Record → Derived → Quality）. Current phase is **v1.86.2 Implementation**
+（v1.86.1 released-state reconciliation）. Pending Release `v1.86.2` is
+**Not Declared**.
 
-**Quality Enforcement Correction** under released `v1.86.0` remains **Complete**
-（Tests 988 / 1026 / 1034 remediated; **1232 PASS**; D-006 **Remediated**）.
+**Quality Enforcement Correction** under released `v1.86.1` lineage remains
+**Complete**（Tests 988 / 1026 / 1034 remediated; **1232 PASS**; D-006
+**Remediated**）.
 
 This phase does **not**:
 
-* set Current Version to **v1.86.1**;
-* declare v1.86.1 Release Complete;
-* modify, delete, or recreate tag **v1.86.0**;
+* set Current Version to **v1.86.2**;
+* declare v1.86.2 Release Complete;
+* modify, delete, or recreate tag **v1.86.1**;
 * authorize Image Provider Review Entry or Formal Assessment;
 * authorize Production Ready / repository-wide Level 4;
 * authorize Real Provider / External IO / automatic SNS publishing;
 * change CL-004 / CL-005 / CL-006;
 * start **v1.87.0** Production Readiness Assessment;
-* execute commit / tag / push for `v1.86.1` until Commit Preparation approval
+* execute commit / tag / push for `v1.86.2` until Implementation approval
   and Commit Execution authorization.
 
 Next Phase Candidate（not formally authorized）
 
 ```
 Next Phase Candidate:
-Commit Execution for v1.86.1
-（only after Commit Preparation approval）
+Commit Execution for v1.86.2
+（only after Implementation approval）
 Commit / Tag / Push — Pending
 Release — Not Declared
 v1.87.0 Production Readiness Assessment — not started
 ```
 
-Independent Review of v1.86.1 Identity Reconciliation is **Complete** — Decision
-**A. GO**. Commit Execution remains separately authorized.
+v1.86.1 Identity Reconciliation Commit / Tag / Push is **Complete**. Commit
+Execution for `v1.86.2` remains separately authorized.

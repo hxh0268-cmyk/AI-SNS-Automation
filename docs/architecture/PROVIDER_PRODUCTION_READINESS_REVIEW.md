@@ -26,18 +26,18 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 | Item | Value |
 |------|-------|
-| **Version** | **v1.86.0** |
-| **Commit** | `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
-| **Tag** | `v1.86.0` |
+| **Version** | **v1.86.1** |
+| **Commit** | `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c` |
+| **Tag** | `v1.86.1` |
 | **Branch** | `main` |
 | **Release / Push Status** | **Completed** / **Completed** |
 | **Remote Synchronization / Divergence** | **Synchronized** / `0 0` |
-| **Release State** | Repository Baseline Inventory Authority complete（prior SSOT Alignment / Image Catalog Registration lineages preserved） |
+| **Release State** | Repository Baseline Identity Reconciliation complete（prior Inventory Authority / SSOT Alignment / Image Catalog Registration lineages preserved） |
 | **Provider Contracts** | **3** |
 | **Catalog Version** | `1.0` |
 | **Text Generation Mock Provider** | **Implemented / Registered** |
 | **Image Generation Mock Provider** | **Implemented / Registered** |
-| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.0`） |
+| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.1`） |
 | **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
 | **Bounded Production Ready Declaration** | **NO** |
 | **Global Provider Production Ready** | **Not Declared** |
@@ -46,7 +46,7 @@ Provider Production Readiness Review は、Provider domain の production readin
 | **Automatic SNS Publishing** | **Prohibited** |
 | **Image Review Entry Authorized** | **NO** |
 | **Image Formally Assessed** | **NO** |
-| **Pending Corrective Release** | **v1.86.1** Identity Reconciliation — Independent Review **Complete** — Decision **A. GO** — **Commit Preparation** / **Not Declared**（Commit / Tag / Push **Pending**） |
+| **Pending Corrective Release** | **v1.86.2** v1.86.1 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
 
 The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
 

@@ -4,22 +4,49 @@
 
 ---
 
-## v1.86.1 — Repository Baseline Identity Reconciliation（Unreleased / Commit Preparation）
+## v1.86.2 — v1.86.1 released-state reconciliation（Unreleased / Implementation）
 
-Corrective patch planning to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.0` @ `57b3182ea2fb51f4f3441f9c1013543276cb757f`.
+Corrective patch Implementation to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.1` @ `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`.
 
-**Status:** Commit Preparation / **Not Declared** — Independent Review **Complete** — Decision **A. GO**; Commit / Tag / Push pending.
+**Status:** Implementation / **Not Declared** — Commit / Tag / Push pending.
 
-Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.0`.
+Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.1`.
 
 ### 変更内容（planned）
 
 | 項目 | 内容 |
 |------|------|
-| Record | Current Baseline Record → released `v1.86.0` |
+| Record | Current Baseline Record → released `v1.86.1` |
 | Derived | VERSION / README / PPRR / architecture current-state sync |
-| Quality | Tests 98 / 1232 / handoff nextVersion identity locks |
+| Quality | Tests 98 / 1232 identity locks（Test 1231 unchanged） |
 | Catalog / Providers | **Unchanged** |
+
+---
+
+## v1.86.1 — Repository Baseline Identity Reconciliation
+
+Repository Baseline Identity Reconciliation — Current Baseline Record / Required Derived Targets / Quality enforcement reconciled to Git-released `v1.86.0` identity, then released as `v1.86.1`.
+
+Commit: `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`. Tag: `v1.86.1`. Branch: `main`. Remote synchronized.
+
+**Status:** Released / **Completed** — Commit / Tag / Push **Complete**. Quality Pipeline **1232 PASS**.
+
+Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.0`.
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Record | Current Baseline Record → released `v1.86.0` identity surfaces closed under `v1.86.1` |
+| Derived | VERSION / README / PPRR / architecture current-state sync |
+| Quality | Tests 98 / 1232 identity locks; **1232 PASS** |
+| Catalog / Providers | **Unchanged** |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1232 PASS** |
 
 ---
 

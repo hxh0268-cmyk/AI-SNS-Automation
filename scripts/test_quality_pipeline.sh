@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.86.0 --"
+echo "-- Test 98: VERSION updated to v1.86.1 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.0**（Repository Baseline Inventory Authority）",
+    "**v1.86.1**（Repository Baseline Identity Reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.86.0");
+  throw new Error("docs/VERSION.md current version must be v1.86.1");
 }
 
 if (
   currentSection.includes(
-    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
+    "**v1.86.0**（Repository Baseline Inventory Authority）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.85.0");
+  throw new Error("docs/VERSION.md current version must not remain v1.86.0");
 }
 
-console.log("VERSION v1.86.0 ok");
+console.log("VERSION v1.86.1 ok");
 EOF
-pass "VERSION updated to v1.86.0"
+pass "VERSION updated to v1.86.1"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -21875,7 +21875,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.86.0 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.86.1 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21884,10 +21884,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.0**（Repository Baseline Inventory Authority）",
+    "**v1.86.1**（Repository Baseline Identity Reconciliation）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.86.0");
+  throw new Error("current VERSION section must declare v1.86.1");
 }
 
 for (const marker of [
@@ -21904,13 +21904,13 @@ for (const marker of [
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
-  "**Repository Baseline Commit:** `57b3182ea2fb51f4f3441f9c1013543276cb757f`",
-  "**Repository Baseline Tag:** `v1.86.0`",
+  "**Repository Baseline Commit:** `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`",
+  "**Repository Baseline Tag:** `v1.86.1`",
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
-  "**v1.86.1** Repository Baseline Identity Reconciliation — **Commit Preparation** / **Not Declared**",
-  "Independent Review **Complete** — Decision **A. GO**",
+  "**v1.86.2** v1.86.1 released-state reconciliation — **Implementation** / **Not Declared**",
   "Commit / Tag / Push **Pending**",
+  "**v1.87.0** Production Readiness Assessment **not started**",
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
@@ -21922,16 +21922,23 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
 }
 
 if (
-  currentSection.includes("**v1.86.0** Planning / **Not Declared**") ||
-  currentSection.includes("**Next Phase Candidate:** **v1.86.0**") ||
-  currentSection.includes("Independent Review of v1.86.1 Identity Reconciliation — **Pending**")
+  currentSection.includes(
+    "**v1.86.0**（Repository Baseline Inventory Authority）",
+  ) ||
+  currentSection.includes(
+    "**v1.86.1** Repository Baseline Identity Reconciliation — **Commit Preparation** / **Not Declared**",
+  ) ||
+  currentSection.includes("v1.86.1 Commit / Tag / Push **Pending**") ||
+  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.1**")
 ) {
-  throw new Error("current VERSION section must not treat v1.86.0 as Planning / Not Declared or leave Independent Review Pending");
+  throw new Error(
+    "current VERSION section must not treat v1.86.0 Inventory Authority as sole current, leave Pending v1.86.1 Commit Preparation, or leave v1.86.1 Commit/Tag/Push Pending",
+  );
 }
 
-console.log("v1.86.0 current version metadata ok");
+console.log("v1.86.1 current version metadata ok");
 EOF
-pass "v1.86.0 current version metadata in VERSION.md"
+pass "v1.86.1 current version metadata in VERSION.md"
 
 
 echo ""

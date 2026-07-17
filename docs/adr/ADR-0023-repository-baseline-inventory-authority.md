@@ -296,11 +296,11 @@ A later step shall never justify omission of an earlier dependency.
 
 ## Current Progress
 
-**v1.86.0** is **Released** at commit `57b3182ea2fb51f4f3441f9c1013543276cb757f`
-（tag `v1.86.0`; remote synchronized）. Corrective workstream **v1.86.1**
-（Repository Baseline Identity Reconciliation）Independent Review is **Complete**
-— Decision **A. GO**; current phase is **Commit Preparation**; Release remains
-**Not Declared**.
+**v1.86.1** is **Released** at commit `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`
+（tag `v1.86.1`; remote synchronized）. Parent release **v1.86.0** remains
+**Released** at `57b3182ea2fb51f4f3441f9c1013543276cb757f`. Corrective workstream
+**v1.86.2**（v1.86.1 released-state reconciliation）is in **Implementation**;
+Release remains **Not Declared**. Post-Push Review for `v1.86.1` is **Complete**.
 
 | Migration Step / Phase | Status |
 | ---------------------- | ------ |
@@ -313,7 +313,7 @@ A later step shall never justify omission of an earlier dependency.
 | 7 — GOVERNANCE_FLOW authority correction | **Complete** |
 | 8 — ARCHITECTURE_DECISIONS registry update | **Complete** |
 | 9 — Synchronization Matrix instantiation（SM-001–SM-025） | **Complete** |
-| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.0`） |
+| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.1`） |
 | 11 — Quality Enforcement Correction（Tests 988 / 1026 / 1034 remediated; **1232 PASS**） | **Complete** |
 | 12 — Independent Review | **Complete** — Decision **A. GO** |
 | 13 — Commit（v1.86.0） | **Complete** — `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
@@ -323,7 +323,7 @@ A later step shall never justify omission of an earlier dependency.
 | Recorded outcome（v1.86.0） | Status |
 | -------------------------- | ------ |
 | ADR Acceptance | **Complete** |
-| Current Baseline Record population | **Complete**（Recorded Current Version `v1.86.0`） |
+| Current Baseline Record population | **Complete**（Recorded Current Version `v1.86.0` — now historical） |
 | Synchronization Matrix | **Complete** |
 | Repository-wide Baseline Synchronization | **Complete** |
 | Quality Enforcement Correction | **Complete** |
@@ -335,7 +335,16 @@ A later step shall never justify omission of an earlier dependency.
 | ------------------------------- | ------ |
 | Purpose | Repository Baseline Identity Reconciliation |
 | Independent Review | **Complete** — Decision **A. GO** |
-| Status | **Commit Preparation** |
+| Status | **Released / Completed** |
+| Release | **Released** — commit `a47e892…` / tag `v1.86.1` / remote synchronized |
+| Commit / Tag / Push | **Complete** |
+| Post-Push Review | **Complete** |
+| Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |
+
+| Corrective workstream（v1.86.2） | Status |
+| ------------------------------- | ------ |
+| Purpose | v1.86.1 released-state reconciliation |
+| Status | **Implementation** / **Not Declared** |
 | Release | **Not Declared** |
 | Commit / Tag / Push | **Pending** |
 | Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |

@@ -1170,20 +1170,35 @@ Latest Current Step
 release-plan
 ```
 
-### Repository Baseline Inventory Authority Release（v1.86.0）
+### Repository Baseline Identity Reconciliation Release（v1.86.1）
 
-**Repository Baseline Inventory Authority Release** を実施しました。ADR-0023 Accepted + Current Baseline Record + Synchronization Matrix SM-001–SM-025 + Quality Enforcement Correction（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+**Repository Baseline Identity Reconciliation Release** を実施しました。Git-released `v1.86.0` と Record / Derived / Quality の identity を整合し、Current Baseline を `v1.86.1` として確定（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
 
-**Current Version: v1.86.0** | **Quality Pipeline: `1232 PASS`**
+**Current Version: v1.86.1** | **Quality Pipeline: `1232 PASS`**
 
-Repository Baseline Inventory Authority: **Complete / Released**。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `57b3182ea2fb51f4f3441f9c1013543276cb757f`。Tag: `v1.86.0`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Corrective Release: **v1.86.1** Identity Reconciliation — Independent Review **Complete** — Decision **A. GO** — **Commit Preparation** / **Not Declared**（Commit / Tag / Push **Pending**）。v1.87.0 Assessment: **not started**。
+Repository Baseline Identity Reconciliation: **Complete / Released**。Repository Baseline Inventory Authority: **Complete / Released**（v1.86.0 lineage preserved）。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`。Tag: `v1.86.1`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Corrective Release: **v1.86.2** v1.86.1 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**）。v1.87.0 Assessment: **not started**。
 
 | 項目 | 内容 |
 |------|------|
 | Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
-| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 **Released**; corrective v1.86.1 Commit Preparation） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 Released; v1.86.1 Identity Reconciliation **Released**; corrective v1.86.2 Implementation） |
 | Current Maturity | **Level 3.19** |
-| Next Phase Candidate | Commit Execution for **v1.86.1** — only after Commit Preparation approval |
+| Next Phase Candidate | Commit Execution for **v1.86.2** — only after Implementation approval |
+
+### Repository Baseline Inventory Authority Release（v1.86.0）
+
+**Repository Baseline Inventory Authority Release** を実施しました。ADR-0023 Accepted + Current Baseline Record + Synchronization Matrix SM-001–SM-025 + Quality Enforcement Correction（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+
+**Current Version: v1.86.0** | **Quality Pipeline: `1232 PASS` lineage（historical release section）**
+
+Repository Baseline Inventory Authority: **Complete / Released**。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `57b3182ea2fb51f4f3441f9c1013543276cb757f`。Tag: `v1.86.0`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Historical successor **v1.86.1** Identity Reconciliation: **Released**。
+
+| 項目 | 内容 |
+|------|------|
+| Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 **Released**; historical successor v1.86.1 now Released） |
+| Current Maturity | **Level 3.19** |
+| Next Phase Candidate | **v1.86.1** Repository Baseline Identity Reconciliation（historical successor — now Released） |
 
 ### Provider Production Readiness SSOT Alignment Release（v1.85.0）
 
