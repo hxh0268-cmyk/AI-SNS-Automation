@@ -1170,20 +1170,35 @@ Latest Current Step
 release-plan
 ```
 
-### Provider Production Readiness SSOT Alignment Release（v1.85.0）
+### Repository Baseline Inventory Authority Release（v1.86.0）
 
-**Provider Production Readiness SSOT Alignment Release** を実施しました。Provider Production Readiness 用語を Assessment ≠ Declaration / Review Entry ≠ Production Ready に整合（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+**Repository Baseline Inventory Authority Release** を実施しました。ADR-0023 Accepted + Current Baseline Record + Synchronization Matrix SM-001–SM-025 + Quality Enforcement Correction（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
 
-**Current Version: v1.85.0** | **Quality Pipeline: planning-worktree `1232 PASS`（Quality Enforcement Correction measured）; measured v1.85.0 released Quality Not Independently Established**（historical `1232 PASS` under v1.84.0-framed sections remains historical only; planning PASS ≠ v1.85.0 released Quality proof）
+**Current Version: v1.86.0** | **Quality Pipeline: `1232 PASS`**
 
-Provider Production Readiness SSOT Alignment: **Complete**。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `0301d1a571997e3236952b3fbb2c593718e1f164`。Tag: `v1.85.0`。Branch: `main`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Release: **v1.86.0** Planning / **Not Declared**。
+Repository Baseline Inventory Authority: **Complete / Released**。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `57b3182ea2fb51f4f3441f9c1013543276cb757f`。Tag: `v1.86.0`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Corrective Release: **v1.86.1** Identity Reconciliation — Independent Review **Complete** — Decision **A. GO** — **Commit Preparation** / **Not Declared**（Commit / Tag / Push **Pending**）。v1.87.0 Assessment: **not started**。
 
 | 項目 | 内容 |
 |------|------|
 | Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
-| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Planning Accepted — not a v1.86.0 release） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 **Released**; corrective v1.86.1 Commit Preparation） |
 | Current Maturity | **Level 3.19** |
-| Next Phase Candidate | **v1.86.0** Planning / **Not Declared** |
+| Next Phase Candidate | Commit Execution for **v1.86.1** — only after Commit Preparation approval |
+
+### Provider Production Readiness SSOT Alignment Release（v1.85.0）
+
+**Provider Production Readiness SSOT Alignment Release** を実施しました。Provider Production Readiness 用語を Assessment ≠ Declaration / Review Entry ≠ Production Ready に整合（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+
+**Current Version: v1.85.0** | **Quality Pipeline: `1232 PASS` lineage（historical release section）**
+
+Provider Production Readiness SSOT Alignment: **Complete**。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `0301d1a571997e3236952b3fbb2c593718e1f164`。Tag: `v1.85.0`。Branch: `main`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。
+
+| 項目 | 内容 |
+|------|------|
+| Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — historical planning context at v1.85.0 framing） |
+| Current Maturity | **Level 3.19** |
+| Next Phase Candidate | **v1.86.0** Repository Baseline Inventory Authority（historical successor — now Released） |
 
 ### Image Generation Mock Provider Catalog Registration Implementation Release（v1.84.0）
 

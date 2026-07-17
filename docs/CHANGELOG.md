@@ -4,6 +4,68 @@
 
 ---
 
+## v1.86.1 — Repository Baseline Identity Reconciliation（Unreleased / Commit Preparation）
+
+Corrective patch planning to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.0` @ `57b3182ea2fb51f4f3441f9c1013543276cb757f`.
+
+**Status:** Commit Preparation / **Not Declared** — Independent Review **Complete** — Decision **A. GO**; Commit / Tag / Push pending.
+
+Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.0`.
+
+### 変更内容（planned）
+
+| 項目 | 内容 |
+|------|------|
+| Record | Current Baseline Record → released `v1.86.0` |
+| Derived | VERSION / README / PPRR / architecture current-state sync |
+| Quality | Tests 98 / 1232 / handoff nextVersion identity locks |
+| Catalog / Providers | **Unchanged** |
+
+---
+
+## v1.86.0 — Repository Baseline Inventory Authority Release
+
+Repository Baseline Inventory Authority — ADR-0023 Accepted — Current Baseline Record / Synchronization Matrix SM-001–SM-025 — Quality Enforcement Correction（Tests 988 / 1026 / 1034）— **1232 PASS**.
+
+Commit: `57b3182ea2fb51f4f3441f9c1013543276cb757f`. Tag: `v1.86.0`. Branch: `main`. Remote synchronized.
+
+Provider modules / Public Contract Catalog contents **unchanged**. Image Review Entry **NO**. Image Formally Assessed **NO**. Bounded Production Ready **NO**. Global Production Ready **Not Declared**.
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| ADR | ADR-0023 Repository Baseline Inventory Authority |
+| SSOT | `docs/architecture/BASELINE_SYNCHRONIZATION.md` |
+| Quality | Tests 988 / 1026 / 1034 remediated; **1232 PASS** |
+| Provider Contracts | **3**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1232 PASS** |
+
+---
+
+## v1.85.0 — Provider Production Readiness SSOT Alignment Release
+
+Provider Production Readiness SSOT Alignment — Assessment ≠ Declaration / Review Entry ≠ Production Ready terminology alignment across governance surfaces.
+
+Commit: `0301d1a571997e3236952b3fbb2c593718e1f164`. Tag: `v1.85.0`. Catalog / provider modules **unchanged**.
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Scope | Documentation / governance terminology alignment |
+| Provider Contracts | **3**（unchanged） |
+| catalogVersion | **1.0**（unchanged） |
+| Production Ready | **Not Declared**（global） |
+
+---
+
 ---
 
 ---

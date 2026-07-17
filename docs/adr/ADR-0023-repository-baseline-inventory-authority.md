@@ -296,36 +296,50 @@ A later step shall never justify omission of an earlier dependency.
 
 ## Current Progress
 
-Complete through Independent Review does **not** declare **v1.86.0** released.
+**v1.86.0** is **Released** at commit `57b3182ea2fb51f4f3441f9c1013543276cb757f`
+（tag `v1.86.0`; remote synchronized）. Corrective workstream **v1.86.1**
+（Repository Baseline Identity Reconciliation）Independent Review is **Complete**
+— Decision **A. GO**; current phase is **Commit Preparation**; Release remains
+**Not Declared**.
 
 | Migration Step / Phase | Status |
 | ---------------------- | ------ |
 | 1 — ADR-0023 Authority Decision | **Complete** |
 | 2 — ADR Independent Review | **Complete** |
-| 3 — ADR Acceptance（v1.86.0 Planning） | **Complete** |
+| 3 — ADR Acceptance（v1.86.0 Planning → Released） | **Complete** |
 | 4 — Inventory Authority / SSOT update | **Complete** |
 | 5 — VERSIONING_POLICY authority correction | **Complete** |
 | 6 — docs/VERSION.md derived-target declaration | **Complete** |
 | 7 — GOVERNANCE_FLOW authority correction | **Complete** |
 | 8 — ARCHITECTURE_DECISIONS registry update | **Complete** |
 | 9 — Synchronization Matrix instantiation（SM-001–SM-025） | **Complete** |
-| 10 — Repository-wide Baseline Synchronization | **Complete** |
+| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.0`） |
 | 11 — Quality Enforcement Correction（Tests 988 / 1026 / 1034 remediated; **1232 PASS**） | **Complete** |
 | 12 — Independent Review | **Complete** — Decision **A. GO** |
-| 13 — Commit | **Pending** |
-| 14 — Tag | **Pending** |
-| 15 — Push | **Pending** |
+| 13 — Commit（v1.86.0） | **Complete** — `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
+| 14 — Tag（v1.86.0） | **Complete** — tag `v1.86.0` |
+| 15 — Push（v1.86.0） | **Complete** — `origin/main` + tag synchronized |
 
-| Recorded outcome | Status |
-| ---------------- | ------ |
+| Recorded outcome（v1.86.0） | Status |
+| -------------------------- | ------ |
 | ADR Acceptance | **Complete** |
-| Current Baseline Record population | **Complete** |
+| Current Baseline Record population | **Complete**（Recorded Current Version `v1.86.0`） |
 | Synchronization Matrix | **Complete** |
 | Repository-wide Baseline Synchronization | **Complete** |
 | Quality Enforcement Correction | **Complete** |
 | Independent Review | **Complete** — **A. GO** |
-| Commit / Tag / Push | **Pending** — not executed |
-| **v1.86.0** Release | **Not Declared** |
+| Commit / Tag / Push | **Complete** |
+| **v1.86.0** Release | **Released** — commit `57b3182…` / tag `v1.86.0` / remote synchronized |
+
+| Corrective workstream（v1.86.1） | Status |
+| ------------------------------- | ------ |
+| Purpose | Repository Baseline Identity Reconciliation |
+| Independent Review | **Complete** — Decision **A. GO** |
+| Status | **Commit Preparation** |
+| Release | **Not Declared** |
+| Commit / Tag / Push | **Pending** |
+| Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |
+| v1.87.0 Production Readiness Assessment | **Not started** |
 
 ## Non-Goals
 

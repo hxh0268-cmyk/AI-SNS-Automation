@@ -26,25 +26,27 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 | Item | Value |
 |------|-------|
-| **Version** | **v1.85.0** |
-| **Commit** | `0301d1a571997e3236952b3fbb2c593718e1f164` |
-| **Tag** | `v1.85.0` |
+| **Version** | **v1.86.0** |
+| **Commit** | `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
+| **Tag** | `v1.86.0` |
 | **Branch** | `main` |
 | **Release / Push Status** | **Completed** / **Completed** |
 | **Remote Synchronization / Divergence** | **Synchronized** / `0 0` |
-| **Release State** | Provider Production Readiness SSOT Alignment complete（prior Image Catalog Registration **Registered** lineage preserved） |
+| **Release State** | Repository Baseline Inventory Authority complete（prior SSOT Alignment / Image Catalog Registration lineages preserved） |
 | **Provider Contracts** | **3** |
 | **Catalog Version** | `1.0` |
 | **Text Generation Mock Provider** | **Implemented / Registered** |
 | **Image Generation Mock Provider** | **Implemented / Registered** |
-| **Quality Pipeline（current evidence）** | Planning working-tree validation **1232 PASS**（Quality Enforcement Correction measured）. Measured v1.85.0 released Quality: **Not Independently Established**. Historical `1232 PASS` under v1.84.0-framed docs remains historical only; planning PASS ≠ v1.85.0 released Quality proof. |
+| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.0`） |
 | **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
 | **Bounded Production Ready Declaration** | **NO** |
 | **Global Provider Production Ready** | **Not Declared** |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **Real Provider / External IO** | **Prohibited / Not Started** |
 | **Automatic SNS Publishing** | **Prohibited** |
-| **Pending Release** | **v1.86.0** Planning / **Not Declared** |
+| **Image Review Entry Authorized** | **NO** |
+| **Image Formally Assessed** | **NO** |
+| **Pending Corrective Release** | **v1.86.1** Identity Reconciliation — Independent Review **Complete** — Decision **A. GO** — **Commit Preparation** / **Not Declared**（Commit / Tag / Push **Pending**） |
 
 The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
 

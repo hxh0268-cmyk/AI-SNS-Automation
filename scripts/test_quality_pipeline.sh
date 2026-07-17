@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.85.0 --"
+echo "-- Test 98: VERSION updated to v1.86.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
+    "**v1.86.0**（Repository Baseline Inventory Authority）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.85.0");
+  throw new Error("docs/VERSION.md current version must be v1.86.0");
 }
 
 if (
   currentSection.includes(
-    "**v1.84.0**（Image Generation Mock Provider Catalog Registration Implementation Release）",
+    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.84.0");
+  throw new Error("docs/VERSION.md current version must not remain v1.85.0");
 }
 
-console.log("VERSION v1.85.0 ok");
+console.log("VERSION v1.86.0 ok");
 EOF
-pass "VERSION updated to v1.85.0"
+pass "VERSION updated to v1.86.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6479,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.86.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.86.0");
+if (payload.nextVersion !== "v1.87.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.87.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6489,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.86.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.86.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.87.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.87.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6545,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.86.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.87.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -16031,7 +16031,8 @@ grep -q "Level 3.13" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "architecture maturity model declares provider level 4 implementation ready"
 
 echo "-- Test 722: future entry criteria current maturity aligned --"
-grep -q "Level 3.19 — Provider Production Readiness SSOT Alignment Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Level 3.19 — Repository Baseline Inventory Authority Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
+grep -q "Provider Production Readiness SSOT Alignment Complete" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Mock Provider Production Implementation" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 grep -q "Implemented" docs/architecture/FUTURE_ENTRY_CRITERIA.md
 pass "future entry criteria current maturity aligned"
@@ -21874,7 +21875,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.85.0 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.86.0 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21883,10 +21884,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.85.0**（Provider Production Readiness SSOT Alignment）",
+    "**v1.86.0**（Repository Baseline Inventory Authority）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.85.0");
+  throw new Error("current VERSION section must declare v1.86.0");
 }
 
 for (const marker of [
@@ -21903,8 +21904,13 @@ for (const marker of [
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
-  "Not Independently Established",
-  "**v1.86.0** Planning / **Not Declared**",
+  "**Repository Baseline Commit:** `57b3182ea2fb51f4f3441f9c1013543276cb757f`",
+  "**Repository Baseline Tag:** `v1.86.0`",
+  "**Release Status / Push Status:** **Completed** / **Completed**",
+  "**1232 PASS**",
+  "**v1.86.1** Repository Baseline Identity Reconciliation — **Commit Preparation** / **Not Declared**",
+  "Independent Review **Complete** — Decision **A. GO**",
+  "Commit / Tag / Push **Pending**",
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
@@ -21915,9 +21921,17 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
   throw new Error("current VERSION section must not declare catalog registered no");
 }
 
-console.log("v1.85.0 current version metadata ok");
+if (
+  currentSection.includes("**v1.86.0** Planning / **Not Declared**") ||
+  currentSection.includes("**Next Phase Candidate:** **v1.86.0**") ||
+  currentSection.includes("Independent Review of v1.86.1 Identity Reconciliation — **Pending**")
+) {
+  throw new Error("current VERSION section must not treat v1.86.0 as Planning / Not Declared or leave Independent Review Pending");
+}
+
+console.log("v1.86.0 current version metadata ok");
 EOF
-pass "v1.85.0 current version metadata in VERSION.md"
+pass "v1.86.0 current version metadata in VERSION.md"
 
 
 echo ""
