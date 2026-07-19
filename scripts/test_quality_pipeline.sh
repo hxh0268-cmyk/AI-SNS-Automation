@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.86.2 --"
+echo "-- Test 98: VERSION updated to v1.86.3 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.2**（v1.86.1 released-state reconciliation）",
+    "**v1.86.3**（v1.86.2 released-state reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.86.2");
+  throw new Error("docs/VERSION.md current version must be v1.86.3");
 }
 
 if (
   currentSection.includes(
-    "**v1.86.1**（Repository Baseline Identity Reconciliation）",
+    "**v1.86.2**（v1.86.1 released-state reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.86.1");
+  throw new Error("docs/VERSION.md current version must not remain v1.86.2");
 }
 
-console.log("VERSION v1.86.2 ok");
+console.log("VERSION v1.86.3 ok");
 EOF
-pass "VERSION updated to v1.86.2"
+pass "VERSION updated to v1.86.3"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -21875,7 +21875,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.86.2 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.86.3 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21884,10 +21884,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.2**（v1.86.1 released-state reconciliation）",
+    "**v1.86.3**（v1.86.2 released-state reconciliation）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.86.2");
+  throw new Error("current VERSION section must declare v1.86.3");
 }
 
 for (const marker of [
@@ -21904,11 +21904,11 @@ for (const marker of [
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
-  "**Repository Baseline Commit:** `46b77f8e39f62ec57c2a4c753c3159bf8fa626ad`",
-  "**Repository Baseline Tag:** `v1.86.2`",
+  "**Repository Baseline Commit:** `695a9e2e4af261ad9f4e996251d1544e31c3572b`",
+  "**Repository Baseline Tag:** `v1.86.3`",
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
-  "**v1.86.3** v1.86.2 released-state reconciliation — **Implementation** / **Not Declared**",
+  "**v1.86.4** v1.86.3 released-state reconciliation — **Implementation** / **Not Declared**",
   "Commit / Tag / Push **Pending**",
   "**v1.87.0** Production Readiness Assessment **not started**",
 ]) {
@@ -21923,26 +21923,26 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
 
 if (
   currentSection.includes(
-    "**v1.86.1**（Repository Baseline Identity Reconciliation）",
+    "**v1.86.2**（v1.86.1 released-state reconciliation）",
   ) ||
   currentSection.includes(
-    "**v1.86.2** v1.86.1 released-state reconciliation — **Implementation** / **Not Declared**",
+    "**v1.86.3** v1.86.2 released-state reconciliation — **Implementation** / **Not Declared**",
   ) ||
-  currentSection.includes("v1.86.2 Commit / Tag / Push **Pending**") ||
-  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.2**") ||
+  currentSection.includes("v1.86.3 Commit / Tag / Push **Pending**") ||
+  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.3**") ||
   currentSection.includes(
-    "**Repository Baseline Commit:** `a47e892f10e468bcc5b3c1ebaa22d891cf041e9c`",
+    "**Repository Baseline Commit:** `46b77f8e39f62ec57c2a4c753c3159bf8fa626ad`",
   ) ||
-  currentSection.includes("**Repository Baseline Tag:** `v1.86.1`")
+  currentSection.includes("**Repository Baseline Tag:** `v1.86.2`")
 ) {
   throw new Error(
-    "current VERSION section must not treat v1.86.1 Identity Reconciliation as sole current, leave Pending v1.86.2 publication claims, or leave Record commit/tag at v1.86.1",
+    "current VERSION section must not treat v1.86.2 released-state reconciliation as sole current, leave Pending v1.86.3 publication claims, or leave Record commit/tag at v1.86.2",
   );
 }
 
-console.log("v1.86.2 current version metadata ok");
+console.log("v1.86.3 current version metadata ok");
 EOF
-pass "v1.86.2 current version metadata in VERSION.md"
+pass "v1.86.3 current version metadata in VERSION.md"
 
 
 echo ""
