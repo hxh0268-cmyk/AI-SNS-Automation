@@ -1170,20 +1170,35 @@ Latest Current Step
 release-plan
 ```
 
-### Repository Baseline Released-State Reconciliation Release（v1.86.3）
+### Repository Baseline Released-State Reconciliation Release（v1.86.4）
 
-**v1.86.2 released-state reconciliation Release** を実施しました。公開済み Git identity `v1.86.2` を Current Baseline Record / Required Derived Targets / Quality に同期し、Current Baseline を `v1.86.3` として確定（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+**v1.86.3 released-state reconciliation Release** を実施しました。公開済み Git identity `v1.86.3` を Current Baseline Record / Required Derived Targets / Quality に同期し、Current Baseline を `v1.86.4` として確定（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
 
-**Current Version: v1.86.3** | **Quality Pipeline: `1232 PASS`**
+**Current Version: v1.86.4** | **Quality Pipeline: `1232 PASS`**
 
-v1.86.2 released-state reconciliation: **Complete / Released**。Repository Baseline Identity Reconciliation: **Complete / Released**（v1.86.1 lineage preserved）。Repository Baseline Inventory Authority: **Complete / Released**（v1.86.0 lineage preserved）。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `695a9e2e4af261ad9f4e996251d1544e31c3572b`。Tag: `v1.86.3`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Corrective Release: **v1.86.4** v1.86.3 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**）。v1.87.0 Assessment: **not started**。
+v1.86.3 released-state reconciliation: **Complete / Released**。Repository Baseline Identity Reconciliation: **Complete / Released**（v1.86.1 lineage preserved）。Repository Baseline Inventory Authority: **Complete / Released**（v1.86.0 lineage preserved）。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `d5907a2fe252eadf4aa68c9e759b64d3a264dc34`。Tag: `v1.86.4`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Corrective Release: **v1.86.5** v1.86.4 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**）。v1.87.0 Assessment: **not started**。
 
 | 項目 | 内容 |
 |------|------|
 | Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
-| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 Released; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; v1.86.3 released-state reconciliation **Released**; corrective v1.86.4 Implementation） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 Released; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; v1.86.3 released-state reconciliation **Released**; v1.86.4 released-state reconciliation **Released**; corrective v1.86.5 Implementation） |
 | Current Maturity | **Level 3.19** |
-| Next Phase Candidate | Commit Execution for **v1.86.4** — only after Implementation approval |
+| Next Phase Candidate | Commit Execution for **v1.86.5** — only after Implementation approval |
+
+### Repository Baseline Released-State Reconciliation Release（v1.86.3）
+
+**v1.86.2 released-state reconciliation Release** を実施しました。公開済み Git identity `v1.86.2` を Current Baseline Record / Required Derived Targets / Quality に同期し、Current Baseline を `v1.86.3` として確定（**49 必須 Governance 文書** — catalog / provider modules **unchanged**）。
+
+**Current Version: v1.86.3** | **Quality Pipeline: `1232 PASS` lineage（historical release section）**
+
+v1.86.2 released-state reconciliation: **Complete / Released**。Repository Baseline Identity Reconciliation: **Complete / Released**（v1.86.1 lineage preserved）。Repository Baseline Inventory Authority: **Complete / Released**（v1.86.0 lineage preserved）。Image Catalog Registration: **Registered**（v1.84.0 lineage preserved）。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `695a9e2e4af261ad9f4e996251d1544e31c3572b`。Tag: `v1.86.3`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Historical successor **v1.86.4** released-state reconciliation: **Released**。
+
+| 項目 | 内容 |
+|------|------|
+| Baseline Authority / Record | [docs/architecture/BASELINE_SYNCHRONIZATION.md](docs/architecture/BASELINE_SYNCHRONIZATION.md)（Inventory Model / Current Baseline Record / Synchronization Matrix SSOT） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — v1.86.0 Released; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; v1.86.3 released-state reconciliation **Released**; historical successor v1.86.4 now Released） |
+| Current Maturity | **Level 3.19** |
+| Next Phase Candidate | **v1.86.4** v1.86.3 released-state reconciliation（historical successor — now Released） |
 
 ### Repository Baseline Released-State Reconciliation Release（v1.86.2）
 

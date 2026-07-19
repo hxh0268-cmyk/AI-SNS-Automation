@@ -26,18 +26,18 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 | Item | Value |
 |------|-------|
-| **Version** | **v1.86.3** |
-| **Commit** | `695a9e2e4af261ad9f4e996251d1544e31c3572b` |
-| **Tag** | `v1.86.3` |
+| **Version** | **v1.86.4** |
+| **Commit** | `d5907a2fe252eadf4aa68c9e759b64d3a264dc34` |
+| **Tag** | `v1.86.4` |
 | **Branch** | `main` |
 | **Release / Push Status** | **Completed** / **Completed** |
 | **Remote Synchronization / Divergence** | **Synchronized** / `0 0` |
-| **Release State** | v1.86.2 released-state reconciliation complete（prior Identity Reconciliation / Inventory Authority / SSOT Alignment / Image Catalog Registration lineages preserved） |
+| **Release State** | v1.86.3 released-state reconciliation complete（prior Identity Reconciliation / Inventory Authority / SSOT Alignment / Image Catalog Registration lineages preserved） |
 | **Provider Contracts** | **3** |
 | **Catalog Version** | `1.0` |
 | **Text Generation Mock Provider** | **Implemented / Registered** |
 | **Image Generation Mock Provider** | **Implemented / Registered** |
-| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.3`） |
+| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.4`） |
 | **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
 | **Bounded Production Ready Declaration** | **NO** |
 | **Global Provider Production Ready** | **Not Declared** |
@@ -46,7 +46,7 @@ Provider Production Readiness Review は、Provider domain の production readin
 | **Automatic SNS Publishing** | **Prohibited** |
 | **Image Review Entry Authorized** | **NO** |
 | **Image Formally Assessed** | **NO** |
-| **Pending Corrective Release** | **v1.86.4** v1.86.3 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
+| **Pending Corrective Release** | **v1.86.5** v1.86.4 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
 
 The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
 
