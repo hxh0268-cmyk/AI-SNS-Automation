@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
+Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.2 released-state reconciliation Released; prior v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
 ```
 
 | 観点 | 状態 |
@@ -235,7 +235,8 @@ Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complet
 | Level 3.19 Provider Production Readiness SSOT Alignment Release | **Completed**（v1.85.0） |
 | Level 3.19 Repository Baseline Inventory Authority Release | **Completed**（v1.86.0） |
 | Corrective Identity Reconciliation | **Completed / Released**（v1.86.1） |
-| Corrective Released-State Reconciliation | **Implementation / Not Declared**（v1.86.2） |
+| Corrective Released-State Reconciliation（v1.86.1→Record） | **Completed / Released**（v1.86.2） |
+| Corrective Released-State Reconciliation（v1.86.2→Record） | **Implementation / Not Declared**（v1.86.3） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |

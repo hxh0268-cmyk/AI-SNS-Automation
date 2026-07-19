@@ -166,7 +166,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0020](../adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md) — Image Generation Mock Provider Expansion Entry Decision（v1.80.0）
 - [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — Image Generation Mock Provider Catalog Registration Governance Decision（v1.83.0）
 - [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md) — Image Generation Mock Provider Implementation Authorization Decision（v1.81.0）
-- [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) — Repository Baseline Inventory Authority Decision（Accepted — v1.86.0 **Released**; v1.86.1 Identity Reconciliation **Released**; corrective v1.86.2 Implementation）
+- [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) — Repository Baseline Inventory Authority Decision（Accepted — v1.86.0 **Released**; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; corrective v1.86.3 Implementation）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
@@ -431,39 +431,41 @@ Full record: [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REV
 
 Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — G12 implementation in `src/lib/public_contract_catalog.js`
 
-### Post–ADR-0023 — Repository Baseline Inventory Authority（v1.86.0 Released; v1.86.1 Identity Reconciliation Released）
+### Post–ADR-0023 — Repository Baseline Inventory Authority（v1.86.0 Released; v1.86.1 Identity Reconciliation Released; v1.86.2 Released-State Reconciliation Released）
 
 | Item | Decision |
 |------|----------|
 | **ADR** | [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) |
-| **Status** | Accepted（v1.86.0 — Repository Baseline Inventory Authority Governance — **Released**; v1.86.1 Identity Reconciliation — **Released**） |
+| **Status** | Accepted（v1.86.0 — Repository Baseline Inventory Authority Governance — **Released**; v1.86.1 Identity Reconciliation — **Released**; v1.86.2 released-state reconciliation — **Released**） |
 | **Operational specification** | [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) — Inventory Model / Current Baseline Record / Synchronization Matrix SSOT |
 | **Decision** | Adopt Repository Baseline Inventory Authority hierarchy; Current Baseline Record is sole operational authority for recorded baseline values |
 | **Authority model** | Repository Baseline Inventory Authority → Current Baseline Record → Synchronization Matrix → Required Derived Targets |
 | **Derived targets** | Receive values from the Current Baseline Record only; do not redefine Record field meanings |
 | **Reverse synchronization** | **Prohibited** |
 | **Distinctions preserved** | Schema / Inventory Model ≠ Current Recorded Values ≠ Pending Release Values ≠ Derived Evidence ≠ Git Evidence ≠ Quality Enforcement |
-| **Current Baseline Record population** | **Complete** for released baseline `v1.86.1`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `a47e892…` / tag `v1.86.1`） |
-| **Repository-wide Synchronization** | **Complete** under released `v1.86.1`; corrective **v1.86.2** released-state reconciliation current phase **Implementation** / **Not Declared** |
+| **Current Baseline Record population** | **Complete** for released baseline `v1.86.2`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `46b77f8…` / tag `v1.86.2`） |
+| **Repository-wide Synchronization** | **Complete** under released `v1.86.2`; corrective **v1.86.3** released-state reconciliation current phase **Implementation** / **Not Declared** |
 | **Quality Enforcement Correction** | **Complete** — Tests 988 / 1026 / 1034 remediated; Quality **1232 PASS**; D-006 **Remediated**; Independent Review Complete — Decision **A. GO** |
 | **v1.86.0 Release** | **Released** — Commit / Tag / Push **Complete**; remote synchronized |
 | **v1.86.1 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
-| **v1.86.2 Corrective Release** | **Implementation / Not Declared** — Commit / Tag / Push **Pending** |
+| **v1.86.2 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
+| **v1.86.3 Corrective Release** | **Implementation / Not Declared** — Commit / Tag / Push **Pending** |
 | **Provider Production Ready（global）** | **Not Declared** |
 | **Repository-wide Level 4** | **Not Declared** |
-| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for `v1.86.1` is complete; Required Derived Target sync and Quality Enforcement Correction completed for release; Independent Review Complete — Decision **A. GO**（including v1.86.1 Identity Reconciliation IR）; Commit / tag / push for `v1.86.0` and `v1.86.1` **Complete**; corrective `v1.86.2` at **Implementation** with Commit / Tag / Push **Pending**; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
+| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for `v1.86.2` is complete; Required Derived Target sync and Quality Enforcement Correction completed for release; Independent Review Complete — Decision **A. GO**; Commit / tag / push for `v1.86.0` / `v1.86.1` / `v1.86.2` **Complete**; corrective `v1.86.3` at **Implementation** with Commit / Tag / Push **Pending**; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
 
 ```text
 ADR accepted
 ≠ automatic release declaration（historical planning distinction）
 v1.86.0 Released（commit 57b3182… / tag v1.86.0）
 ≠ v1.86.1 Released（commit a47e892… / tag v1.86.1）
-≠ v1.86.2 released（Pending / Not Declared）
+≠ v1.86.2 Released（commit 46b77f8… / tag v1.86.2）
+≠ v1.86.3 released（Pending / Not Declared）
 Governance completion approved only after Independent Review
 （Independent Review Complete — A. GO）
 Quality Enforcement Complete（1232 PASS）
 ≠ Image Review Entry / Formal Assessment / Production Ready authorized
-≠ Commit / tag / push for v1.86.2 authorized
+≠ Commit / tag / push for v1.86.3 authorized
 ≠ v1.87.0 Assessment started
 ```
 
