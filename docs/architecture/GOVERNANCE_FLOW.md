@@ -56,7 +56,7 @@ Mandatory rules:
 6. Derived targets, Git state, tests, reports, and release history **must not** reverse-sync or override the Current Baseline Record.
 7. Quality Pipeline is **enforcement and verification**, not authority. PASS count alone does not authorize Record population or release declaration.
 8. Git commits and tags are **evidence and release identity surfaces**, not substitutes for the Current Baseline Record.
-9. Migration 7（GOVERNANCE_FLOW Authority Correction）does **not** populate the Current Baseline Record by itself and does **not** execute repository-wide synchronization. Historical note: Migration 7 did not declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, and `v1.86.4` are now **Released**. Pending corrective release is `v1.86.5`（Not Declared）.
+9. Migration 7（GOVERNANCE_FLOW Authority Correction）does **not** populate the Current Baseline Record by itself and does **not** execute repository-wide synchronization. Historical note: Migration 7 did not declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, and `v1.86.5` are now **Released**. Pending corrective release is `v1.86.6`（Not Declared）.
 
 ```text
 Current Baseline Record
@@ -99,7 +99,7 @@ Reverse synchronization: Prohibited
 - **Level 4 Implementation Ready** 到達を意味しない
 - git commit / tag / push の **自動化** を定義しない（Human Approval Gate 維持）
 - Current Version **value** / Current Baseline Record を **決定・記録しない**（Authority Boundary 参照）
-- Migration 7 による本書更新は **それ自体では release 宣言ではない**（historical: did not declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, and `v1.86.4` are now **Released**; Pending corrective is `v1.86.5`）
+- Migration 7 による本書更新は **それ自体では release 宣言ではない**（historical: did not declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, and `v1.86.5` are now **Released**; Pending corrective is `v1.86.6`）
 - Repository-wide Baseline Synchronization を **実行しない**（別認可フェーズ）
 - Derived Target / Git / Quality / Release History からの **reverse synchronization を許可しない**
 
