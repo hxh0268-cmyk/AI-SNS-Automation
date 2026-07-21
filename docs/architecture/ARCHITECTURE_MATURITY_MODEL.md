@@ -204,7 +204,7 @@ Sub-levels are **documentation maturity markers** — not independent implementa
 ## Current Maturity
 
 ```text
-Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.7 released-state reconciliation Released; prior v1.86.6 released-state reconciliation Released; prior v1.86.5 released-state reconciliation Released; prior v1.86.4 released-state reconciliation Released; prior v1.86.3 released-state reconciliation Released; prior v1.86.2 released-state reconciliation Released; prior v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
+Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.8 released-state reconciliation Released; prior v1.86.7 released-state reconciliation Released; prior v1.86.6 released-state reconciliation Released; prior v1.86.5 released-state reconciliation Released; prior v1.86.4 released-state reconciliation Released; prior v1.86.3 released-state reconciliation Released; prior v1.86.2 released-state reconciliation Released; prior v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
 ```
 
 | 観点 | 状態 |
@@ -241,7 +241,8 @@ Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complet
 | Corrective Released-State Reconciliation（v1.86.4→Record） | **Completed / Released**（v1.86.5） |
 | Corrective Released-State Reconciliation（v1.86.5→Record） | **Completed / Released**（v1.86.6） |
 | Corrective Released-State Reconciliation（v1.86.6→Record） | **Completed / Released**（v1.86.7） |
-| Corrective Released-State Reconciliation（v1.86.7→Record） | **Implementation / Not Declared**（v1.86.8） |
+| Corrective Released-State Reconciliation（v1.86.7→Record） | **Completed / Released**（v1.86.8） |
+| Corrective Released-State Reconciliation（v1.86.8→Record） | **Implementation / Not Declared**（v1.86.9） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |
 | Level 4 Entry Decision | **Recorded**（Conditionally Ready — ADR-0009） |
 | **Provider Level 4 Implementation Ready** | **Declared**（domain-specific — v1.71.0） |

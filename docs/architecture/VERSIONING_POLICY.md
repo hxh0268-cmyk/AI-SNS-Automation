@@ -66,7 +66,7 @@ Derived targets must **not** update, infer, or override the Current Baseline Rec
 
 A version **value** transition requires an explicitly authorized Current Baseline Record population or release phase.
 Editing this Rule Document does **not** populate the Current Baseline Record and does **not** declare a release
-（historical Migration 5 note: editing this policy did not itself declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, and `v1.86.7` are now **Released**; Pending corrective release is `v1.86.8`）。
+（historical Migration 5 note: editing this policy did not itself declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, `v1.86.7`, and `v1.86.8` are now **Released**; Pending corrective release is `v1.86.9`）。
 
 Preserve the Record-layer distinction:
 
@@ -173,7 +173,7 @@ Foundation schema version と repo SemVer は別管理です。混同しない�
 本書は次を行わない。
 
 - Current Baseline Record への値投入
-- Release Declaration（本書編集 alone では宣言しない; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, and `v1.86.7` are now Released via Git/Record; Pending corrective is `v1.86.8`）
+- Release Declaration（本書編集 alone では宣言しない; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, `v1.86.7`, and `v1.86.8` are now Released via Git/Record; Pending corrective is `v1.86.9`）
 - Migration 6（VERSION.md derived-target finalization）の代替実行
 - Repository-wide Baseline Synchronization
 - Production Ready / Real Provider / External IO / automatic SNS publishing の認可
