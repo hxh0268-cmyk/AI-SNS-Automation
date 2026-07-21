@@ -8,7 +8,7 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 Architecture Documentation = **Architecture Governance** として、**49 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1 + v1.71.0 Provider Level 4 Implementation Ready Review 1 + v1.72.0 Provider Public Contract Catalog Extension Review 1 + v1.73.0 Mock Provider Production Implementation Authorization Review 1 + v1.75.0 Mock Provider Catalog Registration Governance Review 1 + v1.77.0 Provider Production Readiness Review 1 + v1.79.0 Provider Expansion Entry Review 1 + v1.80.0 Image Generation Mock Provider Expansion Entry Review 1 + v1.81.0 Image Generation Mock Provider Implementation Authorization Review 1 + v1.83.0 Image Generation Mock Provider Catalog Registration Governance Review 1）を固定します。
 
-**Current Maturity:** **Level 3.19**（v1.86.6 — Repository Baseline Inventory Authority Complete; Identity Reconciliation Released; v1.86.5 released-state reconciliation Released; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — corrective **v1.86.7** released-state reconciliation — **Implementation** / **Not Declared**）
+**Current Maturity:** **Level 3.19**（v1.86.7 — Repository Baseline Inventory Authority Complete; Identity Reconciliation Released; v1.86.6 released-state reconciliation Released; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — corrective **v1.86.8** released-state reconciliation — **Implementation** / **Not Declared**）
 
 > **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **41**（重複ファイルカウントではない）。 Repository Baseline Inventory / Current Baseline Record / Synchronization Matrix の SSOT は [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md)（[ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md)）。
 
@@ -119,7 +119,7 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 
 ---
 
-## 現在フェーズ（v1.86.6 — v1.86.5 released-state reconciliation）
+## 現在フェーズ（v1.86.7 — v1.86.6 released-state reconciliation）
 
 | Layer | 状態 |
 |-------|------|
@@ -158,15 +158,16 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 | **v1.86.3 released-state reconciliation** | **Complete / Released**（v1.86.4） |
 | **v1.86.4 released-state reconciliation** | **Complete / Released**（v1.86.5） |
 | **v1.86.5 released-state reconciliation** | **Complete / Released**（v1.86.6） |
+| **v1.86.6 released-state reconciliation** | **Complete / Released**（v1.86.7） |
 | **Catalog Registered（image provider）** | **YES** |
 | **Image Review Entry Authorized** | **NO** |
 | **Image Formally Assessed** | **NO** |
-| **Repository Baseline** | **v1.86.6** @ `bb26dff72a71bed55ce753cba205c9ce154d2419` |
+| **Repository Baseline** | **v1.86.7** @ `511ceedde5e57dbdab479c515bb8037efb2110bc` |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **Bounded Production Ready** | **NO** |
 | **Global Production Ready** | **Not Declared** |
 | **Provider Production Implementation** | **Not Started**（Real Provider scope） |
-| **Pending Corrective Release** | **v1.86.7** v1.86.6 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
+| **Pending Corrective Release** | **v1.86.8** v1.86.7 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
 | **v1.87.0 Assessment** | **Not started** |
 | Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 

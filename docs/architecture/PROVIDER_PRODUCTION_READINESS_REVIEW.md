@@ -26,9 +26,9 @@ Provider Production Readiness Review は、Provider domain の production readin
 
 | Item | Value |
 |------|-------|
-| **Version** | **v1.86.6** |
-| **Commit** | `bb26dff72a71bed55ce753cba205c9ce154d2419` |
-| **Tag** | `v1.86.6` |
+| **Version** | **v1.86.7** |
+| **Commit** | `511ceedde5e57dbdab479c515bb8037efb2110bc` |
+| **Tag** | `v1.86.7` |
 | **Branch** | `main` |
 | **Release / Push Status** | **Completed** / **Completed** |
 | **Remote Synchronization / Divergence** | **Synchronized** / `0 0` |
@@ -37,7 +37,7 @@ Provider Production Readiness Review は、Provider domain の production readin
 | **Catalog Version** | `1.0` |
 | **Text Generation Mock Provider** | **Implemented / Registered** |
 | **Image Generation Mock Provider** | **Implemented / Registered** |
-| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.6`） |
+| **Quality Pipeline（current evidence）** | **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.7`） |
 | **Production Readiness Assessment** | **READY** for the assessed bounded canonical Mock Provider scope |
 | **Bounded Production Ready Declaration** | **NO** |
 | **Global Provider Production Ready** | **Not Declared** |
@@ -46,7 +46,7 @@ Provider Production Readiness Review は、Provider domain の production readin
 | **Automatic SNS Publishing** | **Prohibited** |
 | **Image Review Entry Authorized** | **NO** |
 | **Image Formally Assessed** | **NO** |
-| **Pending Corrective Release** | **v1.86.7** v1.86.6 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
+| **Pending Corrective Release** | **v1.86.8** v1.86.7 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**） |
 
 The current repository baseline records implementation, registration, and assessment facts. A `READY` assessment decision does not itself constitute a Production Ready declaration.
 
