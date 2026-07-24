@@ -166,7 +166,7 @@ Full record: [LEVEL_4_ENTRY_REVIEW.md](./LEVEL_4_ENTRY_REVIEW.md) + [ADR-0009](.
 - [ADR-0020](../adr/ADR-0020-image-generation-mock-provider-expansion-entry-decision.md) — Image Generation Mock Provider Expansion Entry Decision（v1.80.0）
 - [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — Image Generation Mock Provider Catalog Registration Governance Decision（v1.83.0）
 - [ADR-0021](../adr/ADR-0021-image-generation-mock-provider-implementation-authorization-decision.md) — Image Generation Mock Provider Implementation Authorization Decision（v1.81.0）
-- [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) — Repository Baseline Inventory Authority Decision（Accepted — v1.86.0 **Released**; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; v1.86.3 released-state reconciliation **Released**; v1.86.4 released-state reconciliation **Released**; v1.86.5 released-state reconciliation **Released**; v1.86.6 released-state reconciliation **Released**; v1.86.7 released-state reconciliation **Released**; v1.86.8 released-state reconciliation **Released**; v1.86.9 released-state reconciliation **Released**; v1.86.10 released-state reconciliation **Released**; v1.86.11 released-state reconciliation **Released**; corrective v1.86.12 Implementation）
+- [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) — Repository Baseline Inventory Authority Decision（Accepted — v1.86.0 **Released**; v1.86.1 Identity Reconciliation **Released**; v1.86.2 released-state reconciliation **Released**; v1.86.3 released-state reconciliation **Released**; v1.86.4 released-state reconciliation **Released**; v1.86.5 released-state reconciliation **Released**; v1.86.6 released-state reconciliation **Released**; v1.86.7 released-state reconciliation **Released**; v1.86.8 released-state reconciliation **Released**; v1.86.9 released-state reconciliation **Released**; v1.86.10 released-state reconciliation **Released**; v1.86.11 released-state reconciliation **Released**; v1.86.12 released-state reconciliation **Released**; corrective v1.86.13 Implementation）
 
 ### Decision Chain（Provider Domain — v1.68.0–v1.75.0）
 
@@ -431,20 +431,20 @@ Full record: [IMAGE_GENERATION_MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REV
 
 Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-registration-governance.md) — G12 implementation in `src/lib/public_contract_catalog.js`
 
-### Post–ADR-0023 — Repository Baseline Inventory Authority（v1.86.0 Released; v1.86.1 Identity Reconciliation Released; v1.86.2 / v1.86.3 / v1.86.4 / v1.86.5 / v1.86.6 / v1.86.7 / v1.86.8 / v1.86.9 / v1.86.10 / v1.86.11 Released-State Reconciliation Released）
+### Post–ADR-0023 — Repository Baseline Inventory Authority（v1.86.0 Released; v1.86.1 Identity Reconciliation Released; v1.86.2 / v1.86.3 / v1.86.4 / v1.86.5 / v1.86.6 / v1.86.7 / v1.86.8 / v1.86.9 / v1.86.10 / v1.86.11 / v1.86.12 Released-State Reconciliation Released）
 
 | Item | Decision |
 |------|----------|
 | **ADR** | [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md) |
-| **Status** | Accepted（v1.86.0 — Repository Baseline Inventory Authority Governance — **Released**; v1.86.1 Identity Reconciliation — **Released**; v1.86.2 released-state reconciliation — **Released**; v1.86.3 released-state reconciliation — **Released**; v1.86.4 released-state reconciliation — **Released**; v1.86.5 released-state reconciliation — **Released**; v1.86.6 released-state reconciliation — **Released**; v1.86.7 released-state reconciliation — **Released**; v1.86.8 released-state reconciliation — **Released**; v1.86.9 released-state reconciliation — **Released**; v1.86.10 released-state reconciliation — **Released**; v1.86.11 released-state reconciliation — **Released**） |
+| **Status** | Accepted（v1.86.0 — Repository Baseline Inventory Authority Governance — **Released**; v1.86.1 Identity Reconciliation — **Released**; v1.86.2 released-state reconciliation — **Released**; v1.86.3 released-state reconciliation — **Released**; v1.86.4 released-state reconciliation — **Released**; v1.86.5 released-state reconciliation — **Released**; v1.86.6 released-state reconciliation — **Released**; v1.86.7 released-state reconciliation — **Released**; v1.86.8 released-state reconciliation — **Released**; v1.86.9 released-state reconciliation — **Released**; v1.86.10 released-state reconciliation — **Released**; v1.86.11 released-state reconciliation — **Released**; v1.86.12 released-state reconciliation — **Released**） |
 | **Operational specification** | [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) — Inventory Model / Current Baseline Record / Synchronization Matrix SSOT |
 | **Decision** | Adopt Repository Baseline Inventory Authority hierarchy; Current Baseline Record is sole operational authority for recorded baseline values |
 | **Authority model** | Repository Baseline Inventory Authority → Current Baseline Record → Synchronization Matrix → Required Derived Targets |
 | **Derived targets** | Receive values from the Current Baseline Record only; do not redefine Record field meanings |
 | **Reverse synchronization** | **Prohibited** |
 | **Distinctions preserved** | Schema / Inventory Model ≠ Current Recorded Values ≠ Pending Release Values ≠ Derived Evidence ≠ Git Evidence ≠ Quality Enforcement |
-| **Current Baseline Record population** | **Complete** for released baseline `v1.86.11`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `fb1f6dd…` / tag `v1.86.11`） |
-| **Repository-wide Synchronization** | **Complete** under released `v1.86.11`; corrective **v1.86.12** released-state reconciliation current phase **Implementation** / **Not Declared** |
+| **Current Baseline Record population** | **Complete** for released baseline `v1.86.12`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `881081a…` / tag `v1.86.12`） |
+| **Repository-wide Synchronization** | **Complete** under released `v1.86.12`; corrective **v1.86.13** released-state reconciliation current phase **Implementation** / **Not Declared** |
 | **Quality Enforcement Correction** | **Complete** — Tests 988 / 1026 / 1034 remediated; Quality **1232 PASS**; D-006 **Remediated**; Independent Review Complete — Decision **A. GO** |
 | **v1.86.0 Release** | **Released** — Commit / Tag / Push **Complete**; remote synchronized |
 | **v1.86.1 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
@@ -458,10 +458,11 @@ Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-r
 | **v1.86.9 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
 | **v1.86.10 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
 | **v1.86.11 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
-| **v1.86.12 Corrective Release** | **Implementation / Not Declared** — Commit / Tag / Push **Pending** |
+| **v1.86.12 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
+| **v1.86.13 Corrective Release** | **Implementation / Not Declared** — Commit / Tag / Push **Pending** |
 | **Provider Production Ready（global）** | **Not Declared** |
 | **Repository-wide Level 4** | **Not Declared** |
-| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for `v1.86.11` is complete; Required Derived Target sync and Quality Enforcement Correction completed for release; Independent Review Complete — Decision **A. GO**; Commit / tag / push for `v1.86.0` / `v1.86.1` / `v1.86.2` / `v1.86.3` / `v1.86.4` / `v1.86.5` / `v1.86.6` / `v1.86.7` / `v1.86.8` / `v1.86.9` / `v1.86.10` / `v1.86.11` **Complete**; corrective `v1.86.12` at **Implementation** with Commit / Tag / Push **Pending**; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
+| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for `v1.86.12` is complete; Required Derived Target sync and Quality Enforcement Correction completed for release; Independent Review Complete — Decision **A. GO**; Commit / tag / push for `v1.86.0` / `v1.86.1` / `v1.86.2` / `v1.86.3` / `v1.86.4` / `v1.86.5` / `v1.86.6` / `v1.86.7` / `v1.86.8` / `v1.86.9` / `v1.86.10` / `v1.86.11` / `v1.86.12` **Complete**; corrective `v1.86.13` at **Implementation** with Commit / Tag / Push **Pending**; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
 
 ```text
 ADR accepted
@@ -478,12 +479,13 @@ v1.86.0 Released（commit 57b3182… / tag v1.86.0）
 ≠ v1.86.9 Released（commit 21ec585… / tag v1.86.9）
 ≠ v1.86.10 Released（commit 1d99eb7… / tag v1.86.10）
 ≠ v1.86.11 Released（commit fb1f6dd… / tag v1.86.11）
-≠ v1.86.12 released（Pending / Not Declared）
+≠ v1.86.12 Released（commit 881081a… / tag v1.86.12）
+≠ v1.86.13 released（Pending / Not Declared）
 Governance completion approved only after Independent Review
 （Independent Review Complete — A. GO）
 Quality Enforcement Complete（1232 PASS）
 ≠ Image Review Entry / Formal Assessment / Production Ready authorized
-≠ Commit / tag / push for v1.86.12 authorized
+≠ Commit / tag / push for v1.86.13 authorized
 ≠ v1.87.0 Assessment started
 ```
 

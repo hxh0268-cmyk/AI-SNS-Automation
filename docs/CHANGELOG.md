@@ -4,22 +4,49 @@
 
 ---
 
-## v1.86.12 — v1.86.11 released-state reconciliation（Unreleased / Implementation）
+## v1.86.13 — v1.86.12 released-state reconciliation（Unreleased / Implementation）
 
-Corrective patch Implementation to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.11` @ `fb1f6dd85a5efe967bedc0151c686d4967627ade`.
+Corrective patch Implementation to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.12` @ `881081a1c037093ad275ac0d3c8a1362cc9e017d`.
 
 **Status:** Implementation / **Not Declared** — Commit / Tag / Push pending.
 
-Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.11`.
+Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.12`.
 
 ### 変更内容（planned）
 
 | 項目 | 内容 |
 |------|------|
-| Record | Current Baseline Record → released `v1.86.11` |
+| Record | Current Baseline Record → released `v1.86.12` |
 | Derived | VERSION / README / PPRR / architecture current-state sync |
 | Quality | Tests 98 / 1232 identity locks（Test 1231 unchanged） |
 | Catalog / Providers | **Unchanged** |
+
+---
+
+## v1.86.12 — v1.86.11 released-state reconciliation
+
+Corrective patch release to reconcile Current Baseline Record / Required Derived Targets / Quality enforcement with the already released Git identity `v1.86.11` @ `fb1f6dd85a5efe967bedc0151c686d4967627ade`, then released as `v1.86.12`.
+
+Commit: `881081a1c037093ad275ac0d3c8a1362cc9e017d`. Tag: `v1.86.12`. Branch: `main`. Remote synchronized.
+
+**Status:** Released / **Completed** — Commit / Tag / Push **Complete**. Quality Pipeline **1232 PASS**.
+
+Does **not** authorize Image Review Entry, Image Formal Assessment, Production Ready, Real Provider, External IO, or automatic SNS publishing. Does **not** modify tag `v1.86.11`.
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Record | Current Baseline Record → released `v1.86.11` identity surfaces closed under `v1.86.12` |
+| Derived | VERSION / README / PPRR / architecture current-state sync |
+| Quality | Tests 98 / 1232 identity locks; **1232 PASS** |
+| Catalog / Providers | **Unchanged** |
+
+### テスト内容
+
+| 項目 | 結果 |
+|------|------|
+| Quality Pipeline Tests | **1232 PASS** |
 
 ---
 
