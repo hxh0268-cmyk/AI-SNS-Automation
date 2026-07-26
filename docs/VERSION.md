@@ -51,7 +51,7 @@ Pending Release value は recorded Current Version value ではない。
 本書の Migration 6（Derived Target Declaration）および Repository-wide Baseline Synchronization は:
 
 - Current Baseline Record の値を本書へ **one-way** 表示同期する（Reverse Synchronization Prohibited）
-- Current Version display を Record の released `v1.86.13` に合わせる（Pending corrective `v1.86.14` は Not Declared）
+- Current Version display を Record の released `v1.86.14` に合わせる（Pending corrective `v1.86.15` は Not Declared）
 - Quality / Git を Current Version value authority にしない
 
 以下「現在のバージョン」に表示される値は **Derived Current Version display** である。
@@ -61,13 +61,13 @@ Pending Release value は recorded Current Version value ではない。
 
 ## 現在のバージョン
 
-**v1.86.13**（v1.86.12 released-state reconciliation）
+**v1.86.14**（v1.86.13 released-state reconciliation）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** v1.86.12 released-state reconciliation Release Complete（v1.86.13）— Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— corrective **v1.86.14** released-state reconciliation — current phase **Implementation** — Release **Not Declared**
+**Phase:** v1.86.13 released-state reconciliation Release Complete（v1.86.14）— Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— corrective **v1.86.15** released-state reconciliation — current phase **Implementation** — Release **Not Declared**
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -135,9 +135,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Architecture Maturity:** **Level 3.19**（unchanged）
 
-**Repository Baseline Commit:** `018b6bb2345651edfb65e9fe69c2e03dc0e4382c`
+**Repository Baseline Commit:** `e19a4812325b0f4ee7e4e6c480213aa115cdfb69`
 
-**Repository Baseline Tag:** `v1.86.13`
+**Repository Baseline Tag:** `v1.86.14`
 
 **Branch:** `main`
 
@@ -145,7 +145,7 @@ Pending Release value は recorded Current Version value ではない。
 
 **Remote Synchronization / Divergence:** **Synchronized** / `0 0`
 
-**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.13`）
+**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.14`）
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -159,9 +159,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Human Approval Gate:** **Preserved**（`humanApprovalGateBypass: false`）
 
-**Pending Corrective Release:** **v1.86.14** v1.86.13 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**; not a release declaration）
+**Pending Corrective Release:** **v1.86.15** v1.86.14 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**; not a release declaration）
 
-**Next Phase Candidate:** Commit Execution for **v1.86.14** — only after Implementation approval（**v1.87.0** Production Readiness Assessment **not started**）
+**Next Phase Candidate:** Commit Execution for **v1.86.15** — only after Implementation approval（**v1.87.0** Production Readiness Assessment **not started**）
 
 ---
 
@@ -171,7 +171,8 @@ Pending Release value は recorded Current Version value ではない。
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.86.14** | **ドキュメント** | **🔄 Implementation / Not Declared** | **v1.86.13 released-state reconciliation — Record → Derived → Quality; Commit / Tag / Push Pending** |
+| **v1.86.15** | **ドキュメント** | **🔄 Implementation / Not Declared** | **v1.86.14 released-state reconciliation — Record → Derived → Quality; Commit / Tag / Push Pending** |
+| **v1.86.14** | **ドキュメント** | **✅ 完了** | **v1.86.13 released-state reconciliation — commit `e19a4812325b0f4ee7e4e6c480213aa115cdfb69` / tag `v1.86.14` / Commit·Tag·Push Complete / 1232 PASS** |
 | **v1.86.13** | **ドキュメント** | **✅ 完了** | **v1.86.12 released-state reconciliation — commit `018b6bb2345651edfb65e9fe69c2e03dc0e4382c` / tag `v1.86.13` / Commit·Tag·Push Complete / 1232 PASS** |
 | **v1.86.12** | **ドキュメント** | **✅ 完了** | **v1.86.11 released-state reconciliation — commit `881081a1c037093ad275ac0d3c8a1362cc9e017d` / tag `v1.86.12` / Commit·Tag·Push Complete / 1232 PASS** |
 | **v1.86.11** | **ドキュメント** | **✅ 完了** | **v1.86.10 released-state reconciliation — commit `fb1f6dd85a5efe967bedc0151c686d4967627ade` / tag `v1.86.11` / Commit·Tag·Push Complete / 1232 PASS** |
