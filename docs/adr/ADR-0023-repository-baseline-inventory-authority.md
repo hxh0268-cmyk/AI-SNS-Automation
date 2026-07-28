@@ -296,11 +296,11 @@ A later step shall never justify omission of an earlier dependency.
 
 ## Current Progress
 
-**v1.86.16** is **Released** at commit `0132eb635db1da36eaaf027f69f66e37c5fa9232`
-（tag `v1.86.16`; remote synchronized）. Parent release **v1.86.15** remains
-**Released** at `5311a090b73ea945342845eebdc4c17ea5eaa225`. Corrective workstream
-**v1.86.17**（v1.86.16 released-state reconciliation）is in **Implementation**;
-Release remains **Not Declared**. Post-Push Review for `v1.86.16` is **Complete**.
+**v1.86.17** is **Released** at commit `8ce5a4684d2ddfecd1617ca9c955278e757fe0d0`
+（tag `v1.86.17`; remote synchronized）. Parent release **v1.86.16** remains
+**Released** at `0132eb635db1da36eaaf027f69f66e37c5fa9232`. Corrective workstream
+**v1.86.18**（v1.86.17 released-state reconciliation）is in **Implementation**;
+Release remains **Not Declared**. Post-Push Review for `v1.86.17` is **Complete**.
 
 | Migration Step / Phase | Status |
 | ---------------------- | ------ |
@@ -313,7 +313,7 @@ Release remains **Not Declared**. Post-Push Review for `v1.86.16` is **Complete*
 | 7 — GOVERNANCE_FLOW authority correction | **Complete** |
 | 8 — ARCHITECTURE_DECISIONS registry update | **Complete** |
 | 9 — Synchronization Matrix instantiation（SM-001–SM-025） | **Complete** |
-| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.16`） |
+| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.17`） |
 | 11 — Quality Enforcement Correction（Tests 988 / 1026 / 1034 remediated; **1232 PASS**） | **Complete** |
 | 12 — Independent Review | **Complete** — Decision **A. GO** |
 | 13 — Commit（v1.86.0） | **Complete** — `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
@@ -479,6 +479,15 @@ Release remains **Not Declared**. Post-Push Review for `v1.86.16` is **Complete*
 | Corrective workstream（v1.86.17） | Status |
 | ------------------------------- | ------ |
 | Purpose | v1.86.16 released-state reconciliation |
+| Status | **Released / Completed** |
+| Release | **Released** — commit `8ce5a468…` / tag `v1.86.17` / remote synchronized |
+| Commit / Tag / Push | **Complete** |
+| Post-Push Review | **Complete** |
+| Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |
+
+| Corrective workstream（v1.86.18） | Status |
+| ------------------------------- | ------ |
+| Purpose | v1.86.17 released-state reconciliation |
 | Status | **Implementation** / **Not Declared** |
 | Release | **Not Declared** |
 | Commit / Tag / Push | **Pending** |
