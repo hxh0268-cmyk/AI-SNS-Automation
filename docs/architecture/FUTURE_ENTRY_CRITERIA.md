@@ -19,7 +19,7 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.18 released-state reconciliation Released; prior v1.86.17 released-state reconciliation Released; prior v1.86.16 released-state reconciliation Released; prior v1.86.15 released-state reconciliation Released; prior v1.86.14 released-state reconciliation Released; prior v1.86.13 released-state reconciliation Released; prior v1.86.12 released-state reconciliation Released; prior v1.86.11 released-state reconciliation Released; prior v1.86.10 released-state reconciliation Released; prior v1.86.9 released-state reconciliation Released; prior v1.86.8 released-state reconciliation Released; prior v1.86.7 released-state reconciliation Released; prior v1.86.6 released-state reconciliation Released; prior v1.86.5 released-state reconciliation Released; prior v1.86.4 released-state reconciliation Released; prior v1.86.3 released-state reconciliation Released; prior v1.86.2 released-state reconciliation Released; prior v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
+Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.86.19 released-state reconciliation Released; prior v1.86.18 released-state reconciliation Released; prior v1.86.17 released-state reconciliation Released; prior v1.86.16 released-state reconciliation Released; prior v1.86.15 released-state reconciliation Released; prior v1.86.14 released-state reconciliation Released; prior v1.86.13 released-state reconciliation Released; prior v1.86.12 released-state reconciliation Released; prior v1.86.11 released-state reconciliation Released; prior v1.86.10 released-state reconciliation Released; prior v1.86.9 released-state reconciliation Released; prior v1.86.8 released-state reconciliation Released; prior v1.86.7 released-state reconciliation Released; prior v1.86.6 released-state reconciliation Released; prior v1.86.5 released-state reconciliation Released; prior v1.86.4 released-state reconciliation Released; prior v1.86.3 released-state reconciliation Released; prior v1.86.2 released-state reconciliation Released; prior v1.86.1 Identity Reconciliation Released; prior Repository Baseline Inventory Authority Release — v1.86.0; prior Provider Production Readiness SSOT Alignment Complete — v1.85.0; prior Image Catalog Registration Implementation Complete — v1.84.0）
 ```
 
 | 項目 | 状態（v1.72.0） |
@@ -66,7 +66,8 @@ Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complet
 | Corrective Released-State Reconciliation（v1.86.15→Record） | **Completed / Released**（v1.86.16） |
 | Corrective Released-State Reconciliation（v1.86.16→Record） | **Completed / Released**（v1.86.17） |
 | Corrective Released-State Reconciliation（v1.86.17→Record） | **Completed / Released**（v1.86.18） |
-| Corrective Released-State Reconciliation（v1.86.18→Record） | **Implementation / Not Declared**（v1.86.19） |
+| Corrective Released-State Reconciliation（v1.86.18→Record） | **Completed / Released**（v1.86.19） |
+| Corrective Released-State Reconciliation（v1.86.19→Record） | **Implementation / Not Declared**（v1.86.20） |
 | Image Provider Review Entry / Formal Assessment | **NO** / **NO**（not authorized） |
 | v1.87.0 Production Readiness Assessment | **Not started** |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |

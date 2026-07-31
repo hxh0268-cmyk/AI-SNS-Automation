@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.86.18 --"
+echo "-- Test 98: VERSION updated to v1.86.19 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.18**（v1.86.17 released-state reconciliation）",
+    "**v1.86.19**（v1.86.18 released-state reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.86.18");
+  throw new Error("docs/VERSION.md current version must be v1.86.19");
 }
 
 if (
   currentSection.includes(
-    "**v1.86.17**（v1.86.16 released-state reconciliation）",
+    "**v1.86.18**（v1.86.17 released-state reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.86.17");
+  throw new Error("docs/VERSION.md current version must not remain v1.86.18");
 }
 
-console.log("VERSION v1.86.18 ok");
+console.log("VERSION v1.86.19 ok");
 EOF
-pass "VERSION updated to v1.86.18"
+pass "VERSION updated to v1.86.19"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -21875,7 +21875,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.86.18 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.86.19 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21884,10 +21884,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.18**（v1.86.17 released-state reconciliation）",
+    "**v1.86.19**（v1.86.18 released-state reconciliation）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.86.18");
+  throw new Error("current VERSION section must declare v1.86.19");
 }
 
 for (const marker of [
@@ -21904,11 +21904,11 @@ for (const marker of [
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
-  "**Repository Baseline Commit:** `08a6095fb33aa3e3f34265c8db9956de05eed42a`",
-  "**Repository Baseline Tag:** `v1.86.18`",
+  "**Repository Baseline Commit:** `70771c2996a8226b628e90fffe36ca0aae8e0363`",
+  "**Repository Baseline Tag:** `v1.86.19`",
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
-  "**v1.86.19** v1.86.18 released-state reconciliation — **Implementation** / **Not Declared**",
+  "**v1.86.20** v1.86.19 released-state reconciliation — **Implementation** / **Not Declared**",
   "Commit / Tag / Push **Pending**",
   "**v1.87.0** Production Readiness Assessment **not started**",
 ]) {
@@ -21923,31 +21923,31 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
 
 if (
   currentSection.includes(
-    "**v1.86.17**（v1.86.16 released-state reconciliation）",
+    "**v1.86.18**（v1.86.17 released-state reconciliation）",
   ) ||
   currentSection.includes(
-    "**v1.86.18** v1.86.17 released-state reconciliation — **Implementation** / **Not Declared**",
+    "**v1.86.19** v1.86.18 released-state reconciliation — **Implementation** / **Not Declared**",
   ) ||
-  currentSection.includes("v1.86.18 Commit / Tag / Push **Pending**") ||
-  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.18**") ||
+  currentSection.includes("v1.86.19 Commit / Tag / Push **Pending**") ||
+  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.19**") ||
   currentSection.includes(
-    "**Repository Baseline Commit:** `8ce5a4684d2ddfecd1617ca9c955278e757fe0d0`",
+    "**Repository Baseline Commit:** `08a6095fb33aa3e3f34265c8db9956de05eed42a`",
   ) ||
-  currentSection.includes("**Repository Baseline Tag:** `v1.86.17`") ||
+  currentSection.includes("**Repository Baseline Tag:** `v1.86.18`") ||
   currentSection.includes(
-    "**v1.86.19** v1.86.18 released-state reconciliation — **Planning**",
+    "**v1.86.20** v1.86.19 released-state reconciliation — **Planning**",
   ) ||
-  currentSection.includes("corrective **v1.86.19** released-state reconciliation — current phase **Planning**") ||
+  currentSection.includes("corrective **v1.86.20** released-state reconciliation — current phase **Planning**") ||
   currentSection.includes("Pending Phase: Planning")
 ) {
   throw new Error(
-    "current VERSION section must not treat v1.86.17 released-state reconciliation as sole current, leave Pending v1.86.18 publication claims, leave Record commit/tag at v1.86.17, or affirm Planning as active pending phase for v1.86.19",
+    "current VERSION section must not treat v1.86.18 released-state reconciliation as sole current, leave Pending v1.86.19 publication claims, leave Record commit/tag at v1.86.18, or affirm Planning as active pending phase for v1.86.20",
   );
 }
 
-console.log("v1.86.18 current version metadata ok");
+console.log("v1.86.19 current version metadata ok");
 EOF
-pass "v1.86.18 current version metadata in VERSION.md"
+pass "v1.86.19 current version metadata in VERSION.md"
 
 
 echo ""
