@@ -2,7 +2,7 @@
 
 v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。
 
-> **Current Phase（v1.86.20 released / v1.86.21 Implementation）:** v1.86.19 released-state reconciliation **Released**（`v1.86.20` @ `a86e409e…`）— Repository Baseline Identity Reconciliation lineage preserved（`v1.86.1`）— Repository Baseline Inventory Authority lineage preserved（`v1.86.0`）— corrective **v1.86.21** v1.86.20 released-state reconciliation — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**）— `image-generation-mock-provider` Catalog Registration **Registered**（v1.84.0 lineage）— Catalog Registered **YES** — bounded text Mock Formal Decision **READY** preserved — Image Review Entry **NO** — Image Formally Assessed **NO** — Production Ready **Not Declared**（global）。Real Provider / external IO は **禁止維持**。**v1.87.0** Production Readiness Assessment **not started**。
+> **Current Phase（v1.86.21 released / v1.87.0 Productization Entry Implementation）:** Current Baseline Record = released `v1.86.21` @ `4c1c212…` — Pending **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（ADR-0024）— continuous `v1.86.x` Reconciliation **Terminated** — `v1.86.22` **not authorized** — Real Provider / External IO / Automatic SNS Publishing **Prohibited**.
 
 > **境界:** 将来どう実装するかの **設計構想** は [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) を参照してください。Non-Goals = 今すぐ作ってはいけないもの、Future Architecture = 将来 Epic で検討する構想。
 

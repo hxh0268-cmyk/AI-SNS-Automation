@@ -296,11 +296,13 @@ A later step shall never justify omission of an earlier dependency.
 
 ## Current Progress
 
-**v1.86.20** is **Released** at commit `a86e409efb0be578325eb68b1f98471c610b1f73`
-（tag `v1.86.20`; remote synchronized）. Parent release **v1.86.19** remains
-**Released** at `70771c2996a8226b628e90fffe36ca0aae8e0363`. Corrective workstream
-**v1.86.21**（v1.86.20 released-state reconciliation）is in **Implementation**;
-Release remains **Not Declared**. Post-Push Review for `v1.86.20` is **Complete**.
+**v1.86.21** is **Released** at commit `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`
+（tag `v1.86.21`; remote synchronized）. Parent release **v1.86.20** remains
+**Released** at `a86e409efb0be578325eb68b1f98471c610b1f73`. Continuous `v1.86.x`
+Reconciliation is **Terminated**. Productization Entry workstream **v1.87.0**
+（Bounded Productization Entry — ADR-0024）is in **Implementation**; Release remains
+**Not Declared**. Post-Push Review for `v1.86.21` is **Complete**. `v1.86.22` is
+**not authorized**.
 
 | Migration Step / Phase | Status |
 | ---------------------- | ------ |
@@ -313,7 +315,7 @@ Release remains **Not Declared**. Post-Push Review for `v1.86.20` is **Complete*
 | 7 — GOVERNANCE_FLOW authority correction | **Complete** |
 | 8 — ARCHITECTURE_DECISIONS registry update | **Complete** |
 | 9 — Synchronization Matrix instantiation（SM-001–SM-025） | **Complete** |
-| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.20`） |
+| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.21`） |
 | 11 — Quality Enforcement Correction（Tests 988 / 1026 / 1034 remediated; **1232 PASS**） | **Complete** |
 | 12 — Independent Review | **Complete** — Decision **A. GO** |
 | 13 — Commit（v1.86.0） | **Complete** — `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
@@ -515,11 +517,20 @@ Release remains **Not Declared**. Post-Push Review for `v1.86.20` is **Complete*
 | Corrective workstream（v1.86.21） | Status |
 | ------------------------------- | ------ |
 | Purpose | v1.86.20 released-state reconciliation |
+| Status | **Released / Completed** |
+| Release | **Released** — commit `4c1c212…` / tag `v1.86.21` / remote synchronized |
+| Commit / Tag / Push | **Complete** |
+| Post-Push Review | **Complete** — continuous `v1.86.x` Reconciliation **Terminated** |
+| Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |
+
+| Productization workstream（v1.87.0） | Status |
+| ----------------------------------- | ------ |
+| Purpose | Bounded Productization Entry（ADR-0024） |
 | Status | **Implementation** / **Not Declared** |
 | Release | **Not Declared** |
 | Commit / Tag / Push | **Pending** |
-| Image Review Entry / Formal Assessment / Production Ready | **Unchanged**（NO / NO / Not Declared） |
-| v1.87.0 Production Readiness Assessment | **Not started** |
+| Real Provider / External IO / Automatic SNS | **Prohibited** |
+| v1.86.22 | **Not authorized** |
 
 ## Non-Goals
 
