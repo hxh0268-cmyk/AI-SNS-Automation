@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation release candidate）
+Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation **Released**; Post-Push Record Population **Implementation**）
 
 ## Supersedes
 
@@ -62,7 +62,7 @@ Further identical identity-only cycles add no product capability. The next objec
 | ID | Milestone | Entry status under this ADR |
 | -- | --------- | --------------------------- |
 | P0 | Productization Entry Planning | **Complete** |
-| P1 | Productization Governance and MVP Boundary | **Authorized**（this release candidate） |
+| P1 | Productization Governance and MVP Boundary | **Complete / Published** — Record Population **Implementation** |
 | P2 | Security / Credential / External IO Boundary（specs） | Not started — separate authorization |
 | P3 | Human Approval Workflow Foundation | Not started |
 | P4 | Real Provider Adapter（default-disabled） | Not started — **prohibited** until separately authorized |
@@ -134,13 +134,15 @@ At Productization Entry:
 
 | Field | Value |
 | ----- | ----- |
-| Git published baseline | `v1.86.21` @ `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1` |
-| Record Current（after this Entry population） | `v1.86.21` |
-| Record Pending | `v1.87.0` Bounded Productization Entry — **Implementation** / **Not Declared** |
+| Git published baseline | `v1.87.0` @ `04725ba8c20324c652a5f316bb05c013b968f38d` |
+| Record Current（after Post-Push Record Population） | `v1.87.0` |
+| Record Pending | **None** / **Not Assigned** |
+| Next Authorized Phase | **P2 Planning** only（P2 Implementation **not authorized**） |
 | Continuous `v1.86.x` Reconciliation | **Terminated** |
 | `v1.86.22` | **Not authorized** |
+| `v1.87.1` | **Not assigned** |
 
-Post-push one-cycle lag from `v1.86.21` publication is closed by this Entry’s Record population（Current → `v1.86.21`）. Pending moves to Productization capability work — **not** another identity-only reconciliation.
+Historical note: post-push lag after `v1.86.21` publication was previously closed by Record Current → `v1.86.21` with Pending → `v1.87.0` Productization Entry. After Git publication of `v1.87.0` @ `04725ba8…`, Post-Push Record Population closes Record Current to released `v1.87.0`（Pending Release **None** / **Not Assigned**; Next Authorized Phase **P2 Planning** only; P2 Implementation **not authorized**; `v1.87.1` **not assigned**; `v1.86.22` **not authorized**）. This is **not** another continuous `v1.86.x` identity-only reconciliation.
 
 ## Rollback policy
 
@@ -156,18 +158,28 @@ If a later milestone must abort after partial enablement（future phases）: eng
 
 ## Exit criteria
 
-This ADR’s Entry governance is **complete** when:
+This ADR’s Entry governance Git publication is **complete**. Post-Push Record
+Population Implementation closes Record Current to published `v1.87.0`.
+
+**Entry Git lifecycle complete when（satisfied）:**
 
 1. Productization Entry ADR Accepted（this document）
 2. MVP Boundary document published
 3. Provider Selection Record published（Instagram Recommended）
-4. Current Baseline Record populated to Git-published `v1.86.21`
-5. Pending set to `v1.87.0` Productization Entry（Not Declared）
-6. Required Derived Targets synchronized Record → Derived
-7. Quality identity locks assert Record `v1.86.21`（no Test 1233）
-8. Real Provider / External IO / automatic publishing remain Prohibited
-9. Catalog counts unchanged unless separately authorized
-10. No Adapter / network / credential mutations in this Entry slice
+4. Commit / Tag / Push for `v1.87.0` @ `04725ba8…` **Complete**
+5. Post-Push Release State Review **Complete**
+
+**Record Population complete when:**
+
+6. Current Baseline Record populated to Git-published `v1.87.0`
+7. Pending Release set to **None** / **Not Assigned**
+8. Next Authorized Phase = **P2 Planning** only
+9. Required Derived Targets synchronized Record → Derived
+10. Quality identity locks assert Record `v1.87.0`（no Test 1233）
+11. Real Provider / External IO / automatic publishing remain Prohibited
+12. Catalog counts unchanged unless separately authorized
+13. No Adapter / network / credential mutations in this Entry slice
+14. `v1.87.1` not assigned; `v1.86.22` not authorized; continuous `v1.86.x` terminated
 
 ## Decision summary
 

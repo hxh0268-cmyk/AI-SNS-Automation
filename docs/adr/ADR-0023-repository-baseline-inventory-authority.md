@@ -296,13 +296,14 @@ A later step shall never justify omission of an earlier dependency.
 
 ## Current Progress
 
-**v1.86.21** is **Released** at commit `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`
-（tag `v1.86.21`; remote synchronized）. Parent release **v1.86.20** remains
-**Released** at `a86e409efb0be578325eb68b1f98471c610b1f73`. Continuous `v1.86.x`
-Reconciliation is **Terminated**. Productization Entry workstream **v1.87.0**
-（Bounded Productization Entry — ADR-0024）is in **Implementation**; Release remains
-**Not Declared**. Post-Push Review for `v1.86.21` is **Complete**. `v1.86.22` is
-**not authorized**.
+**v1.87.0** is **Released** at commit `04725ba8c20324c652a5f316bb05c013b968f38d`
+（tag `v1.87.0`; remote synchronized）. Parent release **v1.86.21** remains
+**Released** at `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`. Continuous `v1.86.x`
+Reconciliation is **Terminated**. Productization Entry **v1.87.0**（ADR-0024）Git
+publication and Post-Push Review are **Complete**. Current Baseline Record is being
+populated to released `v1.87.0` under Post-Push Record Population Implementation.
+Pending Release is **None**. Next Authorized Phase is **P2 Planning** only.
+`v1.86.22` is **not authorized**. `v1.87.1` is **not assigned**.
 
 | Migration Step / Phase | Status |
 | ---------------------- | ------ |
@@ -315,7 +316,7 @@ Reconciliation is **Terminated**. Productization Entry workstream **v1.87.0**
 | 7 — GOVERNANCE_FLOW authority correction | **Complete** |
 | 8 — ARCHITECTURE_DECISIONS registry update | **Complete** |
 | 9 — Synchronization Matrix instantiation（SM-001–SM-025） | **Complete** |
-| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.86.21`） |
+| 10 — Repository-wide Baseline Synchronization | **Complete**（under released `v1.87.0` Post-Push Record Population） |
 | 11 — Quality Enforcement Correction（Tests 988 / 1026 / 1034 remediated; **1232 PASS**） | **Complete** |
 | 12 — Independent Review | **Complete** — Decision **A. GO** |
 | 13 — Commit（v1.86.0） | **Complete** — `57b3182ea2fb51f4f3441f9c1013543276cb757f` |
@@ -526,11 +527,14 @@ Reconciliation is **Terminated**. Productization Entry workstream **v1.87.0**
 | Productization workstream（v1.87.0） | Status |
 | ----------------------------------- | ------ |
 | Purpose | Bounded Productization Entry（ADR-0024） |
-| Status | **Implementation** / **Not Declared** |
-| Release | **Not Declared** |
-| Commit / Tag / Push | **Pending** |
+| Status | **Released / Completed** — Post-Push Record Population **Implementation** |
+| Release | **Released** — commit `04725ba8…` / tag `v1.87.0` / remote synchronized |
+| Commit / Tag / Push / Post-Push Review | **Complete** |
+| Pending Release | **None** |
+| Next Authorized Phase | **P2 Planning** only（P2 Implementation **not authorized**） |
 | Real Provider / External IO / Automatic SNS | **Prohibited** |
 | v1.86.22 | **Not authorized** |
+| v1.87.1 | **Not assigned** |
 
 ## Non-Goals
 

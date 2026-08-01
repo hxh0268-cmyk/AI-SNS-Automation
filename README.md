@@ -1170,13 +1170,13 @@ Latest Current Step
 release-plan
 ```
 
-### Bounded Productization Entry（v1.87.0 — Implementation / Not Declared）
+### Bounded Productization Entry（v1.87.0 — Released）
 
-**v1.87.0 Bounded Productization Entry** のガバナンス Implementation を進行中です。公開済み Git identity `v1.86.21` を Current Baseline Record に同期し、continuous `v1.86.x` Reconciliation を終了。ADR-0024 / MVP Boundary / Provider Selection を追加（catalog / provider runtime **unchanged**）。
+**v1.87.0 Bounded Productization Entry** のガバナンス release を公開済みです。ADR-0024 / MVP Boundary / Provider Selection を確立し、Current Baseline Record を公開済み `v1.87.0` @ `04725ba8…` へ population（catalog / provider runtime **unchanged**）。first user-usable product は未完成。
 
-**Current Version: v1.86.21** | **Quality Pipeline: `1232 PASS`** | **Pending: v1.87.0 Implementation / Not Declared**
+**Current Version: v1.87.0** | **Quality Pipeline: `1232 PASS`** | **Pending Release: None** | **Next: P2 Planning only**
 
-v1.86.21 released-state reconciliation: **Complete / Released**。continuous `v1.86.x` Reconciliation: **Terminated**。`v1.86.22`: **not authorized**。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`。Tag: `v1.86.21`。Branch: `main`。Release / Push: **Completed**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Productization Release: **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**）。
+v1.87.0 Bounded Productization Entry: **Complete / Released**。continuous `v1.86.x` Reconciliation: **Terminated**。`v1.86.22`: **not authorized**。`v1.87.1`: **not assigned**。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `04725ba8c20324c652a5f316bb05c013b968f38d`。Tag: `v1.87.0`。Branch: `main`。Release / Push: **Completed**。Post-Push Review: **Complete**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Productization Release: **None**。Next Authorized Phase: **P2 Security / Credential / External IO Boundary Planning** only（P2 Implementation **not authorized**）。
 
 | 項目 | 内容 |
 |------|------|
@@ -1184,9 +1184,9 @@ v1.86.21 released-state reconciliation: **Complete / Released**。continuous `v1
 | Productization ADR | [ADR-0024](docs/adr/ADR-0024-bounded-productization-entry.md)（Accepted — Bounded Productization Entry） |
 | MVP Boundary | [PRODUCT_MVP_BOUNDARY.md](docs/architecture/PRODUCT_MVP_BOUNDARY.md) |
 | Provider Selection | [PRODUCT_PROVIDER_SELECTION.md](docs/architecture/PRODUCT_PROVIDER_SELECTION.md)（Instagram **Recommended** ≠ Authorized） |
-| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — Record authority; v1.86.21 **Released**） |
+| Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — Record authority; v1.87.0 **Released**） |
 | Current Maturity | **Level 3.19** |
-| Next Phase Candidate | Independent Review / Commit Preparation for **v1.87.0** — only after Implementation approval |
+| Next Phase Candidate | **P2 Security / Credential / External IO Boundary Planning** only |
 
 ### Repository Baseline Released-State Reconciliation Release（v1.86.21）
 

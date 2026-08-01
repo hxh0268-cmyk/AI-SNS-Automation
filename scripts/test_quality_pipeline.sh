@@ -4032,7 +4032,7 @@ console.log("experimental workflow unchanged ok");
 EOF
 pass "experimental workflow unchanged"
 
-echo "-- Test 98: VERSION updated to v1.86.21 --"
+echo "-- Test 98: VERSION updated to v1.87.0 --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 import path from "node:path";
@@ -4044,23 +4044,23 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.21**（v1.86.20 released-state reconciliation）",
+    "**v1.87.0**（Bounded Productization Entry）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must be v1.86.21");
+  throw new Error("docs/VERSION.md current version must be v1.87.0");
 }
 
 if (
   currentSection.includes(
-    "**v1.86.20**（v1.86.19 released-state reconciliation）",
+    "**v1.86.21**（v1.86.20 released-state reconciliation）",
   )
 ) {
-  throw new Error("docs/VERSION.md current version must not remain v1.86.20");
+  throw new Error("docs/VERSION.md current version must not remain v1.86.21");
 }
 
-console.log("VERSION v1.86.21 ok");
+console.log("VERSION v1.87.0 ok");
 EOF
-pass "VERSION updated to v1.86.21"
+pass "VERSION updated to v1.87.0"
 
 
 echo "-- Test 99: content generation CLI exists --"
@@ -6479,8 +6479,8 @@ if (payload.project !== "AI-SNS-Automation") {
 if (!Array.isArray(payload.scope) || payload.scope.length === 0) {
   throw new Error("developer-handoff.json scope must be non-empty array");
 }
-if (payload.nextVersion !== "v1.87.0") {
-  throw new Error("developer-handoff.json nextVersion must auto increment to v1.87.0");
+if (payload.nextVersion !== "v1.88.0") {
+  throw new Error("developer-handoff.json nextVersion must auto increment to v1.88.0");
 }
 
 console.log("developer-handoff.json ok");
@@ -6489,8 +6489,8 @@ pass "developer-handoff.json generated"
 
 echo "-- Test 176: developer-handoff.md generated --"
 test -f reports/developer-automation/latest/developer-handoff.md
-grep -q "# AI-SNS-Automation v1.87.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
-grep -q "Next Version: v1.87.0" reports/developer-automation/latest/developer-handoff.md
+grep -q "# AI-SNS-Automation v1.88.0 Implementation Handoff" reports/developer-automation/latest/developer-handoff.md
+grep -q "Next Version: v1.88.0" reports/developer-automation/latest/developer-handoff.md
 pass "developer-handoff.md generated"
 
 echo "-- Test 177: handoff markdown includes Project Context --"
@@ -6545,7 +6545,7 @@ grep -q '"developer:handoff": "node scripts/run_developer_handoff.js"' package.j
 test -f scripts/run_developer_handoff.js
 npm run developer:handoff >/tmp/developer_handoff_cli.log
 grep -q "Developer Handoff" /tmp/developer_handoff_cli.log
-grep -q "Next Version: v1.87.0" /tmp/developer_handoff_cli.log
+grep -q "Next Version: v1.88.0" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.json" /tmp/developer_handoff_cli.log
 grep -q "developer-handoff.md" /tmp/developer_handoff_cli.log
 pass "developer:handoff npm script exists"
@@ -21875,7 +21875,7 @@ grep -Fq "**Current Version: v1.84.0**" README.md
 grep -q "Registered" README.md
 pass "v1.84.0 catalog registration implementation release documented"
 
-echo "-- Test 1232: v1.86.21 current version metadata in VERSION.md --"
+echo "-- Test 1232: v1.87.0 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
 
@@ -21884,10 +21884,10 @@ const currentSection = versionDoc.split("## バージョン履歴")[0];
 
 if (
   !currentSection.includes(
-    "**v1.86.21**（v1.86.20 released-state reconciliation）",
+    "**v1.87.0**（Bounded Productization Entry）",
   )
 ) {
-  throw new Error("current VERSION section must declare v1.86.21");
+  throw new Error("current VERSION section must declare v1.87.0");
 }
 
 for (const marker of [
@@ -21904,14 +21904,17 @@ for (const marker of [
   "**Architecture Maturity:** **Level 3.19**",
   "providerVersion **1.0.0**",
   "capability **`image_generation`**",
-  "**Repository Baseline Commit:** `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`",
-  "**Repository Baseline Tag:** `v1.86.21`",
+  "**Repository Baseline Commit:** `04725ba8c20324c652a5f316bb05c013b968f38d`",
+  "**Repository Baseline Tag:** `v1.87.0`",
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
-  "**v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**",
-  "Commit / Tag / Push **Pending**",
+  "**Pending Productization Release:** **None** / **Not Assigned**",
+  "**P2 Security / Credential / External IO Boundary Planning**",
+  "P2 Implementation **not authorized**",
+  "**v1.87.1** **not assigned**",
   "continuous `v1.86.x` Reconciliation **Terminated**",
   "**v1.86.22** **not authorized**",
+  "Real Provider / External IO / Automatic SNS **Prohibited**",
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
@@ -21924,29 +21927,29 @@ if (currentSection.includes("**Catalog Registered:** **NO**")) {
 
 if (
   currentSection.includes(
-    "**v1.86.20**（v1.86.19 released-state reconciliation）",
+    "**v1.86.21**（v1.86.20 released-state reconciliation）",
   ) ||
   currentSection.includes(
-    "**v1.86.21** v1.86.20 released-state reconciliation — **Implementation** / **Not Declared**",
+    "**Pending Productization Release:** **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**",
   ) ||
-  currentSection.includes("v1.86.21 Commit / Tag / Push **Pending**") ||
-  currentSection.includes("**Next Phase Candidate:** Commit Execution for **v1.86.21**") ||
+  currentSection.includes("Commit / Tag / Push **Pending**") ||
+  currentSection.includes("**Next Phase Candidate:** Independent Review / Commit Preparation for **v1.87.0**") ||
   currentSection.includes(
-    "**Repository Baseline Commit:** `a86e409efb0be578325eb68b1f98471c610b1f73`",
+    "**Repository Baseline Commit:** `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`",
   ) ||
-  currentSection.includes("**Repository Baseline Tag:** `v1.86.20`") ||
+  currentSection.includes("**Repository Baseline Tag:** `v1.86.21`") ||
   currentSection.includes(
     "**v1.87.0** Production Readiness Assessment **not started**",
   )
 ) {
   throw new Error(
-    "current VERSION section must not treat v1.86.20 as sole current, leave Pending v1.86.21 publication claims, leave Record commit/tag at v1.86.20, or retain Assessment-not-started framing for v1.87.0",
+    "current VERSION section must not retain v1.86.21 as current, Pending v1.87.0 Implementation claims, or stale Commit/Tag/Push Pending framing",
   );
 }
 
-console.log("v1.86.21 current version metadata ok");
+console.log("v1.87.0 current version metadata ok");
 EOF
-pass "v1.86.21 current version metadata in VERSION.md"
+pass "v1.87.0 current version metadata in VERSION.md"
 
 
 echo ""

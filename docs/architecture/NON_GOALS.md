@@ -2,7 +2,7 @@
 
 v1.49.0 時点での **明示的非目標（Non-Goals）** — **現時点の実装禁止対象** です。
 
-> **Current Phase（v1.86.21 released / v1.87.0 Productization Entry Implementation）:** Current Baseline Record = released `v1.86.21` @ `4c1c212…` — Pending **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（ADR-0024）— continuous `v1.86.x` Reconciliation **Terminated** — `v1.86.22` **not authorized** — Real Provider / External IO / Automatic SNS Publishing **Prohibited**.
+> **Current Phase（v1.87.0 released / Post-Push Record Population Implementation）:** Current Baseline Record = released `v1.87.0` @ `04725ba8…` — Pending Release **None** — Next Authorized Phase **P2 Planning** only（P2 Implementation **not authorized**）— continuous `v1.86.x` Reconciliation **Terminated** — `v1.86.22` **not authorized** — `v1.87.1` **not assigned** — Real Provider / External IO / Automatic SNS Publishing **Prohibited**（ADR-0024）.
 
 > **境界:** 将来どう実装するかの **設計構想** は [FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) を参照してください。Non-Goals = 今すぐ作ってはいけないもの、Future Architecture = 将来 Epic で検討する構想。
 

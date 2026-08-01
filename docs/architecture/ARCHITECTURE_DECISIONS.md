@@ -444,8 +444,8 @@ Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-r
 | **Derived targets** | Receive values from the Current Baseline Record only; do not redefine Record field meanings |
 | **Reverse synchronization** | **Prohibited** |
 | **Distinctions preserved** | Schema / Inventory Model ≠ Current Recorded Values ≠ Pending Release Values ≠ Derived Evidence ≠ Git Evidence ≠ Quality Enforcement |
-| **Current Baseline Record population** | **Complete** for released baseline `v1.86.21`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `4c1c212…` / tag `v1.86.21`） |
-| **Repository-wide Synchronization** | **Complete** under released `v1.86.21`; continuous `v1.86.x` Reconciliation **Terminated**; **v1.87.0** Productization Entry current phase **Implementation** / **Not Declared** |
+| **Current Baseline Record population** | **Complete** for released baseline `v1.87.0`（authorized Record values in [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md) §6.2.2 — commit `04725ba8…` / tag `v1.87.0`） |
+| **Repository-wide Synchronization** | **Complete** under released `v1.87.0` Post-Push Record Population; continuous `v1.86.x` Reconciliation **Terminated**; Pending Release **None**; Next = **P2 Planning** only |
 | **Quality Enforcement Correction** | **Complete** — Tests 988 / 1026 / 1034 remediated; Quality **1232 PASS**; D-006 **Remediated**; Independent Review Complete — Decision **A. GO** |
 | **v1.86.0 Release** | **Released** — Commit / Tag / Push **Complete**; remote synchronized |
 | **v1.86.1 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
@@ -469,10 +469,10 @@ Full record: [ADR-0022](../adr/ADR-0022-image-generation-mock-provider-catalog-r
 | **v1.86.19 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
 | **v1.86.20 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; remote synchronized |
 | **v1.86.21 Corrective Release** | **Released** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; continuous `v1.86.x` Reconciliation **Terminated** |
-| **v1.87.0 Productization Entry** | **Implementation / Not Declared** — Commit / Tag / Push **Pending**（ADR-0024） |
+| **v1.87.0 Productization Entry** | **Released / Completed** — Commit / Tag / Push / Post-Push **Complete**; Record Population **Implementation**（ADR-0024） |
 | **Provider Production Ready（global）** | **Not Declared** |
 | **Repository-wide Level 4** | **Not Declared** |
-| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for `v1.86.20` is complete; Required Derived Target sync and Quality Enforcement Correction completed for release; Independent Review Complete — Decision **A. GO**; Commit / tag / push for `v1.86.0` / `v1.86.1` / `v1.86.2` / `v1.86.3` / `v1.86.4` / `v1.86.5` / `v1.86.6` / `v1.86.7` / `v1.86.8` / `v1.86.9` / `v1.86.10` / `v1.86.11` / `v1.86.12` / `v1.86.13` / `v1.86.14` / `v1.86.15` / `v1.86.16` / `v1.86.17` / `v1.86.18` / `v1.86.19` / `v1.86.20` **Complete**; corrective `v1.86.21` at **Implementation** with Commit / Tag / Push **Pending**; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
+| **Consequences** | Decision index discovers ADR-0023; Current Baseline Record population for released `v1.87.0` is complete under Post-Push Record Population; Required Derived Target sync and Quality Enforcement Correction completed for release lineage; Independent Review Complete — Decision **A. GO** for Productization Governance; Commit / tag / push for `v1.86.0`–`v1.87.0` **Complete**; Pending Release **None**; Next Authorized Phase **P2 Planning** only; `ARCHITECTURE_DECISIONS.md` remains index / discovery surface only |
 
 ```text
 ADR accepted
@@ -498,12 +498,12 @@ v1.86.0 Released（commit 57b3182… / tag v1.86.0）
 ≠ v1.86.18 Released（commit 08a6095f… / tag v1.86.18）
 ≠ v1.86.19 Released（commit 70771c29… / tag v1.86.19）
 ≠ v1.86.21 Released（commit 4c1c212… / tag v1.86.21）
-≠ v1.87.0 released（Pending / Not Declared）
+≠ P2 Implementation authorized
 Governance completion approved only after Independent Review
 （Independent Review Complete — A. GO）
 Quality Enforcement Complete（1232 PASS）
 ≠ Image Review Entry / Formal Assessment / Production Ready authorized
-≠ Commit / tag / push for v1.87.0 authorized
+≠ v1.87.1 assigned / Pending Release reintroduced
 ≠ v1.87.0 Assessment started
 ```
 
@@ -511,7 +511,7 @@ Full record: [ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.
 
 新判断は ADR 追加後、本ファイルの Accepted Decisions に summary を追記します。
 
-### Post–ADR-0024 — Bounded Productization Entry（v1.87.0 Implementation / Not Declared）
+### Post–ADR-0024 — Bounded Productization Entry（v1.87.0 Released / Record Population Implementation）
 
 | Item | Decision |
 |------|----------|

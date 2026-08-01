@@ -8,7 +8,7 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 Architecture Documentation = **Architecture Governance** として、**49 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1 + v1.71.0 Provider Level 4 Implementation Ready Review 1 + v1.72.0 Provider Public Contract Catalog Extension Review 1 + v1.73.0 Mock Provider Production Implementation Authorization Review 1 + v1.75.0 Mock Provider Catalog Registration Governance Review 1 + v1.77.0 Provider Production Readiness Review 1 + v1.79.0 Provider Expansion Entry Review 1 + v1.80.0 Image Generation Mock Provider Expansion Entry Review 1 + v1.81.0 Image Generation Mock Provider Implementation Authorization Review 1 + v1.83.0 Image Generation Mock Provider Catalog Registration Governance Review 1）を固定します。
 
-**Current Maturity:** **Level 3.19**（v1.86.21 — Repository Baseline Inventory Authority Complete; continuous `v1.86.x` Reconciliation **Terminated**; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（ADR-0024））
+**Current Maturity:** **Level 3.19**（v1.87.0 — Bounded Productization Entry **Released**; Post-Push Record Population **Implementation**; continuous `v1.86.x` Reconciliation **Terminated**; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — Pending Release **None** — Next = **P2 Planning** only（ADR-0024））
 
 > **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **41**（重複ファイルカウントではない）。 Repository Baseline Inventory / Current Baseline Record / Synchronization Matrix の SSOT は [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md)（[ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md)）。
 
@@ -121,7 +121,7 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 
 ---
 
-## 現在フェーズ（v1.86.21 released / v1.87.0 Bounded Productization Entry Implementation）
+## 現在フェーズ（v1.87.0 released / Post-Push Record Population Implementation）
 
 | Layer | 状態 |
 |-------|------|
@@ -179,12 +179,12 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 | **Catalog Registered（image provider）** | **YES** |
 | **Image Review Entry Authorized** | **NO** |
 | **Image Formally Assessed** | **NO** |
-| **Repository Baseline** | **v1.86.21** @ `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1` |
+| **Repository Baseline** | **v1.87.0** @ `04725ba8c20324c652a5f316bb05c013b968f38d` |
 | **Repository-wide Level 4 Implementation Ready** | **Not Declared** |
 | **Bounded Production Ready** | **NO** |
 | **Global Production Ready** | **Not Declared** |
 | **Provider Production Implementation** | **Not Started**（Real Provider scope） |
-| **Pending Productization Release** | **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**; ADR-0024） |
+| **Pending Productization Release** | **None** / **Not Assigned** — Next Authorized Phase **P2 Planning** only（P2 Implementation **not authorized**; ADR-0024） |
 | **v1.86.22** | **Not authorized** |
 | **Productization ADR** | [ADR-0024](../adr/ADR-0024-bounded-productization-entry.md) |
 | **MVP Boundary** | [PRODUCT_MVP_BOUNDARY.md](./PRODUCT_MVP_BOUNDARY.md) |

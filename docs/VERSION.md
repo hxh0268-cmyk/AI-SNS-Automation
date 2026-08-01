@@ -51,7 +51,7 @@ Pending Release value は recorded Current Version value ではない。
 本書の Migration 6（Derived Target Declaration）および Repository-wide Baseline Synchronization は:
 
 - Current Baseline Record の値を本書へ **one-way** 表示同期する（Reverse Synchronization Prohibited）
-- Current Version display を Record の released `v1.86.21` に合わせる（Pending Productization Entry `v1.87.0` は Not Declared）
+- Current Version display を Record の released `v1.87.0` に合わせる（Pending Release **None**; Next Phase = P2 Planning only）
 - Quality / Git を Current Version value authority にしない
 
 以下「現在のバージョン」に表示される値は **Derived Current Version display** である。
@@ -61,13 +61,13 @@ Pending Release value は recorded Current Version value ではない。
 
 ## 現在のバージョン
 
-**v1.86.21**（v1.86.20 released-state reconciliation）
+**v1.87.0**（Bounded Productization Entry）
 
 **Platform Status:** Developer Automation Platform **Completed**（保守のみ）
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** v1.86.20 released-state reconciliation Release Complete（v1.86.21）— continuous `v1.86.x` Reconciliation **Terminated** — Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— **v1.87.0** Bounded Productization Entry — current phase **Implementation** — Release **Not Declared**（ADR-0024）
+**Phase:** Bounded Productization Entry Release Complete（v1.87.0）— continuous `v1.86.x` Reconciliation **Terminated** — Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— Post-Push Record Population **Implementation** — Pending Release **None** — Next Authorized Phase **P2 Planning** only（ADR-0024）
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -135,9 +135,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Architecture Maturity:** **Level 3.19**（unchanged）
 
-**Repository Baseline Commit:** `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`
+**Repository Baseline Commit:** `04725ba8c20324c652a5f316bb05c013b968f38d`
 
-**Repository Baseline Tag:** `v1.86.21`
+**Repository Baseline Tag:** `v1.87.0`
 
 **Branch:** `main`
 
@@ -145,7 +145,7 @@ Pending Release value は recorded Current Version value ではない。
 
 **Remote Synchronization / Divergence:** **Synchronized** / `0 0`
 
-**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.86.21`）
+**Quality Pipeline（current display）:** **1232 PASS**（Quality Enforcement Correction lineage under released `v1.87.0`）
 
 **Repository-wide Level 4 Implementation Ready:** **Not Declared**
 
@@ -159,9 +159,9 @@ Pending Release value は recorded Current Version value ではない。
 
 **Human Approval Gate:** **Preserved**（`humanApprovalGateBypass: false`）
 
-**Pending Productization Release:** **v1.87.0** Bounded Productization Entry — **Implementation** / **Not Declared**（Commit / Tag / Push **Pending**; not a release declaration; ADR-0024）
+**Pending Productization Release:** **None** / **Not Assigned**
 
-**Next Phase Candidate:** Independent Review / Commit Preparation for **v1.87.0** — only after Implementation approval（continuous `v1.86.x` Reconciliation **Terminated**; **v1.86.22** **not authorized**）
+**Next Phase Candidate:** **P2 Security / Credential / External IO Boundary Planning** only（P2 Implementation **not authorized**; **v1.87.1** **not assigned**; continuous `v1.86.x` Reconciliation **Terminated**; **v1.86.22** **not authorized**; Real Provider / External IO / Automatic SNS **Prohibited**; ADR-0024）
 
 ---
 
@@ -171,7 +171,7 @@ Pending Release value は recorded Current Version value ではない。
 
 | バージョン | 名称 | 状態 | 概要 |
 |------------|------|------|------|
-| **v1.87.0** | **ドキュメント** | **🔄 Implementation / Not Declared** | **Bounded Productization Entry — ADR-0024 / MVP Boundary / Provider Selection; Commit / Tag / Push Pending** |
+| **v1.87.0** | **ドキュメント** | **✅ 完了** | **Bounded Productization Entry — commit `04725ba8c20324c652a5f316bb05c013b968f38d` / tag `v1.87.0` / Commit·Tag·Push Complete / Post-Push Review Complete / Record Population Implementation; 1232 PASS; Pending Release None; Next = P2 Planning only** |
 | **v1.86.21** | **ドキュメント** | **✅ 完了** | **v1.86.20 released-state reconciliation — commit `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1` / tag `v1.86.21` / Commit·Tag·Push Complete / 1232 PASS; continuous v1.86.x Reconciliation Terminated** |
 | **v1.86.20** | **ドキュメント** | **✅ 完了** | **v1.86.19 released-state reconciliation — commit `a86e409efb0be578325eb68b1f98471c610b1f73` / tag `v1.86.20` / Commit·Tag·Push Complete / 1232 PASS** |
 | **v1.86.19** | **ドキュメント** | **✅ 完了** | **v1.86.18 released-state reconciliation — commit `70771c2996a8226b628e90fffe36ca0aae8e0363` / tag `v1.86.19` / Commit·Tag·Push Complete / 1232 PASS** |

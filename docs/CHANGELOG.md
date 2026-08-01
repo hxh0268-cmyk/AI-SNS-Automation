@@ -4,21 +4,21 @@
 
 ---
 
-## v1.87.0 — Bounded Productization Entry（Unreleased / Implementation）
+## v1.87.0 — Bounded Productization Entry
 
-Bounded Productization Entry governance Implementation after continuous `v1.86.x` Reconciliation termination. Establishes ADR-0024, MVP Boundary, Provider Selection Record, and migrates Current Baseline Record to published `v1.86.21` @ `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`.
+Bounded Productization Entry governance release after continuous `v1.86.x` Reconciliation termination. Establishes ADR-0024, MVP Boundary, Provider Selection Record（Instagram Recommended ≠ Authorized）. Git-published at `04725ba8c20324c652a5f316bb05c013b968f38d` / tag `v1.87.0`. Post-Push Record Population closes Current Baseline Record to released `v1.87.0`（Pending Release **None**; Next = P2 Planning only）.
 
-**Status:** Implementation / **Not Declared** — Commit / Tag / Push pending.
+**Status:** Released / **Completed** — Commit / Tag / Push **Complete**; Post-Push Review **Complete**; Record Population **Implementation**.
 
-Does **not** authorize Real Provider, External IO, credentials, network calls, automatic SNS publishing, Production Ready, or Level 4. Does **not** start `v1.86.22`. Catalog / provider runtime **unchanged**.
+Does **not** authorize Real Provider, External IO, credentials, network calls, automatic SNS publishing, Production Ready, or Level 4. Does **not** start `v1.86.22` or assign `v1.87.1`. Does **not** authorize P2 Implementation. Catalog / provider runtime **unchanged**.
 
-### 変更内容（planned）
+### 変更内容
 
 | 項目 | 内容 |
 |------|------|
 | ADR | ADR-0024 Bounded Productization Entry |
 | Boundary | PRODUCT_MVP_BOUNDARY / PRODUCT_PROVIDER_SELECTION |
-| Record | Current Baseline Record → released `v1.86.21`; Pending → `v1.87.0` |
+| Record | Current Baseline Record → released `v1.87.0` @ `04725ba8…`; Pending Release **None** |
 | Derived | VERSION / README / PPRR / architecture current-state sync |
 | Quality | Tests 98 / 1232 identity locks（Test 1231 unchanged; Test 1233 absent） |
 | Catalog / Providers | **Unchanged** |
