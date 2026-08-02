@@ -320,14 +320,14 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | Working Tree State | **Clean** at released baseline `v1.87.0`（Post-Push Record Population Implementation edits are out-of-band until separately committed; tip SHA ≠ Current Commit authority） | **Recorded** |
 | Divergence State | `0 0`（ahead/behind vs `origin/main` at released baseline） | **Recorded** |
 | Current Repository Baseline | `v1.87.0` @ `04725ba8c20324c652a5f316bb05c013b968f38d` | **Recorded** |
-| Current Governance Phase | **v1.87.0 Bounded Productization Entry — Post-Push Record Population Implementation**（P1 lifecycle closing; Real Provider / External IO **Prohibited**） | **Recorded** |
-| Next Authorized Phase | **Next Phase Candidate:** P2 Security / Credential / External IO Boundary **Planning** only（P2 Implementation **not authorized**; Real Provider / External IO / credentials / network / Automatic SNS **Prohibited**; Image Review Entry / Formal Assessment / Production Ready unchanged） | **Recorded** |
+| Current Governance Phase | **v1.87.0 Bounded Productization Entry — P1 Complete / Closed; P2A Boundary Specifications Complete**; lifecycle closure **In Progress**（versionless; Real Provider / External IO **Prohibited**） | **Recorded** |
+| Next Authorized Phase | **P2-R1 Official Instagram Contract-Fit Research Planning**（after durable P2A closure）; P2-R1 **Not Started**; Implementation **Not Authorized**; concrete endpoints **Pending P2-R1**; P2B+/P3/P4 **not authorized**; Real Provider / External IO / credentials / network / Automatic SNS **Prohibited**; version **Not Assigned** | **Recorded** |
 | Assessment State | **Complete** — Assessment Decision **READY**（bounded canonical Mock Provider scope — v1.78.0 lineage preserved）; Image Provider Review Entry **NO** / Formally Assessed **NO** | **Recorded** |
 | Declaration State | Bounded Production Ready **NO** / Global Provider Production Ready **Not Declared** | **Recorded** |
 | Architecture Maturity State | **Level 3.19** | **Recorded** |
 | Quality Pipeline Baseline | **1232 PASS**（Quality Enforcement Correction lineage preserved; identity Tests 98 / 1232 assert Record `v1.87.0`） | **Recorded** |
 | Public Contract Catalog Baseline | catalogVersion `1.0`; Provider Contracts `3`; publicContracts `7`; **Total Foundations** `catalog.foundations.length` = `12`（Application Layer `7` + Platform Layer `5`）; **Application Foundations**（CLI label / `layer === "application"`）= `7`; dependencyRules `6`; compatibilityMatrix `5`; layerRules `6`; versionRules `3`; deprecationRules `4`; validate = **valid** | **Recorded**（schema-proven; CLI Application Foundations ≠ Total Foundations） |
-| Required Consistency Checks | Defined by Synchronization Matrix（§8）; Productization Entry **Released**（`v1.87.0`）; prior released-state reconciliation **Released**（`v1.86.21`）; continuous `v1.86.x` Reconciliation **Terminated**; Post-Push Record Population **Implementation** in progress; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated** | **Recorded** |
+| Required Consistency Checks | Defined by Synchronization Matrix（§8）; Productization Entry **Released**（`v1.87.0`）; prior released-state reconciliation **Released**（`v1.86.21`）; continuous `v1.86.x` Reconciliation **Terminated**; P1 Record Population **Complete**; P2 Planning **Complete**; P2A Boundary Specifications **Complete** / IR **A.GO**; P2A lifecycle closure **In Progress**（docs-only; versionless）; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated** | **Recorded** |
 | Generated Files Policy | Manual sync prohibited; regenerate via authoritative process | **Recorded** |
 | Derived Documents | Enumerated in §8.2; Required Derived Target current-state identity/governance displays must synchronize to Record `v1.87.0`（Pending Release **None**） | **Recorded** |
 | Historical Records | VERSION history / CHANGELOG historical sections / completed ADR evidence（including prior baseline `v1.86.21` @ `4c1c212…`, `v1.86.20` @ `a86e409e…`, and earlier `v1.86.x` / `v1.86.0` lineages） | **Recorded** |
@@ -344,8 +344,12 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | Push Preparation / Execution | **Complete** |
 | Post-Push Release State Review | **Complete** |
 | Record Population Planning | **Complete** |
-| Record Population Implementation | **In Progress**（this phase） |
-| Release declaration | **Current Released** after this population |
+| Record Population Implementation | **Complete**（population tip `eee5ba0…` published; Current Commit remains `04725ba8…`） |
+| P2 Planning | **Complete** |
+| P2A Boundary Specifications | **Complete**（Independent Review **Complete** / **A.GO**） |
+| P2A lifecycle closure | **In Progress**（versionless governance tip; version **Not Assigned**; no Pending Release） |
+| P2A specification pack（governed evidence） | `SECURITY_CREDENTIAL_BOUNDARY.md` · `EXTERNAL_IO_BOUNDARY.md` · `SECRET_HANDLING_POLICY.md` · `PROVIDER_ENDPOINT_ALLOWLIST.md` · `ERROR_REDACTION_MODEL.md` · `P2_THREAT_MODEL.md` |
+| Release declaration | **Current Released** = `v1.87.0`（unchanged by P2A） |
 
 **Population markers:**
 
@@ -355,7 +359,7 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | Repository-wide derived synchronization state | **In Progress**（Required Derived Target current-state displays synchronize to Record `v1.87.0`） |
 | Quality Enforcement Correction state | **Complete** lineage（**1232 PASS**; D-006 **Remediated**）; identity Tests 98 / 1232 assert Record `v1.87.0` |
 | Independent Review（v1.87.0 Productization Governance） | **Complete** — Decision **A. GO** |
-| Current Phase | **v1.87.0 Post-Push Record Population Implementation** |
+| Current Phase | **P2A Boundary Specifications lifecycle closure**（docs-only; versionless） |
 | v1.86.0–v1.86.21 Corrective / released-state declarations | **Released / Completed**（historical — preserved） |
 | v1.87.0 Productization Entry release declaration | **Released / Completed**（Git tag `v1.87.0` @ `04725ba8…`; Commit / Tag / Push **Complete**; Post-Push Review **Complete**） |
 | Continuous v1.86.x Reconciliation | **Terminated** after v1.86.21 |
@@ -363,8 +367,8 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | v1.87.1 | **Not assigned** |
 | Reverse synchronization | **Prohibited** |
 
-**Current Version is `v1.87.0`.** Pending Release ID is **None**. Next Authorized Phase is
-**P2 Planning only**（not a Pending Release）.
+**Current Version is `v1.87.0`.** Pending Release ID is **None**. P2 Planning is **Complete**.
+**P2A** Boundary Specifications are **Complete**（IR **A.GO**）. Current docs-only work is **P2A lifecycle closure Implementation**（not a Pending Release; version **Not Assigned**; release declaration **Not Applicable** / versionless governance tip）.
 
 ```
 Schema Definition
@@ -383,7 +387,7 @@ Schema Definition
 | Pending Designation | **None** |
 | Pending Phase | **None** |
 | Pending Declaration | **Not Applicable** |
-| Next Authorized Capability Phase | **P2 Security / Credential / External IO Boundary Planning** only |
+| Next Authorized Capability Phase | **P2-R1 Official Instagram Contract-Fit Research Planning**（after durable P2A closure）; P2-R1 **Not Started**; concrete endpoints **Model Defined / Concrete Endpoints Pending P2-R1**; P2B+ **not started** |
 | P2 Implementation | **Not authorized** |
 | Real Provider / External IO / credentials / network | **Not authorized** / **Prohibited** |
 | Automatic SNS Publishing | **Prohibited** |
@@ -404,11 +408,11 @@ is **None**.
 
 | Evidence Class | Observed Evidence（read-only） | Treatment |
 | -------------- | ------------------------------ | --------- |
-| Current Released Commit | Tag `v1.87.0` / HEAD / `origin/main` = `04725ba8c20324c652a5f316bb05c013b968f38d`; parent `4c1c212…`（`v1.86.21`）; divergence `0 0`; tag type `commit`（lightweight） | **Validation evidence** — authorizes Record §6.2.2 Current Commit/Tag; not a substitute for the Record |
-| Population Implementation Working Tip | Uncommitted Post-Push Record Population edits（this phase）may appear in the working tree | **Evidence only** — tip SHA ≠ Current Commit authority; do not reverse-sync tip → Record |
+| Current Released Commit | Tag `v1.87.0` = `04725ba8c20324c652a5f316bb05c013b968f38d`; parent `4c1c212…`（`v1.86.21`）; tag type `commit`（lightweight） | **Validation evidence** — authorizes Record §6.2.2 Current Commit/Tag; not a substitute for the Record |
+| Repository Population Tip | `main` / `origin/main` tip may be `eee5ba0b9450102d148581043abb043fcde5972f`（Record Population commit） | **Evidence only** — tip SHA ≠ Current Commit authority; do not reverse-sync tip → Record |
 | Prior released baseline | Tag `v1.86.21` = `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`; Tag `v1.86.20` = `a86e409efb0be578325eb68b1f98471c610b1f73`; earlier `v1.86.x` / `v1.86.0` tags preserved | **Historical** — preserved; not Current Version |
 | Working tree evidence | Released baseline `v1.87.0` is clean at publication; Record Population Implementation edits are out-of-band until committed | Implementation edits ≠ Record authority |
-| Derived VERSION / README / PPRR | Must display Current Version `v1.87.0`; Pending Release **None**; Next Phase **P2 Planning** only | Synchronize Record → Derived only |
+| Derived VERSION / README / PPRR | Must display Current Version `v1.87.0`; Pending Release **None**; P2A **Complete**; Next Phase **P2-R1 Official Instagram Contract-Fit Research Planning** | Synchronize Record → Derived only |
 | Catalog probe evidence | catalogVersion `1.0`; providerContracts `3`; publicContracts `7`; Total Foundations `12`; Application Foundations `7`; validate = valid | Unchanged catalog baseline |
 | Quality evidence | Pipeline family **1232 PASS**; Tests 98 / 1232 assert Record `v1.87.0` | Enforcement must assert Record-aligned `v1.87.0` identity |
 | package.json | No `version` field | Not Applicable as SemVer release SSOT |
@@ -580,7 +584,7 @@ These rules bind every Matrix row:
 
 **Instantiation status:** **Complete**（Matrix Instantiation completed under ADR-0023; operational under released `v1.87.0`）
 
-**Release declaration:** **v1.87.0 Released**（Bounded Productization Entry）; Pending Release **None**; Next Authorized Phase **P2 Planning** only
+**Release declaration:** **v1.87.0 Released**（Bounded Productization Entry）; Pending Release **None**; P2 Planning **Complete**; P2A Boundary Specifications **Complete**; P2A lifecycle closure **In Progress**（docs-only; versionless）
 
 **Authoritative source column:** always the Current Baseline Record field named
 in §5 / §6.2. Values in §6.2.2 are **Recorded** for released baseline `v1.87.0`.
@@ -595,14 +599,14 @@ Record Population. Matrix rows still define the sync relationship.
 | SM-004 | Quality Pipeline Baseline（PASS display） | Current Baseline Record → Quality Pipeline Baseline | [README.md](../../README.md) current-release Quality Pipeline line | Record → Derived | Quality baseline authorization | Compare PASS count display to Record | Derived Target Stale / Evidence Mismatch | **Aligned**（current Quality **1232 PASS**; historical PASS claims under ≤ v1.86.21 preserved） | 10, 11, post-push-pop | **Prohibited** |
 | SM-005 | Current Version value authority claim | Current Baseline Record（authority hierarchy） | [VERSIONING_POLICY.md](./VERSIONING_POLICY.md) Current Version SSOT sentence | Record/Authority → Derived Rules doc | ADR-0023 Acceptance + SSOT | Policy must state VERSION is Derived; Record is value SSOT | Derived Target Contradictory / Circular Authority Dependency | **Aligned**（Migration 5 Authority Boundary; current notes reframed for released `v1.87.0`） | 5, post-push-pop | **Prohibited** |
 | SM-006 | Current Version locus in release flow | Current Baseline Record + ADR-0023 hierarchy | [GOVERNANCE_FLOW.md](./GOVERNANCE_FLOW.md) VERSION update / Current Version references | Record → Derived | ADR-0023 Acceptance + SSOT | Flow must not treat VERSION as sole value authority | Derived Target Contradictory | **Aligned**（Migration 7 Authority Boundary; current notes reframed for released `v1.87.0`） | 7, post-push-pop | **Prohibited** |
-| SM-007 | ADR-0023 registry presence | ADR-0023 Accepted status（governance register derivation） | [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) Accepted Decisions register | ADR/SSOT → Derived register | ADR Acceptance | Register must link ADR-0023 | Derived Target Missing | **Aligned**（Migration 8; Post–ADR-0023 progress reflects released `v1.87.0` + ADR-0024; Next = P2 Planning） | 8, post-push-pop | **Prohibited** |
+| SM-007 | ADR-0023 registry presence | ADR-0023 Accepted status（governance register derivation） | [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) Accepted Decisions register | ADR/SSOT → Derived register | ADR Acceptance | Register must link ADR-0023 | Derived Target Missing | **Aligned**（Migration 8; Post–ADR-0023 progress reflects released `v1.87.0` + ADR-0024; Next = P2-R1 Planning） | 8, post-push-pop | **Prohibited** |
 | SM-008 | Current Repository Baseline（version@commit） | Current Baseline Record → Current Repository Baseline | [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) `## Current Repository Baseline` | Record → Derived | Formal Record population | Table Version/Commit match Record | Derived Target Stale | **Aligned**（`v1.87.0` @ `04725ba8…`） | 10, post-push-pop | **Prohibited** |
 | SM-009 | Architecture Maturity State | Current Baseline Record → Architecture Maturity State | [ARCHITECTURE_MATURITY_MODEL.md](./ARCHITECTURE_MATURITY_MODEL.md) Current Maturity | Record → Derived | Maturity/lifecycle authorization | Compare maturity marker to Record | Derived Target Stale | **Aligned**（Level 3.19 current marker; frame `v1.87.0`） | 10, post-push-pop | **Prohibited** |
 | SM-010 | Architecture Maturity / current release frame | Current Baseline Record → Architecture Maturity State + Current Version | [docs/architecture/README.md](./README.md) Current Maturity line | Record → Derived | Formal Record population | Maturity line cites authorized Current Version frame | Derived Target Stale | **Aligned**（v1.87.0 / Level 3.19; ADR-0023 / ADR-0024 pointers present） | 10, post-push-pop | **Prohibited** |
-| SM-011 | Current Governance Phase banner | Current Baseline Record → Current Governance Phase | [NON_GOALS.md](./NON_GOALS.md) Current Phase banner | Record → Derived | Formal Record / phase authorization | Banner matches Record phase | Derived Target Stale | **Aligned**（released `v1.87.0`; Next = P2 Planning; prohibitions preserved） | 10, post-push-pop | **Prohibited** |
+| SM-011 | Current Governance Phase banner | Current Baseline Record → Current Governance Phase | [NON_GOALS.md](./NON_GOALS.md) Current Phase banner | Record → Derived | Formal Record / phase authorization | Banner matches Record phase | Derived Target Stale | **Aligned**（released `v1.87.0`; P2A Complete; Next = P2-R1 Planning; prohibitions preserved） | 10, post-push-pop | **Prohibited** |
 | SM-012 | Catalog Registration / maturity chain | Current Baseline Record → related governance fields | [FUTURE_ENTRY_CRITERIA.md](./FUTURE_ENTRY_CRITERIA.md) Current Maturity Position / registration chain | Record → Derived | Formal Record population | FEC current markers match Record | Derived Target Stale | **Aligned**（Level 3.19 / v1.87.0 framing; deferred/prohibited preserved） | 10, post-push-pop | **Prohibited** |
 | SM-013 | Risk reassessment markers tied to baseline | Current Baseline Record（where risk status cites current baseline） | [RISK_REGISTER.md](./RISK_REGISTER.md) CL-013 / PR status narrative | Record → Derived（optional unless Record requires） | Risk owner update after baseline change | Risk text must not invent competing Current Version authority | Non-Blocking Informational Drift | **Unchanged / Historical**（event-dated facts left as Historical; no competing Current Version authority） | 10 | **Prohibited** |
-| SM-014 | Current Version enforcement | Current Baseline Record → Current Version | `scripts/test_quality_pipeline.sh` Tests 98 / 1231 / 1232 | Record → Enforcement | After Record population + derived VERSION/README sync | Tests assert Record-aligned current version | Derived Target Stale / Evidence Mismatch | **Aligned**（Model A — Tests 98 / 1232 assert `v1.87.0` + Pending Release **None** + Next = P2 Planning; Test 1231 historical v1.84.0 lock; Test 1233 absent） | 11, post-push-pop | **Prohibited** |
+| SM-014 | Current Version enforcement | Current Baseline Record → Current Version | `scripts/test_quality_pipeline.sh` Tests 98 / 1231 / 1232 | Record → Enforcement | After Record population + derived VERSION/README sync | Tests assert Record-aligned current version | Derived Target Stale / Evidence Mismatch | **Aligned**（Model A — Tests 98 / 1232 assert `v1.87.0` + Pending Release **None** + P2A Complete + Next = P2-R1 Planning; Test 1231 historical v1.84.0 lock; Test 1233 absent） | 11, post-push-pop | **Prohibited** |
 | SM-015 | Public Contract Catalog Baseline | Current Baseline Record → Public Contract Catalog Baseline | Catalog generation evidence via `npm run public-contract:catalog` / in-process validate | Record → Evidence/Enforcement | Catalog or Record catalog-baseline change | `validatePublicContractCatalog` PASS; CLI Application Foundations `7` and Total Foundations `12` both match schema | Evidence Mismatch | **Aligned**（Total Foundations `12` = app`7`+platform`5`; Application Foundations `7`） — **Verified Unchanged** | 10, 11 | **Prohibited** |
 | SM-016 | Provider Contracts Count | Current Baseline Record → Public Contract Catalog Baseline | [docs/VERSION.md](../VERSION.md) Provider Contracts display; architecture status tables | Record → Derived | Catalog/Record authorization | Displayed count = Record | Derived Target Stale | **Aligned**（Provider Contracts `3`） — **Verified Unchanged** | 6, 10 | **Prohibited** |
 | SM-017 | Catalog Version | Current Baseline Record → Public Contract Catalog Baseline | VERSION / architecture catalogVersion displays | Record → Derived | Catalog schema policy | Displayed catalogVersion = Record | Derived Target Stale | **Aligned**（catalogVersion `1.0`） — **Verified Unchanged** | 6, 10 | **Prohibited** |
@@ -1025,8 +1029,10 @@ against the approved readiness semantics; lineage Complete under released
 * Historical Records remain unchanged by Quality remediation.
 * Existing published identity is protected: tag `v1.87.0` → commit
   `04725ba8c20324c652a5f316bb05c013b968f38d`; tags `v1.86.1`–`v1.86.21` are not
-  modified, deleted, or recreated. This Record Population Implementation does
-  not create a new release commit / tag / push / Pending Release ID.
+  modified, deleted, or recreated. This P2A lifecycle closure Implementation does
+  not create a new release tag / Pending Release ID; a later versionless
+  governance tip commit may advance repository tip evidence without changing
+  Current Commit / tag `v1.87.0` @ `04725ba8…`.
 
 ## 16. Current Phase Boundary
 
@@ -1042,9 +1048,11 @@ Model, Current Baseline Record, and Synchronization Matrix.
 
 **v1.87.0 Bounded Productization Entry is Released.** Required Derived Targets
 and Quality enforcement synchronize to Record `v1.87.0`（Record → Derived →
-Quality）under Post-Push Record Population Implementation. Continuous `v1.86.x`
-Reconciliation remains **Terminated**. Pending Release is **None**. Next
-Authorized Phase is **P2 Planning only**.
+Quality）. Continuous `v1.86.x` Reconciliation remains **Terminated**. Pending
+Release is **None**. **P1** Complete / Closed. **P2 Planning** Complete.
+**P2A** Boundary Specifications **Complete** / Independent Review **Complete** /
+**A.GO**. P2A lifecycle closure Implementation **In Progress**（docs-only;
+versionless; **Not Assigned**）.
 
 **Quality Enforcement Correction** under the Quality lineage remains
 **Complete**（Tests 988 / 1026 / 1034 remediated; **1232 PASS**; D-006
@@ -1053,30 +1061,33 @@ Authorized Phase is **P2 Planning only**.
 This phase does **not**:
 
 * assign **v1.87.1** or any new Pending Release ID;
-* authorize **P2 Implementation**;
+* authorize **P2B+** runtime / adapter / gateway Implementation;
+* invent or approve concrete Instagram/Meta hosts or endpoints（**P2-R1** required）;
 * modify, delete, or recreate tags **v1.86.1**–**v1.87.0**;
 * authorize Image Provider Review Entry or Formal Assessment;
 * authorize Production Ready / repository-wide Level 4;
 * authorize Real Provider / External IO / automatic SNS publishing;
 * change CL-004 / CL-005 / CL-006;
 * start **v1.86.22** reconciliation;
-* execute commit / tag / push for Record Population until Independent Review
+* stage / commit / tag / push for P2A until Independent Review
   and Commit Execution authorization.
 
 Next Phase Candidate（not formally authorized）
 
 ```
 Next Phase Candidate:
-P2 Security / Credential / External IO Boundary Planning
-（only after Record Population Independent Review / Commit lifecycle if required）
-P2 Implementation — Not authorized
+P2-R1 Official Instagram Contract-Fit Research Planning
+（after durable P2A closure; research Not Started; Implementation Not Authorized）
 Pending Release — None
 v1.87.1 — Not assigned
 Continuous v1.86.x Reconciliation — Terminated
 v1.86.22 — Not authorized
 Real Provider / External IO / Automatic SNS — Prohibited
+Architecture maturity Level 3.19 — unchanged
+Concrete endpoints — Model Defined / Concrete Endpoints Pending P2-R1
 ```
 
 `v1.87.0` Productization Governance Commit / Tag / Push is **Complete**.
-Record Population Implementation is **In Progress**（this phase）.
-P2 Planning remains separately authorized.
+Record Population Commit / Tag / Push is **Complete**.
+P2 Planning is **Complete**. P2A Boundary Specifications are **Complete**（IR **A.GO**）.
+P2A lifecycle closure Implementation is **In Progress**（versionless）.

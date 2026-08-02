@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation **Released**; Post-Push Record Population **Implementation**）
+Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation **Released**; P1 **Complete / Closed**; P2 Planning **Complete**; P2A Boundary Specifications **Complete**; P2A Independent Review **Complete** / **A.GO**; P2A lifecycle closure Implementation **In Progress**（versionless; **Not Assigned**））
 
 ## Supersedes
 
@@ -62,10 +62,12 @@ Further identical identity-only cycles add no product capability. The next objec
 | ID | Milestone | Entry status under this ADR |
 | -- | --------- | --------------------------- |
 | P0 | Productization Entry Planning | **Complete** |
-| P1 | Productization Governance and MVP Boundary | **Complete / Published** — Record Population **Implementation** |
-| P2 | Security / Credential / External IO Boundary（specs） | Not started — separate authorization |
-| P3 | Human Approval Workflow Foundation | Not started |
-| P4 | Real Provider Adapter（default-disabled） | Not started — **prohibited** until separately authorized |
+| P1 | Productization Governance and MVP Boundary | **Complete / Closed**（Git `v1.87.0` + Record Population published） |
+| P2 | Security / Credential / External IO Boundary（specs） | Planning **Complete**; **P2A** Boundary Specifications **Complete**; Independent Review **Complete** / **A.GO**; lifecycle closure Implementation **In Progress**（docs-only; version **Not Assigned**） |
+| P2-R1 | Official Instagram Contract-Fit Research | **Next Authorized Phase** after durable P2A closure — Planning **not started**; read-only; Implementation **Not Authorized** |
+| P2B+ | Local types / resolver / gateway abstractions | **Not started** |
+| P3 | Human Approval Workflow Foundation | **Not started** |
+| P4 | Real Provider Adapter（default-disabled） | **Not started** — **prohibited** until separately authorized |
 | P5 | Dry-Run and Idempotency | Not started |
 | P6 | Controlled Publication Execution | Not started |
 | P7 | Failure / Retry / Kill Switch / Audit | Not started |
@@ -137,10 +139,13 @@ At Productization Entry:
 | Git published baseline | `v1.87.0` @ `04725ba8c20324c652a5f316bb05c013b968f38d` |
 | Record Current（after Post-Push Record Population） | `v1.87.0` |
 | Record Pending | **None** / **Not Assigned** |
-| Next Authorized Phase | **P2 Planning** only（P2 Implementation **not authorized**） |
+| Next Authorized Phase | **P2-R1 Official Instagram Contract-Fit Research Planning**（after durable P2A closure）; P2-R1 research **Not Started**; runtime P2B+/P3/P4 **not authorized** |
+| Version assignment | **Not Assigned**（no `v1.87.1`; P2A = versionless governance tip） |
 | Continuous `v1.86.x` Reconciliation | **Terminated** |
 | `v1.86.22` | **Not authorized** |
 | `v1.87.1` | **Not assigned** |
+| Concrete Meta hosts/endpoints | **Pending P2-R1** |
+| Real Provider / External IO | **Prohibited** |
 
 Historical note: post-push lag after `v1.86.21` publication was previously closed by Record Current → `v1.86.21` with Pending → `v1.87.0` Productization Entry. After Git publication of `v1.87.0` @ `04725ba8…`, Post-Push Record Population closes Record Current to released `v1.87.0`（Pending Release **None** / **Not Assigned**; Next Authorized Phase **P2 Planning** only; P2 Implementation **not authorized**; `v1.87.1` **not assigned**; `v1.86.22` **not authorized**）. This is **not** another continuous `v1.86.x` identity-only reconciliation.
 
@@ -181,6 +186,8 @@ Population Implementation closes Record Current to published `v1.87.0`.
 13. No Adapter / network / credential mutations in this Entry slice
 14. `v1.87.1` not assigned; `v1.86.22` not authorized; continuous `v1.86.x` terminated
 
+**Post-Record Population status（current）:** P2 Planning **Complete**; **P2A** Boundary Specifications **Complete**; Independent Review **Complete** / **A.GO**; P2A lifecycle closure Implementation **In Progress**（docs-only; version **Not Assigned**; no Pending Release; release declaration **Not Applicable** / versionless governance tip）; Next Authorized Phase after durable closure = **P2-R1 Official Instagram Contract-Fit Research Planning**（**Not Started**; Implementation **Not Authorized**）; P2B+ / P3 / P4 **not started**; concrete endpoints **Pending P2-R1**; Real Provider / External IO **Prohibited**; `v1.87.1` **not assigned**; `v1.88.0` remains first user-usable candidate only.
+
 ## Decision summary
 
 | Item | Decision |
@@ -202,6 +209,12 @@ Population Implementation closes Record Current to published `v1.87.0`.
 - [BASELINE_SYNCHRONIZATION.md](../architecture/BASELINE_SYNCHRONIZATION.md)
 - [PRODUCT_MVP_BOUNDARY.md](../architecture/PRODUCT_MVP_BOUNDARY.md)
 - [PRODUCT_PROVIDER_SELECTION.md](../architecture/PRODUCT_PROVIDER_SELECTION.md)
+- [SECURITY_CREDENTIAL_BOUNDARY.md](../architecture/SECURITY_CREDENTIAL_BOUNDARY.md)
+- [EXTERNAL_IO_BOUNDARY.md](../architecture/EXTERNAL_IO_BOUNDARY.md)
+- [SECRET_HANDLING_POLICY.md](../architecture/SECRET_HANDLING_POLICY.md)
+- [PROVIDER_ENDPOINT_ALLOWLIST.md](../architecture/PROVIDER_ENDPOINT_ALLOWLIST.md)
+- [ERROR_REDACTION_MODEL.md](../architecture/ERROR_REDACTION_MODEL.md)
+- [P2_THREAT_MODEL.md](../architecture/P2_THREAT_MODEL.md)
 - [PROVIDER_PRODUCTION_READINESS_REVIEW.md](../architecture/PROVIDER_PRODUCTION_READINESS_REVIEW.md)
 - [VERSIONING_POLICY.md](../architecture/VERSIONING_POLICY.md)
 - [NON_GOALS.md](../architecture/NON_GOALS.md)

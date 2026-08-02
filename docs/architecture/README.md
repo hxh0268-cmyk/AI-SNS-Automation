@@ -8,7 +8,7 @@ AI-SNS-Automation の **Architecture Governance** 正式基準書です。v1.49.
 
 Architecture Documentation = **Architecture Governance** として、**49 必須 Governance 文書**（v1.49.0 新規 15 + 更新 2 + Release 前改善 3 + v1.50.0 Future Entry Criteria 1 + v1.51.0 Governance Flow 1 + v1.52.0 Future Layer Boundaries 1 + v1.53.0 Layer Interaction Model foundation 1 + v1.54.0 Provider Layer Design 1 + v1.55.0 Runtime Layer Design 1 + v1.56.0 Scheduler Layer Design 1 + v1.57.0 Automation Layer Design 1 + v1.58.0 Workflow Layer Design 1 + v1.59.0 Event Layer Design 1 + v1.60.0 Cross Layer Interaction Model Design 1 + v1.61.0 Interaction Lifecycle Design 1 + v1.62.0 Interaction Context Design 1 + v1.63.0 Interaction State Model Design 1 + v1.64.0 Interaction Error Model Design 1 + v1.65.0 Interaction Metadata Model Design 1 + v1.67.0 Level 4 Entry Review 1 + v1.68.0 Provider Entry Preparation Review 1 + v1.69.0 Provider Contract Definition Review 1 + v1.70.0 Provider Non-Goals Release Review 1 + v1.71.0 Provider Level 4 Implementation Ready Review 1 + v1.72.0 Provider Public Contract Catalog Extension Review 1 + v1.73.0 Mock Provider Production Implementation Authorization Review 1 + v1.75.0 Mock Provider Catalog Registration Governance Review 1 + v1.77.0 Provider Production Readiness Review 1 + v1.79.0 Provider Expansion Entry Review 1 + v1.80.0 Image Generation Mock Provider Expansion Entry Review 1 + v1.81.0 Image Generation Mock Provider Implementation Authorization Review 1 + v1.83.0 Image Generation Mock Provider Catalog Registration Governance Review 1）を固定します。
 
-**Current Maturity:** **Level 3.19**（v1.87.0 — Bounded Productization Entry **Released**; Post-Push Record Population **Implementation**; continuous `v1.86.x` Reconciliation **Terminated**; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — Pending Release **None** — Next = **P2 Planning** only（ADR-0024））
+**Current Maturity:** **Level 3.19**（v1.87.0 — Bounded Productization Entry **Released**; P1 **Complete / Closed**; P2 Planning **Complete**; **P2A** Security / Credential / External IO Boundary Specifications **Complete** / Independent Review **Complete** / **A.GO**; P2A lifecycle closure Implementation **In Progress**（versionless; **Not Assigned**）; Next = **P2-R1 Official Instagram Contract-Fit Research Planning**（**Not Started**）; continuous `v1.86.x` Reconciliation **Terminated**; prior Provider Production Readiness SSOT Alignment Complete / Image Catalog Registration lineages preserved — Bounded Production Ready **NO** / Global Production Ready **Not Declared** — Pending Release **None** — Real Provider / External IO **Prohibited**（ADR-0024））
 
 > **Inventory note:** 行 #24（v1.53.0 foundation）と行 #31（v1.60.0 Cross Layer 統合）は同一ファイル [LAYER_INTERACTION_MODEL.md](./LAYER_INTERACTION_MODEL.md) の **リリース系譜** を示す。実効 Governance 文書数は **41**（重複ファイルカウントではない）。 Repository Baseline Inventory / Current Baseline Record / Synchronization Matrix の SSOT は [BASELINE_SYNCHRONIZATION.md](./BASELINE_SYNCHRONIZATION.md)（[ADR-0023](../adr/ADR-0023-repository-baseline-inventory-authority.md)）。
 
@@ -75,6 +75,12 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 | [PROVIDER_PRODUCTION_READINESS_REVIEW.md](./PROVIDER_PRODUCTION_READINESS_REVIEW.md) | **Provider Production Readiness Review** — review entry / evidence model / blocking conditions / Production Ready **Not Declared**（v1.77.0） |
 | [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md) | **Product Provider Selection Record** — first bounded product Provider recommendation（**Instagram**）; Recommended ≠ Authorized; Real Provider / External IO **not** granted（v1.87.0 Productization Entry） |
 | [PRODUCT_MVP_BOUNDARY.md](./PRODUCT_MVP_BOUNDARY.md) | **Bounded Text Publishing MVP Boundary** — include/exclude / approval / dry-run / idempotency / audit / kill switch / success criteria（ADR-0024） |
+| [SECURITY_CREDENTIAL_BOUNDARY.md](./SECURITY_CREDENTIAL_BOUNDARY.md) | **P2A Complete** — credential reference/value boundary / resolution model / storage recommendation（docs-only; IO **Prohibited**; Next **P2-R1**） |
+| [SECRET_HANDLING_POLICY.md](./SECRET_HANDLING_POLICY.md) | **P2A Complete** — secret handling / presence-only validation / incident procedure（no secret values） |
+| [EXTERNAL_IO_BOUNDARY.md](./EXTERNAL_IO_BOUNDARY.md) | **P2A Complete** — External IO deny-by-default / kill-switch / dry-run zero-network（External IO **Prohibited**） |
+| [PROVIDER_ENDPOINT_ALLOWLIST.md](./PROVIDER_ENDPOINT_ALLOWLIST.md) | **P2A Complete** — allowlist schema; concrete hosts/endpoints **Pending P2-R1**（research **Not Started**） |
+| [ERROR_REDACTION_MODEL.md](./ERROR_REDACTION_MODEL.md) | **P2A Complete** — error taxonomy / redaction / quarantine（`UNKNOWN_RESULT`） |
+| [P2_THREAT_MODEL.md](./P2_THREAT_MODEL.md) | **P2A Complete** — threat register for credential / External IO path |
 | [MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md](./MOCK_PROVIDER_CATALOG_REGISTRATION_GOVERNANCE_REVIEW.md) | **Catalog Registration Governance Review** — registration policy / validator policy / identity mapping（v1.75.0） |
 | [MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md](./MOCK_PROVIDER_PRODUCTION_IMPLEMENTATION_AUTHORIZATION_REVIEW.md) | **Mock Provider Authorization Review** — implementation boundaries / Authorized vs Started（v1.73.0） |
 | [PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md](./PROVIDER_PUBLIC_CONTRACT_CATALOG_EXTENSION_REVIEW.md) | **Catalog Extension Review** — `providerContracts[]` registration / backward compatibility（v1.72.0） |
@@ -121,7 +127,7 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 
 ---
 
-## 現在フェーズ（v1.87.0 released / Post-Push Record Population Implementation）
+## 現在フェーズ（v1.87.0 released / P1 Complete / Closed; P2A Boundary Specifications Complete）
 
 | Layer | 状態 |
 |-------|------|
@@ -184,11 +190,17 @@ Architecture Documentation = **Architecture Governance** として、**49 必須
 | **Bounded Production Ready** | **NO** |
 | **Global Production Ready** | **Not Declared** |
 | **Provider Production Implementation** | **Not Started**（Real Provider scope） |
-| **Pending Productization Release** | **None** / **Not Assigned** — Next Authorized Phase **P2 Planning** only（P2 Implementation **not authorized**; ADR-0024） |
+| **Pending Productization Release** | **None** / **Not Assigned** |
+| **P2 Planning** | **Complete** |
+| **P2A Specifications** | **Complete**（Independent Review **Complete** / **A.GO**; lifecycle closure **In Progress**; version **Not Assigned**） |
+| **P2-R1 Contract-Fit Research** | **Next Authorized Phase** = Official Instagram Contract-Fit Research Planning（**Not Started**; Implementation **Not Authorized**; concrete endpoints **Pending P2-R1**） |
+| **P2B+ / P3 / P4** | **Not started**; Real Provider / External IO **Prohibited** |
 | **v1.86.22** | **Not authorized** |
+| **v1.87.1** | **Not assigned** |
 | **Productization ADR** | [ADR-0024](../adr/ADR-0024-bounded-productization-entry.md) |
 | **MVP Boundary** | [PRODUCT_MVP_BOUNDARY.md](./PRODUCT_MVP_BOUNDARY.md) |
 | **Provider Selection** | [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md)（Instagram Recommended） |
+| **P2A Spec Pack** | [SECURITY_CREDENTIAL_BOUNDARY.md](./SECURITY_CREDENTIAL_BOUNDARY.md) · [EXTERNAL_IO_BOUNDARY.md](./EXTERNAL_IO_BOUNDARY.md) · [SECRET_HANDLING_POLICY.md](./SECRET_HANDLING_POLICY.md) · [PROVIDER_ENDPOINT_ALLOWLIST.md](./PROVIDER_ENDPOINT_ALLOWLIST.md) · [ERROR_REDACTION_MODEL.md](./ERROR_REDACTION_MODEL.md) · [P2_THREAT_MODEL.md](./P2_THREAT_MODEL.md) |
 | Future Infrastructure（Queue / Worker / Receiver / Adapter 等） | **Boundary Only** — 実装禁止 |
 
 Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / Worker / Cloud Runtime / Real Metrics / Real Automation は **Future Architecture**（[FUTURE_ARCHITECTURE.md](./FUTURE_ARCHITECTURE.md) — 将来設計）として記述し、**現時点では [NON_GOALS.md](./NON_GOALS.md) により実装禁止** です。

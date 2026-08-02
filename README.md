@@ -1174,9 +1174,9 @@ release-plan
 
 **v1.87.0 Bounded Productization Entry** のガバナンス release を公開済みです。ADR-0024 / MVP Boundary / Provider Selection を確立し、Current Baseline Record を公開済み `v1.87.0` @ `04725ba8…` へ population（catalog / provider runtime **unchanged**）。first user-usable product は未完成。
 
-**Current Version: v1.87.0** | **Quality Pipeline: `1232 PASS`** | **Pending Release: None** | **Next: P2 Planning only**
+**Current Version: v1.87.0** | **Quality Pipeline: `1232 PASS`** | **Pending Release: None** | **P2A Boundary Specifications: Complete** | **Next: P2-R1 Official Instagram Contract-Fit Research Planning**
 
-v1.87.0 Bounded Productization Entry: **Complete / Released**。continuous `v1.86.x` Reconciliation: **Terminated**。`v1.86.22`: **not authorized**。`v1.87.1`: **not assigned**。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `04725ba8c20324c652a5f316bb05c013b968f38d`。Tag: `v1.87.0`。Branch: `main`。Release / Push: **Completed**。Post-Push Review: **Complete**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Productization Release: **None**。Next Authorized Phase: **P2 Security / Credential / External IO Boundary Planning** only（P2 Implementation **not authorized**）。
+v1.87.0 Bounded Productization Entry: **Complete / Released**。continuous `v1.86.x` Reconciliation: **Terminated**。`v1.86.22`: **not authorized**。`v1.87.1`: **not assigned**。Catalog Registered: **YES**。Provider Contracts: **3**。catalogVersion: **1.0**。Commit: `04725ba8c20324c652a5f316bb05c013b968f38d`。Tag: `v1.87.0`。Branch: `main`。Release / Push: **Completed**。Post-Push Review: **Complete**。Remote: **Synchronized** / `0 0`。Human Approval Gate **Preserved**。Repository-wide L4 **Not Declared**。Provider Production Ready **Not Declared**（global）。Bounded Production Ready **NO**。Image Review Entry **NO**。Image Formally Assessed **NO**。Real Provider **Prohibited**。Automatic SNS publishing **Prohibited**。Pending Productization Release: **None**。**P2A Security / Credential / External IO Boundary Specifications:** **Complete**（Independent Review **Complete** / **A.GO**; versionless; **Not Assigned**）。Next Authorized Phase: **P2-R1 Official Instagram Contract-Fit Research Planning**（**Not Started**; Implementation **Not Authorized**; P2 Implementation **not authorized**）。first user-usable product remains incomplete（candidate **`v1.88.0`** only）。
 
 | 項目 | 内容 |
 |------|------|
@@ -1184,9 +1184,10 @@ v1.87.0 Bounded Productization Entry: **Complete / Released**。continuous `v1.8
 | Productization ADR | [ADR-0024](docs/adr/ADR-0024-bounded-productization-entry.md)（Accepted — Bounded Productization Entry） |
 | MVP Boundary | [PRODUCT_MVP_BOUNDARY.md](docs/architecture/PRODUCT_MVP_BOUNDARY.md) |
 | Provider Selection | [PRODUCT_PROVIDER_SELECTION.md](docs/architecture/PRODUCT_PROVIDER_SELECTION.md)（Instagram **Recommended** ≠ Authorized） |
+| P2A Spec Pack | [SECURITY_CREDENTIAL_BOUNDARY.md](docs/architecture/SECURITY_CREDENTIAL_BOUNDARY.md) · [EXTERNAL_IO_BOUNDARY.md](docs/architecture/EXTERNAL_IO_BOUNDARY.md) · [SECRET_HANDLING_POLICY.md](docs/architecture/SECRET_HANDLING_POLICY.md) · [PROVIDER_ENDPOINT_ALLOWLIST.md](docs/architecture/PROVIDER_ENDPOINT_ALLOWLIST.md) · [ERROR_REDACTION_MODEL.md](docs/architecture/ERROR_REDACTION_MODEL.md) · [P2_THREAT_MODEL.md](docs/architecture/P2_THREAT_MODEL.md) |
 | Governance ADR | [ADR-0023](docs/adr/ADR-0023-repository-baseline-inventory-authority.md)（Accepted — Record authority; v1.87.0 **Released**） |
 | Current Maturity | **Level 3.19** |
-| Next Phase Candidate | **P2 Security / Credential / External IO Boundary Planning** only |
+| Next Phase Candidate | **P2-R1 Official Instagram Contract-Fit Research Planning**（**Not Started**） |
 
 ### Repository Baseline Released-State Reconciliation Release（v1.86.21）
 

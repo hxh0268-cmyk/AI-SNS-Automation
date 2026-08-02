@@ -21878,6 +21878,7 @@ pass "v1.84.0 catalog registration implementation release documented"
 echo "-- Test 1232: v1.87.0 current version metadata in VERSION.md --"
 node --input-type=module <<'EOF'
 import fs from "node:fs";
+import path from "node:path";
 
 const versionDoc = fs.readFileSync("docs/VERSION.md", "utf8");
 const currentSection = versionDoc.split("## バージョン履歴")[0];
@@ -21909,7 +21910,11 @@ for (const marker of [
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
   "**Pending Productization Release:** **None** / **Not Assigned**",
-  "**P2 Security / Credential / External IO Boundary Planning**",
+  "**P2A Security / Credential / External IO Boundary Specifications:** **Complete**",
+  "**P2A Independent Review:** **Complete** / **A.GO**",
+  "**P2-R1 Official Instagram Contract-Fit Research Planning**",
+  "**P2-R1:** **Not Started**",
+  "**P2A version:** **Not Assigned**",
   "P2 Implementation **not authorized**",
   "**v1.87.1** **not assigned**",
   "continuous `v1.86.x` Reconciliation **Terminated**",
@@ -21918,6 +21923,45 @@ for (const marker of [
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
+  }
+}
+
+const p2aDocs = [
+  "docs/architecture/SECURITY_CREDENTIAL_BOUNDARY.md",
+  "docs/architecture/EXTERNAL_IO_BOUNDARY.md",
+  "docs/architecture/SECRET_HANDLING_POLICY.md",
+  "docs/architecture/PROVIDER_ENDPOINT_ALLOWLIST.md",
+  "docs/architecture/ERROR_REDACTION_MODEL.md",
+  "docs/architecture/P2_THREAT_MODEL.md",
+];
+
+for (const rel of p2aDocs) {
+  if (!fs.existsSync(rel)) {
+    throw new Error(`missing P2A specification document: ${rel}`);
+  }
+}
+
+const pack = p2aDocs
+  .map((rel) => fs.readFileSync(rel, "utf8"))
+  .join("\n");
+
+for (const marker of [
+  "Recommended ≠ Authorized",
+  "Real Provider",
+  "External IO",
+  "**Prohibited**",
+  "Concrete Endpoints Pending P2-R1",
+  "Deny by default",
+  "zero-network",
+  "CredentialReference",
+  "Secret value",
+  "All default **OFF**",
+  "UNKNOWN_RESULT",
+  "redaction failure",
+  "fail closed",
+]) {
+  if (!pack.includes(marker)) {
+    throw new Error(`P2A specification pack missing boundary marker: ${marker}`);
   }
 }
 
@@ -21940,14 +21984,18 @@ if (
   currentSection.includes("**Repository Baseline Tag:** `v1.86.21`") ||
   currentSection.includes(
     "**v1.87.0** Production Readiness Assessment **not started**",
-  )
+  ) ||
+  currentSection.includes(
+    "**Next Phase Candidate:** **P2 Security / Credential / External IO Boundary Planning**",
+  ) ||
+  currentSection.includes("Next Authorized Phase **P2 Planning** only")
 ) {
   throw new Error(
-    "current VERSION section must not retain v1.86.21 as current, Pending v1.87.0 Implementation claims, or stale Commit/Tag/Push Pending framing",
+    "current VERSION section must not retain stale Planning-as-Next, v1.86.21 current, Pending v1.87.0 Implementation claims, or Commit/Tag/Push Pending framing",
   );
 }
 
-console.log("v1.87.0 current version metadata ok");
+console.log("v1.87.0 current version metadata + P2A locks ok");
 EOF
 pass "v1.87.0 current version metadata in VERSION.md"
 
