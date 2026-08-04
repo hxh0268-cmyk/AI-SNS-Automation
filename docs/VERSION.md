@@ -51,7 +51,7 @@ Pending Release value は recorded Current Version value ではない。
 本書の Migration 6（Derived Target Declaration）および Repository-wide Baseline Synchronization は:
 
 - Current Baseline Record の値を本書へ **one-way** 表示同期する（Reverse Synchronization Prohibited）
-- Current Version display を Record の released `v1.87.0` に合わせる（Pending Release **None**; P2A Boundary Specifications **Complete**; Next Phase = **P2-R1 Official Instagram Contract-Fit Research Planning**）
+- Current Version display を Record の released `v1.87.0` に合わせる（Pending Release **None**; P2A **Durable Complete**; P2-R1–R4 **Complete**; Next Phase = **Documentation Independent Review**）
 - Quality / Git を Current Version value authority にしない
 
 以下「現在のバージョン」に表示される値は **Derived Current Version display** である。
@@ -67,7 +67,7 @@ Pending Release value は recorded Current Version value ではない。
 
 **Application Layer Status:** **Completed**（v1.47.0）
 
-**Phase:** Bounded Productization Entry Release Complete（v1.87.0）— continuous `v1.86.x` Reconciliation **Terminated** — Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— Post-Push Record Population **Complete** — **P2A Security / Credential / External IO Boundary Specifications:** **Complete** — **P2A Independent Review:** **Complete** / **A.GO** — P2A lifecycle closure Implementation **In Progress**（versionless; **P2A version:** **Not Assigned**; release declaration **Not Applicable**）— Pending Release **None** — **Next Authorized Phase:** **P2-R1 Official Instagram Contract-Fit Research Planning**（**P2-R1:** **Not Started**; Implementation **Not Authorized**; concrete endpoints **Pending P2-R1**）（ADR-0024）
+**Phase:** Bounded Productization Entry Release Complete（v1.87.0）— continuous `v1.86.x` Reconciliation **Terminated** — Repository Baseline Identity Reconciliation lineage preserved（v1.86.1）— Repository Baseline Inventory Authority lineage preserved（v1.86.0）— Provider Production Readiness SSOT Alignment lineage preserved（v1.85.0）— prior Image Catalog Registration **Registered** lineage preserved（v1.84.0）— Post-Push Record Population **Complete** — **P2A Security / Credential / External IO Boundary Specifications:** **Durable Complete** — **P2A Independent Review:** **Complete** / **A.GO** — **P2-R1 Instagram Contract-Fit Research:** **Complete** / **NOT FIT** — **P2-R2 Threads Contract-Fit Research:** **Complete** / **CONDITIONAL FIT** / **Deferred** — **P2-R3 X Contract-Fit Research:** **Complete** / **CONDITIONAL FIT** — **P2-R4 Unified Selection:** **Complete** / **D. CONDITIONAL RECOMMENDATION — X** — Provider Re-evaluation Documentation Implementation **In Progress**（versionless; **P2A version:** **Not Assigned**; release declaration **Not Applicable**）— Pending Release **None** — **Next Authorized Phase:** **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**（Provider Authorization **No**; endpoints **Not Approved**; P2B+ **Not Authorized**; Implementation **Not Authorized**）（ADR-0024）
 
 **Cross Layer Design:** **Complete**（v1.60.0–v1.65.0）
 
@@ -161,7 +161,7 @@ Pending Release value は recorded Current Version value ではない。
 
 **Pending Productization Release:** **None** / **Not Assigned**
 
-**Next Phase Candidate:** **P2-R1 Official Instagram Contract-Fit Research Planning**（**P2-R1:** **Not Started**; Implementation **Not Authorized**; P2 Implementation **not authorized**; **P2A Security / Credential / External IO Boundary Specifications:** **Complete**; **P2A Independent Review:** **Complete** / **A.GO**; **P2A version:** **Not Assigned**; **v1.87.1** **not assigned**; continuous `v1.86.x` Reconciliation **Terminated**; **v1.86.22** **not authorized**; Real Provider / External IO / Automatic SNS **Prohibited**; ADR-0024）
+**Next Phase Candidate:** **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**（Documentation Implementation **In Progress**; Provider Authorization **No**; endpoints **Not Approved**; P2 Implementation **not authorized**; **P2A Security / Credential / External IO Boundary Specifications:** **Durable Complete**; **P2A Independent Review:** **Complete** / **A.GO**; **P2-R1–R4:** **Complete**; Selection Outcome **D — X Conditional Recommendation**; **P2A version:** **Not Assigned**; **v1.87.1** **not assigned**; continuous `v1.86.x` Reconciliation **Terminated**; **v1.86.22** **not authorized**; Real Provider / External IO / Automatic SNS **Prohibited**; ADR-0024）
 
 ---
 

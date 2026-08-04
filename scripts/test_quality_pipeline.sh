@@ -21910,12 +21910,17 @@ for (const marker of [
   "**Release Status / Push Status:** **Completed** / **Completed**",
   "**1232 PASS**",
   "**Pending Productization Release:** **None** / **Not Assigned**",
-  "**P2A Security / Credential / External IO Boundary Specifications:** **Complete**",
+  "**P2A Security / Credential / External IO Boundary Specifications:** **Durable Complete**",
   "**P2A Independent Review:** **Complete** / **A.GO**",
-  "**P2-R1 Official Instagram Contract-Fit Research Planning**",
-  "**P2-R1:** **Not Started**",
+  "**P2-R1 Instagram Contract-Fit Research:** **Complete** / **NOT FIT**",
+  "**P2-R2 Threads Contract-Fit Research:** **Complete** / **CONDITIONAL FIT** / **Deferred**",
+  "**P2-R3 X Contract-Fit Research:** **Complete** / **CONDITIONAL FIT**",
+  "**P2-R4 Unified Selection:** **Complete** / **D. CONDITIONAL RECOMMENDATION — X**",
+  "**P2 Provider Re-evaluation Research and Selection Documentation Independent Review**",
   "**P2A version:** **Not Assigned**",
   "P2 Implementation **not authorized**",
+  "Provider Authorization **No**",
+  "endpoints **Not Approved**",
   "**v1.87.1** **not assigned**",
   "continuous `v1.86.x` Reconciliation **Terminated**",
   "**v1.86.22** **not authorized**",
@@ -21923,6 +21928,90 @@ for (const marker of [
 ]) {
   if (!currentSection.includes(marker)) {
     throw new Error(`current VERSION section missing marker: ${marker}`);
+  }
+}
+
+const researchDocs = [
+  "docs/architecture/research/README.md",
+  "docs/architecture/research/P2_R1_INSTAGRAM_CONTRACT_FIT_RESEARCH.md",
+  "docs/architecture/research/P2_R2_THREADS_CONTRACT_FIT_RESEARCH.md",
+  "docs/architecture/research/P2_R3_X_CONTRACT_FIT_RESEARCH.md",
+  "docs/architecture/research/P2_PROVIDER_REEVALUATION_MATRIX.md",
+  "docs/architecture/research/P2_PROVIDER_REEVALUATION_SOURCE_REGISTER.md",
+];
+
+for (const rel of researchDocs) {
+  if (!fs.existsSync(rel)) {
+    throw new Error(`missing research artifact: ${rel}`);
+  }
+}
+
+const selection = fs.readFileSync(
+  "docs/architecture/PRODUCT_PROVIDER_SELECTION.md",
+  "utf8",
+);
+for (const marker of [
+  "D. CONDITIONAL RECOMMENDATION — X",
+  "Recommended with Entry Conditions",
+  "Historical Initial Recommendation",
+  "NOT FIT",
+  "Deferred",
+  "Authorized Provider",
+  "**None**",
+  "Recommended ≠ Authorized",
+  "Endpoint Approved",
+  "**No**",
+  "URL-bearing Posts prohibited",
+  "UNKNOWN_RESULT quarantine",
+  "P2B+",
+  "**Not Authorized**",
+]) {
+  if (!selection.includes(marker)) {
+    throw new Error(`PRODUCT_PROVIDER_SELECTION missing marker: ${marker}`);
+  }
+}
+
+if (
+  selection.includes("**Decision** | **Instagram**") &&
+  !selection.includes("Historical Initial Recommendation")
+) {
+  throw new Error("Instagram must not remain current Decision without Historical framing");
+}
+
+const allowlist = fs.readFileSync(
+  "docs/architecture/PROVIDER_ENDPOINT_ALLOWLIST.md",
+  "utf8",
+);
+for (const marker of [
+  "Research Complete",
+  "Concrete Endpoint Selection and Approval Pending Separate Planning",
+  "Candidate Evidence ≠ Approved Allowlist",
+  "Endpoints Approved",
+  "**No**",
+  "Provider Authorization",
+]) {
+  if (!allowlist.includes(marker)) {
+    throw new Error(`PROVIDER_ENDPOINT_ALLOWLIST missing marker: ${marker}`);
+  }
+}
+
+if (allowlist.includes("Concrete Endpoints Pending P2-R1")) {
+  throw new Error("allowlist must not retain stale Pending P2-R1 endpoint status");
+}
+
+const matrix = fs.readFileSync(
+  "docs/architecture/research/P2_PROVIDER_REEVALUATION_MATRIX.md",
+  "utf8",
+);
+for (const marker of [
+  "D. CONDITIONAL RECOMMENDATION — X",
+  "NOT FIT",
+  "Deferred",
+  "Recommended with Entry Conditions",
+  "Recommended ≠ Authorized",
+]) {
+  if (!matrix.includes(marker)) {
+    throw new Error(`unified matrix missing marker: ${marker}`);
   }
 }
 
@@ -21950,7 +22039,6 @@ for (const marker of [
   "Real Provider",
   "External IO",
   "**Prohibited**",
-  "Concrete Endpoints Pending P2-R1",
   "Deny by default",
   "zero-network",
   "CredentialReference",
@@ -21988,14 +22076,16 @@ if (
   currentSection.includes(
     "**Next Phase Candidate:** **P2 Security / Credential / External IO Boundary Planning**",
   ) ||
-  currentSection.includes("Next Authorized Phase **P2 Planning** only")
+  currentSection.includes("Next Authorized Phase **P2 Planning** only") ||
+  currentSection.includes("**P2-R1:** **Not Started**") ||
+  currentSection.includes("Concrete Endpoints Pending P2-R1")
 ) {
   throw new Error(
-    "current VERSION section must not retain stale Planning-as-Next, v1.86.21 current, Pending v1.87.0 Implementation claims, or Commit/Tag/Push Pending framing",
+    "current VERSION section must not retain stale P2-R1 Not Started / Pending P2-R1 / Planning-as-Next framing",
   );
 }
 
-console.log("v1.87.0 current version metadata + P2A locks ok");
+console.log("v1.87.0 current version metadata + P2A locks + research selection locks ok");
 EOF
 pass "v1.87.0 current version metadata in VERSION.md"
 

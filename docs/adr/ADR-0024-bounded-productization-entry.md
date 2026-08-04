@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation **Released**; P1 **Complete / Closed**; P2 Planning **Complete**; P2A Boundary Specifications **Complete**; P2A Independent Review **Complete** / **A.GO**; P2A lifecycle closure Implementation **In Progress**（versionless; **Not Assigned**））
+Accepted（v1.87.0 — Bounded Productization Entry — governance / documentation **Released**; P1 **Complete / Closed**; P2 Planning **Complete**; P2A Boundary Specifications **Durable Complete**; P2A Independent Review **Complete** / **A.GO**; P2-R1–R4 Research / Selection **Complete**; Provider Re-evaluation Documentation Implementation **Complete**; Independent Review / Bounded Remediation / Re-verification / Final Minor Remediation **Complete**; next = **Commit Preparation eligibility** only（versionless; **Not Assigned**））
 
 ## Supersedes
 
@@ -28,7 +28,7 @@ This ADR defines entry authority, roadmap framing, non-goals, constraints, migra
 - Post-Push Release State Review for `v1.86.21` returned **A. GO** and **terminated** continuous `v1.86.x` Reconciliation.
 - `v1.86.22` normal reconciliation is **not authorized**.
 - Planning for `v1.87.0 Bounded Productization Entry` returned **A. GO** and recommended capability-based milestones P0–P10.
-- Provider Selection Record recommends **Instagram** as the first Provider（Recommended ≠ Authorized）— see [PRODUCT_PROVIDER_SELECTION.md](../architecture/PRODUCT_PROVIDER_SELECTION.md).
+- Provider Selection Record initially recommended **Instagram**（repository-fit era）. After official Contract-Fit Research, current state is **X Recommended with Entry Conditions**（Recommended ≠ Authorized）; Instagram = Historical / **NOT FIT**; Threads = Deferred — see [PRODUCT_PROVIDER_SELECTION.md](../architecture/PRODUCT_PROVIDER_SELECTION.md) and [research/](../architecture/research/README.md).
 
 Further identical identity-only cycles add no product capability. The next objective is a bounded, human-approved, text-only publishing product with mandatory safety controls.
 
@@ -63,9 +63,13 @@ Further identical identity-only cycles add no product capability. The next objec
 | -- | --------- | --------------------------- |
 | P0 | Productization Entry Planning | **Complete** |
 | P1 | Productization Governance and MVP Boundary | **Complete / Closed**（Git `v1.87.0` + Record Population published） |
-| P2 | Security / Credential / External IO Boundary（specs） | Planning **Complete**; **P2A** Boundary Specifications **Complete**; Independent Review **Complete** / **A.GO**; lifecycle closure Implementation **In Progress**（docs-only; version **Not Assigned**） |
-| P2-R1 | Official Instagram Contract-Fit Research | **Next Authorized Phase** after durable P2A closure — Planning **not started**; read-only; Implementation **Not Authorized** |
-| P2B+ | Local types / resolver / gateway abstractions | **Not started** |
+| P2 | Security / Credential / External IO Boundary（specs） | Planning **Complete**; **P2A** Boundary Specifications **Durable Complete**; Independent Review **Complete** / **A.GO**; version **Not Assigned** |
+| P2-R1 | Official Instagram Contract-Fit Research | **Complete** — Outcome **NOT FIT**（Branch A） |
+| P2-R2 | Official Threads Contract-Fit Research | **Complete** — Outcome **CONDITIONAL FIT** / **Deferred** |
+| P2-R3 | Official X Contract-Fit Research | **Complete** — Outcome **CONDITIONAL FIT** |
+| P2-R4 | Unified Provider Comparison and Selection | **Complete** — Outcome **D. CONDITIONAL RECOMMENDATION — X** |
+| P2-Doc | Provider Re-evaluation Research and Selection Documentation | Implementation **Complete**; Independent Review / Bounded Remediation / Re-verification / Final Minor Remediation **Complete**; next = **Commit Preparation eligibility** only |
+| P2B+ | Local types / resolver / gateway abstractions | **Not started** / **Not Authorized** |
 | P3 | Human Approval Workflow Foundation | **Not started** |
 | P4 | Real Provider Adapter（default-disabled） | **Not started** — **prohibited** until separately authorized |
 | P5 | Dry-Run and Idempotency | Not started |
@@ -139,13 +143,15 @@ At Productization Entry:
 | Git published baseline | `v1.87.0` @ `04725ba8c20324c652a5f316bb05c013b968f38d` |
 | Record Current（after Post-Push Record Population） | `v1.87.0` |
 | Record Pending | **None** / **Not Assigned** |
-| Next Authorized Phase | **P2-R1 Official Instagram Contract-Fit Research Planning**（after durable P2A closure）; P2-R1 research **Not Started**; runtime P2B+/P3/P4 **not authorized** |
-| Version assignment | **Not Assigned**（no `v1.87.1`; P2A = versionless governance tip） |
+| Next Authorized Phase | **P2 Provider Re-evaluation Research and Selection Documentation Commit Preparation eligibility** only; runtime P2B+/P3/P4 **not authorized** |
+| Version assignment | **Not Assigned**（no `v1.87.1`; documentation = versionless governance tip） |
 | Continuous `v1.86.x` Reconciliation | **Terminated** |
 | `v1.86.22` | **Not authorized** |
 | `v1.87.1` | **Not assigned** |
-| Concrete Meta hosts/endpoints | **Pending P2-R1** |
+| Provider Authorization | **No** |
+| Concrete endpoints | **Not Approved** — Candidate Evidence ≠ Approved Allowlist; separate endpoint Planning required |
 | Real Provider / External IO | **Prohibited** |
+| First product candidate | **`v1.88.0`**（unchanged） |
 
 Historical note: post-push lag after `v1.86.21` publication was previously closed by Record Current → `v1.86.21` with Pending → `v1.87.0` Productization Entry. After Git publication of `v1.87.0` @ `04725ba8…`, Post-Push Record Population closes Record Current to released `v1.87.0`（Pending Release **None** / **Not Assigned**; Next Authorized Phase **P2 Planning** only; P2 Implementation **not authorized**; `v1.87.1` **not assigned**; `v1.86.22` **not authorized**）. This is **not** another continuous `v1.86.x` identity-only reconciliation.
 
@@ -170,7 +176,7 @@ Population Implementation closes Record Current to published `v1.87.0`.
 
 1. Productization Entry ADR Accepted（this document）
 2. MVP Boundary document published
-3. Provider Selection Record published（Instagram Recommended）
+3. Provider Selection Record published（historical initial Instagram Recommended — later superseded for Branch A text-only MVP）
 4. Commit / Tag / Push for `v1.87.0` @ `04725ba8…` **Complete**
 5. Post-Push Release State Review **Complete**
 
@@ -186,7 +192,26 @@ Population Implementation closes Record Current to published `v1.87.0`.
 13. No Adapter / network / credential mutations in this Entry slice
 14. `v1.87.1` not assigned; `v1.86.22` not authorized; continuous `v1.86.x` terminated
 
-**Post-Record Population status（current）:** P2 Planning **Complete**; **P2A** Boundary Specifications **Complete**; Independent Review **Complete** / **A.GO**; P2A lifecycle closure Implementation **In Progress**（docs-only; version **Not Assigned**; no Pending Release; release declaration **Not Applicable** / versionless governance tip）; Next Authorized Phase after durable closure = **P2-R1 Official Instagram Contract-Fit Research Planning**（**Not Started**; Implementation **Not Authorized**）; P2B+ / P3 / P4 **not started**; concrete endpoints **Pending P2-R1**; Real Provider / External IO **Prohibited**; `v1.87.1` **not assigned**; `v1.88.0` remains first user-usable candidate only.
+**Current Productization Governance State:**
+
+| Field | Current value |
+| ----- | ------------- |
+| P1 Productization Governance | **Complete / Closed** |
+| P2A Boundary Specifications | **Durable Complete** |
+| P2-R1 Instagram Contract-Fit Research | **Complete / NOT FIT** |
+| P2-R2 Threads Contract-Fit Research | **Complete / CONDITIONAL FIT / Deferred** |
+| P2-R3 X Contract-Fit Research | **Complete / CONDITIONAL FIT** |
+| P2-R4 Unified Comparison and Selection | **Complete / Outcome D — X Recommended with Entry Conditions** |
+| Provider Re-evaluation Documentation | Implementation **Complete**; Independent Review **Complete / C.STOP**; Bounded ADR remediation **Complete / A.GO**; Independent Review re-verification **Complete / B.GO WITH MINOR REMEDIATION**; Final Minor Remediation **Complete** |
+| Provider Authorization | **No** |
+| Concrete Endpoint Selection / Approval | **Not Started / Not Authorized** — Candidate Evidence only; Research Complete / Concrete Endpoint Selection and Approval Pending Separate Planning; no approved allowlist values |
+| Next Authorized Phase | **Commit Preparation eligibility** review only（no stage / commit / tag / push until separately authorized） |
+| P2B+ / P3 / P4 | **Not Authorized** / **not started** |
+| Version / Pending Release | **Not Assigned** / **None** |
+| Real Provider / External IO / Automatic SNS | **Prohibited** |
+| First user-usable product candidate | **`v1.88.0`** only |
+
+Research evidence ≠ endpoint approval. Conditional Recommendation ≠ Authorization.
 
 ## Decision summary
 
@@ -197,7 +222,11 @@ Population Implementation closes Record Current to published `v1.87.0`.
 | **Continuous v1.86.x Reconciliation** | **Terminated** |
 | **v1.86.22** | **Not authorized** |
 | **First product** | Bounded Text Publishing MVP |
-| **Provider recommendation** | Instagram（Recommended — not Authorized） |
+| **Historical initial Provider recommendation** | Instagram（repository-fit era; Recommended ≠ Authorized at Entry）— **superseded for Branch A** |
+| **Current Provider recommendation** | **X — Recommended with Entry Conditions** under Selection Outcome **D. CONDITIONAL RECOMMENDATION — X** |
+| **Current Provider states** | Instagram = Historical / **NOT FIT**; Threads = **CONDITIONAL FIT / Deferred**; X = **CONDITIONAL FIT / Recommended with Entry Conditions**; Authorized Provider = **None** |
+| **Recommended ≠ Authorized** | **Yes** — does **not** authorize Real Provider, External IO, credentials, concrete endpoints, Catalog registration, or P2B+ |
+| **Endpoints** | **Not Approved** |
 | **Real Provider / External IO** | **Still Prohibited** |
 | **Automatic SNS Publishing** | **Still Prohibited** |
 | **Production Ready** | **Not Declared** |

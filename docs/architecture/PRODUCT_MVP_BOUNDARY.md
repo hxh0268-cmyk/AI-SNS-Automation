@@ -1,9 +1,9 @@
 # Bounded Text Publishing MVP Boundary
 
-**Document type:** Productization MVP boundary（governance）  
-**Lifecycle:** v1.87.0 Bounded Productization Entry  
-**Authority:** [ADR-0024](../adr/ADR-0024-bounded-productization-entry.md)  
-**Provider recommendation:** [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md)（Instagram — Recommended ≠ Authorized）
+**Document type:** Productization MVP boundary（governance）
+**Lifecycle:** v1.87.0 Bounded Productization Entry
+**Authority:** [ADR-0024](../adr/ADR-0024-bounded-productization-entry.md)
+**Provider recommendation:** [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md)（**X** — Recommended with Entry Conditions ≠ Authorized; Instagram = Historical / **NOT FIT**; Threads = Deferred）
 
 ---
 
@@ -27,8 +27,8 @@ Bounded Text Publishing MVP
 
 | Capability | Requirement |
 | ---------- | ----------- |
-| Single Provider | **1 Provider only**（recommended: Instagram） |
-| Content | **Text-only** |
+| Single Provider | **1 Provider only**（recommended: **X** with Entry Conditions; **not** Authorized） |
+| Content | **Text-only**（URL-bearing Posts **prohibited** in initial MVP unless separately approved） |
 | Human approval | Required before any real publish eligibility |
 | Draft → review → approve flow | Explicit states; no Draft→Published |
 | Dry-run | Required; no outbound network; no Published state |
@@ -170,12 +170,15 @@ Dry-run と real execution は過度に分岐させない（共有パイプラ�
 | Item | Value |
 | ---- | ----- |
 | Count | **1** |
-| Recommended Provider | **Instagram** |
-| Status | **Recommended** — **Not Authorized** for Real Provider |
-| Threads / X / others | **Deferred** |
+| Recommended Provider | **X** with Entry Conditions |
+| Status | **Conditional Recommendation** — **Not Authorized** for Real Provider |
+| Instagram | Historical Initial Recommendation / Current Branch A **NOT FIT** |
+| Threads | **Deferred** / CONDITIONAL FIT |
+| URL-bearing Posts | **Prohibited** in initial MVP unless separately approved |
 | Catalog Real / SNS provider registration | **Not authorized** by this boundary |
+| Endpoints Approved | **No** |
 
-See [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md).
+See [PRODUCT_PROVIDER_SELECTION.md](./PRODUCT_PROVIDER_SELECTION.md). Recommendation does **not** authorize Implementation, External IO, credentials, or endpoint approval.
 
 ---
 

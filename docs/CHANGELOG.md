@@ -4,6 +4,24 @@
 
 ---
 
+## Unreleased — P2 Provider Re-evaluation Documentation（versionless）
+
+Governance documentation only. Records P2-R1–R4 official Contract-Fit Research and Selection Outcome **D. CONDITIONAL RECOMMENDATION — X**. Adds research artifacts under `docs/architecture/research/`. Updates Provider Selection Record（Instagram Historical / NOT FIT; Threads Deferred; X Recommended with Entry Conditions）. Does **not** assign SemVer, move tags, authorize Real Provider / External IO, approve endpoints, register Catalog Real Provider, purchase credits, or start P2B+.
+
+**Status:** Documentation Implementation **In Progress** — Independent Review next. Current Released remains `v1.87.0` @ `04725ba8…`. Version **Not Assigned**. Pending Release **None**.
+
+### 変更内容
+
+| 項目 | 内容 |
+|------|------|
+| Research | R1 Instagram NOT FIT / R2 Threads CONDITIONAL FIT Deferred / R3 X CONDITIONAL FIT / R4 Outcome D |
+| Selection | X Recommended with Entry Conditions ≠ Authorized |
+| Allowlist | Status only — endpoints Not Approved |
+| Quality | Test 1232 governance locks updated（Test 1231 unchanged; Test 1233 absent） |
+| Catalog / Providers | **Unchanged** |
+
+---
+
 ## v1.87.0 — Bounded Productization Entry
 
 Bounded Productization Entry governance release after continuous `v1.86.x` Reconciliation termination. Establishes ADR-0024, MVP Boundary, Provider Selection Record（Instagram Recommended ≠ Authorized）. Git-published at `04725ba8c20324c652a5f316bb05c013b968f38d` / tag `v1.87.0`. Post-Push Record Population closes Current Baseline Record to released `v1.87.0`（Pending Release **None**; Next = P2 Planning only）.

@@ -66,7 +66,7 @@ Derived targets must **not** update, infer, or override the Current Baseline Rec
 
 A version **value** transition requires an explicitly authorized Current Baseline Record population or release phase.
 Editing this Rule Document does **not** populate the Current Baseline Record and does **not** declare a release
-（historical Migration 5 note: editing this policy did not itself declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, `v1.86.7`, `v1.86.8`, `v1.86.9`, and `v1.86.10`, and `v1.86.11`, and `v1.86.12`, and `v1.86.13`, and `v1.86.14`, and `v1.86.15`, and `v1.86.16`, and `v1.86.17`, and `v1.86.18`, and `v1.86.19`, and `v1.86.21`, and `v1.87.0` are now **Released**; Pending Release is **None**; P2 Planning is **Complete**; **P2A** Boundary Specifications are **Complete**; P2A lifecycle closure is versionless and does **not** assign `v1.87.1` or any new release identity；Next after durable closure = **P2-R1 Planning**）。
+（historical Migration 5 note: editing this policy did not itself declare `v1.86.0`; `v1.86.0`, `v1.86.1`, `v1.86.2`, `v1.86.3`, `v1.86.4`, `v1.86.5`, `v1.86.6`, `v1.86.7`, `v1.86.8`, `v1.86.9`, and `v1.86.10`, and `v1.86.11`, and `v1.86.12`, and `v1.86.13`, and `v1.86.14`, and `v1.86.15`, and `v1.86.16`, and `v1.86.17`, and `v1.86.18`, and `v1.86.19`, and `v1.86.21`, and `v1.87.0` are now **Released**; Pending Release is **None**; P2 Planning is **Complete**; **P2A** Boundary Specifications are **Durable Complete**; P2-R1–R4 are **Complete**; Provider Re-evaluation Documentation is versionless and does **not** assign `v1.87.1` or any new release identity；Next = **Documentation Independent Review**）。
 
 Preserve the Record-layer distinction:
 
