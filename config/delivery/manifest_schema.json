@@ -1,0 +1,245 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "delivery-manifest-schema/1.0",
+  "title": "Delivery Gate Manifest",
+  "description": "Machine-readable change manifest for Accelerated Delivery Gate. Defines the exact scope, safety constraints, and authorization boundaries for a single change unit.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "change_id",
+    "commit_subject",
+    "allowed_paths",
+    "expected_file_count"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Manifest schema version. Must be '1.0'.",
+      "const": "1.0"
+    },
+    "change_id": {
+      "type": "string",
+      "description": "Unique identifier for this change unit (e.g. 'p2-provider-docs-2026-08')."
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable short title for this change."
+    },
+    "change_type": {
+      "type": "string",
+      "description": "Classification of the change.",
+      "enum": [
+        "governance_docs",
+        "implementation",
+        "remediation",
+        "quality",
+        "catalog",
+        "dependency_update",
+        "other"
+      ],
+      "default": "governance_docs"
+    },
+    "base_branch": {
+      "type": "string",
+      "description": "Required branch for this change. Default: 'main'.",
+      "default": "main"
+    },
+    "expected_base_commit": {
+      "type": "string",
+      "description": "Expected SHA of HEAD before staging. If set, delivery gate will reject any other base commit (CAS precondition). Leave empty to skip base commit check.",
+      "default": ""
+    },
+    "allowed_paths": {
+      "type": "array",
+      "description": "Exact list of files allowed to be changed (modified or added). Must be an exhaustive enumeration — no implicit additions. Empty array means no changes allowed.",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "description": "Paths that must NOT appear in the changeset. Takes priority over allowed_paths.",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "default": []
+    },
+    "expected_file_count": {
+      "type": "integer",
+      "description": "Expected number of changed files. Must equal length of allowed_paths. Enforced as exact equality check.",
+      "minimum": 0
+    },
+    "allow_add": {
+      "type": "boolean",
+      "description": "Allow new (untracked) files. Default: false.",
+      "default": false
+    },
+    "allow_modify": {
+      "type": "boolean",
+      "description": "Allow modification of tracked files. Default: true.",
+      "default": true
+    },
+    "allow_delete": {
+      "type": "boolean",
+      "description": "Allow deletion of tracked files. Default: false. Deletion requires explicit opt-in.",
+      "default": false
+    },
+    "allow_rename": {
+      "type": "boolean",
+      "description": "Allow renaming of tracked files. Default: false. Rename requires explicit opt-in.",
+      "default": false
+    },
+    "commit_subject": {
+      "type": "string",
+      "description": "Exact commit subject line. Must be single-line, non-empty. No body or trailers will be added. Forbidden prefixes: Co-authored-by, Signed-off-by, Reviewed-by, Change-Id."
+    },
+    "version_assignment": {
+      "type": "string",
+      "description": "Version to assign for this change. 'none' = versionless governance commit (no tag created).",
+      "default": "none"
+    },
+    "tag_policy": {
+      "type": "string",
+      "description": "Tag policy. 'none' = no tag created. Tagging requires separate explicit authorization.",
+      "enum": ["none", "lightweight", "annotated"],
+      "default": "none"
+    },
+    "push_policy": {
+      "type": "string",
+      "description": "Push policy. 'main_only' = git push origin main only, no force, no tags.",
+      "enum": ["none", "main_only"],
+      "default": "none"
+    },
+    "quality_required": {
+      "type": "boolean",
+      "description": "Whether to run the Quality Pipeline gate. Default: true.",
+      "default": true
+    },
+    "catalog_required": {
+      "type": "boolean",
+      "description": "Whether to run the Public Contract Catalog gate. Default: true.",
+      "default": true
+    },
+    "governance_checks": {
+      "type": "array",
+      "description": "Named governance assertions to verify in repository content.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "no_provider_authorization",
+          "no_endpoint_approval",
+          "no_real_provider",
+          "no_external_io",
+          "no_automatic_publishing"
+        ]
+      },
+      "default": []
+    },
+    "provider_authorization": {
+      "type": "string",
+      "description": "Provider authorization state expected in this change. 'none' = no authorization granted. Changing to 'authorized' requires separate human-approved governance phase.",
+      "enum": ["none", "authorized"],
+      "default": "none"
+    },
+    "endpoint_approval": {
+      "type": "string",
+      "description": "Endpoint approval state. 'none' = endpoints not approved. Approval requires separate governance phase.",
+      "enum": ["none", "approved"],
+      "default": "none"
+    },
+    "external_io": {
+      "type": "string",
+      "description": "External IO boundary. 'prohibited' = no external IO enabled. Default: prohibited.",
+      "enum": ["prohibited", "allowed"],
+      "default": "prohibited"
+    },
+    "real_provider": {
+      "type": "string",
+      "description": "Real provider state. 'prohibited' = no real provider usage. Default: prohibited.",
+      "enum": ["prohibited", "allowed"],
+      "default": "prohibited"
+    },
+    "automatic_publishing": {
+      "type": "string",
+      "description": "Automatic SNS publishing state. 'prohibited' = not enabled. Default: prohibited.",
+      "enum": ["prohibited", "allowed"],
+      "default": "prohibited"
+    },
+    "force_push": {
+      "type": "string",
+      "description": "Force push policy. 'prohibited' = force push disabled. Cannot be overridden.",
+      "const": "prohibited",
+      "default": "prohibited"
+    },
+    "report_format": {
+      "type": "array",
+      "description": "Report formats to generate.",
+      "items": {
+        "type": "string",
+        "enum": ["markdown", "json"]
+      },
+      "default": ["markdown", "json"]
+    }
+  },
+  "$defs": {
+    "example_governance_docs": {
+      "description": "Example manifest for a versionless governance documentation commit",
+      "value": {
+        "schema_version": "1.0",
+        "change_id": "p2-provider-docs-2026-08",
+        "title": "P2 Provider Re-evaluation Research and Selection Documentation",
+        "change_type": "governance_docs",
+        "base_branch": "main",
+        "expected_base_commit": "88f33aff78d7be6e9b76427338c5ffe1b4ff0302",
+        "allowed_paths": [
+          "README.md",
+          "docs/CHANGELOG.md",
+          "docs/VERSION.md",
+          "docs/adr/ADR-0024-bounded-productization-entry.md",
+          "docs/architecture/ARCHITECTURE_MATURITY_MODEL.md",
+          "docs/architecture/BASELINE_SYNCHRONIZATION.md",
+          "docs/architecture/FUTURE_ENTRY_CRITERIA.md",
+          "docs/architecture/GOVERNANCE_FLOW.md",
+          "docs/architecture/NON_GOALS.md",
+          "docs/architecture/PRODUCT_MVP_BOUNDARY.md",
+          "docs/architecture/PRODUCT_PROVIDER_SELECTION.md",
+          "docs/architecture/PROVIDER_ENDPOINT_ALLOWLIST.md",
+          "docs/architecture/README.md",
+          "docs/architecture/VERSIONING_POLICY.md",
+          "scripts/test_quality_pipeline.sh",
+          "docs/architecture/research/README.md",
+          "docs/architecture/research/P2_PROVIDER_REEVALUATION_MATRIX.md",
+          "docs/architecture/research/P2_PROVIDER_REEVALUATION_SOURCE_REGISTER.md",
+          "docs/architecture/research/P2_R1_INSTAGRAM_CONTRACT_FIT_RESEARCH.md",
+          "docs/architecture/research/P2_R2_THREADS_CONTRACT_FIT_RESEARCH.md",
+          "docs/architecture/research/P2_R3_X_CONTRACT_FIT_RESEARCH.md"
+        ],
+        "forbidden_paths": [],
+        "expected_file_count": 21,
+        "allow_add": true,
+        "allow_modify": true,
+        "allow_delete": false,
+        "allow_rename": false,
+        "commit_subject": "docs(governance): document P2 provider re-evaluation",
+        "version_assignment": "none",
+        "tag_policy": "none",
+        "push_policy": "main_only",
+        "quality_required": true,
+        "catalog_required": true,
+        "governance_checks": [
+          "no_provider_authorization",
+          "no_endpoint_approval",
+          "no_real_provider",
+          "no_external_io",
+          "no_automatic_publishing"
+        ],
+        "provider_authorization": "none",
+        "endpoint_approval": "none",
+        "external_io": "prohibited",
+        "real_provider": "prohibited",
+        "automatic_publishing": "prohibited",
+        "force_push": "prohibited",
+        "report_format": ["markdown", "json"]
+      }
+    }
+  }
+}

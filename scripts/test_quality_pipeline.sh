@@ -22092,3 +22092,52 @@ pass "v1.87.0 current version metadata in VERSION.md"
 
 echo ""
 echo "All quality pipeline tests passed."
+
+# == Accelerated Delivery Foundation auxiliary verification ==
+# Non-numbered supplementary checks — do not affect the 1232 PASS count above.
+echo ""
+echo "== accelerated delivery foundation auxiliary verification =="
+
+_dg_aux_pass() { echo "[DG-AUX PASS] $1"; }
+_dg_aux_fail() { echo "[DG-AUX FAIL] $1" >&2; exit 1; }
+
+# Verify delivery gate scripts exist
+[ -f "$SCRIPT_DIR/delivery_gate.sh" ] \
+  && _dg_aux_pass "delivery_gate.sh exists" \
+  || _dg_aux_fail "delivery_gate.sh not found"
+
+[ -f "$SCRIPT_DIR/lib/delivery_gate_lib.sh" ] \
+  && _dg_aux_pass "delivery_gate_lib.sh exists" \
+  || _dg_aux_fail "delivery_gate_lib.sh not found"
+
+[ -f "$SCRIPT_DIR/test_delivery_gate.sh" ] \
+  && _dg_aux_pass "test_delivery_gate.sh exists" \
+  || _dg_aux_fail "test_delivery_gate.sh not found"
+
+# Verify manifest schema exists and is valid JSON
+[ -f "$PROJECT_ROOT/config/delivery/manifest_schema.json" ] \
+  && _dg_aux_pass "manifest_schema.json exists" \
+  || _dg_aux_fail "manifest_schema.json not found"
+
+node -e "JSON.parse(require('fs').readFileSync('$PROJECT_ROOT/config/delivery/manifest_schema.json','utf8'))" \
+  2>/dev/null \
+  && _dg_aux_pass "manifest_schema.json is valid JSON" \
+  || _dg_aux_fail "manifest_schema.json is not valid JSON"
+
+# Verify ACCELERATED_DELIVERY.md exists
+[ -f "$PROJECT_ROOT/docs/architecture/ACCELERATED_DELIVERY.md" ] \
+  && _dg_aux_pass "ACCELERATED_DELIVERY.md exists" \
+  || _dg_aux_fail "ACCELERATED_DELIVERY.md not found"
+
+# Run delivery gate unit/integration tests
+# Capture output to avoid [PASS] lines inflating the numbered quality pipeline count
+_dg_test_out="$(bash "$SCRIPT_DIR/test_delivery_gate.sh" 2>&1)" && _dg_test_ok=0 || _dg_test_ok=$?
+if [[ "$_dg_test_ok" -eq 0 ]]; then
+  _dg_pass_count="$(printf '%s\n' "$_dg_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _dg_aux_pass "delivery gate tests passed ($_dg_pass_count checks)"
+else
+  printf '%s\n' "$_dg_test_out" >&2
+  _dg_aux_fail "delivery gate tests failed"
+fi
+
+echo "== accelerated delivery foundation auxiliary verification complete =="

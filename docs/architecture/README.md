@@ -221,6 +221,14 @@ Provider / Adapter / Runtime / Scheduler / SNS API / OAuth / Database / Queue / 
 
 ---
 
+## Operational Tools
+
+| ツール | 説明 |
+|--------|------|
+| [ACCELERATED_DELIVERY.md](./ACCELERATED_DELIVERY.md) | **Accelerated Delivery Model** — commit-tree + CAS / Delivery Gate CLI / Manifest format / 4-step cycle / High-risk change boundary（Operational Tool; not counted in 49 必須 Governance 文書） |
+
+---
+
 ## ADR との関係
 
 | 種別 | 場所 | 役割 |
