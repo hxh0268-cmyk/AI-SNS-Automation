@@ -14229,9 +14229,17 @@ const forbiddenPatterns = [
 ];
 
 /** v1.74.0 ADR-0016 authorized Mock Provider production module */
+/** Stage A X text-only MVP fake dry-run slice (catalog registration still prohibited) */
 const authorizedImplementationPaths = new Set([
   "src/lib/mock_provider.js",
   "src/lib/image_generation_mock_provider.js",
+  "src/lib/text_post_content.js",
+  "src/lib/text_post_lifecycle.js",
+  "src/lib/text_post_idempotency.js",
+  "src/lib/text_post_audit.js",
+  "src/lib/text_post_kill_switch.js",
+  "src/lib/text_post_service.js",
+  "src/lib/x_text_post_mock_provider.js",
 ]);
 
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
@@ -22141,3 +22149,48 @@ else
 fi
 
 echo "== accelerated delivery foundation auxiliary verification complete =="
+
+# == X Text-only MVP Stage A auxiliary verification ==
+# Non-numbered TP-AUX checks — do not affect the 1232 PASS count / do not add Test 1233.
+echo ""
+echo "== x text-only stage a auxiliary verification =="
+
+_tp_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_tp_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$SCRIPT_DIR/test_text_post_slice.sh" ] \
+  && _tp_aux_pass "test_text_post_slice.sh exists" \
+  || _tp_aux_fail "test_text_post_slice.sh not found"
+
+[ -f "$PROJECT_ROOT/src/lib/text_post_service.js" ] \
+  && _tp_aux_pass "text_post_service.js exists" \
+  || _tp_aux_fail "text_post_service.js not found"
+
+[ -f "$PROJECT_ROOT/docs/architecture/TEXT_POST_SLICE.md" ] \
+  && _tp_aux_pass "TEXT_POST_SLICE.md exists" \
+  || _tp_aux_fail "TEXT_POST_SLICE.md not found"
+
+[ -f "$PROJECT_ROOT/config/delivery/x_text_only_stage_a_manifest.json" ] \
+  && _tp_aux_pass "x_text_only_stage_a_manifest.json exists" \
+  || _tp_aux_fail "x_text_only_stage_a_manifest.json not found"
+
+# Capture output so nested [PASS] lines do not inflate the numbered quality count
+_tp_test_out="$(bash "$SCRIPT_DIR/test_text_post_slice.sh" 2>&1)" && _tp_test_ok=0 || _tp_test_ok=$?
+if [[ "$_tp_test_ok" -eq 0 ]]; then
+  _tp_pass_count="$(printf '%s\n' "$_tp_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _tp_aux_pass "text post slice tests passed ($_tp_pass_count checks)"
+else
+  printf '%s\n' "$_tp_test_out" >&2
+  _tp_aux_fail "text post slice tests failed"
+fi
+
+# Confirm numbered Test 1233 definition remains absent from the numbered suite
+# (search only content before the first auxiliary verification block)
+if sed -n '1,/^# == Accelerated Delivery Foundation auxiliary verification ==/p' \
+  "$SCRIPT_DIR/test_quality_pipeline.sh" | grep -qE '^echo "-- Test 1233:'; then
+  _tp_aux_fail "numbered Test 1233 definition must remain absent"
+else
+  _tp_aux_pass "Test 1233 absent"
+fi
+
+echo "== x text-only stage a auxiliary verification complete =="

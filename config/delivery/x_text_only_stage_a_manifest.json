@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "change_id": "x-text-only-stage-a-2026-08",
+  "title": "X Text-only MVP Stage A — Fake Provider Dry-run Slice",
+  "change_type": "implementation",
+  "base_branch": "main",
+  "expected_base_commit": "71f88c47bc09beba612e0df7b1885ab46d4086b5",
+  "allowed_paths": [
+    "src/lib/text_post_content.js",
+    "src/lib/text_post_lifecycle.js",
+    "src/lib/text_post_idempotency.js",
+    "src/lib/text_post_audit.js",
+    "src/lib/text_post_kill_switch.js",
+    "src/lib/x_text_post_mock_provider.js",
+    "src/lib/text_post_service.js",
+    "scripts/test_text_post_slice.sh",
+    "docs/architecture/TEXT_POST_SLICE.md",
+    "scripts/test_quality_pipeline.sh",
+    "config/delivery/x_text_only_stage_a_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/x_api_provider.js",
+    "src/lib/x_api_client.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/token_store.js",
+    "src/lib/credential_resolver.js"
+  ],
+  "expected_file_count": 11,
+  "allow_add": true,
+  "allow_modify": true,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "feat(publishing): add X text-only dry-run slice",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "A",
+    "real_provider_entry_conditions": [
+      "X Provider Authorization (human decision)",
+      "POST /2/tweets Endpoint Approval",
+      "OAuth 2.0 PKCE or OAuth 1.0a Approval",
+      "Scope Approval: tweet.read + tweet.write + users.read",
+      "Credential Handling Approval",
+      "Test Account Approval",
+      "Cost / Access Plan Confirmation (live Console)",
+      "External IO Approval",
+      "Canary Plan Approval",
+      "Kill-switch Verification"
+    ],
+    "catalog_notes": "Stage A does NOT register x_text_post_mock_provider in PROVIDER_CONTRACT_DEFINITIONS. Catalog counts remain 1.0/7/7/3/6/5/6/3/4. Separate catalog governance required before Stage B.",
+    "test1233_policy": "No numbered test 1233 is added. Text post tests run as non-numbered TP-AUX auxiliary checks in quality pipeline."
+  }
+}
