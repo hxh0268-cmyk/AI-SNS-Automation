@@ -108,10 +108,12 @@ dg_validate_manifest() {
 }
 
 # ── Repository preflight ─────────────────────────────────────────────────────
-# Check branch, HEAD vs expected_base_commit, divergence
+# mode: "strict" (default) — HEAD must equal expected_base_commit
+#       "publish" — HEAD may be expected_base_commit OR one commit ahead of it
 dg_preflight_repo() {
   local manifest="$1"
   local project_root="$2"
+  local mode="${3:-strict}"
 
   local expected_branch
   expected_branch="$(_dg_mget_str "$manifest" "base_branch" 2>/dev/null || echo "main")"
@@ -126,8 +128,19 @@ dg_preflight_repo() {
   if [[ -n "$expected_base" ]]; then
     local actual_head
     actual_head="$(git -C "$project_root" rev-parse HEAD)"
-    [[ "$actual_head" == "$expected_base" ]] \
-      || dg_fail "$DG_E_REPO" "base commit mismatch: expected=$expected_base actual=$actual_head"
+    if [[ "$mode" == "publish" ]]; then
+      # Accept: HEAD == expected_base (pre-commit combined publish)
+      #      OR HEAD^ == expected_base (post-commit separate publish)
+      local head_parent
+      head_parent="$(git -C "$project_root" rev-parse HEAD^ 2>/dev/null || echo "")"
+      if [[ "$actual_head" != "$expected_base" && "$head_parent" != "$expected_base" ]]; then
+        dg_fail "$DG_E_REPO" "publish preflight: HEAD ($actual_head) is not at or one commit ahead of expected_base_commit ($expected_base)"
+      fi
+      dg_info "publish preflight: HEAD relationship to base_commit verified (mode=publish)"
+    else
+      [[ "$actual_head" == "$expected_base" ]] \
+        || dg_fail "$DG_E_REPO" "base commit mismatch: expected=$expected_base actual=$actual_head"
+    fi
   fi
 
   dg_info "repo preflight passed: branch=$actual_branch"
@@ -467,6 +480,8 @@ dg_verify_commit_identity() {
 }
 
 # ── Push preflight ───────────────────────────────────────────────────────────
+# Checks: branch=main, index clean (not working tree), divergence=0 N,
+#         no tag at HEAD, origin/main == expected_remote_base
 dg_push_preflight() {
   local project_root="$1"
   local manifest="$2"
@@ -477,13 +492,13 @@ dg_push_preflight() {
   [[ "$branch" == "main" ]] \
     || dg_fail "$DG_E_PUSH_PRE" "push preflight: branch must be main, got $branch"
 
-  # Working tree must be clean
-  local dirty
-  dirty="$(git -C "$project_root" status --short)"
-  [[ -z "$dirty" ]] \
-    || dg_fail "$DG_E_PUSH_PRE" "push preflight: working tree not clean"
+  # Index must be clean (nothing staged — working tree allowed to have unstaged changes)
+  local staged
+  staged="$(git -C "$project_root" diff --cached --name-status)"
+  [[ -z "$staged" ]] \
+    || dg_fail "$DG_E_PUSH_PRE" "push preflight: index is not clean — stage must be empty before push:\n$staged"
 
-  # Divergence must be 0 N (ahead, not behind)
+  # Divergence must be 0 N (local is ahead by at least 1)
   local diverge left right
   diverge="$(git -C "$project_root" rev-list --left-right --count origin/main...HEAD)"
   left="${diverge%%$'\t'*}"
@@ -506,6 +521,19 @@ dg_push_preflight() {
   local tag_policy
   tag_policy="$(_dg_mget_str "$manifest" "tag_policy" 2>/dev/null || echo "none")"
   [[ "$tag_policy" == "none" ]] && dg_info "tag_policy=none: no tag will be pushed"
+
+  # Verify origin/main against expected_remote_base (falls back to expected_base_commit)
+  local expected_remote
+  expected_remote="$(_dg_mget_str "$manifest" "expected_remote_base" 2>/dev/null || echo "")"
+  if [[ -z "$expected_remote" ]]; then
+    expected_remote="$(_dg_mget_str "$manifest" "expected_base_commit" 2>/dev/null || echo "")"
+  fi
+  if [[ -n "$expected_remote" ]]; then
+    local actual_origin
+    actual_origin="$(git -C "$project_root" rev-parse origin/main 2>/dev/null || echo "")"
+    [[ "$actual_origin" == "$expected_remote" ]] \
+      || dg_fail "$DG_E_PUSH_PRE" "push preflight: origin/main ($actual_origin) != expected_remote_base ($expected_remote) — remote may have advanced"
+  fi
 
   dg_info "push preflight passed: branch=$branch diverge=0 $right"
 }
@@ -804,4 +832,266 @@ dg_run_separate() {
 
   dg_info "separation complete: transfer stash=$transfer_stash retained for hash verification"
   printf '%s\n' "$transfer_stash"
+}
+
+# ── Staging: exact bounded staging from manifest ──────────────────────────────
+# dg_stage_exact: stages exactly the allowlist files, with pre and post verification.
+# Pre-check: ensure no non-allowlist files are staged; allowlist files must be present.
+# Post-check: staged set must equal allowlist exactly.
+dg_stage_exact() {
+  local project_root="$1"
+  local manifest="$2"
+  local dry_run="${3:-false}"
+
+  # Read allowlist
+  local stage_paths=()
+  while IFS= read -r p; do
+    [[ -n "$p" ]] && stage_paths+=("$p")
+  done < <(_dg_mget_arr "$manifest" "allowed_paths")
+
+  local expected_count
+  expected_count="$(_dg_mget_str "$manifest" "expected_file_count")"
+
+  if [[ "${#stage_paths[@]}" -eq 0 ]]; then
+    dg_info "stage: allowed_paths is empty — nothing to stage"
+    return 0
+  fi
+
+  if [[ "$dry_run" == "true" ]]; then
+    dg_dry_print "git -C $project_root add -- ${stage_paths[*]}"
+    dg_info "dry-run: would stage ${#stage_paths[@]} files (expected_file_count=$expected_count)"
+    return 0
+  fi
+
+  git -C "$project_root" add -- "${stage_paths[@]}" \
+    || dg_fail "$DG_E_ALLOWLIST" "stage: git add failed"
+
+  dg_info "staged ${#stage_paths[@]} files from allowlist"
+}
+
+# Post-stage verification: staged set must match allowlist exactly.
+dg_verify_staged_scope() {
+  local project_root="$1"
+  local manifest="$2"
+
+  local staged_paths expected_paths
+  staged_paths="$(git -C "$project_root" diff --cached --name-only | sort)"
+  expected_paths="$(_dg_mget_arr "$manifest" "allowed_paths" | sort)"
+
+  local expected_count staged_count
+  expected_count="$(_dg_mget_str "$manifest" "expected_file_count")"
+  staged_count="$(printf '%s\n' "$staged_paths" | grep -c . || echo 0)"
+
+  local diff_out
+  diff_out="$(diff <(printf '%s\n' "$expected_paths") <(printf '%s\n' "$staged_paths") 2>/dev/null || true)"
+  if [[ -n "$diff_out" ]]; then
+    dg_error "post-stage scope mismatch (expected vs staged):"
+    printf '%s\n' "$diff_out" >&2
+    exit "$DG_E_STAGED"
+  fi
+
+  [[ "$staged_count" -eq "$expected_count" ]] \
+    || dg_fail "$DG_E_STAGED" "post-stage count: expected=$expected_count staged=$staged_count"
+
+  git -C "$project_root" diff --cached --check \
+    || dg_fail "$DG_E_ALLOWLIST" "post-stage diff --check failed (whitespace/conflict marker)"
+
+  dg_info "post-stage verification: $staged_count files staged correctly"
+}
+
+# ── Verify: auto-detect delivery state and verify accordingly ──────────────────
+# Detects: staged → check staged vs allowlist; working → check dirty vs allowlist
+dg_detect_delivery_state() {
+  local project_root="$1"
+  local staged_count working_count
+  staged_count="$(git -C "$project_root" diff --cached --name-only | grep -c . 2>/dev/null || echo 0)"
+  working_count="$(git -C "$project_root" diff --name-only | grep -c . 2>/dev/null || echo 0)"
+  if [[ "$staged_count" -gt 0 ]]; then
+    printf 'staged\n'
+  elif [[ "$working_count" -gt 0 ]]; then
+    printf 'working\n'
+  else
+    printf 'clean\n'
+  fi
+}
+
+# ── Verify: structured summary output ─────────────────────────────────────────
+dg_verify_print_summary() {
+  local -n _results="$1"
+  printf '[DG VERIFY] ─────────────────────────────────────────\n' >&2
+  local all_pass=true
+  local key
+  for key in "${!_results[@]}"; do
+    local status="${_results[$key]}"
+    if [[ "$status" == PASS* ]]; then
+      printf '[DG PASS]  %-16s %s\n' "$key" "$status" >&2
+    else
+      printf '[DG FAIL]  %-16s %s\n' "$key" "$status" >&2
+      all_pass=false
+    fi
+  done
+  printf '[DG VERIFY] ─────────────────────────────────────────\n' >&2
+  if [[ "$all_pass" == "true" ]]; then
+    printf '[DG PASS]  OPERATIONAL READY\n' >&2
+  else
+    printf '[DG FAIL]  OPERATIONAL NOT READY\n' >&2
+  fi
+}
+
+# ── Separation topology verification ─────────────────────────────────────────
+# Checks registered worktrees are in expected state.
+# Reports findings; does not fail — topology mismatches are advisory for verify.
+dg_verify_separation_topology() {
+  local project_root="$1"
+  local worktrees
+  worktrees="$(git -C "$project_root" worktree list --porcelain)"
+
+  local wt_count
+  wt_count="$(printf '%s\n' "$worktrees" | grep -c '^worktree ' || echo 0)"
+
+  dg_info "separation topology: $wt_count worktree(s) registered"
+
+  # Report each worktree
+  local wt_path wt_head wt_branch
+  while IFS= read -r line; do
+    case "$line" in
+      worktree\ *) wt_path="${line#worktree }"; wt_head=""; wt_branch="" ;;
+      HEAD\ *)     wt_head="${line#HEAD }" ;;
+      branch\ *)   wt_branch="${line#branch refs/heads/}" ;;
+      "")
+        if [[ -n "$wt_path" && "$wt_path" != "$project_root" ]]; then
+          if [[ -d "$wt_path" ]]; then
+            local dirty_count
+            dirty_count="$(git -C "$wt_path" diff --name-only 2>/dev/null | grep -c . || echo 0)"
+            dg_info "  worktree: $wt_path branch=$wt_branch head=${wt_head:0:12} dirty=$dirty_count"
+          else
+            dg_warn "  worktree: $wt_path — directory MISSING (stale registration)"
+          fi
+        fi
+        ;;
+    esac
+  done <<EOF
+$worktrees
+
+EOF
+}
+
+# ── Restore: apply transfer stash from a restoration record ───────────────────
+# dg_run_restore <project_root> <record_file> <dry_run>
+dg_run_restore() {
+  local project_root="$1"
+  local record="$2"
+  local dry_run="${3:-false}"
+
+  [[ -f "$record" ]] || dg_fail "$DG_E_MANIFEST" "restore: record file not found: $record"
+
+  # Read record fields
+  local stash_sha stash_msg expected_count dest_wt
+  stash_sha="$(dg_spget_str "$record" "stash_sha" 2>/dev/null)" \
+    || dg_fail "$DG_E_MANIFEST" "restore: record missing stash_sha"
+  stash_msg="$(dg_spget_str "$record" "stash_message" 2>/dev/null)" \
+    || dg_fail "$DG_E_MANIFEST" "restore: record missing stash_message"
+  expected_count="$(dg_spget_str "$record" "expected_path_count" 2>/dev/null)" \
+    || dg_fail "$DG_E_MANIFEST" "restore: record missing expected_path_count"
+  dest_wt="$(dg_spget_str "$record" "destination_worktree" 2>/dev/null)" \
+    || dg_fail "$DG_E_MANIFEST" "restore: record missing destination_worktree"
+
+  # Verify stash object exists and identity matches
+  local actual_stash_type
+  actual_stash_type="$(git -C "$project_root" cat-file -t "$stash_sha" 2>/dev/null || echo "")"
+  [[ "$actual_stash_type" == "commit" ]] \
+    || dg_fail "$DG_E_MANIFEST" "restore: stash object not found or not a commit: $stash_sha"
+
+  # Verify stash is still registered (in stash list)
+  local stash_list_sha
+  stash_list_sha="$(git -C "$project_root" stash list --format='%H' | grep -F "$stash_sha" || echo "")"
+  [[ -n "$stash_list_sha" ]] \
+    || dg_fail "$DG_E_MANIFEST" "restore: stash $stash_sha is not in stash list (may have been dropped)"
+
+  # Verify destination worktree exists
+  [[ -d "$dest_wt" ]] \
+    || dg_fail "$DG_E_REPO" "restore: destination worktree not found: $dest_wt"
+
+  # Verify destination worktree has no conflicts
+  local dest_conflicts
+  dest_conflicts="$(git -C "$dest_wt" diff --name-only --diff-filter=U 2>/dev/null || echo "")"
+  [[ -z "$dest_conflicts" ]] \
+    || dg_fail "$DG_E_ALLOWLIST" "restore: destination worktree has conflicts: $dest_conflicts"
+
+  dg_info "restore: stash identity verified ($stash_sha)"
+  dg_info "restore: destination worktree exists ($dest_wt)"
+
+  if [[ "$dry_run" == "true" ]]; then
+    dg_dry_print "git -C $dest_wt stash apply $stash_sha"
+    dg_info "dry-run: would apply $expected_count paths to $dest_wt"
+    return 0
+  fi
+
+  # Apply stash to destination worktree
+  git -C "$dest_wt" stash apply "$stash_sha" \
+    || dg_fail "$DG_E_ALLOWLIST" "restore: stash apply failed in $dest_wt"
+
+  # Post-apply count verification
+  local restored_count
+  restored_count="$(git -C "$dest_wt" diff --name-only | grep -c . || echo 0)"
+  [[ "$restored_count" -ge "$expected_count" ]] \
+    || dg_fail "$DG_E_ALLOWLIST" "restore: path count after apply: expected>=$expected_count got=$restored_count"
+
+  dg_info "restore: $restored_count paths applied to $dest_wt"
+  dg_info "restore: stash $stash_sha RETAINED — run hash verification before dropping"
+  printf '%s\n' "$stash_sha"
+}
+
+# ── Separate: generate restoration record after successful separation ──────────
+# Called from dg_run_separate after successful apply; writes record to report dir.
+_dg_write_restoration_record() {
+  local project_root="$1"
+  local plan="$2"
+  local stash_sha="$3"
+  local report_dir="$4"
+
+  mkdir -p "$report_dir"
+
+  local operation_id dest_wt dest_br expected_head stash_msg path_count
+  operation_id="$(dg_spget_str "$plan" "operation_id" 2>/dev/null || echo "unknown")"
+  dest_wt="$(dg_spget_str "$plan" "destination_worktree")"
+  dest_br="$(dg_spget_str "$plan" "destination_branch")"
+  expected_head="$(dg_spget_str "$plan" "expected_head")"
+  stash_msg="$(dg_spget_str "$plan" "stash_message")"
+  path_count="$(dg_spget_str "$plan" "expected_path_count")"
+
+  local ts record_id
+  ts="$(date '+%Y-%m-%dT%H:%M:%S')"
+  record_id="${operation_id}-$(date '+%Y%m%d_%H%M%S')"
+
+  local record_path="$report_dir/restoration-record-${record_id}.json"
+
+  # Build exact_paths JSON array via Node.js
+  node - "$plan" "$record_path" \
+    "$record_id" "$ts" "$operation_id" "$stash_sha" "$stash_msg" \
+    "$project_root" "$dest_wt" "$dest_br" "$expected_head" "$path_count" <<'NODEEOF'
+const [,,plan,out,rid,ts,opid,sha,msg,src,dwt,dbr,head,cnt]=process.argv;
+const fs=require('fs');
+const m=JSON.parse(fs.readFileSync(plan,'utf8'));
+const rec={
+  schema_version:'1.0',
+  record_id:rid,
+  created_at:ts,
+  operation_id:opid,
+  stash_sha:sha,
+  stash_message:msg,
+  source_worktree:src,
+  destination_worktree:dwt,
+  destination_branch:dbr,
+  expected_head_at_separation:head,
+  exact_paths:m.exact_paths||[],
+  expected_path_count:parseInt(cnt,10),
+  stash_dropped:false,
+  verified:false
+};
+fs.writeFileSync(out,JSON.stringify(rec,null,2)+'\n');
+NODEEOF
+
+  dg_info "restoration record written: $record_path"
+  printf '%s\n' "$record_path"
 }

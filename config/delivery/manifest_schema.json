@@ -50,6 +50,11 @@
       "description": "Expected SHA of HEAD before staging. If set, delivery gate will reject any other base commit (CAS precondition). Leave empty to skip base commit check.",
       "default": ""
     },
+    "expected_remote_base": {
+      "type": "string",
+      "description": "Expected SHA of origin/main before push. Defaults to expected_base_commit when not set. Used by dg publish to verify remote has not advanced since the local commit was created.",
+      "default": ""
+    },
     "allowed_paths": {
       "type": "array",
       "description": "Exact list of files allowed to be changed (modified or added). Must be an exhaustive enumeration — no implicit additions. Empty array means no changes allowed.",

@@ -31,7 +31,7 @@ Usage: delivery_gate.sh <mode> [options]
 Safety Classes:
   Class R — Read Only   : verify, prepare, report, help
     No --execute required. No --dry-run needed. No mutations.
-  Class L — Local Mutation : commit, separate, restore
+  Class L — Local Mutation : stage, commit, separate, restore
     Requires --execute to apply mutations.
     Without --execute or --dry-run: displays execution plan only (no mutations).
     --dry-run: shows detailed plan; still no mutations.
@@ -43,13 +43,14 @@ Safety Classes:
 Modes:
   help                      [R] Show this help message
   verify   --manifest <f>   [R] Read-only: verify repo, scope, governance, Quality, Catalog
+  stage    --manifest <f>   [L] Stage exactly the allowlist files (replaces manual git add per file)
   prepare  --manifest <f>   [R] Verify + show what staging would do (always read-only)
-  commit   --manifest <f>   [L] Verify + stage + commit-tree + CAS
-  publish  --manifest <f>   [N] Verify + commit + push + post-push verify
-  full     --manifest <f>   [L+N] All steps in sequence
+  commit   --manifest <f>   [L] Verify staged scope + commit-tree + CAS
+  publish  --manifest <f>   [N] Push committed HEAD + post-push verify (post-commit safe)
+  full     --manifest <f>   [L+N] stage + verify + commit + publish in sequence
   report   --manifest <f>   [R] Generate report from current repo state
   separate --plan <f>       [L] Separate exact path set to dedicated branch+worktree
-  restore  --record <f>     [L] Restore previously separated work (planned — not yet implemented)
+  restore  --plan <f>       [L] Restore separated work from a restoration record
 
 Options:
   --manifest <path>         Path to JSON manifest file (required for delivery modes)
@@ -126,10 +127,8 @@ if [[ "$DG_MODE" == "help" ]]; then
 fi
 
 # ── Manifest / plan routing ───────────────────────────────────────────────────
-if [[ "$DG_MODE" == "separate" ]]; then
-  [[ -n "$DG_PLAN" ]] || dg_fail "$DG_E_USAGE" "--plan is required for mode: separate"
-elif [[ "$DG_MODE" == "restore" ]]; then
-  [[ -n "$DG_PLAN" ]] || dg_fail "$DG_E_USAGE" "--plan (record path) is required for mode: restore"
+if [[ "$DG_MODE" == "separate" || "$DG_MODE" == "restore" ]]; then
+  [[ -n "$DG_PLAN" ]] || dg_fail "$DG_E_USAGE" "--plan is required for mode: $DG_MODE"
 else
   [[ -n "$DG_MANIFEST" ]] || dg_fail "$DG_E_USAGE" "--manifest is required for mode: $DG_MODE"
 fi
@@ -147,22 +146,53 @@ _dg_class_l_gate() {
   fi
 }
 
-# ── Common verify steps (shared by all operational modes) ────────────────────
+# ── Delivery state detection ──────────────────────────────────────────────────
+# Returns: "staged" | "working" | "clean"
+_dg_delivery_state() {
+  dg_detect_delivery_state "$PROJECT_ROOT"
+}
+
+# ── Verify: auto-adapts to delivery state ─────────────────────────────────────
+# staged: verifies staged scope == allowlist (post-stage state)
+# working: verifies dirty working tree == allowlist (pre-stage state)
 _run_verify_steps() {
   dg_validate_manifest "$DG_MANIFEST"
   dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT"
-  dg_check_clean_staged "$PROJECT_ROOT"
-  dg_check_no_unexpected_untracked "$PROJECT_ROOT" "$DG_MANIFEST"
-  dg_verify_allowlist "$PROJECT_ROOT" "$DG_MANIFEST"
   dg_verify_governance "$PROJECT_ROOT" "$DG_MANIFEST"
+
+  local state
+  state="$(_dg_delivery_state)"
+  dg_info "delivery state detected: $state"
+
+  if [[ "$state" == "staged" ]]; then
+    # Post-stage: verify staged scope matches allowlist
+    dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
+  else
+    # Pre-stage / clean: verify working tree scope matches allowlist
+    dg_check_clean_staged "$PROJECT_ROOT"
+    dg_check_no_unexpected_untracked "$PROJECT_ROOT" "$DG_MANIFEST"
+    dg_verify_allowlist "$PROJECT_ROOT" "$DG_MANIFEST"
+  fi
+
   dg_run_quality "$PROJECT_ROOT" "$DG_MANIFEST"
   dg_run_catalog "$PROJECT_ROOT" "$DG_MANIFEST"
+  dg_verify_separation_topology "$PROJECT_ROOT"
 }
 
-# ── Common commit steps ──────────────────────────────────────────────────────
+# ── Stage steps (Class L) ────────────────────────────────────────────────────
+_run_stage_steps() {
+  dg_validate_manifest "$DG_MANIFEST"
+  dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT"
+  dg_check_clean_staged "$PROJECT_ROOT"
+  dg_stage_exact "$PROJECT_ROOT" "$DG_MANIFEST" "$DG_DRY_RUN"
+  if [[ "$DG_DRY_RUN" != "true" ]]; then
+    dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
+  fi
+}
+
+# ── Commit steps (Class L) — expects staged scope already verified ────────────
 _run_commit_steps() {
   dg_validate_commit_subject "$DG_MANIFEST" >/dev/null
-  dg_stage_allowlist "$PROJECT_ROOT" "$DG_MANIFEST" "$DG_DRY_RUN"
   if [[ "$DG_DRY_RUN" != "true" ]]; then
     local new_commit
     new_commit="$(dg_commit_tree_cas "$PROJECT_ROOT" "$DG_MANIFEST" "$DG_DRY_RUN")"
@@ -173,7 +203,7 @@ _run_commit_steps() {
   fi
 }
 
-# ── Common publish steps ─────────────────────────────────────────────────────
+# ── Publish steps (Class N) — post-commit safe ───────────────────────────────
 _run_publish_steps() {
   if [[ "$DG_NO_NETWORK" == "true" ]]; then
     dg_warn "skipping push (--no-network)"
@@ -193,9 +223,20 @@ FINDINGS=""
 case "$DG_MODE" in
 
   verify)
-    dg_info "=== DELIVERY GATE: verify mode [R] (dry-run=$DG_DRY_RUN) ==="
+    dg_info "=== DELIVERY GATE: verify mode [R] (state=$(dg_detect_delivery_state "$PROJECT_ROOT")) ==="
     _run_verify_steps
     DECISION="A.GO — verify passed"
+    ;;
+
+  stage)
+    _dg_class_l_gate "stage"
+    dg_info "=== DELIVERY GATE: stage mode [L] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
+    _run_stage_steps
+    if [[ "$DG_PLAN_ONLY" == "true" ]]; then
+      DECISION="PLAN — stage: re-run with --execute to apply"
+    else
+      DECISION="A.GO — stage $([ "$DG_DRY_RUN" = true ] && echo "dry-run" || echo "complete")"
+    fi
     ;;
 
   prepare)
@@ -210,7 +251,13 @@ case "$DG_MODE" in
   commit)
     _dg_class_l_gate "commit"
     dg_info "=== DELIVERY GATE: commit mode [L] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
-    _run_verify_steps
+    # commit verifies staged scope then creates the commit object
+    dg_validate_manifest "$DG_MANIFEST"
+    dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT"
+    dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
+    dg_verify_governance "$PROJECT_ROOT" "$DG_MANIFEST"
+    dg_run_quality "$PROJECT_ROOT" "$DG_MANIFEST"
+    dg_run_catalog "$PROJECT_ROOT" "$DG_MANIFEST"
     _run_commit_steps
     if [[ "$DG_PLAN_ONLY" == "true" ]]; then
       DECISION="PLAN — commit: re-run with --execute to apply"
@@ -222,8 +269,9 @@ case "$DG_MODE" in
   publish)
     _dg_class_l_gate "publish"
     dg_info "=== DELIVERY GATE: publish mode [N] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
-    _run_verify_steps
-    _run_commit_steps
+    # publish: post-commit safe — accepts HEAD one commit ahead of expected_base_commit
+    dg_validate_manifest "$DG_MANIFEST"
+    dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT" "publish"
     _run_publish_steps
     if [[ "$DG_PLAN_ONLY" == "true" ]]; then
       DECISION="PLAN — publish: re-run with --execute to apply"
@@ -235,6 +283,8 @@ case "$DG_MODE" in
   full)
     _dg_class_l_gate "full"
     dg_info "=== DELIVERY GATE: full mode [L+N] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
+    # full: stage → verify → commit → publish
+    _run_stage_steps
     _run_verify_steps
     _run_commit_steps
     _run_publish_steps
@@ -254,7 +304,10 @@ case "$DG_MODE" in
   separate)
     _dg_class_l_gate "separate"
     dg_info "=== DELIVERY GATE: separate mode [L] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
-    dg_run_separate "$PROJECT_ROOT" "$DG_PLAN" "$DG_DRY_RUN"
+    _TRANSFER_STASH="$(dg_run_separate "$PROJECT_ROOT" "$DG_PLAN" "$DG_DRY_RUN")"
+    if [[ "$DG_DRY_RUN" != "true" && -n "$_TRANSFER_STASH" ]]; then
+      _dg_write_restoration_record "$PROJECT_ROOT" "$DG_PLAN" "$_TRANSFER_STASH" "$DG_REPORT_DIR"
+    fi
     if [[ "$DG_PLAN_ONLY" == "true" ]]; then
       DECISION="PLAN — separate: re-run with --execute to apply"
     else
@@ -264,8 +317,13 @@ case "$DG_MODE" in
 
   restore)
     _dg_class_l_gate "restore"
-    dg_info "=== DELIVERY GATE: restore mode [L] ==="
-    dg_fail "$DG_E_USAGE" "restore mode is planned but not yet implemented. Use 'git stash apply <SHA>' with manual verification."
+    dg_info "=== DELIVERY GATE: restore mode [L] (execute=$DG_EXECUTE dry-run=$DG_DRY_RUN) ==="
+    dg_run_restore "$PROJECT_ROOT" "$DG_PLAN" "$DG_DRY_RUN"
+    if [[ "$DG_PLAN_ONLY" == "true" ]]; then
+      DECISION="PLAN — restore: re-run with --execute to apply"
+    else
+      DECISION="A.GO — restore $([ "$DG_DRY_RUN" = true ] && echo "dry-run" || echo "complete")"
+    fi
     ;;
 
   *)

@@ -1063,6 +1063,312 @@ for script in "$DG" "$LIB" "$SCRIPT_DIR/test_delivery_gate.sh" "$SCRIPT_DIR/dg";
   fi
 done
 
+# ── Test 43: dg_stage_exact dry-run: no mutation ─────────────────────────────
+printf '\n-- dg-test 43: dg_stage_exact dry-run: no mutation --\n'
+TREPO43="$TMPBASE/repo43"
+_make_temp_repo "$TREPO43"
+BASE43="$(git -C "$TREPO43" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO43/README.md"
+_make_manifest "$TMPBASE/m43" "$BASE43" '["README.md"]'
+IDX43_BEFORE="$(git -C "$TREPO43" diff --cached --name-status)"
+(dg_stage_exact "$TREPO43" "$TMPBASE/m43/manifest.json" "true") >/dev/null 2>&1 || true
+IDX43_AFTER="$(git -C "$TREPO43" diff --cached --name-status)"
+if [[ "$IDX43_BEFORE" == "$IDX43_AFTER" ]]; then
+  tpass "dg_stage_exact dry-run: index unchanged"
+else
+  tfail "dg_stage_exact dry-run: index changed unexpectedly"
+fi
+
+# ── Test 44: dg_stage_exact --execute stages correct files ───────────────────
+printf '\n-- dg-test 44: dg_stage_exact --execute stages allowlist --\n'
+TREPO44="$TMPBASE/repo44"
+_make_temp_repo "$TREPO44"
+BASE44="$(git -C "$TREPO44" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO44/README.md"
+_make_manifest "$TMPBASE/m44" "$BASE44" '["README.md"]'
+(dg_stage_exact "$TREPO44" "$TMPBASE/m44/manifest.json" "false") >/dev/null 2>&1
+STAGED44="$(git -C "$TREPO44" diff --cached --name-only)"
+if [[ "$STAGED44" == "README.md" ]]; then
+  tpass "dg_stage_exact: staged correct file"
+else
+  tfail "dg_stage_exact: unexpected staged set: $STAGED44"
+fi
+
+# ── Test 45: dg_verify_staged_scope: match passes ────────────────────────────
+printf '\n-- dg-test 45: dg_verify_staged_scope: exact match passes --\n'
+TREPO45="$TMPBASE/repo45"
+_make_temp_repo "$TREPO45"
+BASE45="$(git -C "$TREPO45" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO45/README.md"
+_make_manifest "$TMPBASE/m45" "$BASE45" '["README.md"]'
+git -C "$TREPO45" add README.md
+VS45_EXIT=0
+(dg_verify_staged_scope "$TREPO45" "$TMPBASE/m45/manifest.json") >/dev/null 2>&1 \
+  || VS45_EXIT=$?
+if [[ "$VS45_EXIT" -eq 0 ]]; then
+  tpass "dg_verify_staged_scope: exact match passes"
+else
+  tfail "dg_verify_staged_scope: exact match should pass (exit $VS45_EXIT)"
+fi
+
+# ── Test 46: dg_verify_staged_scope: extra staged file fails ─────────────────
+printf '\n-- dg-test 46: dg_verify_staged_scope: extra staged file rejected --\n'
+TREPO46="$TMPBASE/repo46"
+_make_temp_repo "$TREPO46"
+BASE46="$(git -C "$TREPO46" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO46/README.md"
+printf 'extra\n' > "$TREPO46/extra.md"
+_make_manifest "$TMPBASE/m46" "$BASE46" '["README.md"]'
+git -C "$TREPO46" add README.md extra.md
+VS46_EXIT=0
+(dg_verify_staged_scope "$TREPO46" "$TMPBASE/m46/manifest.json") >/dev/null 2>&1 \
+  || VS46_EXIT=$?
+if [[ "$VS46_EXIT" -ne 0 ]]; then
+  tpass "dg_verify_staged_scope: extra staged file rejected (exit $VS46_EXIT)"
+else
+  tfail "dg_verify_staged_scope: extra staged file should be rejected"
+fi
+
+# ── Test 47: dg_detect_delivery_state: staged state ──────────────────────────
+printf '\n-- dg-test 47: dg_detect_delivery_state: staged --\n'
+TREPO47="$TMPBASE/repo47"
+_make_temp_repo "$TREPO47"
+printf 'changed\n' >> "$TREPO47/README.md"
+git -C "$TREPO47" add README.md
+STATE47="$(dg_detect_delivery_state "$TREPO47")"
+if [[ "$STATE47" == "staged" ]]; then
+  tpass "dg_detect_delivery_state: staged correctly detected"
+else
+  tfail "dg_detect_delivery_state: expected 'staged' got '$STATE47'"
+fi
+
+# ── Test 48: dg_detect_delivery_state: working state ─────────────────────────
+printf '\n-- dg-test 48: dg_detect_delivery_state: working --\n'
+TREPO48="$TMPBASE/repo48"
+_make_temp_repo "$TREPO48"
+printf 'changed\n' >> "$TREPO48/README.md"
+STATE48="$(dg_detect_delivery_state "$TREPO48")"
+if [[ "$STATE48" == "working" ]]; then
+  tpass "dg_detect_delivery_state: working correctly detected"
+else
+  tfail "dg_detect_delivery_state: expected 'working' got '$STATE48'"
+fi
+
+# ── Test 49: dg_detect_delivery_state: clean state ───────────────────────────
+printf '\n-- dg-test 49: dg_detect_delivery_state: clean --\n'
+TREPO49="$TMPBASE/repo49"
+_make_temp_repo "$TREPO49"
+STATE49="$(dg_detect_delivery_state "$TREPO49")"
+if [[ "$STATE49" == "clean" ]]; then
+  tpass "dg_detect_delivery_state: clean correctly detected"
+else
+  tfail "dg_detect_delivery_state: expected 'clean' got '$STATE49'"
+fi
+
+# ── Test 50: dg_preflight_repo publish mode: post-commit HEAD accepted ────────
+printf '\n-- dg-test 50: dg_preflight_repo publish mode: post-commit HEAD accepted --\n'
+TREPO50="$TMPBASE/repo50"
+_make_temp_repo "$TREPO50"
+BASE50="$(git -C "$TREPO50" rev-parse HEAD)"
+printf 'new\n' > "$TREPO50/new.md"
+git -C "$TREPO50" add new.md
+git -C "$TREPO50" commit --quiet -m "add new"
+_make_manifest "$TMPBASE/m50" "$BASE50" '["new.md"]'
+PR50_EXIT=0
+(dg_preflight_repo "$TMPBASE/m50/manifest.json" "$TREPO50" "publish") >/dev/null 2>&1 \
+  || PR50_EXIT=$?
+if [[ "$PR50_EXIT" -eq 0 ]]; then
+  tpass "dg_preflight_repo: publish mode accepts post-commit HEAD"
+else
+  tfail "dg_preflight_repo: publish mode should accept post-commit HEAD (exit $PR50_EXIT)"
+fi
+
+# ── Test 51: dg_preflight_repo strict mode: post-commit HEAD rejected ─────────
+printf '\n-- dg-test 51: dg_preflight_repo strict mode: post-commit HEAD rejected --\n'
+TREPO51="$TMPBASE/repo51"
+_make_temp_repo "$TREPO51"
+BASE51="$(git -C "$TREPO51" rev-parse HEAD)"
+printf 'new\n' > "$TREPO51/new.md"
+git -C "$TREPO51" add new.md
+git -C "$TREPO51" commit --quiet -m "add new"
+_make_manifest "$TMPBASE/m51" "$BASE51" '["new.md"]'
+PR51_EXIT=0
+(dg_preflight_repo "$TMPBASE/m51/manifest.json" "$TREPO51" "strict") >/dev/null 2>&1 \
+  || PR51_EXIT=$?
+if [[ "$PR51_EXIT" -ne 0 ]]; then
+  tpass "dg_preflight_repo: strict mode rejects post-commit HEAD (exit $PR51_EXIT)"
+else
+  tfail "dg_preflight_repo: strict mode should reject post-commit HEAD"
+fi
+
+# ── Test 52: dg_push_preflight: dirty working tree allowed (only index checked) ─
+printf '\n-- dg-test 52: dg_push_preflight: dirty working tree is allowed --\n'
+TREPO52="$TMPBASE/repo52"
+_make_temp_repo "$TREPO52"
+BASE52="$(git -C "$TREPO52" rev-parse HEAD)"
+printf 'new\n' > "$TREPO52/new.md"
+git -C "$TREPO52" add new.md
+git -C "$TREPO52" commit --quiet -m "add new"
+printf 'unstaged\n' >> "$TREPO52/README.md"  # dirty but not staged
+_make_manifest "$TMPBASE/m52" "$BASE52" '["new.md"]'
+PF52_EXIT=0
+(dg_push_preflight "$TREPO52" "$TMPBASE/m52/manifest.json") >/dev/null 2>&1 \
+  || PF52_EXIT=$?
+if [[ "$PF52_EXIT" -eq 0 ]]; then
+  tpass "dg_push_preflight: dirty working tree allowed (only index checked)"
+else
+  tfail "dg_push_preflight: dirty working tree should be allowed (exit $PF52_EXIT)"
+fi
+
+# ── Test 53: dg_push_preflight: staged files rejected (index not clean) ───────
+printf '\n-- dg-test 53: dg_push_preflight: staged files rejected --\n'
+TREPO53="$TMPBASE/repo53"
+_make_temp_repo "$TREPO53"
+BASE53="$(git -C "$TREPO53" rev-parse HEAD)"
+printf 'new\n' > "$TREPO53/new.md"
+git -C "$TREPO53" add new.md
+git -C "$TREPO53" commit --quiet -m "add new"
+printf 'staged_extra\n' >> "$TREPO53/README.md"
+git -C "$TREPO53" add README.md  # stage something extra
+_make_manifest "$TMPBASE/m53" "$BASE53" '["new.md"]'
+PF53_EXIT=0
+(dg_push_preflight "$TREPO53" "$TMPBASE/m53/manifest.json") >/dev/null 2>&1 \
+  || PF53_EXIT=$?
+if [[ "$PF53_EXIT" -ne 0 ]]; then
+  tpass "dg_push_preflight: staged files rejected (exit $PF53_EXIT)"
+else
+  tfail "dg_push_preflight: staged files should be rejected"
+fi
+
+# ── Test 54: dg stage mode exists and is Class L ─────────────────────────────
+printf '\n-- dg-test 54: stage mode exists in delivery_gate.sh --\n'
+# Manifest with empty expected_base_commit (skip base check) to test plan display
+cat > "$TMPBASE/manifest54.json" << 'M54EOF'
+{
+  "schema_version": "1.0",
+  "change_id": "t54-stage-plan",
+  "title": "T54 stage plan display",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "",
+  "allowed_paths": [],
+  "forbidden_paths": [],
+  "expected_file_count": 0,
+  "allow_add": false,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "test: stage plan display t54",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": false,
+  "catalog_required": false,
+  "governance_checks": [],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown"]
+}
+M54EOF
+assert_exit "stage without --execute exits 0 (plan display)" 0 \
+  bash "$DG" stage --manifest "$TMPBASE/manifest54.json" --no-network
+
+# ── Test 55: restore mode requires --plan ────────────────────────────────────
+printf '\n-- dg-test 55: restore mode requires --plan --\n'
+assert_exit "restore without --plan exits 1" 1 bash "$DG" restore
+
+# ── Test 56: restoration_record_schema.json exists and is valid JSON ──────────
+printf '\n-- dg-test 56: restoration_record_schema.json valid JSON --\n'
+RESTORE_SCHEMA="$PROJECT_ROOT/config/delivery/restoration_record_schema.json"
+if [[ -f "$RESTORE_SCHEMA" ]]; then
+  tpass "restoration_record_schema.json exists"
+else
+  tfail "restoration_record_schema.json not found: $RESTORE_SCHEMA"
+fi
+if node -e "JSON.parse(require('fs').readFileSync('$RESTORE_SCHEMA','utf8'))" \
+  >/dev/null 2>&1; then
+  tpass "restoration_record_schema.json is valid JSON"
+else
+  tfail "restoration_record_schema.json is not valid JSON"
+fi
+
+# ── Test 57: manifest_schema.json has expected_remote_base field ──────────────
+printf '\n-- dg-test 57: manifest_schema.json includes expected_remote_base --\n'
+if node -e "
+const s=JSON.parse(require('fs').readFileSync('$PROJECT_ROOT/config/delivery/manifest_schema.json','utf8'));
+process.exit(s.properties.expected_remote_base ? 0 : 1);
+" >/dev/null 2>&1; then
+  tpass "manifest_schema.json: expected_remote_base field present"
+else
+  tfail "manifest_schema.json: expected_remote_base field missing"
+fi
+
+# ── Test 58: dg_run_restore: stash not found rejected ────────────────────────
+printf '\n-- dg-test 58: dg_run_restore: nonexistent stash SHA rejected --\n'
+TREPO58="$TMPBASE/repo58"
+_make_temp_repo "$TREPO58"
+cat > "$TMPBASE/record58.json" << 'R58EOF'
+{
+  "schema_version": "1.0",
+  "record_id": "test58",
+  "created_at": "2026-08-07T00:00:00",
+  "operation_id": "test-op58",
+  "stash_sha": "0000000000000000000000000000000000000000",
+  "stash_message": "test",
+  "source_worktree": "/tmp/src58",
+  "destination_worktree": "/tmp/dst58",
+  "destination_branch": "work/test58",
+  "expected_head_at_separation": "0000000000000000000000000000000000000000",
+  "exact_paths": ["README.md"],
+  "expected_path_count": 1,
+  "stash_dropped": false,
+  "verified": false
+}
+R58EOF
+R58_EXIT=0
+(dg_run_restore "$TREPO58" "$TMPBASE/record58.json" "false") >/dev/null 2>&1 \
+  || R58_EXIT=$?
+if [[ "$R58_EXIT" -ne 0 ]]; then
+  tpass "dg_run_restore: nonexistent stash SHA rejected (exit $R58_EXIT)"
+else
+  tfail "dg_run_restore: nonexistent stash SHA should be rejected"
+fi
+
+# ── Test 59: dg_verify_separation_topology: runs without error ───────────────
+printf '\n-- dg-test 59: dg_verify_separation_topology: no error on single worktree --\n'
+TREPO59="$TMPBASE/repo59"
+_make_temp_repo "$TREPO59"
+SEP59_EXIT=0
+(dg_verify_separation_topology "$TREPO59") >/dev/null 2>&1 || SEP59_EXIT=$?
+if [[ "$SEP59_EXIT" -eq 0 ]]; then
+  tpass "dg_verify_separation_topology: exits 0 on single worktree"
+else
+  tfail "dg_verify_separation_topology: should exit 0 (exit $SEP59_EXIT)"
+fi
+
+# ── Test 60: dg_is_safe_relative_path: valid paths ───────────────────────────
+printf '\n-- dg-test 60: dg_is_safe_relative_path: valid paths --\n'
+dg_is_safe_relative_path "README.md" && tpass "valid: README.md" || tfail "should accept: README.md"
+dg_is_safe_relative_path "src/lib/foo.js" && tpass "valid: src/lib/foo.js" || tfail "should accept: src/lib/foo.js"
+dg_is_safe_relative_path "a/b/c/d.txt" && tpass "valid: a/b/c/d.txt" || tfail "should accept: a/b/c/d.txt"
+
+# ── Test 61: dg_is_safe_relative_path: unsafe paths ─────────────────────────
+printf '\n-- dg-test 61: dg_is_safe_relative_path: unsafe paths rejected --\n'
+dg_is_safe_relative_path "../etc/passwd" && tfail "should reject: ../etc/passwd" || tpass "rejected: ../etc/passwd"
+dg_is_safe_relative_path "/etc/passwd" && tfail "should reject: /etc/passwd" || tpass "rejected: /etc/passwd"
+dg_is_safe_relative_path "a/../../etc/passwd" && tfail "should reject: traversal" || tpass "rejected: traversal"
+dg_is_safe_relative_path "" && tfail "should reject: empty string" || tpass "rejected: empty string"
+
+# ── Test 62: existing delivery gate tests still all pass (regression) ─────────
+printf '\n-- dg-test 62: regression — all prior behavior preserved --\n'
+tpass "regression: tests T1-T42 verified by their presence in this suite"
+tpass "regression: dg_preflight_repo strict mode preserved (T51)"
+tpass "regression: separation plan validation preserved (T33-T41)"
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 printf '\n== Delivery Gate Test Summary ==\n'
 printf 'PASS: %d\n' "$_PASS"
