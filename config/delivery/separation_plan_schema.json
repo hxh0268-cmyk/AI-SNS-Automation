@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "separation-plan-schema/1.0",
+  "title": "Delivery Gate Separation Plan",
+  "description": "Machine-readable plan for safely separating an exact set of uncommitted changes from one worktree to a dedicated branch and worktree. All fields with default safe values are explicit to prevent ambiguous defaults.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "operation_id",
+    "source_worktree",
+    "destination_worktree",
+    "destination_branch",
+    "expected_head",
+    "expected_origin",
+    "exact_paths",
+    "expected_path_count",
+    "stash_message",
+    "commit_allowed",
+    "push_allowed",
+    "drop_stash_after_verified_restore",
+    "required_hash_match",
+    "preserve_existing_backup"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Separation plan schema version. Must be '1.0'.",
+      "const": "1.0"
+    },
+    "operation_id": {
+      "type": "string",
+      "description": "Unique identifier for this separation operation."
+    },
+    "source_worktree": {
+      "type": "string",
+      "description": "Absolute path to the source worktree (must be realpath, no symlinks, no traversal)."
+    },
+    "destination_worktree": {
+      "type": "string",
+      "description": "Absolute path for the new dedicated worktree (must not already exist)."
+    },
+    "destination_branch": {
+      "type": "string",
+      "description": "Branch name for the dedicated worktree (must not already exist)."
+    },
+    "expected_head": {
+      "type": "string",
+      "description": "Expected HEAD SHA of source_worktree before separation. Enforced as exact equality (CAS precondition)."
+    },
+    "expected_origin": {
+      "type": "string",
+      "description": "Expected origin/main SHA at separation time. Verified before any mutation."
+    },
+    "exact_paths": {
+      "type": "array",
+      "description": "Exact set of relative paths to separate. Must match actual dirty paths exactly (allowlist equality). No path traversal, no absolute paths, no newline characters.",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "expected_path_count": {
+      "type": "integer",
+      "description": "Expected count of exact_paths. Must equal length of exact_paths array.",
+      "minimum": 1
+    },
+    "include_untracked": {
+      "type": "boolean",
+      "description": "Include untracked files in the stash. Default: false.",
+      "default": false
+    },
+    "external_hash_manifest": {
+      "type": "string",
+      "description": "Optional absolute path to an existing SHA-256 hash manifest file to verify current state against before separation. If set, must match current working tree files exactly."
+    },
+    "preserve_existing_backup": {
+      "type": "boolean",
+      "description": "Never overwrite or delete an existing external backup. Default: true (safe).",
+      "default": true
+    },
+    "stash_message": {
+      "type": "string",
+      "description": "Message for the transfer stash. Used to identify the stash by message."
+    },
+    "commit_allowed": {
+      "type": "boolean",
+      "description": "Whether a commit may be created during separation. Default: false (safe).",
+      "default": false
+    },
+    "push_allowed": {
+      "type": "boolean",
+      "description": "Whether a push may be executed during separation. Default: false (safe).",
+      "default": false
+    },
+    "remove_source_changes": {
+      "type": "boolean",
+      "description": "Whether to remove the separated changes from source_worktree after verified restoration. Default: true (stash created, changes removed from source).",
+      "default": true
+    },
+    "drop_stash_after_verified_restore": {
+      "type": "boolean",
+      "description": "Whether to drop the transfer stash after exact restoration is proven. Default: false (safe — manual drop required after independent verification).",
+      "default": false
+    },
+    "required_hash_match": {
+      "type": "boolean",
+      "description": "Whether SHA-256 equality between pre-separation and restored manifests is required before any stash drop. Default: true (safe).",
+      "default": true
+    },
+    "reports": {
+      "type": "array",
+      "description": "Report formats to generate.",
+      "items": { "type": "string", "enum": ["markdown", "json"] },
+      "default": ["markdown", "json"]
+    }
+  },
+  "$defs": {
+    "example": {
+      "description": "Example separation plan for a carousel/instagram workstream",
+      "value": {
+        "schema_version": "1.0",
+        "operation_id": "carousel-instagram-sep-2026-08",
+        "source_worktree": "/Users/dev/AI-SNS-Automation",
+        "destination_worktree": "/Users/dev/AI-SNS-Automation-carousel-instagram",
+        "destination_branch": "work/carousel-instagram-assets",
+        "expected_head": "1120d4e30a7fe77b756691d5a8536d823e6c5317",
+        "expected_origin": "1120d4e30a7fe77b756691d5a8536d823e6c5317",
+        "exact_paths": [
+          "content/carousel/review.json",
+          "content/carousel/review.md"
+        ],
+        "expected_path_count": 2,
+        "include_untracked": false,
+        "preserve_existing_backup": true,
+        "stash_message": "transfer: carousel and instagram work to dedicated worktree",
+        "commit_allowed": false,
+        "push_allowed": false,
+        "remove_source_changes": true,
+        "drop_stash_after_verified_restore": false,
+        "required_hash_match": true,
+        "reports": ["markdown", "json"]
+      }
+    }
+  }
+}

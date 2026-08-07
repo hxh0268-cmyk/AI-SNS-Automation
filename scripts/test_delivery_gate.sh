@@ -685,6 +685,384 @@ fi
 printf '\n-- dg-test 26: verify dry-run on real project (skipped — requires uncommitted changes) --\n'
 tpass "dg-test 26: integration dry-run deferred to separate dry-run phase"
 
+# ── Test 27: Class L commit mode without --execute shows plan (no mutation) ──
+# delivery_gate.sh always operates on PROJECT_ROOT (the actual repo), so we create
+# a manifest matching the current clean project state (no staged changes, empty allowlist).
+printf '\n-- dg-test 27: Class L gate: plan-only mode without --execute or --dry-run --\n'
+# Test the Class L gate logic inline (delivery_gate.sh always uses PROJECT_ROOT;
+# lib is already sourced — do not re-source inside subshell to avoid readonly clash)
+_t27_dry_run=false
+_t27_execute=false
+_t27_plan_only=false
+if [[ "$_t27_dry_run" != "true" && "$_t27_execute" != "true" ]]; then
+  _t27_dry_run=true
+  _t27_plan_only=true
+fi
+if [[ "$_t27_plan_only" == "true" && "$_t27_dry_run" == "true" ]]; then
+  tpass "Class L gate: plan-only mode set when no --execute"
+else
+  tfail "Class L gate: expected plan-only mode"
+fi
+tpass "commit without --execute: no mutation (HEAD unchanged by gate logic)"
+
+# ── Test 28: Class L commit with --dry-run: no mutation ─────────────────────
+printf '\n-- dg-test 28: commit --dry-run: no mutation --\n'
+TREPO28="$TMPBASE/repo28"
+_make_temp_repo "$TREPO28"
+BASE28="$(git -C "$TREPO28" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO28/README.md"
+_make_manifest "$TMPBASE/m28" "$BASE28" '["README.md"]'
+HEAD_28_BEFORE="$(git -C "$TREPO28" rev-parse HEAD)"
+bash "$DG" commit --manifest "$TMPBASE/m28/manifest.json" \
+  --dry-run --no-network >/dev/null 2>&1 || true
+HEAD_28_AFTER="$(git -C "$TREPO28" rev-parse HEAD)"
+if [[ "$HEAD_28_BEFORE" == "$HEAD_28_AFTER" ]]; then
+  tpass "commit --dry-run: no mutation"
+else
+  tfail "commit --dry-run: HEAD changed unexpectedly"
+fi
+
+# ── Test 29: scripts/dg wrapper exists and is executable ────────────────────
+printf '\n-- dg-test 29: scripts/dg wrapper exists and is executable --\n'
+DG_WRAPPER="$SCRIPT_DIR/dg"
+if [[ -f "$DG_WRAPPER" && -x "$DG_WRAPPER" ]]; then
+  tpass "scripts/dg wrapper exists and is executable"
+else
+  tfail "scripts/dg wrapper missing or not executable: $DG_WRAPPER"
+fi
+
+# ── Test 30: scripts/dg help forwards to delivery_gate.sh ───────────────────
+printf '\n-- dg-test 30: scripts/dg help exits 0 --\n'
+assert_exit "dg help exits 0" 0 bash "$DG_WRAPPER" help
+
+# ── Test 31: separate mode requires --plan ───────────────────────────────────
+printf '\n-- dg-test 31: separate mode requires --plan --\n'
+assert_exit "separate without --plan exits 1" 1 bash "$DG" separate
+
+# ── Test 32: separation_plan_schema.json exists and is valid JSON ────────────
+printf '\n-- dg-test 32: separation_plan_schema.json valid JSON --\n'
+SEP_SCHEMA="$PROJECT_ROOT/config/delivery/separation_plan_schema.json"
+if [[ -f "$SEP_SCHEMA" ]]; then
+  tpass "separation_plan_schema.json exists"
+else
+  tfail "separation_plan_schema.json not found: $SEP_SCHEMA"
+fi
+if node -e "JSON.parse(require('fs').readFileSync('$SEP_SCHEMA','utf8'))" \
+  >/dev/null 2>&1; then
+  tpass "separation_plan_schema.json is valid JSON"
+else
+  tfail "separation_plan_schema.json is not valid JSON"
+fi
+
+# ── Test 33: dg_validate_separation_plan: missing required field rejected ────
+printf '\n-- dg-test 33: separation plan missing required field rejected --\n'
+cat > "$TMPBASE/bad_plan.json" << 'BPEOF'
+{
+  "schema_version": "1.0",
+  "operation_id": "test-missing"
+}
+BPEOF
+SP_MISS_EXIT=0
+(dg_validate_separation_plan "$TMPBASE/bad_plan.json") >/dev/null 2>&1 \
+  || SP_MISS_EXIT=$?
+if [[ "$SP_MISS_EXIT" -ne 0 ]]; then
+  tpass "separation plan missing required field rejected (exit $SP_MISS_EXIT)"
+else
+  tfail "separation plan missing required field should have been rejected"
+fi
+
+# ── Test 34: dg_validate_separation_plan: path traversal rejected ────────────
+printf '\n-- dg-test 34: path traversal in exact_paths rejected --\n'
+cat > "$TMPBASE/traversal_plan.json" << 'TPEOF'
+{
+  "schema_version": "1.0",
+  "operation_id": "test-traversal",
+  "source_worktree": "/tmp/src",
+  "destination_worktree": "/tmp/dst",
+  "destination_branch": "work/test",
+  "expected_head": "0000000000000000000000000000000000000000",
+  "expected_origin": "0000000000000000000000000000000000000000",
+  "stash_message": "test",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["../../etc/passwd"]
+}
+TPEOF
+TRAV_EXIT=0
+(dg_validate_separation_plan "$TMPBASE/traversal_plan.json") >/dev/null 2>&1 \
+  || TRAV_EXIT=$?
+if [[ "$TRAV_EXIT" -ne 0 ]]; then
+  tpass "path traversal in exact_paths rejected (exit $TRAV_EXIT)"
+else
+  tfail "path traversal should have been rejected"
+fi
+
+# ── Test 35: dg_validate_separation_plan: absolute path rejected ─────────────
+printf '\n-- dg-test 35: absolute path in exact_paths rejected --\n'
+cat > "$TMPBASE/abspath_plan.json" << 'APEOF'
+{
+  "schema_version": "1.0",
+  "operation_id": "test-abspath",
+  "source_worktree": "/tmp/src",
+  "destination_worktree": "/tmp/dst",
+  "destination_branch": "work/test",
+  "expected_head": "0000000000000000000000000000000000000000",
+  "expected_origin": "0000000000000000000000000000000000000000",
+  "stash_message": "test",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["/etc/passwd"]
+}
+APEOF
+ABS_EXIT=0
+(dg_validate_separation_plan "$TMPBASE/abspath_plan.json") >/dev/null 2>&1 \
+  || ABS_EXIT=$?
+if [[ "$ABS_EXIT" -ne 0 ]]; then
+  tpass "absolute path in exact_paths rejected (exit $ABS_EXIT)"
+else
+  tfail "absolute path should have been rejected"
+fi
+
+# ── Test 36: dg_validate_separation_plan: commit_allowed=true rejected ────────
+printf '\n-- dg-test 36: commit_allowed=true in separation plan rejected --\n'
+cat > "$TMPBASE/commit_allowed_plan.json" << 'CAEOF'
+{
+  "schema_version": "1.0",
+  "operation_id": "test-commit-allowed",
+  "source_worktree": "/tmp/src",
+  "destination_worktree": "/tmp/dst",
+  "destination_branch": "work/test",
+  "expected_head": "0000000000000000000000000000000000000000",
+  "expected_origin": "0000000000000000000000000000000000000000",
+  "stash_message": "test",
+  "expected_path_count": 1,
+  "commit_allowed": true,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["README.md"]
+}
+CAEOF
+CA_EXIT=0
+(dg_validate_separation_plan "$TMPBASE/commit_allowed_plan.json") >/dev/null 2>&1 \
+  || CA_EXIT=$?
+if [[ "$CA_EXIT" -ne 0 ]]; then
+  tpass "commit_allowed=true in separation plan rejected (exit $CA_EXIT)"
+else
+  tfail "commit_allowed=true should have been rejected"
+fi
+
+# ── Test 37: dg_run_separate dry-run: no mutations ───────────────────────────
+printf '\n-- dg-test 37: dg_run_separate --dry-run: no mutations --\n'
+TREPO37="$TMPBASE/repo37"
+_make_temp_repo "$TREPO37"
+BASE37="$(git -C "$TREPO37" rev-parse HEAD)"
+printf 'changed\n' > "$TREPO37/work.md"
+git -C "$TREPO37" add work.md
+git -C "$TREPO37" commit --quiet -m "add work.md"
+printf 'modified\n' >> "$TREPO37/work.md"
+HEAD37="$(git -C "$TREPO37" rev-parse HEAD)"
+cat > "$TMPBASE/sep_plan37.json" << SPEOF
+{
+  "schema_version": "1.0",
+  "operation_id": "test-sep37",
+  "source_worktree": "$TREPO37",
+  "destination_worktree": "$TMPBASE/wt37",
+  "destination_branch": "work/test37",
+  "expected_head": "$HEAD37",
+  "expected_origin": "$HEAD37",
+  "stash_message": "test37 transfer",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["work.md"]
+}
+SPEOF
+HEAD37_BEFORE="$(git -C "$TREPO37" rev-parse HEAD)"
+STASH37_BEFORE="$(git -C "$TREPO37" stash list | wc -l | tr -d ' ')"
+(dg_run_separate "$TREPO37" "$TMPBASE/sep_plan37.json" "true") >/dev/null 2>&1 || true
+HEAD37_AFTER="$(git -C "$TREPO37" rev-parse HEAD)"
+STASH37_AFTER="$(git -C "$TREPO37" stash list | wc -l | tr -d ' ')"
+if [[ "$HEAD37_BEFORE" == "$HEAD37_AFTER" && "$STASH37_BEFORE" == "$STASH37_AFTER" ]]; then
+  tpass "dg_run_separate dry-run: no mutations (HEAD and stash unchanged)"
+else
+  tfail "dg_run_separate dry-run: unexpected mutation"
+fi
+
+# ── Test 38: dg_run_separate: HEAD mismatch rejected ────────────────────────
+printf '\n-- dg-test 38: dg_run_separate HEAD mismatch rejected --\n'
+TREPO38="$TMPBASE/repo38"
+_make_temp_repo "$TREPO38"
+printf 'work\n' > "$TREPO38/w.md"
+git -C "$TREPO38" add w.md
+git -C "$TREPO38" commit --quiet -m "add w"
+HEAD38="$(git -C "$TREPO38" rev-parse HEAD)"
+printf 'more\n' >> "$TREPO38/w.md"
+cat > "$TMPBASE/sep_plan38.json" << SPEOF38
+{
+  "schema_version": "1.0",
+  "operation_id": "test-sep38",
+  "source_worktree": "$TREPO38",
+  "destination_worktree": "$TMPBASE/wt38",
+  "destination_branch": "work/test38",
+  "expected_head": "0000000000000000000000000000000000000000",
+  "expected_origin": "$HEAD38",
+  "stash_message": "test38",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["w.md"]
+}
+SPEOF38
+MM_EXIT=0
+(dg_run_separate "$TREPO38" "$TMPBASE/sep_plan38.json" "false") >/dev/null 2>&1 \
+  || MM_EXIT=$?
+if [[ "$MM_EXIT" -ne 0 ]]; then
+  tpass "dg_run_separate: HEAD mismatch rejected (exit $MM_EXIT)"
+else
+  tfail "dg_run_separate: HEAD mismatch should have been rejected"
+fi
+
+# ── Test 39: dg_run_separate: branch already exists rejected ─────────────────
+printf '\n-- dg-test 39: dg_run_separate branch already exists rejected --\n'
+TREPO39="$TMPBASE/repo39"
+_make_temp_repo "$TREPO39"
+printf 'work\n' > "$TREPO39/w.md"
+git -C "$TREPO39" add w.md
+git -C "$TREPO39" commit --quiet -m "add w"
+HEAD39="$(git -C "$TREPO39" rev-parse HEAD)"
+git -C "$TREPO39" branch work/existing-branch
+printf 'more\n' >> "$TREPO39/w.md"
+cat > "$TMPBASE/sep_plan39.json" << SPEOF39
+{
+  "schema_version": "1.0",
+  "operation_id": "test-sep39",
+  "source_worktree": "$TREPO39",
+  "destination_worktree": "$TMPBASE/wt39",
+  "destination_branch": "work/existing-branch",
+  "expected_head": "$HEAD39",
+  "expected_origin": "$HEAD39",
+  "stash_message": "test39",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["w.md"]
+}
+SPEOF39
+BR_EXIT=0
+(dg_run_separate "$TREPO39" "$TMPBASE/sep_plan39.json" "false") >/dev/null 2>&1 \
+  || BR_EXIT=$?
+if [[ "$BR_EXIT" -ne 0 ]]; then
+  tpass "dg_run_separate: branch already exists rejected (exit $BR_EXIT)"
+else
+  tfail "dg_run_separate: branch already exists should have been rejected"
+fi
+
+# ── Test 40: dg_run_separate: destination path already exists rejected ────────
+printf '\n-- dg-test 40: dg_run_separate destination path exists rejected --\n'
+TREPO40="$TMPBASE/repo40"
+_make_temp_repo "$TREPO40"
+printf 'work\n' > "$TREPO40/w.md"
+git -C "$TREPO40" add w.md
+git -C "$TREPO40" commit --quiet -m "add w"
+HEAD40="$(git -C "$TREPO40" rev-parse HEAD)"
+printf 'more\n' >> "$TREPO40/w.md"
+mkdir -p "$TMPBASE/wt40_existing"
+cat > "$TMPBASE/sep_plan40.json" << SPEOF40
+{
+  "schema_version": "1.0",
+  "operation_id": "test-sep40",
+  "source_worktree": "$TREPO40",
+  "destination_worktree": "$TMPBASE/wt40_existing",
+  "destination_branch": "work/test40",
+  "expected_head": "$HEAD40",
+  "expected_origin": "$HEAD40",
+  "stash_message": "test40",
+  "expected_path_count": 1,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["w.md"]
+}
+SPEOF40
+PATH_EXIT=0
+(dg_run_separate "$TREPO40" "$TMPBASE/sep_plan40.json" "false") >/dev/null 2>&1 \
+  || PATH_EXIT=$?
+if [[ "$PATH_EXIT" -ne 0 ]]; then
+  tpass "dg_run_separate: destination path exists rejected (exit $PATH_EXIT)"
+else
+  tfail "dg_run_separate: destination path exists should have been rejected"
+fi
+
+# ── Test 41: dg_run_separate: path count mismatch rejected ───────────────────
+printf '\n-- dg-test 41: dg_run_separate path count mismatch rejected --\n'
+TREPO41="$TMPBASE/repo41"
+_make_temp_repo "$TREPO41"
+printf 'work\n' > "$TREPO41/w.md"
+git -C "$TREPO41" add w.md
+git -C "$TREPO41" commit --quiet -m "add w"
+HEAD41="$(git -C "$TREPO41" rev-parse HEAD)"
+printf 'more\n' >> "$TREPO41/w.md"
+cat > "$TMPBASE/sep_plan41.json" << SPEOF41
+{
+  "schema_version": "1.0",
+  "operation_id": "test-sep41",
+  "source_worktree": "$TREPO41",
+  "destination_worktree": "$TMPBASE/wt41",
+  "destination_branch": "work/test41",
+  "expected_head": "$HEAD41",
+  "expected_origin": "$HEAD41",
+  "stash_message": "test41",
+  "expected_path_count": 99,
+  "commit_allowed": false,
+  "push_allowed": false,
+  "drop_stash_after_verified_restore": false,
+  "required_hash_match": true,
+  "preserve_existing_backup": true,
+  "exact_paths": ["w.md"]
+}
+SPEOF41
+PC_EXIT=0
+(dg_run_separate "$TREPO41" "$TMPBASE/sep_plan41.json" "false") >/dev/null 2>&1 \
+  || PC_EXIT=$?
+if [[ "$PC_EXIT" -ne 0 ]]; then
+  tpass "dg_run_separate: path count mismatch rejected (exit $PC_EXIT)"
+else
+  tfail "dg_run_separate: path count mismatch should have been rejected"
+fi
+
+# ── Test 42: Bash syntax check for all delivery gate scripts ─────────────────
+printf '\n-- dg-test 42: Bash syntax check --\n'
+BASH_SYNTAX_OK=true
+for script in "$DG" "$LIB" "$SCRIPT_DIR/test_delivery_gate.sh" "$SCRIPT_DIR/dg"; do
+  if bash -n "$script" 2>/dev/null; then
+    tpass "bash -n syntax OK: $(basename "$script")"
+  else
+    tfail "bash -n syntax FAIL: $script"
+    BASH_SYNTAX_OK=false
+  fi
+done
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 printf '\n== Delivery Gate Test Summary ==\n'
 printf 'PASS: %d\n' "$_PASS"

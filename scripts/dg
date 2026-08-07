@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Low-prompt Delivery Gate entry point — thin wrapper for delivery_gate.sh
+# Usage: ./scripts/dg <mode> [options]
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$SCRIPT_DIR/delivery_gate.sh" "$@"

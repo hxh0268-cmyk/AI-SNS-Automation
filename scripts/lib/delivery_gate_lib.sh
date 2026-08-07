@@ -2,6 +2,21 @@
 # Delivery Gate shared library — Bash 3.2 compatible (macOS default)
 # Source this file; do not execute directly.
 
+# ── Safety classes ───────────────────────────────────────────────────────────
+# Class R — Read Only: no ref/index/remote/stash/worktree mutation
+#   modes: help, verify, prepare, report
+#   flags: no --execute required; --dry-run has no effect on mutations
+#
+# Class L — Local Mutation: manifest/plan-authorized local changes only
+#   modes: commit, separate, restore
+#   flags: requires --execute or --dry-run; default is plan-display (no mutation)
+#   scope: staged → commit-tree + CAS; scoped-stash; branch/worktree creation; stash apply/drop
+#
+# Class N — Network Mutation: requires clean local state + Class L complete
+#   modes: publish (includes push + post-push verify)
+#   flags: requires --execute or --dry-run
+#   constraints: main-only, no force, no tag push (tag_policy=none), remote CAS verified
+
 # ── Exit codes ──────────────────────────────────────────────────────────────
 readonly DG_E_SUCCESS=0
 readonly DG_E_USAGE=1
@@ -604,4 +619,189 @@ require('fs').writeFileSync(out, JSON.stringify(obj,null,2)+'\n');
 NODEEOF
 
   dg_info "reports written to $report_dir"
+}
+
+# ── Path safety ──────────────────────────────────────────────────────────────
+# Returns 0 (safe) or 1 (unsafe). Does not exit — caller decides.
+dg_is_safe_relative_path() {
+  local p="$1"
+  # Reject empty
+  [[ -z "$p" ]] && return 1
+  # Reject absolute paths
+  [[ "$p" == /* ]] && return 1
+  # Reject path traversal components
+  case "$p" in
+    ../*)  return 1 ;;
+    */../*) return 1 ;;
+    */..*)  return 1 ;;
+    ..)    return 1 ;;
+  esac
+  # Reject newlines (bash pattern — IFS-safe)
+  case "$p" in
+    *$'\n'*) return 1 ;;
+  esac
+  return 0
+}
+
+# ── Separation plan parsing ───────────────────────────────────────────────────
+# Mirror of _dg_mget_str/_dg_mget_arr/_dg_mbool for separation plans
+dg_spget_str() {
+  local f="$1" k="$2"
+  node - "$f" "$k" <<'EOF'
+const [,,f,k]=process.argv;
+try{
+  const m=JSON.parse(require('fs').readFileSync(f,'utf8'));
+  if(m[k]===undefined||m[k]===null){process.exit(1);}
+  process.stdout.write(String(m[k])+'\n');
+}catch(e){process.stderr.write(e.message+'\n');process.exit(2);}
+EOF
+}
+
+dg_spget_arr() {
+  local f="$1" k="$2"
+  node - "$f" "$k" <<'EOF'
+const [,,f,k]=process.argv;
+try{
+  const m=JSON.parse(require('fs').readFileSync(f,'utf8'));
+  const v=m[k];
+  if(!Array.isArray(v)){process.exit(1);}
+  v.forEach(x=>process.stdout.write(String(x)+'\n'));
+}catch(e){process.stderr.write(e.message+'\n');process.exit(2);}
+EOF
+}
+
+dg_spbool() {
+  local f="$1" k="$2"
+  node - "$f" "$k" <<'EOF'
+const [,,f,k]=process.argv;
+try{
+  const m=JSON.parse(require('fs').readFileSync(f,'utf8'));
+  process.exit(m[k]===true?0:1);
+}catch(e){process.exit(2);}
+EOF
+}
+
+# Validate separation plan has required fields and safe path values
+dg_validate_separation_plan() {
+  local plan="$1"
+  [[ -f "$plan" ]] || dg_fail "$DG_E_MANIFEST" "separation plan not found: $plan"
+
+  local required_fields="schema_version operation_id source_worktree destination_worktree destination_branch expected_head expected_origin stash_message expected_path_count"
+  local field
+  for field in $required_fields; do
+    dg_spget_str "$plan" "$field" >/dev/null 2>&1 \
+      || dg_fail "$DG_E_MANIFEST" "separation plan missing required field: $field"
+  done
+
+  # Validate safe defaults: commit_allowed and push_allowed must be false
+  if dg_spbool "$plan" "commit_allowed" 2>/dev/null; then
+    dg_fail "$DG_E_GOVERNANCE" "separation plan: commit_allowed must be false"
+  fi
+  if dg_spbool "$plan" "push_allowed" 2>/dev/null; then
+    dg_fail "$DG_E_GOVERNANCE" "separation plan: push_allowed must be false"
+  fi
+
+  # Validate path safety for all exact_paths
+  local path_entry
+  while IFS= read -r path_entry; do
+    [[ -z "$path_entry" ]] && continue
+    dg_is_safe_relative_path "$path_entry" \
+      || dg_fail "$DG_E_FORBIDDEN" "separation plan: unsafe path in exact_paths: $path_entry"
+  done < <(dg_spget_arr "$plan" "exact_paths" 2>/dev/null || true)
+
+  # Validate destination paths are absolute and not traversal
+  local dest_wt dest_br
+  dest_wt="$(dg_spget_str "$plan" "destination_worktree")"
+  dest_br="$(dg_spget_str "$plan" "destination_branch")"
+  [[ "$dest_wt" == /* ]] || dg_fail "$DG_E_MANIFEST" "destination_worktree must be absolute path: $dest_wt"
+  case "$dest_wt" in
+    */../*|*/..) dg_fail "$DG_E_FORBIDDEN" "destination_worktree contains traversal: $dest_wt" ;;
+  esac
+  [[ -n "$dest_br" ]] || dg_fail "$DG_E_MANIFEST" "destination_branch is empty"
+
+  dg_info "separation plan validated: $plan"
+}
+
+# Execute or preview workstream separation
+# dg_run_separate <project_root> <plan> <dry_run>
+dg_run_separate() {
+  local project_root="$1"
+  local plan="$2"
+  local dry_run="${3:-false}"
+
+  dg_validate_separation_plan "$plan"
+
+  local dest_wt dest_br expected_head stash_msg path_count
+  dest_wt="$(dg_spget_str "$plan" "destination_worktree")"
+  dest_br="$(dg_spget_str "$plan" "destination_branch")"
+  expected_head="$(dg_spget_str "$plan" "expected_head")"
+  stash_msg="$(dg_spget_str "$plan" "stash_message")"
+  path_count="$(dg_spget_str "$plan" "expected_path_count")"
+
+  # Preflight: HEAD matches
+  local actual_head
+  actual_head="$(git -C "$project_root" rev-parse HEAD)"
+  [[ "$actual_head" == "$expected_head" ]] \
+    || dg_fail "$DG_E_REPO" "separate: HEAD ($actual_head) != expected_head ($expected_head)"
+
+  # Preflight: branch must not exist
+  if git -C "$project_root" show-ref --verify --quiet "refs/heads/$dest_br" 2>/dev/null; then
+    dg_fail "$DG_E_REPO" "separate: branch already exists: $dest_br"
+  fi
+
+  # Preflight: destination path must not exist
+  if test -e "$dest_wt"; then
+    dg_fail "$DG_E_REPO" "separate: destination path already exists: $dest_wt"
+  fi
+
+  # Collect paths
+  local plan_paths=()
+  while IFS= read -r p; do
+    [[ -n "$p" ]] || continue
+    dg_is_safe_relative_path "$p" \
+      || dg_fail "$DG_E_FORBIDDEN" "separate: unsafe path: $p"
+    plan_paths+=("$p")
+  done < <(dg_spget_arr "$plan" "exact_paths")
+
+  local actual_count="${#plan_paths[@]}"
+  [[ "$actual_count" -eq "$path_count" ]] \
+    || dg_fail "$DG_E_ALLOWLIST" "separate: path count mismatch: plan=$path_count actual=$actual_count"
+
+  if [[ "$dry_run" == "true" ]]; then
+    dg_dry_print "git -C $project_root stash push --include-untracked -m '$stash_msg' -- (${actual_count} paths)"
+    dg_dry_print "git -C $project_root branch $dest_br"
+    dg_dry_print "git -C $project_root worktree add $dest_wt $dest_br"
+    dg_dry_print "git -C $dest_wt stash apply <TRANSFER_STASH_SHA>"
+    dg_info "dry-run: $actual_count paths, branch=$dest_br worktree=$dest_wt"
+    return 0
+  fi
+
+  # Execute: scoped stash
+  git -C "$project_root" stash push \
+    --include-untracked \
+    -m "$stash_msg" \
+    -- "${plan_paths[@]}" \
+    || dg_fail "$DG_E_ALLOWLIST" "separate: git stash push failed"
+
+  local transfer_stash
+  transfer_stash="$(git -C "$project_root" rev-parse refs/stash)"
+  dg_info "transfer stash created: $transfer_stash"
+
+  # Create branch
+  git -C "$project_root" branch "$dest_br" \
+    || dg_fail "$DG_E_REPO" "separate: branch creation failed: $dest_br"
+  dg_info "branch created: $dest_br"
+
+  # Create worktree
+  git -C "$project_root" worktree add "$dest_wt" "$dest_br" \
+    || dg_fail "$DG_E_REPO" "separate: worktree add failed: $dest_wt"
+  dg_info "worktree created: $dest_wt"
+
+  # Apply stash to worktree
+  git -C "$dest_wt" stash apply "$transfer_stash" \
+    || dg_fail "$DG_E_ALLOWLIST" "separate: stash apply failed in worktree $dest_wt"
+  dg_info "stash applied to worktree: $actual_count paths"
+
+  dg_info "separation complete: transfer stash=$transfer_stash retained for hash verification"
+  printf '%s\n' "$transfer_stash"
 }
