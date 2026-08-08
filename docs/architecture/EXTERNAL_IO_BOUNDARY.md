@@ -18,9 +18,10 @@ Define the deny-by-default External IO boundary for a future single-Provider tex
 | Item | Value |
 | ---- | ----- |
 | Count | **1** |
-| Recommended Provider | **Instagram** |
+| Conditional Recommendation | **X**（with Entry Conditions） |
 | Status | **Recommended ≠ Authorized** |
-| Threads / X / others | Deferred |
+| Instagram | **NOT FIT**（Historical — Branch A excluded） |
+| Threads | **CONDITIONAL FIT** / **Deferred** |
 
 ## 3. Deny by default
 
@@ -85,7 +86,7 @@ Define the deny-by-default External IO boundary for a future single-Provider tex
 
 Canonical model: [PROVIDER_ENDPOINT_ALLOWLIST.md](./PROVIDER_ENDPOINT_ALLOWLIST.md).
 
-**Concrete Meta hosts/endpoints remain TBD until P2-R1 — Official Instagram Contract-Fit Research**（official Meta primary documentation only）. Do not invent hosts in P2A.
+**P2-R1 is Complete** — Official Instagram Contract-Fit Research outcome: **NOT FIT** for Branch A. Concrete X host/endpoint planning is the next allowlist gate（pending entry-condition acceptance and separate endpoint Planning per [PROVIDER_ENDPOINT_ALLOWLIST.md](./PROVIDER_ENDPOINT_ALLOWLIST.md)）. **No X endpoints are currently approved.** Do not invent hosts.
 
 ## 8. Dry-run zero-network invariant
 
@@ -152,7 +153,7 @@ All IO logs must pass redaction. Redaction failure → fail closed（do not emit
 
 - Enabling External IO in P2A
 - Implementing HTTP clients / gateways
-- Finalizing concrete Meta endpoints without P2-R1
+- Approving concrete X endpoints（pending entry-condition acceptance and separate endpoint Planning）
 - Automatic SNS publishing
 - Multi-Provider IO
 
@@ -160,7 +161,7 @@ All IO logs must pass redaction. Redaction failure → fail closed（do not emit
 
 | Gate | Before |
 | ---- | ------ |
-| P2-R1 | Concrete host/endpoint tables |
+| Entry-condition acceptance + separate endpoint Planning | Concrete X host/endpoint tables |
 | P2D | Gateway abstraction（still no network） |
 | Separate External IO authorization | Any live request |
 | P4 | Real Provider adapter（default-disabled） |
@@ -173,5 +174,7 @@ All IO logs must pass redaction. Redaction failure → fail closed（do not emit
 | ----- | ----- |
 | Status | **Complete** — P2A Boundary Specifications（IR **A.GO**）; lifecycle closure **In Progress**（versionless） |
 | External IO | **Prohibited**（current） |
-| Instagram | Recommended ≠ Authorized |
+| X | Conditional Recommendation — **Not Authorized** |
+| Instagram | **NOT FIT**（Historical — Branch A excluded） |
+| Threads | CONDITIONAL FIT / **Deferred** |
 | Version | **Not Assigned** |
