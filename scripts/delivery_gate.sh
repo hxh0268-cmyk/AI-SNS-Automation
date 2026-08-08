@@ -88,6 +88,7 @@ Exit codes:
   16  post-push verification failure
   17  manifest schema failure
   18  unexpected untracked file
+  19  operational health failure (SAFE STOP)
 
 Safety model:
   - default deny; explicit allowlist / plan only
@@ -177,13 +178,16 @@ _run_verify_steps() {
   dg_run_quality "$PROJECT_ROOT" "$DG_MANIFEST"
   dg_run_catalog "$PROJECT_ROOT" "$DG_MANIFEST"
   dg_verify_separation_topology "$PROJECT_ROOT"
+  dg_operational_health_report  "$PROJECT_ROOT" "$DG_MANIFEST" "verify"
 }
 
 # ── Stage steps (Class L) ────────────────────────────────────────────────────
 _run_stage_steps() {
   dg_validate_manifest "$DG_MANIFEST"
   dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT"
-  dg_check_clean_staged "$PROJECT_ROOT"
+  if [[ "$DG_DRY_RUN" != "true" ]]; then
+    dg_check_clean_staged "$PROJECT_ROOT"
+  fi
   dg_stage_exact "$PROJECT_ROOT" "$DG_MANIFEST" "$DG_DRY_RUN"
   if [[ "$DG_DRY_RUN" != "true" ]]; then
     dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
@@ -254,7 +258,9 @@ case "$DG_MODE" in
     # commit verifies staged scope then creates the commit object
     dg_validate_manifest "$DG_MANIFEST"
     dg_preflight_repo "$DG_MANIFEST" "$PROJECT_ROOT"
-    dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
+    if [[ "$DG_DRY_RUN" != "true" ]]; then
+      dg_verify_staged_scope "$PROJECT_ROOT" "$DG_MANIFEST"
+    fi
     dg_verify_governance "$PROJECT_ROOT" "$DG_MANIFEST"
     dg_run_quality "$PROJECT_ROOT" "$DG_MANIFEST"
     dg_run_catalog "$PROJECT_ROOT" "$DG_MANIFEST"

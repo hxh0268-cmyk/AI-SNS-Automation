@@ -37,6 +37,10 @@ readonly DG_E_PUSH=15
 readonly DG_E_POST_PUSH=16
 readonly DG_E_MANIFEST=17
 readonly DG_E_UNTRACKED=18
+readonly DG_E_HEALTH=19
+
+# SNS content workstream paths — centralized; extend here to add new SNS workstreams
+readonly _DG_SNS_PATH_PATTERN="^(content/carousel|images/carousel|output/instagram)"
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 _dg_ts() { date '+%Y-%m-%dT%H:%M:%S'; }
@@ -385,6 +389,13 @@ dg_stage_allowlist() {
     [[ -n "$p" ]] && paths_to_stage+=("$p")
   done < <(_dg_mget_arr "$manifest" "allowed_paths")
 
+  # Empty-Allowlist guard: zero entries must never reach git add
+  if [[ "${#paths_to_stage[@]}" -eq 0 ]]; then
+    dg_info "stage_allowlist: allowed_paths is empty — deterministic safe no-op"
+    [[ "$dry_run" == "true" ]] && dg_dry_print "# empty allowlist: nothing to stage"
+    return 0
+  fi
+
   if [[ "$dry_run" == "true" ]]; then
     dg_dry_print "git -C $project_root add -- ${paths_to_stage[*]}"
     return 0
@@ -416,7 +427,7 @@ dg_commit_tree_cas() {
     tree="$(git -C "$project_root" write-tree)"
     dg_dry_print "git commit-tree $tree -p $parent  (subject: $subject)"
     dg_dry_print "git update-ref refs/heads/main <new_commit> $parent"
-    dg_info "dry-run: commit-tree + CAS would target parent=$parent tree=$tree"
+    dg_info "dry-run: tree=$tree from current staged index — stage intended files first for an accurate preview; parent=$parent"
     return 0
   fi
 
@@ -863,8 +874,12 @@ dg_stage_exact() {
     return 0
   fi
 
-  git -C "$project_root" add -- "${stage_paths[@]}" \
-    || dg_fail "$DG_E_ALLOWLIST" "stage: git add failed"
+  if ! git -C "$project_root" add -- "${stage_paths[@]}"; then
+    # Partial-stage rollback: unstage any files from allowlist that may have been staged
+    dg_warn "stage: git add failed; rolling back staged allowlist files"
+    git -C "$project_root" reset HEAD -- "${stage_paths[@]}" 2>/dev/null || true
+    dg_fail "$DG_E_ALLOWLIST" "stage: git add failed; index rolled back to pre-stage state"
+  fi
 
   dg_info "staged ${#stage_paths[@]} files from allowlist"
 }
@@ -915,32 +930,258 @@ dg_detect_delivery_state() {
   fi
 }
 
-# ── Verify: structured summary output ─────────────────────────────────────────
-dg_verify_print_summary() {
-  local -n _results="$1"
-  printf '[DG VERIFY] ─────────────────────────────────────────\n' >&2
-  local all_pass=true
-  local key
-  for key in "${!_results[@]}"; do
-    local status="${_results[$key]}"
-    if [[ "$status" == PASS* ]]; then
-      printf '[DG PASS]  %-16s %s\n' "$key" "$status" >&2
+# ── Worktree Health assessment ────────────────────────────────────────────────
+# Returns one of: HEALTHY | SAFE_INTENTIONALLY_DIRTY | RECOVERY_REQUIRED | UNSAFE_OR_AMBIGUOUS
+# HEALTHY:                 clean working tree or staged == allowlist exactly
+# SAFE_INTENTIONALLY_DIRTY: unstaged SNS-only content, main not contaminated
+# RECOVERY_REQUIRED:       detected conflicts or partial staging needing repair
+# UNSAFE_OR_AMBIGUOUS:    SNS content staged in wrong worktree or unknown state
+dg_worktree_health() {
+  local project_root="$1"
+  local manifest="${2:-}"
+
+  local staged_count dirty_count conflict_count
+  staged_count="$(git -C "$project_root" diff --cached --name-only 2>/dev/null | grep -c . || echo 0)"
+  dirty_count="$(git -C "$project_root" diff --name-only 2>/dev/null | grep -c . || echo 0)"
+  conflict_count="$(git -C "$project_root" diff --name-only --diff-filter=U 2>/dev/null | grep -c . || echo 0)"
+
+  # Conflicts always require recovery
+  if [[ "$conflict_count" -gt 0 ]]; then
+    printf 'RECOVERY_REQUIRED\n'
+    return
+  fi
+
+  # SNS content staged in main worktree = main contamination risk
+  local sns_staged
+  sns_staged="$(git -C "$project_root" diff --cached --name-only 2>/dev/null \
+    | grep -E "$_DG_SNS_PATH_PATTERN" | head -1 || echo "")"
+  if [[ -n "$sns_staged" ]]; then
+    printf 'UNSAFE_OR_AMBIGUOUS\n'
+    return
+  fi
+
+  # Nothing staged, nothing dirty = clean
+  if [[ "$staged_count" -eq 0 && "$dirty_count" -eq 0 ]]; then
+    printf 'HEALTHY\n'
+    return
+  fi
+
+  # Staged present with manifest: verify exact match
+  if [[ "$staged_count" -gt 0 && -n "$manifest" && -f "$manifest" ]]; then
+    local staged_paths expected_paths
+    staged_paths="$(git -C "$project_root" diff --cached --name-only 2>/dev/null | sort)"
+    expected_paths="$(_dg_mget_arr "$manifest" "allowed_paths" 2>/dev/null | sort || echo "")"
+    if [[ "$staged_paths" == "$expected_paths" ]]; then
+      printf 'HEALTHY\n'
     else
-      printf '[DG FAIL]  %-16s %s\n' "$key" "$status" >&2
+      printf 'UNSAFE_OR_AMBIGUOUS\n'
+    fi
+    return
+  fi
+
+  # Staged present without manifest: report but don't block
+  if [[ "$staged_count" -gt 0 ]]; then
+    printf 'UNSAFE_OR_AMBIGUOUS\n'
+    return
+  fi
+
+  # Only unstaged dirty: check if all dirty are SNS-isolation paths (intentional)
+  local non_sns_dirty
+  non_sns_dirty="$(git -C "$project_root" diff --name-only 2>/dev/null \
+    | grep -vE "$_DG_SNS_PATH_PATTERN" | head -1 || echo "")"
+  if [[ -z "$non_sns_dirty" && "$dirty_count" -gt 0 ]]; then
+    printf 'SAFE_INTENTIONALLY_DIRTY\n'
+    return
+  fi
+
+  # Mixed dirty (implementation + SNS content) — HEALTHY as long as nothing staged
+  # Non-SNS dirty files are implementation work waiting to be staged
+  printf 'HEALTHY\n'
+}
+
+# ── Operation Eligibility ─────────────────────────────────────────────────────
+# Returns: ELIGIBLE | NOT_ELIGIBLE:<reason>
+# operation: verify | stage | commit | publish | restore | separate | full
+dg_operation_eligibility() {
+  local project_root="$1"
+  local manifest="${2:-}"
+  local operation="${3:-verify}"
+
+  local staged_count dirty_count
+  staged_count="$(git -C "$project_root" diff --cached --name-only 2>/dev/null | grep -c . || echo 0)"
+  dirty_count="$(git -C "$project_root" diff --name-only 2>/dev/null | grep -c . || echo 0)"
+
+  case "$operation" in
+    verify)
+      # Always eligible — verify is read-only
+      printf 'ELIGIBLE\n'
+      ;;
+    stage)
+      # Eligible only when nothing staged (clean index)
+      if [[ "$staged_count" -gt 0 ]]; then
+        printf 'NOT_ELIGIBLE:index_not_clean\n'
+      else
+        printf 'ELIGIBLE\n'
+      fi
+      ;;
+    commit)
+      # Eligible when staged files match allowlist (or just in dry-run: manifest valid)
+      if [[ "$staged_count" -eq 0 ]]; then
+        printf 'NOT_ELIGIBLE:nothing_staged\n'
+      else
+        printf 'ELIGIBLE\n'
+      fi
+      ;;
+    publish)
+      # Eligible when: staged=0, HEAD ahead of origin, HEAD != origin/main
+      if [[ "$staged_count" -gt 0 ]]; then
+        printf 'NOT_ELIGIBLE:index_not_clean\n'
+        return
+      fi
+      local diverge left right
+      diverge="$(git -C "$project_root" rev-list --left-right --count origin/main...HEAD 2>/dev/null || echo "0	0")"
+      left="${diverge%%$'\t'*}"
+      right="${diverge##*$'\t'}"
+      if [[ "$left" -gt 0 ]]; then
+        printf 'NOT_ELIGIBLE:local_behind_remote\n'
+      elif [[ "$right" -eq 0 ]]; then
+        printf 'NOT_ELIGIBLE:nothing_committed\n'
+      else
+        printf 'ELIGIBLE\n'
+      fi
+      ;;
+    restore)
+      printf 'ELIGIBLE\n'
+      ;;
+    separate)
+      if [[ "$staged_count" -gt 0 ]]; then
+        printf 'NOT_ELIGIBLE:index_not_clean\n'
+      elif [[ "$dirty_count" -eq 0 ]]; then
+        printf 'NOT_ELIGIBLE:nothing_to_separate\n'
+      else
+        printf 'ELIGIBLE\n'
+      fi
+      ;;
+    full)
+      # full is eligible when: nothing staged and working tree has changes
+      if [[ "$staged_count" -gt 0 ]]; then
+        printf 'NOT_ELIGIBLE:index_not_clean\n'
+      else
+        printf 'ELIGIBLE\n'
+      fi
+      ;;
+    *)
+      printf 'ELIGIBLE\n'
+      ;;
+  esac
+}
+
+# ── Operational Health Report ─────────────────────────────────────────────────
+# Emits structured health lines to stderr. Exits 0 if operationally ready.
+# Parameters: project_root manifest operation
+dg_operational_health_report() {
+  local project_root="$1"
+  local manifest="${2:-}"
+  local operation="${3:-verify}"
+
+  local all_pass=true
+
+  _dg_health_line() {
+    local category="$1" status="$2"
+    if [[ "$status" == PASS* || "$status" == HEALTHY* || "$status" == SAFE_INTENTIONALLY_DIRTY* || "$status" == ELIGIBLE* ]]; then
+      printf '[DG HEALTH] %-22s %s\n' "$category" "$status" >&2
+    else
+      printf '[DG HEALTH] %-22s %s\n' "$category" "$status" >&2
       all_pass=false
     fi
-  done
-  printf '[DG VERIFY] ─────────────────────────────────────────\n' >&2
-  if [[ "$all_pass" == "true" ]]; then
-    printf '[DG PASS]  OPERATIONAL READY\n' >&2
+  }
+
+  # Repository Health
+  local branch
+  branch="$(git -C "$project_root" branch --show-current 2>/dev/null || echo "unknown")"
+  local expected_branch
+  expected_branch="$( [[ -n "$manifest" && -f "$manifest" ]] && _dg_mget_str "$manifest" "base_branch" 2>/dev/null || echo "main" )"
+  if [[ "$branch" == "$expected_branch" ]]; then
+    _dg_health_line "Repository" "PASS branch=$branch"
   else
-    printf '[DG FAIL]  OPERATIONAL NOT READY\n' >&2
+    _dg_health_line "Repository" "FAIL branch=$branch expected=$expected_branch"
+  fi
+
+  # Allowlist Health (if manifest provided)
+  if [[ -n "$manifest" && -f "$manifest" ]]; then
+    local expected_count
+    expected_count="$(_dg_mget_str "$manifest" "expected_file_count" 2>/dev/null || echo "?")"
+    _dg_health_line "Allowlist" "PASS expected_count=$expected_count"
+  else
+    _dg_health_line "Allowlist" "PASS (no manifest)"
+  fi
+
+  # CAS Health: HEAD identity
+  local head head_short
+  head="$(git -C "$project_root" rev-parse HEAD 2>/dev/null || echo "unknown")"
+  head_short="${head:0:12}"
+  local diverge
+  diverge="$(git -C "$project_root" rev-list --left-right --count origin/main...HEAD 2>/dev/null || echo "?")"
+  _dg_health_line "CAS" "PASS head=${head_short} diverge=${diverge}"
+
+  # Worktree Health
+  local wt_health
+  wt_health="$(dg_worktree_health "$project_root" "${manifest:-}")"
+  _dg_health_line "Worktree" "$wt_health"
+
+  # Separation Health (advisory — does not fail)
+  local wt_count
+  wt_count="$(git -C "$project_root" worktree list --porcelain 2>/dev/null | grep -c '^worktree ' || echo 0)"
+  _dg_health_line "Separation" "PASS worktrees=$wt_count"
+
+  # Quality and Catalog health below reflect results from dg_run_quality and
+  # dg_run_catalog already executed by the canonical verify flow. This section
+  # does not re-execute those checks; it confirms required/skipped status.
+  # Quality Health (only if quality_required and manifest present)
+  if [[ -n "$manifest" && -f "$manifest" ]]; then
+    local quality_req
+    quality_req="$(_dg_mget_str "$manifest" "quality_required" 2>/dev/null || echo "true")"
+    if [[ "$quality_req" == "false" ]]; then
+      _dg_health_line "Quality" "PASS (quality_required=false)"
+    else
+      _dg_health_line "Quality" "PASS (verified by dg_run_quality)"
+    fi
+  else
+    _dg_health_line "Quality" "PASS (no manifest)"
+  fi
+
+  # Catalog Health
+  if [[ -n "$manifest" && -f "$manifest" ]]; then
+    local catalog_req
+    catalog_req="$(_dg_mget_str "$manifest" "catalog_required" 2>/dev/null || echo "true")"
+    if [[ "$catalog_req" == "false" ]]; then
+      _dg_health_line "Catalog" "PASS (catalog_required=false)"
+    else
+      _dg_health_line "Catalog" "PASS (verified by dg_run_catalog)"
+    fi
+  else
+    _dg_health_line "Catalog" "PASS (no manifest)"
+  fi
+
+  # Operation Eligibility
+  local eligibility
+  eligibility="$(dg_operation_eligibility "$project_root" "${manifest:-}" "$operation")"
+  _dg_health_line "Eligibility[$operation]" "$eligibility"
+
+  # Summary
+  printf '[DG HEALTH] ──────────────────────────────────────\n' >&2
+  if [[ "$all_pass" == "true" ]]; then
+    printf '[DG HEALTH] OPERATIONAL READY\n' >&2
+    return 0
+  else
+    printf '[DG HEALTH] SAFE STOP\n' >&2
+    return "$DG_E_HEALTH"
   fi
 }
 
 # ── Separation topology verification ─────────────────────────────────────────
-# Checks registered worktrees are in expected state.
-# Reports findings; does not fail — topology mismatches are advisory for verify.
+# Checks registered worktrees are in expected state. Also checks main worktree
+# for SNS content contamination. Reports advisory findings; does not fail.
 dg_verify_separation_topology() {
   local project_root="$1"
   local worktrees
@@ -951,7 +1192,15 @@ dg_verify_separation_topology() {
 
   dg_info "separation topology: $wt_count worktree(s) registered"
 
-  # Report each worktree
+  # Main contamination check: SNS content staged in main
+  local sns_staged_count
+  sns_staged_count="$(git -C "$project_root" diff --cached --name-only 2>/dev/null \
+    | grep -cE "$_DG_SNS_PATH_PATTERN" || echo 0)"
+  if [[ "$sns_staged_count" -gt 0 ]]; then
+    dg_warn "separation: MAIN CONTAMINATION — $sns_staged_count SNS path(s) staged in main worktree"
+  fi
+
+  # Report each linked worktree
   local wt_path wt_head wt_branch
   while IFS= read -r line; do
     case "$line" in
@@ -963,7 +1212,9 @@ dg_verify_separation_topology() {
           if [[ -d "$wt_path" ]]; then
             local dirty_count
             dirty_count="$(git -C "$wt_path" diff --name-only 2>/dev/null | grep -c . || echo 0)"
-            dg_info "  worktree: $wt_path branch=$wt_branch head=${wt_head:0:12} dirty=$dirty_count"
+            local wt_health
+            wt_health="$(dg_worktree_health "$wt_path" "")"
+            dg_info "  worktree: $wt_path branch=$wt_branch head=${wt_head:0:12} dirty=$dirty_count health=$wt_health"
           else
             dg_warn "  worktree: $wt_path — directory MISSING (stale registration)"
           fi

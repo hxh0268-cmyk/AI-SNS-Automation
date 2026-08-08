@@ -662,7 +662,8 @@ printf '\n-- dg-test 23: exit code constants --\n'
  [[ "$DG_E_PUSH"        -eq 15 ]] && \
  [[ "$DG_E_POST_PUSH"   -eq 16 ]] && \
  [[ "$DG_E_MANIFEST"    -eq 17 ]] && \
- [[ "$DG_E_UNTRACKED"   -eq 18 ]]
+ [[ "$DG_E_UNTRACKED"   -eq 18 ]] && \
+ [[ "$DG_E_HEALTH"      -eq 19 ]]
 ) >/dev/null 2>&1 && tpass "all exit code constants correct" \
                   || tfail "exit code constant mismatch"
 
@@ -1368,6 +1369,217 @@ printf '\n-- dg-test 62: regression — all prior behavior preserved --\n'
 tpass "regression: tests T1-T42 verified by their presence in this suite"
 tpass "regression: dg_preflight_repo strict mode preserved (T51)"
 tpass "regression: separation plan validation preserved (T33-T41)"
+
+# ── Test 63: dg_worktree_health: clean repo = HEALTHY ────────────────────────
+printf '\n-- dg-test 63: dg_worktree_health clean repo --\n'
+TREPO63="$TMPBASE/repo63"
+_make_temp_repo "$TREPO63"
+WH63="$(dg_worktree_health "$TREPO63" "")"
+if [[ "$WH63" == "HEALTHY" ]]; then
+  tpass "dg_worktree_health: clean repo = HEALTHY"
+else
+  tfail "dg_worktree_health: expected HEALTHY got '$WH63'"
+fi
+
+# ── Test 64: dg_worktree_health: SNS content staged in main = UNSAFE ─────────
+printf '\n-- dg-test 64: dg_worktree_health SNS staged = UNSAFE_OR_AMBIGUOUS --\n'
+TREPO64="$TMPBASE/repo64"
+_make_temp_repo "$TREPO64"
+mkdir -p "$TREPO64/content/carousel"
+printf 'slide\n' > "$TREPO64/content/carousel/slide01.md"
+git -C "$TREPO64" add content/carousel/slide01.md
+WH64="$(dg_worktree_health "$TREPO64" "")"
+if [[ "$WH64" == "UNSAFE_OR_AMBIGUOUS" ]]; then
+  tpass "dg_worktree_health: SNS staged = UNSAFE_OR_AMBIGUOUS"
+else
+  tfail "dg_worktree_health: expected UNSAFE_OR_AMBIGUOUS got '$WH64'"
+fi
+
+# ── Test 65: dg_operation_eligibility: verify always ELIGIBLE ────────────────
+printf '\n-- dg-test 65: dg_operation_eligibility verify --\n'
+TREPO65="$TMPBASE/repo65"
+_make_temp_repo "$TREPO65"
+OE65="$(dg_operation_eligibility "$TREPO65" "" "verify")"
+if [[ "$OE65" == "ELIGIBLE" ]]; then
+  tpass "dg_operation_eligibility: verify always ELIGIBLE"
+else
+  tfail "dg_operation_eligibility: expected ELIGIBLE got '$OE65'"
+fi
+
+# ── Test 66: dg_operation_eligibility: stage NOT_ELIGIBLE when index dirty ────
+printf '\n-- dg-test 66: dg_operation_eligibility stage with staged files --\n'
+TREPO66="$TMPBASE/repo66"
+_make_temp_repo "$TREPO66"
+printf 'changed\n' >> "$TREPO66/README.md"
+git -C "$TREPO66" add README.md
+OE66="$(dg_operation_eligibility "$TREPO66" "" "stage")"
+if [[ "$OE66" == "NOT_ELIGIBLE:index_not_clean" ]]; then
+  tpass "dg_operation_eligibility: stage NOT_ELIGIBLE:index_not_clean when index dirty"
+else
+  tfail "dg_operation_eligibility: expected NOT_ELIGIBLE:index_not_clean got '$OE66'"
+fi
+
+# ── Test 67: dg_operational_health_report: exits 0 on healthy clean repo ──────
+printf '\n-- dg-test 67: dg_operational_health_report exits 0 --\n'
+TREPO67="$TMPBASE/repo67"
+_make_temp_repo "$TREPO67"
+BASE67="$(git -C "$TREPO67" rev-parse HEAD)"
+_make_manifest "$TMPBASE/m67" "$BASE67" '["README.md"]'
+OHR67_EXIT=0
+(dg_operational_health_report "$TREPO67" "$TMPBASE/m67/manifest.json" "verify") \
+  >/dev/null 2>&1 || OHR67_EXIT=$?
+if [[ "$OHR67_EXIT" -eq 0 ]]; then
+  tpass "dg_operational_health_report: exits 0 on healthy clean repo"
+else
+  tfail "dg_operational_health_report: expected exit 0 (exit $OHR67_EXIT)"
+fi
+
+# ── Test 68: dg_stage_allowlist: empty allowlist is safe no-op ───────────────
+printf '\n-- dg-test 68: dg_stage_allowlist empty allowlist --\n'
+TREPO68="$TMPBASE/repo68"
+_make_temp_repo "$TREPO68"
+BASE68="$(git -C "$TREPO68" rev-parse HEAD)"
+mkdir -p "$TMPBASE/m68"
+cat > "$TMPBASE/m68/manifest.json" << 'EMEOF'
+{
+  "schema_version": "1.0",
+  "change_id": "test-068",
+  "title": "Empty Allowlist Test",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "PLACEHOLDER",
+  "allowed_paths": [],
+  "forbidden_paths": [],
+  "expected_file_count": 0,
+  "allow_add": false,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "test: empty allowlist",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": false,
+  "catalog_required": false,
+  "governance_checks": [],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"]
+}
+EMEOF
+node -e "
+const fs=require('fs');
+const m=JSON.parse(fs.readFileSync('$TMPBASE/m68/manifest.json','utf8'));
+m.expected_base_commit='$(git -C "$TREPO68" rev-parse HEAD)';
+fs.writeFileSync('$TMPBASE/m68/manifest.json',JSON.stringify(m,null,2)+'\n');
+"
+IDX68_BEFORE="$(git -C "$TREPO68" diff --cached --name-status)"
+SA68_EXIT=0
+(dg_stage_allowlist "$TREPO68" "$TMPBASE/m68/manifest.json" "false") \
+  >/dev/null 2>&1 || SA68_EXIT=$?
+IDX68_AFTER="$(git -C "$TREPO68" diff --cached --name-status)"
+if [[ "$SA68_EXIT" -eq 0 && "$IDX68_BEFORE" == "$IDX68_AFTER" ]]; then
+  tpass "dg_stage_allowlist: empty allowlist exits 0 with no index mutation"
+else
+  tfail "dg_stage_allowlist: empty allowlist failed (exit=$SA68_EXIT idx_changed=$([ "$IDX68_BEFORE" != "$IDX68_AFTER" ] && echo yes || echo no))"
+fi
+
+# ── Test 69: dg commit --dry-run fix: staged scope skipped on empty index ─────
+# Verifies the fix: dg_verify_staged_scope is skipped in dry-run so commit
+# --dry-run does not fail simply because nothing is staged.
+printf '\n-- dg-test 69: commit --dry-run fix: staged scope check skipped --\n'
+TREPO69="$TMPBASE/repo69"
+_make_temp_repo "$TREPO69"
+BASE69="$(git -C "$TREPO69" rev-parse HEAD)"
+printf 'changed\n' >> "$TREPO69/README.md"
+_make_manifest "$TMPBASE/m69" "$BASE69" '["README.md"]'
+# Confirm: dg_verify_staged_scope correctly rejects an empty index (confirms bug)
+VS69_EXIT=0
+(dg_verify_staged_scope "$TREPO69" "$TMPBASE/m69/manifest.json") >/dev/null 2>&1 \
+  || VS69_EXIT=$?
+if [[ "$VS69_EXIT" -ne 0 ]]; then
+  tpass "commit --dry-run fix: dg_verify_staged_scope rejects empty index (bug confirmed)"
+else
+  tfail "commit --dry-run fix: dg_verify_staged_scope should reject empty index"
+fi
+# Confirm: dg_commit_tree_cas dry-run exits 0 even with no staged changes (fix path)
+DTC69_EXIT=0
+(dg_commit_tree_cas "$TREPO69" "$TMPBASE/m69/manifest.json" "true") >/dev/null 2>&1 \
+  || DTC69_EXIT=$?
+if [[ "$DTC69_EXIT" -eq 0 ]]; then
+  tpass "commit --dry-run fix: dg_commit_tree_cas dry-run exits 0 (fixed path works)"
+else
+  tfail "commit --dry-run fix: dg_commit_tree_cas dry-run should exit 0 (exit $DTC69_EXIT)"
+fi
+
+# ── Test 70: SAFE STOP regression — SNS contamination in main worktree ───────
+# Proves: SNS content staged in main is detected, Operational Health reports
+# UNSAFE_OR_AMBIGUOUS, and the expected DG_E_HEALTH / SAFE STOP exit occurs.
+# Also verifies clean and safe-intentionally-dirty cases continue to exit 0.
+printf '\n-- dg-test 70: SAFE STOP regression: SNS contamination → DG_E_HEALTH --\n'
+
+# T70a: SNS content staged in main → SAFE STOP (DG_E_HEALTH=19)
+TREPO70="$TMPBASE/repo70"
+_make_temp_repo "$TREPO70"
+BASE70="$(git -C "$TREPO70" rev-parse HEAD)"
+mkdir -p "$TREPO70/content/carousel"
+printf 'slide\n' > "$TREPO70/content/carousel/slide01.md"
+git -C "$TREPO70" add "$TREPO70/content/carousel/slide01.md"
+_make_manifest "$TMPBASE/m70" "$BASE70" '["content/carousel/slide01.md"]'
+HEAD70_BEFORE="$(git -C "$TREPO70" rev-parse HEAD)"
+STASH70_BEFORE="$(git -C "$TREPO70" stash list | wc -l | tr -d ' ')"
+OHR70_EXIT=0
+(dg_operational_health_report "$TREPO70" "$TMPBASE/m70/manifest.json" "verify") \
+  >/dev/null 2>&1 || OHR70_EXIT=$?
+if [[ "$OHR70_EXIT" -eq "$DG_E_HEALTH" ]]; then
+  tpass "T70a: SNS staged in main → SAFE STOP (exit=$OHR70_EXIT matches DG_E_HEALTH=$DG_E_HEALTH)"
+else
+  tfail "T70a: SNS staged in main should exit DG_E_HEALTH=$DG_E_HEALTH (got $OHR70_EXIT)"
+fi
+HEAD70_AFTER="$(git -C "$TREPO70" rev-parse HEAD)"
+STASH70_AFTER="$(git -C "$TREPO70" stash list | wc -l | tr -d ' ')"
+if [[ "$HEAD70_BEFORE" == "$HEAD70_AFTER" && "$STASH70_BEFORE" == "$STASH70_AFTER" ]]; then
+  tpass "T70a: no mutation during health report (HEAD and stash unchanged)"
+else
+  tfail "T70a: unexpected mutation detected during health report"
+fi
+
+# T70b: clean repo → OPERATIONAL READY (exit 0)
+TREPO70B="$TMPBASE/repo70b"
+_make_temp_repo "$TREPO70B"
+BASE70B="$(git -C "$TREPO70B" rev-parse HEAD)"
+_make_manifest "$TMPBASE/m70b" "$BASE70B" '["README.md"]'
+OHR70B_EXIT=0
+(dg_operational_health_report "$TREPO70B" "$TMPBASE/m70b/manifest.json" "verify") \
+  >/dev/null 2>&1 || OHR70B_EXIT=$?
+if [[ "$OHR70B_EXIT" -eq 0 ]]; then
+  tpass "T70b: clean repo → OPERATIONAL READY (exit 0)"
+else
+  tfail "T70b: clean repo should exit 0 (got $OHR70B_EXIT)"
+fi
+
+# T70c: SNS content modified in working tree (tracked, unstaged) → SAFE_INTENTIONALLY_DIRTY → exit 0
+TREPO70C="$TMPBASE/repo70c"
+_make_temp_repo "$TREPO70C"
+mkdir -p "$TREPO70C/content/carousel"
+printf 'slide\n' > "$TREPO70C/content/carousel/slide01.md"
+git -C "$TREPO70C" add content/carousel/slide01.md
+git -C "$TREPO70C" commit --quiet -m "add slide"
+BASE70C="$(git -C "$TREPO70C" rev-parse HEAD)"
+printf 'modified slide\n' >> "$TREPO70C/content/carousel/slide01.md"
+_make_manifest "$TMPBASE/m70c" "$BASE70C" '["README.md"]'
+OHR70C_EXIT=0
+(dg_operational_health_report "$TREPO70C" "$TMPBASE/m70c/manifest.json" "verify") \
+  >/dev/null 2>&1 || OHR70C_EXIT=$?
+if [[ "$OHR70C_EXIT" -eq 0 ]]; then
+  tpass "T70c: SNS tracked+unstaged only → SAFE_INTENTIONALLY_DIRTY → exit 0"
+else
+  tfail "T70c: SNS tracked+unstaged only should exit 0 (got $OHR70C_EXIT)"
+fi
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 printf '\n== Delivery Gate Test Summary ==\n'
