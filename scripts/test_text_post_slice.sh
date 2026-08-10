@@ -56,7 +56,34 @@ const {
   invokeMockTextPost,
   policy,
   providerId,
+  providerVersion: mockProviderVersion,
 } = await import(u("src/lib/x_text_post_mock_provider.js"));
+// P2B+ boundary imports
+const { CAPABILITY, EXECUTION_MODE, AUTHORIZATION_STATE, P2B_IMPLEMENTED_TARGET } =
+  await import(u("src/lib/text_post_capability.js"));
+const { validateNormalizedResult, validateNormalizedError, buildNormalizedError } =
+  await import(u("src/lib/normalized_provider_contract.js"));
+const { createFakeXProviderAdapter } = await import(u("src/lib/x_text_post_fake_adapter.js"));
+const { createProviderResolver, ProviderResolutionError, RESOLVER_ERROR } =
+  await import(u("src/lib/text_post_provider_resolver.js"));
+const { createTextPostGateway } = await import(u("src/lib/text_post_gateway.js"));
+const { validateCredentialReference, CREDENTIAL_ERROR, CREDENTIAL_ENVIRONMENT } =
+  await import(u("src/lib/credential_reference.js"));
+
+// Minimal success stub for injected providerInvoke (P2B+: capability = publish.text).
+// Used in tests that capture requests without caring about provider internals.
+const makeMockSuccess = (req) => ({
+  ok: true,
+  providerId,
+  providerVersion: mockProviderVersion,
+  capability: req.capability,
+  result: {
+    status: "dry_run_accepted",
+    dryRun: true,
+    normalizedText: req.applicationContract?.normalizedText ?? "",
+  },
+});
+
 let passed = 0;
 function ok(name) {
   passed += 1;
@@ -189,7 +216,7 @@ check("7 fake provider receives normalized request", () => {
   const svc = makeService({
     providerInvoke: (req) => {
       seen = req;
-      return invokeMockTextPost(req);
+      return makeMockSuccess(req);
     },
   });
   svc.runStageADryRun({
@@ -197,7 +224,8 @@ check("7 fake provider receives normalized request", () => {
     actorId: "actor-1",
     idempotencyKey: "key-norm",
   });
-  assert.equal(seen.capability, capability);
+  // P2B+: service sends the provider-neutral capability name (publish.text)
+  assert.equal(seen.capability, CAPABILITY.PUBLISH_TEXT);
   assert.equal(seen.applicationContract.normalizedText, "Trim me");
 });
 
@@ -600,7 +628,7 @@ check("34 same-key concurrency behavior", () => {
       if (enterCount === 1) {
         await gate;
       }
-      return invokeMockTextPost(req);
+      return makeMockSuccess(req);
     },
   });
   // Synchronous Stage A path uses sync provider; simulate in-flight via store API.
@@ -629,7 +657,7 @@ check("34 same-key concurrency behavior", () => {
       if (!nested.ok && nested.error?.details?.concurrency) {
         inFlightHit = true;
       }
-      return invokeMockTextPost(req);
+      return makeMockSuccess(req);
     },
   });
   locked.getKillSwitch().enable();
@@ -739,7 +767,8 @@ check("40 network disabled by default", () => {
   });
   assert.equal(r.ok, true);
   assert.notEqual(r.result.status, "published");
-  assert.equal(FakeXTextPostProvider.capability, capability);
+  // P2B+: FakeXTextPostProvider.capability is the provider-neutral name (publish.text)
+  assert.equal(FakeXTextPostProvider.capability, CAPABILITY.PUBLISH_TEXT);
 });
 
 // null byte rejection (extra safety under validation group)
@@ -753,6 +782,259 @@ check("idempotency key required", () => {
   const store = createInMemoryIdempotencyStore();
   const r = checkIdempotency(store, "  ", "abc");
   assert.equal(r.ok, false);
+});
+
+// ============================================================
+// P2B+ Provider Adapter Boundary tests (TP-AUX, non-numbered)
+// ============================================================
+
+// P2B-1 capability constants defined and non-overlapping
+check("P2B-1 capability constants defined", () => {
+  assert.equal(CAPABILITY.PUBLISH_TEXT, "publish.text");
+  assert.equal(EXECUTION_MODE.MOCK, "mock");
+  assert.equal(EXECUTION_MODE.DRY_RUN, "dry_run");
+  assert.equal(EXECUTION_MODE.LIVE, "live");
+  assert.equal(AUTHORIZATION_STATE.AUTHORIZED, "authorized");
+  assert.equal(AUTHORIZATION_STATE.PROHIBITED, "prohibited");
+  const vals = Object.values(CAPABILITY);
+  assert.equal(new Set(vals).size, vals.length);
+});
+
+// P2B-2 P2B_IMPLEMENTED_TARGET is frozen and correct
+check("P2B-2 implemented target is frozen and correct", () => {
+  assert.equal(P2B_IMPLEMENTED_TARGET.capability, CAPABILITY.PUBLISH_TEXT);
+  assert.equal(P2B_IMPLEMENTED_TARGET.executionMode, EXECUTION_MODE.MOCK);
+  assert.equal(P2B_IMPLEMENTED_TARGET.authorizationState, AUTHORIZATION_STATE.AUTHORIZED);
+  assert.throws(() => { P2B_IMPLEMENTED_TARGET.capability = "other"; }, TypeError);
+});
+
+// P2B-3 FakeAdapter: success produces normalized result
+check("P2B-3 FakeAdapter success produces normalized result", () => {
+  const adapter = createFakeXProviderAdapter();
+  assert.equal(adapter.capability, CAPABILITY.PUBLISH_TEXT);
+  assert.equal(adapter.executionMode, EXECUTION_MODE.MOCK);
+  const r = adapter.invoke({ normalizedText: "hello world", requestedAt: FIXED_NOW, correlationId: "c-001" });
+  assert.equal(r.ok, true);
+  assert.equal(r.capability, CAPABILITY.PUBLISH_TEXT);
+  assert.equal(r.executionMode, EXECUTION_MODE.MOCK);
+  assert.equal(r.result.dryRun, true);
+  assert.equal(r.result.normalizedText, "hello world");
+  assert.equal(r.result.correlationId, "c-001");
+  assert.notEqual(r.result.status, "published");
+  assert.notEqual(r.result.status, "live_published");
+});
+
+// P2B-4 FakeAdapter: forbidden field rejected
+check("P2B-4 FakeAdapter rejects forbidden field", () => {
+  const adapter = createFakeXProviderAdapter();
+  const r = adapter.invoke({ normalizedText: "x", credential: "should-be-rejected" });
+  assert.equal(r.ok, false);
+});
+
+// P2B-5 FakeAdapter: empty text rejected
+check("P2B-5 FakeAdapter rejects empty text", () => {
+  const adapter = createFakeXProviderAdapter();
+  const r = adapter.invoke({ normalizedText: "" });
+  assert.equal(r.ok, false);
+});
+
+// P2B-6 FakeAdapter: error simulation works
+check("P2B-6 FakeAdapter error simulation", () => {
+  const adapter = createFakeXProviderAdapter();
+  const r = adapter.invoke({ normalizedText: "x", requestedAt: FIXED_NOW, simulateError: "simulate_rate_limit" });
+  assert.equal(r.ok, false);
+  assert.equal(r.error.kind, "PROVIDER_RATE_LIMITED");
+});
+
+// P2B-7 Resolver: returns FakeAdapter for mock mode
+check("P2B-7 Resolver returns adapter for mock mode", () => {
+  const resolver = createProviderResolver();
+  const adapter = resolver.resolve(CAPABILITY.PUBLISH_TEXT, EXECUTION_MODE.MOCK, AUTHORIZATION_STATE.AUTHORIZED);
+  assert.ok(adapter && typeof adapter.invoke === "function");
+  assert.equal(adapter.capability, CAPABILITY.PUBLISH_TEXT);
+});
+
+// P2B-8 Resolver: live mode throws REAL_PROVIDER_NOT_AUTHORIZED
+check("P2B-8 Resolver blocks live mode", () => {
+  const resolver = createProviderResolver();
+  assert.throws(
+    () => resolver.resolve(CAPABILITY.PUBLISH_TEXT, EXECUTION_MODE.LIVE, AUTHORIZATION_STATE.AUTHORIZED),
+    (err) => err instanceof ProviderResolutionError && err.kind === RESOLVER_ERROR.REAL_PROVIDER_NOT_AUTHORIZED,
+  );
+});
+
+// P2B-9 Resolver: unknown capability throws UNSUPPORTED_CAPABILITY
+check("P2B-9 Resolver rejects unknown capability", () => {
+  const resolver = createProviderResolver();
+  assert.throws(
+    () => resolver.resolve("unknown.capability", EXECUTION_MODE.MOCK, AUTHORIZATION_STATE.AUTHORIZED),
+    (err) => err instanceof ProviderResolutionError && err.kind === RESOLVER_ERROR.UNSUPPORTED_CAPABILITY,
+  );
+});
+
+// P2B-10 Gateway: happy path succeeds end-to-end
+check("P2B-10 Gateway happy path", () => {
+  const gw = createTextPostGateway();
+  const r = gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "gateway test", requestedAt: FIXED_NOW },
+  });
+  assert.equal(r.ok, true);
+  assert.equal(r.result.dryRun, true);
+  assert.notEqual(r.result.status, "published");
+});
+
+// P2B-11 Gateway: unknown capability rejected
+check("P2B-11 Gateway rejects unknown capability", () => {
+  const gw = createTextPostGateway();
+  const r = gw.invoke({
+    capability: "unknown.capability",
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "x" },
+  });
+  assert.equal(r.ok, false);
+});
+
+// P2B-12 Gateway: prohibited authorization state rejected
+check("P2B-12 Gateway rejects prohibited auth state", () => {
+  const gw = createTextPostGateway();
+  const r = gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.PROHIBITED,
+    applicationContract: { normalizedText: "x" },
+  });
+  assert.equal(r.ok, false);
+});
+
+// P2B-13 Gateway: live execution mode rejected
+check("P2B-13 Gateway rejects live execution mode", () => {
+  const gw = createTextPostGateway();
+  const r = gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.LIVE,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "x" },
+  });
+  assert.equal(r.ok, false);
+  assert.ok(r.error?.details?.realProviderBlocked === true || r.ok === false);
+});
+
+// P2B-14 Gateway: real hostname triggers NoNetworkGuard
+check("P2B-14 Gateway blocks real hostname", () => {
+  const gw = createTextPostGateway();
+  const r = gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "x", hostname: "api.x.com" },
+  });
+  assert.equal(r.ok, false);
+});
+
+// P2B-15 Gateway: real-published status blocked at gateway level
+check("P2B-15 Gateway blocks published status from adapter", () => {
+  const badAdapter = {
+    invoke: () => ({ ok: true, providerId: "bad", providerVersion: "0",
+      capability: CAPABILITY.PUBLISH_TEXT, executionMode: EXECUTION_MODE.MOCK,
+      result: { status: "published", dryRun: false } }),
+  };
+  const badResolver = { resolve: () => badAdapter };
+  const gw = createTextPostGateway({ resolver: badResolver });
+  const r = gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "x" },
+  });
+  assert.equal(r.ok, false);
+});
+
+// P2B-16 Service uses gateway by default (no provider-specific import needed)
+check("P2B-16 Service uses gateway by default", () => {
+  const svc = makeService();
+  svc.getKillSwitch().enable();
+  const r = svc.runStageADryRun({ rawText: "gateway default", actorId: "a", idempotencyKey: "gw-1" });
+  assert.equal(r.ok, true);
+  assert.equal(r.result.dryRun, true);
+  assert.equal(r.state, LIFECYCLE_STATE.DRY_RUN_SUCCEEDED);
+});
+
+// P2B-17 Service capability in request is publish.text
+check("P2B-17 Service sends publish.text capability", () => {
+  let seen = null;
+  const svc = makeService({ providerInvoke: (req) => { seen = req; return makeMockSuccess(req); } });
+  svc.getKillSwitch().enable();
+  svc.runStageADryRun({ rawText: "cap check", actorId: "a", idempotencyKey: "cap-1" });
+  assert.equal(seen?.capability, CAPABILITY.PUBLISH_TEXT);
+});
+
+// P2B-18 NormalizedResult validation
+check("P2B-18 validateNormalizedResult accepts valid result", () => {
+  const r = { ok: true, providerId: "p", providerVersion: "1", capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK, result: { status: "dry_run_accepted" } };
+  assert.deepEqual(validateNormalizedResult(r), { ok: true });
+});
+
+check("P2B-18b validateNormalizedResult rejects published status", () => {
+  const r = { ok: true, providerId: "p", providerVersion: "1", capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK, result: { status: "published" } };
+  assert.equal(validateNormalizedResult(r).ok, false);
+});
+
+// P2B-19 NormalizedError validation
+check("P2B-19 validateNormalizedError accepts valid error", () => {
+  const e = { ok: false, providerId: "p", providerVersion: "1", capability: CAPABILITY.PUBLISH_TEXT,
+    error: { kind: "PROVIDER_REJECTED", message: "test" } };
+  assert.deepEqual(validateNormalizedError(e), { ok: true });
+});
+
+// P2B-20 CredentialReference: valid reference accepted
+check("P2B-20 validateCredentialReference accepts valid ref", () => {
+  const ref = { refId: "ref-001", providerId: "x-provider", environment: CREDENTIAL_ENVIRONMENT.LOCAL, accountRef: "acct-1" };
+  assert.deepEqual(validateCredentialReference(ref), { ok: true });
+});
+
+// P2B-21 CredentialReference: secret fields rejected
+check("P2B-21 validateCredentialReference rejects secret fields", () => {
+  const ref = { refId: "r", providerId: "p", environment: CREDENTIAL_ENVIRONMENT.LOCAL, accountRef: "a", token: "MUST_BE_REJECTED" };
+  assert.equal(validateCredentialReference(ref).ok, false);
+});
+
+// P2B-22 CredentialReference: invalid environment rejected
+check("P2B-22 validateCredentialReference rejects unknown environment", () => {
+  const ref = { refId: "r", providerId: "p", environment: "unknown", accountRef: "a" };
+  assert.equal(validateCredentialReference(ref).ok, false);
+});
+
+// P2B-23 External IO impossible: Gateway always calls NoNetworkGuard
+check("P2B-23 NoNetworkGuard called by Gateway", () => {
+  let guardCalled = false;
+  const fakeGuard = {
+    assertNoNetwork: (h) => { guardCalled = true; if (h) throw new Error("network blocked"); },
+  };
+  const gw = createTextPostGateway({ noNetworkGuard: fakeGuard });
+  gw.invoke({
+    capability: CAPABILITY.PUBLISH_TEXT,
+    executionMode: EXECUTION_MODE.MOCK,
+    authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+    applicationContract: { normalizedText: "x" },
+  });
+  assert.equal(guardCalled, true);
+});
+
+// P2B-24 Core service does not import x_text_post_mock_provider (DoD-7 check)
+check("P2B-24 text_post_service.js does not directly import mock provider", () => {
+  const src = fs.readFileSync(
+    path.join(ROOT, "src/lib/text_post_service.js"), "utf8",
+  );
+  assert.ok(
+    !src.includes("x_text_post_mock_provider"),
+    "text_post_service.js must not directly import x_text_post_mock_provider",
+  );
 });
 
 console.log(`TEXT_POST_SLICE_CHECKS=${passed}`);

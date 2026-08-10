@@ -1,11 +1,14 @@
 /**
- * Text Post Service — Stage A orchestrator.
+ * Text Post Service — P2B+ orchestrator.
  *
  * Flow: Draft → Validation → Manual Approval → Publish Request →
- *       Kill-switch → Idempotency → Fake X Text Provider → Dry-run → Audit
+ *       Kill-switch → Idempotency → Gateway → Provider Adapter → Dry-run → Audit
  *
  * No Real Provider. No External IO. No automatic publishing.
  * Success states are dry-run only (never "published").
+ *
+ * P2B+: provider invocation routes through Gateway → Resolver → Fake Adapter.
+ * Core Service does not import provider-specific modules (DoD-7).
  */
 
 import {
@@ -30,16 +33,19 @@ import {
   TEXT_POST_ERROR_KIND,
   TextPostError,
 } from "./text_post_lifecycle.js";
-import {
-  capability as MOCK_CAPABILITY,
-  invokeMockTextPost,
-} from "./x_text_post_mock_provider.js";
+import { CAPABILITY, EXECUTION_MODE, AUTHORIZATION_STATE } from "./text_post_capability.js";
+import { createTextPostGateway } from "./text_post_gateway.js";
+import { createFakeXProviderAdapter } from "./x_text_post_fake_adapter.js";
 
-/** Provider-neutral boundary name (planning: FakeXTextPostProvider). */
-export const FakeXTextPostProvider = {
-  capability: MOCK_CAPABILITY,
-  invoke: invokeMockTextPost,
-};
+/** Fake provider reference — capability is publish.text (provider-neutral). */
+export const FakeXTextPostProvider = (() => {
+  const adapter = createFakeXProviderAdapter();
+  return {
+    capability: adapter.capability,
+    executionMode: adapter.executionMode,
+    invoke: (req) => adapter.invoke(req),
+  };
+})();
 
 const SAFE_PROVIDER_KIND = new Set([
   TEXT_POST_ERROR_KIND.PROVIDER_REJECTED,
@@ -78,7 +84,8 @@ export function mapProviderError(providerError) {
  *   auditSink?: ReturnType<typeof createInMemoryAuditSink>,
  *   idempotencyStore?: ReturnType<typeof createInMemoryIdempotencyStore>,
  *   noNetworkGuard?: ReturnType<typeof createNoNetworkGuard>,
- *   providerInvoke?: typeof invokeMockTextPost,
+ *   providerInvoke?: (req: { capability: string, applicationContract: object }) => object,
+ *   providerGateway?: ReturnType<typeof createTextPostGateway>,
  *   now?: () => string,
  *   createCorrelationId?: () => string,
  *   maxLength?: number,
@@ -91,7 +98,19 @@ export function createTextPostService(deps = {}) {
   const idempotencyStore =
     deps.idempotencyStore ?? createInMemoryIdempotencyStore();
   const noNetworkGuard = deps.noNetworkGuard ?? createNoNetworkGuard();
-  const providerInvoke = deps.providerInvoke ?? invokeMockTextPost;
+
+  // P2B+: gateway-backed by default (Fake Adapter → Resolver → Gateway).
+  // Legacy deps.providerInvoke accepted for test injection (backward compat).
+  const _gateway = deps.providerGateway ?? createTextPostGateway();
+  const providerInvoke = deps.providerInvoke ?? function gatewayProviderInvoke(request) {
+    return _gateway.invoke({
+      capability: CAPABILITY.PUBLISH_TEXT,
+      executionMode: EXECUTION_MODE.MOCK,
+      authorizationState: AUTHORIZATION_STATE.AUTHORIZED,
+      applicationContract: request.applicationContract,
+    });
+  };
+
   const now = deps.now ?? (() => new Date().toISOString());
   let corrSeq = 0;
   const createCorrelationId =
@@ -503,10 +522,11 @@ export function createTextPostService(deps = {}) {
 
       providerInvokeCount += 1;
       const request = {
-        capability: MOCK_CAPABILITY,
+        capability: CAPABILITY.PUBLISH_TEXT,
         applicationContract: {
           normalizedText: content.normalizedText,
           requestedAt: now(),
+          correlationId,
           ...(args.simulateError ? { simulateError: args.simulateError } : {}),
         },
       };

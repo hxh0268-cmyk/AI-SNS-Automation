@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p2b-provider-adapter-boundary-2026-08",
+  "title": "P2B+ Provider Adapter Boundary — Gateway / Resolver / Fake Adapter / Capability / NormalizedContract / CredentialReference",
+  "change_type": "implementation",
+  "base_branch": "main",
+  "expected_base_commit": "d66103dbc328b33d5f9aef8435dae6fac904933f",
+  "allowed_paths": [
+    "src/lib/text_post_capability.js",
+    "src/lib/normalized_provider_contract.js",
+    "src/lib/x_text_post_fake_adapter.js",
+    "src/lib/text_post_provider_resolver.js",
+    "src/lib/text_post_gateway.js",
+    "src/lib/credential_reference.js",
+    "src/lib/text_post_service.js",
+    "scripts/test_text_post_slice.sh",
+    "scripts/test_quality_pipeline.sh",
+    "config/delivery/p2b_provider_adapter_boundary_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/x_api_provider.js",
+    "src/lib/x_api_client.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/token_store.js",
+    "src/lib/credential_resolver.js",
+    "src/lib/provider_registry.js"
+  ],
+  "expected_file_count": 10,
+  "allow_add": true,
+  "allow_modify": true,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "feat(publishing): add P2B+ provider adapter boundary",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P2B+",
+    "authorization": "Implementation Authorization Review A.GO — Independent Review A.GO",
+    "real_provider_entry_conditions": [
+      "X Provider Authorization (human decision) — P4",
+      "POST /2/tweets Endpoint Approval — P4",
+      "OAuth 2.0 Authorization — P4",
+      "Credential Handling Approval — P4",
+      "External IO Authorization — P4"
+    ],
+    "catalog_notes": "P2B+ does NOT register any new provider in providerContracts[]. Catalog counts unchanged. Separate catalog governance required for any Real Provider registration.",
+    "test1233_policy": "No numbered test 1233 added. P2B+ boundary tests run as non-numbered TP-AUX checks (P2B-1 to P2B-24) in test_text_post_slice.sh.",
+    "real_provider_status": "Prohibited — Resolver throws REAL_PROVIDER_NOT_AUTHORIZED for EXECUTION_MODE.LIVE",
+    "credential_status": "CredentialReference types only — no values, no resolver, no secret store",
+    "registry_status": "Not implemented — SingleFakeProviderResolver; Registry deferred to 2+ providers"
+  }
+}

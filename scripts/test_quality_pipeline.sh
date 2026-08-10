@@ -14230,6 +14230,9 @@ const forbiddenPatterns = [
 
 /** v1.74.0 ADR-0016 authorized Mock Provider production module */
 /** Stage A X text-only MVP fake dry-run slice (catalog registration still prohibited) */
+/** P2B+ Provider Adapter Boundary — Implementation Authorization A.GO */
+/** (Gateway / Resolver Boundary / Fake Adapter / Capability / NormalizedContract / CredentialReference) */
+/** Real Provider / External IO / Catalog registration remain Prohibited */
 const authorizedImplementationPaths = new Set([
   "src/lib/mock_provider.js",
   "src/lib/image_generation_mock_provider.js",
@@ -14240,6 +14243,13 @@ const authorizedImplementationPaths = new Set([
   "src/lib/text_post_kill_switch.js",
   "src/lib/text_post_service.js",
   "src/lib/x_text_post_mock_provider.js",
+  // P2B+ Provider Adapter Boundary (authorized — Implementation Authorization A.GO)
+  "src/lib/text_post_capability.js",
+  "src/lib/normalized_provider_contract.js",
+  "src/lib/x_text_post_fake_adapter.js",
+  "src/lib/text_post_provider_resolver.js",
+  "src/lib/text_post_gateway.js",
+  "src/lib/credential_reference.js",
 ]);
 
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
