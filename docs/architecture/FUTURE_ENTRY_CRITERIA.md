@@ -19,7 +19,7 @@ Future Layer および v2 Architecture へ **実装を開始する前** に満�
 ## Current Maturity Position
 
 ```text
-Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.87.0 Bounded Productization Entry Released; Provider Production Readiness SSOT Alignment Complete; P2A Boundary Specifications Durable Complete / IR A.GO; P2-R1–R4 Complete; Documentation Implementation In Progress versionless; Next = Documentation Independent Review; prior Post-Push Record Population Complete; continuous v1.86.x Reconciliation Terminated; Bounded Production Ready NO; Global Production Ready Not Declared; Pending Release None; Real Provider / External IO Prohibited; ADR-0024）
+Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complete（v1.87.0 Bounded Productization Entry Released; Provider Production Readiness SSOT Alignment Complete; P2A Boundary Specifications Durable Complete / IR A.GO; P2-R1–R4 Complete; Documentation Implementation In Progress versionless; P2B+ Provider Adapter Boundary Complete / Published（versionless; tip c6269918c67af9ef2aa4822c9935435089963a70）; Post-Push Record Population In Progress; continuous v1.86.x Reconciliation Terminated; Bounded Production Ready NO; Global Production Ready Not Declared; Pending Release None; Real Provider / External IO Prohibited; ADR-0024）
 ```
 
 | 項目 | 状態（v1.72.0） |
@@ -69,7 +69,7 @@ Current Maturity: Level 3.19 — Repository Baseline Inventory Authority Complet
 | Corrective Released-State Reconciliation（v1.86.18→Record） | **Completed / Released**（v1.86.19） |
 | Corrective Released-State Reconciliation（v1.86.19→Record） | **Completed / Released**（v1.86.20） |
 | Corrective Released-State Reconciliation（v1.86.20→Record） | **Completed / Released**（v1.86.21） |
-| Bounded Productization Entry（v1.87.0） | **Released / P1 Complete / Closed**（ADR-0024）; P2 Planning **Complete**; **P2A** Boundary Specifications **Durable Complete** / IR **A.GO**; P2-R1–R4 **Complete**（Outcome **D — X Conditional Recommendation**）; Documentation Implementation **In Progress**（versionless）; Next = **Documentation Independent Review**; Real Provider / External IO **Prohibited** |
+| Bounded Productization Entry（v1.87.0） | **Released / P1 Complete / Closed**（ADR-0024）; P2 Planning **Complete**; **P2A** Boundary Specifications **Durable Complete** / IR **A.GO**; P2-R1–R4 **Complete**（Outcome **D — X Conditional Recommendation**）; Documentation Implementation **In Progress**（versionless）; **P2B+ Provider Adapter Boundary: Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`）; Post-Push Record Population **In Progress**; Next = **Documentation Independent Review** + P3 Planning; Real Provider / External IO **Prohibited** |
 | v1.86.22 Reconciliation | **Not authorized** |
 | Image Provider Review Entry / Formal Assessment | **NO** / **NO**（not authorized） |
 | Final Architecture Review | **Completed**（DECISION D — Formal Assessment Accepted） |

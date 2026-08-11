@@ -320,14 +320,14 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | Working Tree State | **Clean** at released baseline `v1.87.0`（Post-Push Record Population Implementation edits are out-of-band until separately committed; tip SHA ≠ Current Commit authority） | **Recorded** |
 | Divergence State | `0 0`（ahead/behind vs `origin/main` at released baseline） | **Recorded** |
 | Current Repository Baseline | `v1.87.0` @ `04725ba8c20324c652a5f316bb05c013b968f38d` | **Recorded** |
-| Current Governance Phase | **v1.87.0 Bounded Productization Entry — P1 Complete / Closed; P2A Boundary Specifications Complete**; lifecycle closure **In Progress**（versionless; Real Provider / External IO **Prohibited**） | **Recorded** |
-| Next Authorized Phase | **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**; Documentation Implementation **In Progress**; P2A **Durable Complete**; P2-R1–R4 **Complete**（Instagram NOT FIT; Threads Deferred CONDITIONAL FIT; X CONDITIONAL FIT; Outcome **D — X Conditional Recommendation**）; Provider Authorization **No**; endpoints **Not Approved**; P2B+/P3/P4 **not authorized**; Real Provider / External IO / credentials / network / Automatic SNS **Prohibited**; version **Not Assigned** | **Recorded** |
+| Current Governance Phase | **v1.87.0 Bounded Productization Entry — P1 Complete / Closed; P2A Boundary Specifications Complete**; lifecycle closure **In Progress**（versionless）; **P2B+ Provider Adapter Boundary: Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`; Real Provider / External IO **Prohibited**） | **Recorded** |
+| Next Authorized Phase | **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**; Documentation Implementation **In Progress**; P2A **Durable Complete**; P2-R1–R4 **Complete**（Instagram NOT FIT; Threads Deferred CONDITIONAL FIT; X CONDITIONAL FIT; Outcome **D — X Conditional Recommendation**）; **P2B+ Provider Adapter Boundary: Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`）; Provider Authorization **No**; endpoints **Not Approved**; **P3 Human Approval Workflow Foundation: Not Started / Not Authorized**; P4 **not authorized**; Real Provider / External IO / credentials / network / Automatic SNS **Prohibited**; version **Not Assigned** | **Recorded** |
 | Assessment State | **Complete** — Assessment Decision **READY**（bounded canonical Mock Provider scope — v1.78.0 lineage preserved）; Image Provider Review Entry **NO** / Formally Assessed **NO** | **Recorded** |
 | Declaration State | Bounded Production Ready **NO** / Global Provider Production Ready **Not Declared** | **Recorded** |
 | Architecture Maturity State | **Level 3.19** | **Recorded** |
 | Quality Pipeline Baseline | **1232 PASS**（Quality Enforcement Correction lineage preserved; identity Tests 98 / 1232 assert Record `v1.87.0`） | **Recorded** |
 | Public Contract Catalog Baseline | catalogVersion `1.0`; Provider Contracts `3`; publicContracts `7`; **Total Foundations** `catalog.foundations.length` = `12`（Application Layer `7` + Platform Layer `5`）; **Application Foundations**（CLI label / `layer === "application"`）= `7`; dependencyRules `6`; compatibilityMatrix `5`; layerRules `6`; versionRules `3`; deprecationRules `4`; validate = **valid** | **Recorded**（schema-proven; CLI Application Foundations ≠ Total Foundations） |
-| Required Consistency Checks | Defined by Synchronization Matrix（§8）; Productization Entry **Released**（`v1.87.0`）; prior released-state reconciliation **Released**（`v1.86.21`）; continuous `v1.86.x` Reconciliation **Terminated**; P1 Record Population **Complete**; P2 Planning **Complete**; P2A Boundary Specifications **Durable Complete** / IR **A.GO**; P2-R1–R4 **Complete**; Provider Re-evaluation Documentation Implementation **In Progress**（docs-only; versionless）; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated** | **Recorded** |
+| Required Consistency Checks | Defined by Synchronization Matrix（§8）; Productization Entry **Released**（`v1.87.0`）; prior released-state reconciliation **Released**（`v1.86.21`）; continuous `v1.86.x` Reconciliation **Terminated**; P1 Record Population **Complete**; P2 Planning **Complete**; P2A Boundary Specifications **Durable Complete** / IR **A.GO**; P2-R1–R4 **Complete**; Provider Re-evaluation Documentation Implementation **In Progress**（docs-only; versionless）; **P2B+ Provider Adapter Boundary: Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`; Post-Push Record Population **In Progress**）; Quality enforcement D-006 **Remediated**（**1232 PASS**）; D-008 **Remediated** | **Recorded** |
 | Generated Files Policy | Manual sync prohibited; regenerate via authoritative process | **Recorded** |
 | Derived Documents | Enumerated in §8.2; Required Derived Target current-state identity/governance displays must synchronize to Record `v1.87.0`（Pending Release **None**） | **Recorded** |
 | Historical Records | VERSION history / CHANGELOG historical sections / completed ADR evidence（including prior baseline `v1.86.21` @ `4c1c212…`, `v1.86.20` @ `a86e409e…`, and earlier `v1.86.x` / `v1.86.0` lineages） | **Recorded** |
@@ -349,6 +349,7 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | P2A Boundary Specifications | **Complete**（Independent Review **Complete** / **A.GO**） |
 | P2A lifecycle closure | **Durable Complete**（versionless） |
 | Provider Re-evaluation Documentation | **In Progress**（versionless governance tip; version **Not Assigned**; no Pending Release; tip evidence at entry `88f33aff78d7be6e9b76427338c5ffe1b4ff0302`） |
+| P2B+ Provider Adapter Boundary | **Complete / Published**（versionless; commit `c6269918c67af9ef2aa4822c9935435089963a70`; feat(publishing): add P2B+ provider adapter boundary; Gateway / Resolver Boundary / Fake Adapter / Capability / NormalizedContract / CredentialReference; Scoping Planning → Remediation → Implementation Authorization A.GO → Implementation → Independent Review A.GO → Commit Preparation → Post-Commit Reverification A.GO → Push A.GO; Post-Push Record Population **In Progress**） |
 | Provider Authorization | **No** |
 | Endpoints Approved | **No** |
 | Selection Outcome | **D. CONDITIONAL RECOMMENDATION — X** |
@@ -369,10 +370,12 @@ new SemVer beyond `v1.87.0` and do **not** authorize P2 Implementation.
 | Continuous v1.86.x Reconciliation | **Terminated** after v1.86.21 |
 | v1.86.22 | **Not authorized** |
 | v1.87.1 | **Not assigned** |
+| P2B+ Provider Adapter Boundary commit | **Published**（`c6269918c67af9ef2aa4822c9935435089963a70` / versionless / main / origin/main synchronized） |
+| P2B+ Post-Push Record Population | **In Progress** |
 | Reverse synchronization | **Prohibited** |
 
 **Current Version is `v1.87.0`.** Pending Release ID is **None**. P2 Planning is **Complete**.
-**P2A** Boundary Specifications are **Durable Complete**（IR **A.GO**）. P2-R1–R4 Research/Selection are **Complete**. Current docs-only work is **Provider Re-evaluation Research and Selection Documentation Implementation**（not a Pending Release; version **Not Assigned**; release declaration **Not Applicable** / versionless governance tip）.
+**P2A** Boundary Specifications are **Durable Complete**（IR **A.GO**）. P2-R1–R4 Research/Selection are **Complete**. **P2B+ Provider Adapter Boundary** is **Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`）. Current docs-only work includes **Provider Re-evaluation Research and Selection Documentation Implementation**（not a Pending Release; version **Not Assigned**; release declaration **Not Applicable** / versionless governance tip）. **P3 Human Approval Workflow Foundation** is **Not Started / Not Authorized**.
 
 ```
 Schema Definition
@@ -391,7 +394,7 @@ Schema Definition
 | Pending Designation | **None** |
 | Pending Phase | **None** |
 | Pending Declaration | **Not Applicable** |
-| Next Authorized Capability Phase | **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**; concrete endpoints **Research Complete / Concrete Endpoint Selection and Approval Pending Separate Planning**; Provider Authorization **No**; P2B+ **not started** |
+| Next Authorized Capability Phase | **P2 Provider Re-evaluation Research and Selection Documentation Independent Review**; concrete endpoints **Research Complete / Concrete Endpoint Selection and Approval Pending Separate Planning**; Provider Authorization **No**; P2B+ **Complete / Published**（versionless; tip `c6269918c67af9ef2aa4822c9935435089963a70`）; P3 Human Approval Workflow Foundation **Not Started / Not Authorized** |
 | P2 Implementation | **Not authorized** |
 | Real Provider / External IO / credentials / network | **Not authorized** / **Prohibited** |
 | Automatic SNS Publishing | **Prohibited** |
@@ -413,7 +416,7 @@ is **None**.
 | Evidence Class | Observed Evidence（read-only） | Treatment |
 | -------------- | ------------------------------ | --------- |
 | Current Released Commit | Tag `v1.87.0` = `04725ba8c20324c652a5f316bb05c013b968f38d`; parent `4c1c212…`（`v1.86.21`）; tag type `commit`（lightweight） | **Validation evidence** — authorizes Record §6.2.2 Current Commit/Tag; not a substitute for the Record |
-| Repository Population Tip | `main` / `origin/main` tip may be `eee5ba0b9450102d148581043abb043fcde5972f`（Record Population commit） | **Evidence only** — tip SHA ≠ Current Commit authority; do not reverse-sync tip → Record |
+| Repository Population Tip | `main` / `origin/main` tip is `c6269918c67af9ef2aa4822c9935435089963a70`（P2B+ Provider Adapter Boundary commit — feat(publishing): add P2B+ provider adapter boundary）; prior Record Population tip `eee5ba0b9450102d148581043abb043fcde5972f` preserved for lineage | **Evidence only** — tip SHA ≠ Current Commit authority; do not reverse-sync tip → Record |
 | Prior released baseline | Tag `v1.86.21` = `4c1c21259493d3bcb7a1de79bf6c99c09fc0ffd1`; Tag `v1.86.20` = `a86e409efb0be578325eb68b1f98471c610b1f73`; earlier `v1.86.x` / `v1.86.0` tags preserved | **Historical** — preserved; not Current Version |
 | Working tree evidence | Released baseline `v1.87.0` is clean at publication; Record Population Implementation edits are out-of-band until committed | Implementation edits ≠ Record authority |
 | Derived VERSION / README / PPRR | Must display Current Version `v1.87.0`; Pending Release **None**; P2A **Durable Complete**; R1–R4 **Complete**; Next Phase **Documentation Independent Review** | Synchronize Record → Derived only |

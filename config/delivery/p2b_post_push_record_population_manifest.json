@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p2b-post-push-record-population-2026-08",
+  "title": "P2B+ Post-Push Record Population — BASELINE_SYNCHRONIZATION / VERSION / FUTURE_ENTRY_CRITERIA",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "c6269918c67af9ef2aa4822c9935435089963a70",
+  "allowed_paths": [
+    "docs/VERSION.md",
+    "docs/architecture/BASELINE_SYNCHRONIZATION.md",
+    "docs/architecture/FUTURE_ENTRY_CRITERIA.md",
+    "config/delivery/p2b_post_push_record_population_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "content/carousel",
+    "images/carousel",
+    "output/instagram"
+  ],
+  "expected_file_count": 4,
+  "allow_add": true,
+  "allow_modify": true,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): populate P2B+ post-push record",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P2B+ Post-Push Record Population",
+    "scope": "Governance record update only. BASELINE_SYNCHRONIZATION.md (SSOT) → VERSION.md (Derived) → FUTURE_ENTRY_CRITERIA.md (Derived). No code changes, no catalog changes, no version bump.",
+    "carousel_protection": "35 carousel/instagram unstaged modifications remain in working tree. Delivery gate allowed_paths excludes all carousel/instagram paths. Commit is clean.",
+    "test1233_policy": "No numbered test 1233. Quality Pipeline 1232 PASS maintained."
+  }
+}
