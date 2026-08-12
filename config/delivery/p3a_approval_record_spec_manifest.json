@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p3a-approval-record-spec-2026-08",
+  "title": "P3A — Approval Record Specification",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "2de47d0881edadbe8c156455181e5f81abc3c01c",
+  "allowed_paths": [
+    "docs/architecture/P3_APPROVAL_RECORD_SPEC.md",
+    "config/delivery/p3a_approval_record_spec_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    ".gitignore",
+    "src/lib/text_post_approval_record.js",
+    "src/lib/text_post_approval_file_store.js",
+    "src/text_post_approve.js",
+    "src/text_post_draft.js",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "scripts/test_text_post_approval.sh"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): add P3A approval record specification",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P3A — Approval Record Specification",
+    "scope": "Specification document only. No code changes. No .gitignore changes. No catalog changes. No version bump. P3B Implementation NOT authorized.",
+    "p3b_status": "Not Authorized. P3-ImplAuth gate required before any implementation.",
+    "gitignore_note": "tmp/ gitignore entry is specified in P3_APPROVAL_RECORD_SPEC.md §5.3 but NOT applied here. Applies in P3B.",
+    "forbidden_paths_note": "Forbidden list includes all P3B implementation targets to prevent accidental scope creep."
+  }
+}
