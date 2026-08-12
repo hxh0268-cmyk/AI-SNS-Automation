@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p3-human-approval-workflow-planning-2026-08",
+  "title": "P3 Human Approval Workflow Foundation — Planning Document",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "cb2b3db29636c6758b81c3e0dbe0f8ba6bc9304d",
+  "allowed_paths": [
+    "docs/architecture/P3_HUMAN_APPROVAL_WORKFLOW_PLANNING.md",
+    "config/delivery/p3_human_approval_workflow_planning_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/text_post_approval_record.js",
+    "src/lib/text_post_approval_file_store.js",
+    "src/text_post_approve.js",
+    "src/text_post_draft.js",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): add P3 human approval workflow planning",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P3 Planning",
+    "scope": "Planning document only. No code changes. No catalog changes. No version bump. P3 Implementation is NOT authorized by this commit.",
+    "carousel_protection": "35 carousel/instagram unstaged modifications remain in working tree. Delivery gate allowed_paths excludes all carousel/instagram paths.",
+    "p3_impl_status": "Not Authorized. P3A Spec and P3-ImplAuth gate required before any implementation.",
+    "next_steps": [
+      "Commit this planning document (versionless governance tip)",
+      "Begin P3A: Approval Record Specification (docs-only)",
+      "P3-ImplAuth: human authorization gate before P3B implementation"
+    ]
+  }
+}
