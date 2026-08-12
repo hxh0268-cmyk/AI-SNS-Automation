@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p3-impl-auth-2026-08",
+  "title": "P3 Implementation Authorization (P3-ImplAuth)",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "c63364d268a73c36c3f909330115814984607873",
+  "allowed_paths": [
+    "docs/architecture/P3_IMPL_AUTH.md",
+    "config/delivery/p3_impl_auth_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    ".gitignore",
+    "src/lib/text_post_approval_record.js",
+    "src/lib/text_post_approval_file_store.js",
+    "src/text_post_approve.js",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "src/lib/token_store.js",
+    "scripts/test_text_post_approval.sh"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): grant P3 implementation authorization",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P3-ImplAuth — Implementation Authorization",
+    "scope": "Authorization document only. P3B implementation NOT started in this commit.",
+    "p3b_authorized_paths": [
+      "src/lib/text_post_approval_record.js",
+      "src/lib/text_post_approval_file_store.js",
+      "src/text_post_approve.js",
+      "src/lib/text_post_service.js",
+      "src/lib/text_post_audit.js",
+      ".gitignore",
+      "scripts/test_text_post_approval.sh",
+      "scripts/test_quality_pipeline.sh"
+    ],
+    "p3b_status": "Authorized. Implementation begins in next P3B phase.",
+    "adr_required": false,
+    "catalog_change": false,
+    "version_bump": false
+  }
+}
