@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "change_id": "p3a-approval-record-spec-remediation-2026-08",
+  "title": "P3A Approval Record Spec — Bounded Remediation (F-01 F-03 F-04)",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "bdf50d77f2e06dda7fab124e7b1c462af80f9235",
+  "allowed_paths": [
+    "docs/architecture/P3_APPROVAL_RECORD_SPEC.md",
+    "config/delivery/p3a_approval_record_spec_remediation_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    ".gitignore",
+    "src/lib/text_post_approval_record.js",
+    "src/lib/text_post_approval_file_store.js",
+    "src/text_post_approve.js",
+    "src/text_post_draft.js",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "scripts/test_text_post_approval.sh"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": true,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): fix P3A approval record spec contentDigest format",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_provider_authorization",
+    "no_endpoint_approval",
+    "no_real_provider",
+    "no_external_io",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "P3A Bounded Remediation",
+    "ir_findings": ["F-01 Major Gap", "F-03 Minor Gap", "F-04 Minor Gap"],
+    "scope": "Spec document correction only. No code changes. No implementation authorization.",
+    "f01_fix": "contentDigest format: sha256:<hex> → <64-hex> (bare hex, matching contentDigest() output)",
+    "f03_fix": "Cross-session protocol Step 6: '期待 providerId' → 'adapter.providerId' (explicit reference)",
+    "f04_fix": "expiresAt non-null behavior: explicitly reject with error in P3B (C-09 + Step 11)"
+  }
+}

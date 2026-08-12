@@ -62,7 +62,7 @@ Approval Record は、CLI オペレーターが特定コンテンツを承認し
   "actorId": "<operator-identity-string>",
   "approvedAt": "<ISO-8601-UTC>",
   "correlationId": "<corr-id>",
-  "contentDigest": "sha256:<64-hex-chars>",
+  "contentDigest": "<64-hex-chars>",
   "normalizedText": "<exact-approved-text>",
   "approvalMode": "dry_run",
   "providerId": "<provider-id-string>",
@@ -78,7 +78,7 @@ Approval Record は、CLI オペレーターが特定コンテンツを承認し
 | `actorId` | `string` | ✅ | 承認したオペレーターの識別子（空文字禁止）。認証情報ではない |
 | `approvedAt` | `string` | ✅ | ISO-8601 UTC タイムスタンプ（例: `2026-08-12T11:00:00.000Z`）|
 | `correlationId` | `string` | ✅ | 対応する publication attempt の correlation ID（空文字禁止）|
-| `contentDigest` | `string` | ✅ | `sha256:<hex>` 形式。承認時の `normalizedText` のダイジェスト |
+| `contentDigest` | `string` | ✅ | 64文字 hex 文字列（`contentDigest()` 関数の出力）。承認時の `normalizedText` のダイジェスト |
 | `normalizedText` | `string` | ✅ | 承認された正規化テキスト（空文字禁止）。digest の原文 |
 | `approvalMode` | `string` | ✅ | P3B では `"dry_run"` のみ許容。将来: `"live"` は P4+ |
 | `providerId` | `string` | ✅ | 対象 provider の ID（例: `"x-text-post-mock-provider"`） |
@@ -92,11 +92,11 @@ Approval Record は、CLI オペレーターが特定コンテンツを承認し
 | C-02 | `actorId` は 1 文字以上の文字列（trim 後も空文字でないこと）|
 | C-03 | `approvedAt` は ISO-8601 形式としてパース可能であること |
 | C-04 | `correlationId` は 1 文字以上の文字列 |
-| C-05 | `contentDigest` は `sha256:` プレフィックス + 64 文字の hex |
+| C-05 | `contentDigest` は 64 文字の hex 文字列（`contentDigest()` 関数の出力形式と同一）|
 | C-06 | `normalizedText` は 1 文字以上 |
 | C-07 | `approvalMode` は `"dry_run"` （P3B の実装スコープ内）|
 | C-08 | `providerId` は 1 文字以上の文字列 |
-| C-09 | `expiresAt` は `null` または ISO-8601 文字列（P3B では `null` のみ）|
+| C-09 | `expiresAt` は `null` のみ（P3B）。非 null 値は `{ ok: false, error: "expiresAt must be null in P3B" }` を返す |
 | C-10 | Approval Record は **追加フィールドを禁止**（下記 §4 の禁止フィールドを含むいかなる未知フィールドも拒否）|
 
 ---
@@ -179,11 +179,11 @@ P3B の実装は以下の順序で検証を行うこと:
 4. actorId         string, trim 後 length >= 1
 5. approvedAt      string, ISO-8601 パース可能
 6. correlationId   string, trim 後 length >= 1
-7. contentDigest   string, /^sha256:[0-9a-f]{64}$/ にマッチ
+7. contentDigest   string, /^[0-9a-f]{64}$/ にマッチ（`contentDigest()` 出力形式）
 8. normalizedText  string, length >= 1
 9. approvalMode    === "dry_run"（P3B 実装スコープ）
 10. providerId     string, length >= 1
-11. expiresAt      null または string（P3B では null のみ）
+11. expiresAt      null のみ許容（P3B）— null 以外は { ok: false, error: "expiresAt must be null in P3B" }
 ```
 
 検証エラーは最初に検出した問題を返す（early-exit）。
@@ -198,7 +198,7 @@ Step 2  liveDigest = contentDigest(content.normalizedText)  ← 現在のコン�
 Step 3  liveDigest === record.contentDigest                 ← record の digest と一致
 Step 4  content.normalizedText === record.normalizedText    ← テキスト直接一致
 Step 5  record.approvalMode === "dry_run"                   ← P3B スコープ内
-Step 6  record.providerId === 期待 providerId               ← provider 一致
+Step 6  record.providerId === adapter.providerId             ← Resolver が解決した ProviderAdapter の providerId と一致
 ```
 
 いずれかが失敗した場合: `APPROVAL_CONTENT_MISMATCH` または `APPROVAL_REQUIRED` を返す。
