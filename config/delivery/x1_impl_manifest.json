@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "change_id": "x1-impl-2026-08",
+  "title": "X1 — Real Provider Adapter Implementation",
+  "change_type": "implementation",
+  "base_branch": "main",
+  "expected_base_commit": "3b3aa5b50cb735248152a8c0fe104e6b59a95882",
+  "allowed_paths": [
+    "src/lib/x_real_provider_adapter.js",
+    "src/lib/x_oauth_client.js",
+    "src/lib/x_credential_loader.js",
+    "scripts/test_x_real_provider.sh",
+    "config/delivery/x1_impl_manifest.json",
+    "src/lib/text_post_provider_resolver.js",
+    "src/lib/text_post_gateway.js",
+    "src/lib/text_post_idempotency.js",
+    "src/lib/text_post_audit.js",
+    "scripts/test_quality_pipeline.sh"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "src/lib/token_store.js",
+    ".github/workflows/x_daily_post.yml",
+    "src/lib/x_daily_job.js"
+  ],
+  "expected_file_count": 10,
+  "allow_add": true,
+  "allow_modify": true,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "feat(x1): implement X real provider adapter (offline; no network)",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_implementation_notes": {
+    "stage": "X1 — Real Provider Adapter Implementation",
+    "authorized_by": "ADR-0025 (commit 3b3aa5b50cb735248152a8c0fe104e6b59a95882)",
+    "network_policy": "No real network in X1. Transport is injectable. Real transport injected at X2 smoke test only.",
+    "credential_policy": "Credentials loaded from env only. Never committed, logged, or in fixtures.",
+    "kill_switch": "Default OFF. Adapter checks kill-switch as defense-in-depth. Primary check at Service.",
+    "new_files": [
+      "src/lib/x_real_provider_adapter.js",
+      "src/lib/x_oauth_client.js",
+      "src/lib/x_credential_loader.js",
+      "scripts/test_x_real_provider.sh"
+    ],
+    "modified_files": [
+      "src/lib/text_post_provider_resolver.js - LIVE+AUTHORIZED routes to x-real-provider",
+      "src/lib/text_post_gateway.js - LIVE mode unlocked when realProviderEnabled",
+      "src/lib/text_post_idempotency.js - added createFileBackedIdempotencyStore",
+      "src/lib/text_post_audit.js - added X1 real-publish event types",
+      "scripts/test_quality_pipeline.sh - added X1 TP-AUX verification"
+    ],
+    "next_step": "X2 smoke test (smoke_test_x_post.sh with real transport + credentials)"
+  }
+}

@@ -1,4 +1,4 @@
-/** 11 audit event types for the Stage A text post lifecycle. */
+/** Audit event types for the text post lifecycle (Stage A + X1 Real Provider). */
 export const AUDIT_EVENT_TYPE = {
   DRAFT_CREATED: "draft_created",
   VALIDATION_PASSED: "validation_passed",
@@ -11,6 +11,13 @@ export const AUDIT_EVENT_TYPE = {
   FAKE_PROVIDER_INVOKED: "fake_provider_invoked",
   DRY_RUN_SUCCEEDED: "dry_run_succeeded",
   PROVIDER_FAILED: "provider_failed",
+  // X1 Real Provider event types (ADR-0025 §10)
+  REAL_PROVIDER_INVOKED: "real_provider_invoked",
+  REAL_PROVIDER_SUCCEEDED: "real_provider_succeeded",
+  REAL_PROVIDER_FAILED: "real_provider_failed",
+  UNKNOWN_RESULT_QUARANTINE: "unknown_result_quarantine",
+  RETRY_ATTEMPTED: "retry_attempted",
+  DUPLICATE_REJECTED_LEDGER: "duplicate_rejected_ledger",
 };
 
 // Field names that must never appear in audit events

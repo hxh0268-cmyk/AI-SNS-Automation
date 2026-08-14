@@ -14250,6 +14250,10 @@ const authorizedImplementationPaths = new Set([
   "src/lib/text_post_provider_resolver.js",
   "src/lib/text_post_gateway.js",
   "src/lib/credential_reference.js",
+  // X1 Real Provider Adapter (authorized — ADR-0025; offline only; no real network in X1)
+  "src/lib/x_real_provider_adapter.js",
+  "src/lib/x_oauth_client.js",
+  "src/lib/x_credential_loader.js",
 ]);
 
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
@@ -22204,3 +22208,42 @@ else
 fi
 
 echo "== x text-only stage a auxiliary verification complete =="
+
+# == X1 Real Provider auxiliary verification ==
+# Non-numbered TP-AUX checks — do not affect the 1232 PASS count / do not add Test 1233.
+echo ""
+echo "== x1 real provider auxiliary verification =="
+
+_x1_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_x1_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$SCRIPT_DIR/test_x_real_provider.sh" ] \
+  && _x1_aux_pass "test_x_real_provider.sh exists" \
+  || _x1_aux_fail "test_x_real_provider.sh not found"
+
+[ -f "$PROJECT_ROOT/src/lib/x_real_provider_adapter.js" ] \
+  && _x1_aux_pass "x_real_provider_adapter.js exists" \
+  || _x1_aux_fail "x_real_provider_adapter.js not found"
+
+[ -f "$PROJECT_ROOT/src/lib/x_oauth_client.js" ] \
+  && _x1_aux_pass "x_oauth_client.js exists" \
+  || _x1_aux_fail "x_oauth_client.js not found"
+
+[ -f "$PROJECT_ROOT/src/lib/x_credential_loader.js" ] \
+  && _x1_aux_pass "x_credential_loader.js exists" \
+  || _x1_aux_fail "x_credential_loader.js not found"
+
+[ -f "$PROJECT_ROOT/config/delivery/x1_impl_manifest.json" ] \
+  && _x1_aux_pass "x1_impl_manifest.json exists" \
+  || _x1_aux_fail "x1_impl_manifest.json not found"
+
+_x1_test_out="$(bash "$SCRIPT_DIR/test_x_real_provider.sh" 2>&1)" && _x1_test_ok=0 || _x1_test_ok=$?
+if [[ "$_x1_test_ok" -eq 0 ]]; then
+  _x1_pass_count="$(printf '%s\n' "$_x1_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _x1_aux_pass "X1 real provider tests passed ($_x1_pass_count checks)"
+else
+  printf '%s\n' "$_x1_test_out" >&2
+  _x1_aux_fail "X1 real provider tests failed"
+fi
+
+echo "== x1 real provider auxiliary verification complete =="

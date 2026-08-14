@@ -17,8 +17,9 @@
  * Provider Registry is NOT implemented in P2B+ (YAGNI).
  */
 
-import { CAPABILITY, EXECUTION_MODE } from "./text_post_capability.js";
+import { CAPABILITY, EXECUTION_MODE, AUTHORIZATION_STATE } from "./text_post_capability.js";
 import { createFakeXProviderAdapter } from "./x_text_post_fake_adapter.js";
+import { createXRealProviderAdapter } from "./x_real_provider_adapter.js";
 
 /** Error kinds for resolution failures. */
 export const RESOLVER_ERROR = {
@@ -41,24 +42,29 @@ export class ProviderResolutionError extends Error {
 }
 
 /**
- * Create a Provider Resolver (SingleFakeProviderResolver in P2B+).
+ * Create a Provider Resolver.
  *
  * Interface:
  *   { resolve(capability, executionMode, authorizationState) → ProviderAdapter }
  *
- * @param {object} [_config]  Reserved for future Registry-backed configuration.
+ * @param {{
+ *   realProviderEnabled?: boolean,
+ * }} [config]
+ *   - realProviderEnabled: true unlocks LIVE → x-real-provider routing (ADR-0025 prototype scope).
+ *     Defaults to REAL_PUBLISH_ENABLED env var. Without it, LIVE mode always throws (P2B+ behavior).
  * @returns {{ resolve: (capability: string, executionMode: string, authorizationState: string) => object }}
  */
-export function createProviderResolver(_config = {}) {
+export function createProviderResolver(config = {}) {
+  const realProviderEnabled =
+    config.realProviderEnabled ?? (process.env.REAL_PUBLISH_ENABLED === "true");
   const fakeAdapter = createFakeXProviderAdapter();
 
   return {
     /**
      * Resolve capability + mode to a ProviderAdapter.
-     * Throws ProviderResolutionError if no adapter is available or if the
-     * request would require a Real Provider (prohibited in P2B+).
+     * Throws ProviderResolutionError if no adapter is available.
      */
-    resolve(capability, executionMode, _authorizationState) {
+    resolve(capability, executionMode, authorizationState) {
       if (capability !== CAPABILITY.PUBLISH_TEXT) {
         throw new ProviderResolutionError(
           RESOLVER_ERROR.UNSUPPORTED_CAPABILITY,
@@ -67,10 +73,17 @@ export function createProviderResolver(_config = {}) {
       }
 
       if (executionMode === EXECUTION_MODE.LIVE) {
-        // Structural block: Real Provider is prohibited until separately authorized (P4+).
+        if (realProviderEnabled && authorizationState === AUTHORIZATION_STATE.AUTHORIZED) {
+          // ADR-0025: X Real Provider authorized at prototype scope.
+          // Adapter requires transport injection for any network call (X1 safe default: no transport).
+          return createXRealProviderAdapter();
+        }
+        // Structural block: LIVE without REAL_PUBLISH_ENABLED + AUTHORIZED (P2B+ default preserved).
         throw new ProviderResolutionError(
           RESOLVER_ERROR.REAL_PROVIDER_NOT_AUTHORIZED,
-          "live execution requires a Real Provider which is not authorized in P2B+",
+          realProviderEnabled
+            ? "live execution requires AUTHORIZED state (ADR-0025 prototype scope)"
+            : "live execution requires Real Provider authorization (set REAL_PUBLISH_ENABLED=true with ADR-0025 scope)",
         );
       }
 

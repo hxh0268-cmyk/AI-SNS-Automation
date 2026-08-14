@@ -31,13 +31,10 @@ import {
   RESOLVER_ERROR,
 } from "./text_post_provider_resolver.js";
 
-/** Capabilities the Gateway accepts in P2B+. */
+/** Capabilities the Gateway accepts. */
 const ALLOWED_CAPABILITIES = new Set([CAPABILITY.PUBLISH_TEXT]);
 
-/** Execution modes the Gateway accepts in P2B+. */
-const ALLOWED_EXECUTION_MODES = new Set([EXECUTION_MODE.MOCK]);
-
-/** Result statuses that indicate real publication — blocked at Gateway level. */
+/** Result statuses that indicate real publication. */
 const LIVE_PUBLISH_STATUSES = new Set(["published", "live_published"]);
 
 /**
@@ -46,11 +43,20 @@ const LIVE_PUBLISH_STATUSES = new Set(["published", "live_published"]);
  * @param {{
  *   resolver?: ReturnType<typeof createProviderResolver>,
  *   noNetworkGuard?: ReturnType<typeof createNoNetworkGuard>,
+ *   realProviderEnabled?: boolean,
  * }} [deps]
+ *   - realProviderEnabled: true unlocks LIVE execution mode (kill-switch gated at adapter).
+ *     Defaults to REAL_PUBLISH_ENABLED env var. ADR-0025 prototype scope.
  */
 export function createTextPostGateway(deps = {}) {
-  const resolver = deps.resolver ?? createProviderResolver();
+  const realProviderEnabled =
+    deps.realProviderEnabled ?? (process.env.REAL_PUBLISH_ENABLED === "true");
+  const resolver = deps.resolver ?? createProviderResolver({ realProviderEnabled });
   const noNetworkGuard = deps.noNetworkGuard ?? createNoNetworkGuard();
+
+  const ALLOWED_EXECUTION_MODES = realProviderEnabled
+    ? new Set([EXECUTION_MODE.MOCK, EXECUTION_MODE.LIVE])
+    : new Set([EXECUTION_MODE.MOCK]);
 
   return {
     /**
@@ -147,15 +153,15 @@ export function createTextPostGateway(deps = {}) {
 
       const adapterResult = adapter.invoke(normalizedRequest);
 
-      // 7. Block real-publish statuses (defense-in-depth at Gateway level)
-      if (adapterResult?.ok === true) {
+      // 7. Block real-publish statuses in MOCK mode (defense-in-depth; LIVE mode allows "published")
+      if (adapterResult?.ok === true && req.executionMode !== EXECUTION_MODE.LIVE) {
         const status = adapterResult.result?.status;
         if (LIVE_PUBLISH_STATUSES.has(status)) {
           return {
             ok: false,
             error: new TextPostError(
               TEXT_POST_ERROR_KIND.INTERNAL_ERROR,
-              "gateway: real published status is prohibited in P2B+",
+              "gateway: real published status is prohibited outside LIVE mode",
             ),
           };
         }

@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { TEXT_POST_ERROR_KIND, TextPostError } from "./text_post_lifecycle.js";
 
 /**
@@ -96,4 +98,65 @@ export function checkIdempotency(store, idempotencyKey, digest) {
   }
 
   return { ok: true, cached: null };
+}
+
+/**
+ * File-backed idempotency store for cross-session safety (X1/X4).
+ * Records are stored as JSON in tmp/publish-records/<jobId>.json.
+ * tmp/publish-records/ is gitignored.
+ *
+ * @param {{ dir?: string }} [opts]
+ */
+export function createFileBackedIdempotencyStore(opts = {}) {
+  const dir = opts.dir ?? path.join(process.cwd(), "tmp", "publish-records");
+
+  function recordPath(jobId) {
+    return path.join(dir, `${jobId}.json`);
+  }
+
+  function ensureDir() {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  }
+
+  return {
+    /**
+     * Get the publish record for a jobId, or null if not found.
+     * @param {string} jobId
+     * @returns {object | null}
+     */
+    get(jobId) {
+      const p = recordPath(jobId);
+      if (!fs.existsSync(p)) return null;
+      try {
+        return JSON.parse(fs.readFileSync(p, "utf-8"));
+      } catch {
+        return null;
+      }
+    },
+
+    /**
+     * Write a publish record for a jobId.
+     * @param {string} jobId
+     * @param {object} record
+     */
+    set(jobId, record) {
+      ensureDir();
+      fs.writeFileSync(recordPath(jobId), JSON.stringify(record, null, 2), "utf-8");
+    },
+
+    /**
+     * Check publish status for a jobId.
+     * @param {string} jobId
+     * @returns {"published" | "unknown_result" | "not_found"}
+     */
+    checkPublished(jobId) {
+      const record = this.get(jobId);
+      if (!record) return "not_found";
+      if (record.result === "published" && record.xPostId) return "published";
+      if (record.result === "unknown_result") return "unknown_result";
+      return "not_found";
+    },
+  };
 }
