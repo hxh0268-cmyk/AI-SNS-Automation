@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "change_id": "x2-smoke-2026-08",
+  "title": "X2 — Fixed-Text Smoke Test Script and Evidence",
+  "change_type": "implementation",
+  "base_branch": "main",
+  "expected_base_commit": "f31911bcca6ddf9883b6d74f7dfaffd2d1a0157e",
+  "allowed_paths": [
+    "scripts/smoke_test_x_post.sh",
+    "config/delivery/x2_smoke_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "src/lib/token_store.js",
+    ".github/workflows/x_daily_post.yml",
+    "src/lib/x_daily_job.js"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "feat(x2): add fixed-text smoke test script for POST /2/tweets",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "none",
+  "endpoint_approval": "none",
+  "external_io": "prohibited",
+  "real_provider": "prohibited",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_smoke_test_notes": {
+    "stage": "X2 — Fixed-Text Smoke Test",
+    "authorized_by": "ADR-0025 §9 + X0_PROTOTYPE_PLANNING.md §9",
+    "fixed_text": "AI-SNS-Automation X publishing smoke test [delete after verify]",
+    "dry_run_command": "bash scripts/smoke_test_x_post.sh --dry-run --actor <your-name>",
+    "execute_command": "REAL_PUBLISH_ENABLED=true bash scripts/smoke_test_x_post.sh --execute --actor <your-name>",
+    "required_env_vars": ["X_API_KEY", "X_API_SECRET", "X_ACCESS_TOKEN", "X_ACCESS_TOKEN_SECRET", "REAL_PUBLISH_ENABLED"],
+    "cleanup_required": "Delete test post manually on X after verification",
+    "idempotency": "tmp/publish-records/smoke-test-YYYY-MM-DD.json (gitignored)",
+    "result_record": "tmp/smoke/result-<corrId>.json (gitignored)",
+    "next_step": "X3 Content Generation + Approval Integration"
+  }
+}
