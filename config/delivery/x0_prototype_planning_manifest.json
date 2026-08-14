@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "change_id": "x0-prototype-planning-2026-08",
+  "title": "X0 — Prototype Planning / Real IO Authorization",
+  "change_type": "governance_docs",
+  "base_branch": "main",
+  "expected_base_commit": "d5912c6d3fd557345a8cb9cd0b5c731c3f964fac",
+  "allowed_paths": [
+    "docs/architecture/X0_PROTOTYPE_PLANNING.md",
+    "config/delivery/x0_prototype_planning_manifest.json"
+  ],
+  "forbidden_paths": [
+    ".env",
+    "src/lib/x_real_provider_adapter.js",
+    "src/lib/x_oauth_client.js",
+    "src/lib/x_credential_loader.js",
+    "src/lib/x_api_provider.js",
+    "src/lib/real_x_provider.js",
+    "src/lib/oauth_handler.js",
+    "src/lib/credential_resolver.js",
+    "src/lib/token_store.js",
+    ".github/workflows/x_daily_post.yml",
+    "src/lib/x_daily_job.js"
+  ],
+  "expected_file_count": 2,
+  "allow_add": true,
+  "allow_modify": false,
+  "allow_delete": false,
+  "allow_rename": false,
+  "commit_subject": "docs(governance): add X0 prototype planning and real IO authorization",
+  "version_assignment": "none",
+  "tag_policy": "none",
+  "push_policy": "main_only",
+  "quality_required": true,
+  "catalog_required": true,
+  "governance_checks": [
+    "no_endpoint_approval",
+    "no_automatic_publishing"
+  ],
+  "provider_authorization": "x-real-provider-prototype-scope",
+  "endpoint_approval": "POST /2/tweets",
+  "external_io": "authorized-kill-switch-gated",
+  "real_provider": "authorized-prototype-scope",
+  "automatic_publishing": "prohibited",
+  "force_push": "prohibited",
+  "report_format": ["markdown", "json"],
+  "_planning_notes": {
+    "stage": "X0 — Prototype Planning",
+    "scope": "Planning document only. No implementation. X1 ADR required before implementation.",
+    "real_provider_authorization": "X only; POST /2/tweets only; OAuth 1.0a; kill-switch gated",
+    "preserved": [
+      "P2B+ Gateway/Resolver/Fake Adapter",
+      "P3A Approval Record Spec",
+      "P3-ImplAuth granted",
+      "Quality 1232 PASS",
+      "Catalog baseline"
+    ],
+    "next_step": "X1 ADR + Real Provider Adapter implementation"
+  }
+}
