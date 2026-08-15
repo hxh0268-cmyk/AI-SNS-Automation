@@ -8,7 +8,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/butatohitsujitohaiboru/AI-SNS-Automation/scripts/run_daily.sh</string>
+		<string>/Users/butatohitsujitohaiboru/AI-SNS-Automation/scripts/run_x_daily.sh</string>
 	</array>
 
 	<key>WorkingDirectory</key>
@@ -20,9 +20,9 @@
 	<key>StartCalendarInterval</key>
 	<dict>
 		<key>Hour</key>
-		<integer>9</integer>
+		<integer>8</integer>
 		<key>Minute</key>
-		<integer>0</integer>
+		<integer>8</integer>
 	</dict>
 
 	<key>StandardOutPath</key>

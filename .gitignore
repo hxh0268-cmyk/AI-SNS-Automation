@@ -18,3 +18,5 @@ output/image-generation/
 output/publishing/
 output/analytics/
 output/continuous-improvement/
+tmp/publish-records/
+tmp/smoke/
