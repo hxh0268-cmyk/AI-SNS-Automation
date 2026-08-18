@@ -14254,6 +14254,8 @@ const authorizedImplementationPaths = new Set([
   "src/lib/x_real_provider_adapter.js",
   "src/lib/x_oauth_client.js",
   "src/lib/x_credential_loader.js",
+  // X3-B Daily Publish Job (authorized — X3 Planning; FC-1 resolved; idempotency + Stage 1 content)
+  "src/lib/daily_publish_job.js",
 ]);
 
 const candidatePaths = [...new Set([...listAddedPaths(), ...listUntrackedPaths()])]
@@ -22247,3 +22249,35 @@ else
 fi
 
 echo "== x1 real provider auxiliary verification complete =="
+
+echo "== x3-b daily publish job auxiliary verification =="
+
+_x3b_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_x3b_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$PROJECT_ROOT/src/lib/daily_publish_job.js" ] \
+  && _x3b_aux_pass "daily_publish_job.js exists" \
+  || _x3b_aux_fail "daily_publish_job.js not found"
+
+[ -f "$PROJECT_ROOT/content/scheduled/daily_fixed.txt" ] \
+  && _x3b_aux_pass "content/scheduled/daily_fixed.txt exists" \
+  || _x3b_aux_fail "content/scheduled/daily_fixed.txt not found"
+
+[ -f "$SCRIPT_DIR/test_daily_job.sh" ] \
+  && _x3b_aux_pass "test_daily_job.sh exists" \
+  || _x3b_aux_fail "test_daily_job.sh not found"
+
+[ -f "$PROJECT_ROOT/config/delivery/x3b_daily_job_manifest.json" ] \
+  && _x3b_aux_pass "x3b_daily_job_manifest.json exists" \
+  || _x3b_aux_fail "x3b_daily_job_manifest.json not found"
+
+_x3b_test_out="$(bash "$SCRIPT_DIR/test_daily_job.sh" 2>&1)" && _x3b_test_ok=0 || _x3b_test_ok=$?
+if [[ "$_x3b_test_ok" -eq 0 ]]; then
+  _x3b_pass_count="$(printf '%s\n' "$_x3b_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _x3b_aux_pass "X3-B daily job tests passed ($_x3b_pass_count checks)"
+else
+  printf '%s\n' "$_x3b_test_out" >&2
+  _x3b_aux_fail "X3-B daily job tests failed"
+fi
+
+echo "== x3-b daily publish job auxiliary verification complete =="

@@ -1,0 +1,29 @@
+{
+  "phase": "X3-B",
+  "name": "Daily Publish Job Identity / Idempotency",
+  "description": "Daily job implementation: JST date authority (FC-1 fix), file-backed idempotency, crash guard, Stage 1 content, safe diagnostic record.",
+  "status": "implemented",
+  "authorizedBy": "X3 Planning A.GO",
+  "files": {
+    "new": [
+      "src/lib/daily_publish_job.js",
+      "content/scheduled/daily_fixed.txt",
+      "scripts/test_daily_job.sh",
+      "config/delivery/x3b_daily_job_manifest.json"
+    ],
+    "modified": [
+      "scripts/test_quality_pipeline.sh"
+    ]
+  },
+  "fc1Resolution": "resolved — jstDate parameter uses Asia/Tokyo authority passed from run_x_daily.sh; jobId = daily-{jstDate}",
+  "contentSource": "Stage 1 — content/scheduled/daily_fixed.txt (fixed approved text)",
+  "idempotency": {
+    "published": "SKIP",
+    "unknown_result": "QUARANTINE",
+    "in_progress": "BLOCK (real mode only)",
+    "failed": "ALLOW retry",
+    "not_found": "PROCEED"
+  },
+  "scheduledPublishingActivation": "OFF — SCHEDULED_PUBLISH_ENABLED not set; requires explicit Human Approval Gate",
+  "scheduledTime": "08:08 JST / Asia/Tokyo"
+}
