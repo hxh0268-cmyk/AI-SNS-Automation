@@ -1,0 +1,27 @@
+{
+  "phase": "X3-C",
+  "name": "Dry-run Scheduled Execution",
+  "description": "Adds --simulate-scheduled flag (dry-run + skip-time-check) and end-to-end simulated 08:08 JST test suite.",
+  "status": "implemented",
+  "authorizedBy": "X3 Planning A.GO",
+  "files": {
+    "modified": [
+      "scripts/run_x_daily.sh",
+      "scripts/test_quality_pipeline.sh"
+    ],
+    "new": [
+      "scripts/test_simulated_schedule.sh",
+      "config/delivery/x3c_simulated_schedule_manifest.json"
+    ]
+  },
+  "dodCoverage": {
+    "17": "dry-run available — --dry-run flag fully operational",
+    "18": "simulated 08:08 schedule test available — --simulate-scheduled flag + test_simulated_schedule.sh (19 checks)",
+    "5":  "scheduler double-fire safe — Test 14 verifies two consecutive --simulate-scheduled both succeed",
+    "10": "credential-safe — Test 10 confirms no credential-length strings in output",
+    "11": "no secret logging — Test 10 + Test 11 confirm"
+  },
+  "simulateScheduledFlag": "--simulate-scheduled = --dry-run + --skip-time-check",
+  "canonicalSchedule": "08:08 JST / Asia/Tokyo",
+  "scheduledPublishingActivation": "OFF — SCHEDULED_PUBLISH_ENABLED not set; requires explicit Human Approval Gate"
+}

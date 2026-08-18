@@ -22281,3 +22281,31 @@ else
 fi
 
 echo "== x3-b daily publish job auxiliary verification complete =="
+
+echo "== x3-c simulated scheduled execution auxiliary verification =="
+
+_x3c_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_x3c_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$SCRIPT_DIR/test_simulated_schedule.sh" ] \
+  && _x3c_aux_pass "test_simulated_schedule.sh exists" \
+  || _x3c_aux_fail "test_simulated_schedule.sh not found"
+
+[ -f "$PROJECT_ROOT/config/delivery/x3c_simulated_schedule_manifest.json" ] \
+  && _x3c_aux_pass "x3c_simulated_schedule_manifest.json exists" \
+  || _x3c_aux_fail "x3c_simulated_schedule_manifest.json not found"
+
+grep -q '\-\-simulate-scheduled' "$SCRIPT_DIR/run_x_daily.sh" \
+  && _x3c_aux_pass "run_x_daily.sh has --simulate-scheduled flag" \
+  || _x3c_aux_fail "--simulate-scheduled flag missing from run_x_daily.sh"
+
+_x3c_test_out="$(bash "$SCRIPT_DIR/test_simulated_schedule.sh" 2>&1)" && _x3c_test_ok=0 || _x3c_test_ok=$?
+if [[ "$_x3c_test_ok" -eq 0 ]]; then
+  _x3c_pass_count="$(printf '%s\n' "$_x3c_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _x3c_aux_pass "X3-C simulated schedule tests passed ($_x3c_pass_count checks)"
+else
+  printf '%s\n' "$_x3c_test_out" >&2
+  _x3c_aux_fail "X3-C simulated schedule tests failed"
+fi
+
+echo "== x3-c simulated scheduled execution auxiliary verification complete =="

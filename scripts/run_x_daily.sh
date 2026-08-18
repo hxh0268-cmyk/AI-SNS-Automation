@@ -10,6 +10,7 @@
 #   ./scripts/run_x_daily.sh --dry-run                Preview: zero network; guards informational
 #   ./scripts/run_x_daily.sh --dry-run --skip-time-check
 #                                                     Test: bypass grace window for simulation
+#   ./scripts/run_x_daily.sh --simulate-scheduled     X3-C: dry-run + skip time check combined
 #
 # Separation from scripts/run_daily.sh:
 #   run_daily.sh   — existing Instagram/carousel pipeline (unrelated workstream)
@@ -48,11 +49,12 @@ SKIP_TIME_CHECK=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --dry-run)         DRY_RUN=true;         shift ;;
-    --skip-time-check) SKIP_TIME_CHECK=true; shift ;;
+    --dry-run)            DRY_RUN=true;                        shift ;;
+    --skip-time-check)    SKIP_TIME_CHECK=true;               shift ;;
+    --simulate-scheduled) DRY_RUN=true; SKIP_TIME_CHECK=true; shift ;;
     *)
       echo "[ERROR] Unknown argument: $1" >&2
-      echo "Usage: $0 [--dry-run] [--skip-time-check]" >&2
+      echo "Usage: $0 [--dry-run] [--skip-time-check] [--simulate-scheduled]" >&2
       exit 1
       ;;
   esac
