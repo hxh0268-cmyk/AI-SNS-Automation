@@ -22333,3 +22333,30 @@ else
 fi
 
 echo "== x3-d failure / missed-run / restart handling auxiliary verification complete =="
+
+echo "== x4-scheduler auxiliary verification =="
+
+_x4_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_x4_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" ] \
+  && _x4_aux_pass "x_daily_post.yml exists" \
+  || _x4_aux_fail "x_daily_post.yml not found"
+
+[ -f "$PROJECT_ROOT/docs/adr/ADR-0026-scheduled-publishing-activation-authorization.md" ] \
+  && _x4_aux_pass "ADR-0026 exists" \
+  || _x4_aux_fail "ADR-0026 not found"
+
+grep -q '8 23 \* \* \*' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _x4_aux_pass "x_daily_post.yml has cron 8 23 * * * (08:08 JST)" \
+  || _x4_aux_fail "x_daily_post.yml missing cron 8 23 * * *"
+
+grep -q 'cancel-in-progress: false' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _x4_aux_pass "x_daily_post.yml has cancel-in-progress: false" \
+  || _x4_aux_fail "x_daily_post.yml missing cancel-in-progress: false"
+
+grep -q 'run_x_daily.sh' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _x4_aux_pass "x_daily_post.yml delegates to run_x_daily.sh" \
+  || _x4_aux_fail "x_daily_post.yml does not call run_x_daily.sh"
+
+echo "== x4-scheduler auxiliary verification complete =="

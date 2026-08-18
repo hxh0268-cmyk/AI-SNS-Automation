@@ -1,0 +1,42 @@
+{
+  "phase": "X4",
+  "name": "GitHub Actions Scheduler + Scheduled Publishing Activation Governance",
+  "description": "GitHub Actions cron workflow (08:08 JST) and ADR-0026 Scheduled Publishing Activation authorization. DoD-04 Stage 1 Gate and DoD-11 GitHub Actions satisfied.",
+  "status": "implemented",
+  "authorizedBy": "ADR-0026",
+  "files": {
+    "new": [
+      ".github/workflows/x_daily_post.yml",
+      "docs/adr/ADR-0026-scheduled-publishing-activation-authorization.md",
+      "config/delivery/x4_impl_manifest.json"
+    ],
+    "modified": [
+      "scripts/test_quality_pipeline.sh"
+    ]
+  },
+  "schedulerSpec": {
+    "cron": "8 23 * * *",
+    "utc": "23:08 UTC",
+    "jst": "08:08 JST",
+    "gracWindowJst": "08:08–08:38",
+    "entryPoint": "scripts/run_x_daily.sh",
+    "concurrencyGroup": "x-daily-post",
+    "cancelInProgress": false
+  },
+  "activationGate": {
+    "dod04": "Stage 1 Gate — SCHEDULED_PUBLISH_ENABLED=true is the Human Approval Gate; content/scheduled/daily_fixed.txt commit = content pre-approved",
+    "dod11": "GitHub Actions cron 8 23 * * * (23:08 UTC = 08:08 JST); workflow_dispatch for testing",
+    "workflowDispatchInputs": ["dry_run", "skip_time_check"]
+  },
+  "secretsRequired": [
+    "X_API_KEY",
+    "X_API_SECRET",
+    "X_ACCESS_TOKEN",
+    "X_ACCESS_TOKEN_SECRET",
+    "REAL_PUBLISH_ENABLED",
+    "SCHEDULED_PUBLISH_ENABLED"
+  ],
+  "defaultsOff": "REAL_PUBLISH_ENABLED=false, SCHEDULED_PUBLISH_ENABLED=false — production activation is X5 Human Approval Gate step",
+  "scheduledPublishingActivation": "OFF — requires explicit Human Approval (ADR-0026 §4.2); X5 activation step",
+  "canonicalSchedule": "08:08 JST / Asia/Tokyo"
+}

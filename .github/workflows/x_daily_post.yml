@@ -1,0 +1,52 @@
+name: X Daily Post
+
+on:
+  schedule:
+    - cron: "8 23 * * *"    # 23:08 UTC = 08:08 JST (+9)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "dry-run mode (no real publish)"
+        type: boolean
+        default: true
+      skip_time_check:
+        description: "bypass grace window check (testing only)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: x-daily-post
+  cancel-in-progress: false  # never cancel a post already in flight
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run X Daily Post
+        run: |
+          ARGS=""
+          if [[ "${{ github.event.inputs.dry_run || 'false' }}" == "true" ]]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [[ "${{ github.event.inputs.skip_time_check || 'false' }}" == "true" ]]; then
+            ARGS="$ARGS --skip-time-check"
+          fi
+          bash scripts/run_x_daily.sh $ARGS
+        env:
+          X_API_KEY:                 ${{ secrets.X_API_KEY }}
+          X_API_SECRET:              ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN:            ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET:     ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          REAL_PUBLISH_ENABLED:      ${{ secrets.REAL_PUBLISH_ENABLED }}
+          SCHEDULED_PUBLISH_ENABLED: ${{ secrets.SCHEDULED_PUBLISH_ENABLED }}
