@@ -22309,3 +22309,27 @@ else
 fi
 
 echo "== x3-c simulated scheduled execution auxiliary verification complete =="
+
+echo "== x3-d failure / missed-run / restart handling auxiliary verification =="
+
+_x3d_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_x3d_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+[ -f "$SCRIPT_DIR/test_failure_handling.sh" ] \
+  && _x3d_aux_pass "test_failure_handling.sh exists" \
+  || _x3d_aux_fail "test_failure_handling.sh not found"
+
+[ -f "$PROJECT_ROOT/config/delivery/x3d_failure_handling_manifest.json" ] \
+  && _x3d_aux_pass "x3d_failure_handling_manifest.json exists" \
+  || _x3d_aux_fail "x3d_failure_handling_manifest.json not found"
+
+_x3d_test_out="$(bash "$SCRIPT_DIR/test_failure_handling.sh" 2>&1)" && _x3d_test_ok=0 || _x3d_test_ok=$?
+if [[ "$_x3d_test_ok" -eq 0 ]]; then
+  _x3d_pass_count="$(printf '%s\n' "$_x3d_test_out" | grep -c '^\[PASS\]' 2>/dev/null || echo 0)"
+  _x3d_aux_pass "X3-D failure handling tests passed ($_x3d_pass_count checks)"
+else
+  printf '%s\n' "$_x3d_test_out" >&2
+  _x3d_aux_fail "X3-D failure handling tests failed"
+fi
+
+echo "== x3-d failure / missed-run / restart handling auxiliary verification complete =="

@@ -11,6 +11,8 @@
 #   ./scripts/run_x_daily.sh --dry-run --skip-time-check
 #                                                     Test: bypass grace window for simulation
 #   ./scripts/run_x_daily.sh --simulate-scheduled     X3-C: dry-run + skip time check combined
+#   ./scripts/run_x_daily.sh --simulate-scheduled --jst-date YYYY-MM-DD
+#                                                     X3-D: test isolation — synthetic date (dry-run only)
 #
 # Separation from scripts/run_daily.sh:
 #   run_daily.sh   — existing Instagram/carousel pipeline (unrelated workstream)
@@ -46,15 +48,24 @@ readonly LOG_DIR="${PROJECT_ROOT}/logs"
 # ── Argument parsing ───────────────────────────────────────────────────────────
 DRY_RUN=false
 SKIP_TIME_CHECK=false
+_JST_DATE_OVERRIDE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run)            DRY_RUN=true;                        shift ;;
     --skip-time-check)    SKIP_TIME_CHECK=true;               shift ;;
     --simulate-scheduled) DRY_RUN=true; SKIP_TIME_CHECK=true; shift ;;
+    --jst-date)
+      if [[ $# -lt 2 ]]; then
+        echo "[ERROR] --jst-date requires a YYYY-MM-DD argument" >&2; exit 1
+      fi
+      if [[ -z "$2" ]]; then
+        echo "[ERROR] --jst-date value must not be empty" >&2; exit 1
+      fi
+      _JST_DATE_OVERRIDE="$2"; shift 2 ;;
     *)
       echo "[ERROR] Unknown argument: $1" >&2
-      echo "Usage: $0 [--dry-run] [--skip-time-check] [--simulate-scheduled]" >&2
+      echo "Usage: $0 [--dry-run] [--skip-time-check] [--simulate-scheduled] [--jst-date YYYY-MM-DD]" >&2
       exit 1
       ;;
   esac
@@ -117,6 +128,20 @@ JST_DATE="$(TZ="${CANONICAL_TZ}" date '+%Y-%m-%d')"
 JST_TIME="$(TZ="${CANONICAL_TZ}" date '+%H:%M')"
 JST_HH_RAW="$(TZ="${CANONICAL_TZ}" date '+%H')"
 JST_MM_RAW="$(TZ="${CANONICAL_TZ}" date '+%M')"
+
+# --jst-date override: deterministic test isolation only (dry-run safety guard enforced below)
+if [[ -n "${_JST_DATE_OVERRIDE}" ]]; then
+  if [[ "${DRY_RUN}" != "true" ]]; then
+    log "FATAL" "--jst-date requires --dry-run — not for production use"
+    exit 1
+  fi
+  if [[ ! "${_JST_DATE_OVERRIDE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    log "ERROR" "--jst-date value '${_JST_DATE_OVERRIDE}' is not YYYY-MM-DD"
+    exit 1
+  fi
+  log "INFO" "[DRY-RUN] JST date overridden for test isolation: ${_JST_DATE_OVERRIDE} (real: ${JST_DATE})"
+  JST_DATE="${_JST_DATE_OVERRIDE}"
+fi
 
 log "INFO" "JST current: ${JST_DATE}T${JST_TIME} JST (host TZ independent)"
 

@@ -1,0 +1,37 @@
+{
+  "phase": "X3-D",
+  "name": "Failure / Missed-run / Restart Handling",
+  "description": "Comprehensive test coverage for all failure/missed-run/restart scenarios. No new implementation code required — X3-A/B already handles all failure categories.",
+  "status": "implemented",
+  "authorizedBy": "X3 Planning A.GO",
+  "files": {
+    "new": [
+      "scripts/test_failure_handling.sh",
+      "config/delivery/x3d_failure_handling_manifest.json"
+    ],
+    "modified": [
+      "scripts/test_quality_pipeline.sh",
+      "scripts/run_x_daily.sh",
+      "scripts/test_simulated_schedule.sh"
+    ]
+  },
+  "coverageMatrix": {
+    "grace_window_exceeded_SKIP":      "Test 1-1/1-2: --dry-run outside 08:08–08:38 → SKIP exit 0",
+    "grace_window_arithmetic":         "Test 1-3: 08:07/08:08/08:38/08:39/00:00/14:00 boundary values",
+    "SCHEDULED_PUBLISH_ENABLED_guard": "Test 2-1/2-3: not set → BLOCKED exit 1",
+    "REAL_PUBLISH_ENABLED_guard":      "Test 2-2: code inspection confirms fail-closed guard",
+    "credential_fail_closed":          "Test 2-4/2-5: guard in source + xCredentialsAvailable=false",
+    "unknown_result_QUARANTINE":       "Test 3-2/3-9: UNKNOWN_RESULT_QUARANTINE exitCode 2; auto-retry blocked",
+    "in_progress_BLOCK_real":          "Test 3-3: crash guard blocks real-mode re-entry",
+    "in_progress_dry_run_OK":          "Test 3-4: dry-run can proceed over in_progress (re-runnable)",
+    "published_SKIP":                  "Test 3-5: ALREADY_PUBLISHED exitCode 0; xPostId returned",
+    "failed_ALLOW_retry":              "Test 3-6: failed state → proceeds to DRY_RUN_SUCCESS",
+    "content_missing_fail_closed":     "Test 3-7: CONTENT_FILE_MISSING exitCode 1",
+    "invalid_jstDate_rejected":        "Test 3-8: 6 invalid formats → INVALID_JST_DATE",
+    "test_isolation_from_prod_ledger": "--jst-date 2099-01-15 (dry-run only guard); X3-C DRY-RUN SUCCESS tests isolated from real ledger",
+    "ALREADY_PUBLISHED_regression":    "X3-C Test 17: synthetic fixture 2099-01-16 → ALREADY_PUBLISHED exit 0; trap EXIT cleanup (M-2 resolved)",
+    "jst_date_validation_regression":  "X3-C Tests 18-21: empty/bad-format/no-dry-run → rejected; valid+dry-run → success (M-1 resolved)"
+  },
+  "scheduledPublishingActivation": "OFF — SCHEDULED_PUBLISH_ENABLED not set; requires explicit Human Approval Gate",
+  "canonicalSchedule": "08:08 JST / Asia/Tokyo"
+}
