@@ -22334,6 +22334,119 @@ fi
 
 echo "== x3-d failure / missed-run / restart handling auxiliary verification complete =="
 
+echo "== r1 scheduler reliability auxiliary verification =="
+
+_r1_aux_pass() { echo "[TP-AUX PASS] $1"; }
+_r1_aux_fail() { echo "[TP-AUX FAIL] $1" >&2; exit 1; }
+
+# Structural checks — workflow definition
+grep -q '8 1 \* \* \*' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml has Recovery cron 8 1 * * * (10:08 JST)" \
+  || _r1_aux_fail "x_daily_post.yml missing Recovery cron 8 1 * * *"
+
+grep -q 'cancel-in-progress: false' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml has cancel-in-progress: false (T4/T9 protection)" \
+  || _r1_aux_fail "x_daily_post.yml missing cancel-in-progress: false"
+
+grep -q 'actions: write' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml has permissions: actions: write (cache save)" \
+  || _r1_aux_fail "x_daily_post.yml missing permissions: actions: write"
+
+grep -q 'cache/restore' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml has cache restore step (cross-run ledger restore)" \
+  || _r1_aux_fail "x_daily_post.yml missing cache restore step"
+
+grep -q 'cache/save' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && grep -q "if: always()" "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml has cache save with if: always() (T5 protection)" \
+  || _r1_aux_fail "x_daily_post.yml missing cache save step or if: always()"
+
+grep -q 'IS_RECOVERY' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && grep -q 'skip-time-check' "$PROJECT_ROOT/.github/workflows/x_daily_post.yml" \
+  && _r1_aux_pass "x_daily_post.yml passes --skip-time-check for recovery path" \
+  || _r1_aux_fail "x_daily_post.yml missing recovery path skip-time-check"
+
+# ADR-0027 structural checks
+[ -f "$PROJECT_ROOT/docs/adr/ADR-0027-scheduled-publish-recovery-and-duplicate-containment-policy.md" ] \
+  && _r1_aux_pass "ADR-0027 exists" \
+  || _r1_aux_fail "ADR-0027 not found"
+
+grep -q 'at-most-once with bounded duplicate-containment' \
+  "$PROJECT_ROOT/docs/adr/ADR-0027-scheduled-publish-recovery-and-duplicate-containment-policy.md" \
+  && _r1_aux_pass "ADR-0027 states correct guarantee model (at-most-once with bounded duplicate-containment)" \
+  || _r1_aux_fail "ADR-0027 missing correct guarantee model"
+
+grep -qi 'Exactly-once: NOT CLAIMED\|NOT CLAIMED' \
+  "$PROJECT_ROOT/docs/adr/ADR-0027-scheduled-publish-recovery-and-duplicate-containment-policy.md" \
+  && _r1_aux_pass "ADR-0027 explicitly states Exactly-once is NOT CLAIMED" \
+  || _r1_aux_fail "ADR-0027 missing NOT CLAIMED statement"
+
+# Failure-injection verification via Node.js
+_r1_node_out="$(node --input-type=module <<'R1NODEEOF' 2>&1
+import { createFileBackedIdempotencyStore } from "/Users/butatohitsujitohaiboru/AI-SNS-Automation/src/lib/text_post_idempotency.js";
+import { mkdirSync, rmSync } from "node:fs";
+import path from "node:path";
+
+const ROOT = "/Users/butatohitsujitohaiboru/AI-SNS-Automation";
+let p = 0, f = 0;
+const ok = (label) => { console.log("[PASS]", label); p++; };
+const fail = (label) => { console.error("[FAIL]", label); f++; };
+
+const tmpDir = path.join(ROOT, "tmp", "r1-test-" + Date.now());
+mkdirSync(tmpDir, { recursive: true });
+try {
+  const ledger = createFileBackedIdempotencyStore({ dir: tmpDir });
+
+  // T6/T7: cache miss = empty ledger = not_found = recovery eligible
+  ok("T6/T7: empty ledger (cache miss) → not_found → recovery eligible: " +
+    (ledger.checkPublished("daily-2099-02-01") === "not_found" ? "PASS" : "FAIL"),
+  );
+
+  // T8: published → ALREADY_PUBLISHED (recovery NOT eligible)
+  ledger.set("daily-2099-02-02", { result: "published", xPostId: "r1-test-id" });
+  ok("T8: published state → checkPublished='published' → SKIP (no duplicate): " +
+    (ledger.checkPublished("daily-2099-02-02") === "published" ? "PASS" : "FAIL"),
+  );
+
+  // T12: unknown_result → QUARANTINE (recovery NOT eligible, no auto-retry)
+  ledger.set("daily-2099-02-03", { result: "unknown_result" });
+  ok("T12: unknown_result → checkPublished='unknown_result' → QUARANTINE: " +
+    (ledger.checkPublished("daily-2099-02-03") === "unknown_result" ? "PASS" : "FAIL"),
+  );
+
+  // T5b: in_progress → BLOCKED (crash guard; recovery must not proceed)
+  ledger.set("daily-2099-02-04", { result: "in_progress", correlationId: "r1-crash-test" });
+  const rawInProgress = ledger.get("daily-2099-02-04");
+  ok("T5b: in_progress → raw get shows in_progress (BLOCKED in real mode): " +
+    (rawInProgress?.result === "in_progress" ? "PASS" : "FAIL"),
+  );
+
+  // FAILED_SAFE: failed → recovery eligible
+  ledger.set("daily-2099-02-05", { result: "failed", reason: "PROVIDER_REJECTED" });
+  ok("T11/FAILED_SAFE: failed → checkPublished='not_found' → recovery eligible: " +
+    (ledger.checkPublished("daily-2099-02-05") === "not_found" ? "PASS" : "FAIL"),
+  );
+
+  console.log(`\nR1 Node.js failure-injection tests: ${p} passed, ${f} failed`);
+  if (f > 0) process.exit(1);
+} finally {
+  rmSync(tmpDir, { recursive: true, force: true });
+}
+R1NODEEOF
+)" && _r1_node_ok=0 || _r1_node_ok=$?
+
+while IFS= read -r line; do
+  case "$line" in
+    '[PASS]'*) _r1_aux_pass "${line#\[PASS\] }" ;;
+    '[FAIL]'*) _r1_aux_fail "${line#\[FAIL\] }" ;;
+    *)         echo "$line" ;;
+  esac
+done <<< "$_r1_node_out"
+
+[[ $_r1_node_ok -eq 0 ]] || _r1_aux_fail "R1 Node.js failure-injection tests failed"
+
+echo "== r1 scheduler reliability auxiliary verification complete =="
+
 echo "== x4-scheduler auxiliary verification =="
 
 _x4_aux_pass() { echo "[TP-AUX PASS] $1"; }

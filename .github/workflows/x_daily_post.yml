@@ -2,7 +2,8 @@ name: X Daily Post
 
 on:
   schedule:
-    - cron: "8 23 * * *"    # 23:08 UTC = 08:08 JST (+9)
+    - cron: "8 23 * * *"    # 23:08 UTC = 08:08 JST (+9) — Primary
+    - cron: "8 1 * * *"     # 01:08 UTC = 10:08 JST (+9) — Recovery (ADR-0027)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -11,6 +12,10 @@ on:
         default: true
       skip_time_check:
         description: "bypass grace window check (testing only)"
+        type: boolean
+        default: false
+      force_recovery:
+        description: "treat as recovery run — skip grace window, check ledger state first"
         type: boolean
         default: false
 
@@ -23,8 +28,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: write    # required for actions/cache/save (ADR-0027 §19)
     steps:
       - uses: actions/checkout@v4
+
+      - name: Compute JST date for ledger cache key
+        id: jst
+        run: echo "date=$(TZ=Asia/Tokyo date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore publish ledger cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/publish-records
+          key: publish-ledger-${{ steps.jst.outputs.date }}-${{ github.run_id }}
+          restore-keys: |
+            publish-ledger-${{ steps.jst.outputs.date }}-
 
       - uses: actions/setup-node@v4
         with:
@@ -36,10 +55,10 @@ jobs:
       - name: Run X Daily Post
         run: |
           ARGS=""
-          if [[ "${{ github.event.inputs.dry_run || 'false' }}" == "true" ]]; then
+          if [[ "$DRY_RUN" == "true" ]]; then
             ARGS="$ARGS --dry-run"
           fi
-          if [[ "${{ github.event.inputs.skip_time_check || 'false' }}" == "true" ]]; then
+          if [[ "$SKIP_TIME_CHECK" == "true" ]] || [[ "$IS_RECOVERY" == "true" ]]; then
             ARGS="$ARGS --skip-time-check"
           fi
           bash scripts/run_x_daily.sh $ARGS
@@ -50,3 +69,13 @@ jobs:
           X_ACCESS_TOKEN_SECRET:     ${{ secrets.X_ACCESS_TOKEN_SECRET }}
           REAL_PUBLISH_ENABLED:      ${{ secrets.REAL_PUBLISH_ENABLED }}
           SCHEDULED_PUBLISH_ENABLED: ${{ secrets.SCHEDULED_PUBLISH_ENABLED }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          SKIP_TIME_CHECK: ${{ github.event.inputs.skip_time_check || 'false' }}
+          IS_RECOVERY: ${{ (github.event.schedule == '8 1 * * *') || (github.event.inputs.force_recovery == 'true') }}
+
+      - name: Save publish ledger cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/publish-records
+          key: publish-ledger-${{ steps.jst.outputs.date }}-${{ github.run_id }}

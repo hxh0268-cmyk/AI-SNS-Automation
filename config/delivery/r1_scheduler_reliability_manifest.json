@@ -1,0 +1,47 @@
+{
+  "phase": "R1",
+  "name": "Scheduler Reliability — Recovery Cron + Persistent Cache Ledger",
+  "description": "ADR-0027 implementation: dual-cron (primary 08:08 JST + recovery 10:08 JST), GitHub Actions Cache persistent ledger with dual-stage upload (if:always()), and actions:write permission for cross-runner idempotency.",
+  "status": "implemented",
+  "authorizedBy": "ADR-0027",
+  "humanApproval": "2026-08-27",
+  "files": {
+    "new": [
+      "docs/adr/ADR-0027-scheduled-publish-recovery-and-duplicate-containment-policy.md",
+      "config/delivery/r1_scheduler_reliability_manifest.json"
+    ],
+    "modified": [
+      ".github/workflows/x_daily_post.yml",
+      "scripts/test_quality_pipeline.sh"
+    ]
+  },
+  "schedulerChanges": {
+    "primaryCron": "8 23 * * *",
+    "primaryTime": "08:08 JST (23:08 UTC)",
+    "recoveryCron": "8 1 * * *",
+    "recoveryTime": "10:08 JST (01:08 UTC)",
+    "recoveryGrace": "SKIP (ledger state authority, not clock)",
+    "recoveryDetection": "github.event.schedule == '8 1 * * *' OR force_recovery == true"
+  },
+  "persistenceChanges": {
+    "cacheKey": "publish-ledger-{jstDate}-{runId}",
+    "cacheRestoreKeys": "publish-ledger-{jstDate}-",
+    "cacheUploadCondition": "if: always()",
+    "cachePermission": "actions: write",
+    "cacheType": "GitHub Actions Cache (best-effort, 7-day TTL, ACID non-compliant)"
+  },
+  "concurrency": {
+    "group": "x-daily-post",
+    "cancelInProgress": false
+  },
+  "guaranteeModel": "at-most-once with bounded duplicate-containment, and at-least-once via dual-cron redundancy",
+  "exactlyOnceClaimed": false,
+  "unknownResultAutoRetry": false,
+  "residualRisks": {
+    "T3": "dual-miss (~2-14%/day) — Phase 2: External Scheduler",
+    "T5": "early crash before in_progress upload (very low) — irreducible",
+    "T7": "same-day cache eviction (very low) — Phase 2: Artifact escalation"
+  },
+  "canonicalSchedule": "08:08 JST / Asia/Tokyo",
+  "recoverySchedule": "10:08 JST / Asia/Tokyo"
+}
