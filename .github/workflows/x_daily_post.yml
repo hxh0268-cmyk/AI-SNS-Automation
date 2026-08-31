@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore publish ledger cache
         id: cache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: tmp/publish-records
           key: publish-ledger-${{ steps.jst.outputs.date }}-${{ github.run_id }}
@@ -75,7 +75,7 @@ jobs:
 
       - name: Save publish ledger cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: tmp/publish-records
           key: publish-ledger-${{ steps.jst.outputs.date }}-${{ github.run_id }}
